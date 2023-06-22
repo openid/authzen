@@ -139,7 +139,7 @@ Tulshibagwale                Standards Track                    [Page 2]
    arbitrary string.  The following non-normative example describes this
    header:
 
-   POST /access/v1/evaluations HTTP 1.1
+   POST /access/v1/evaluations HTTP/1.1
    Authorization: Bearer mF_9.B5f-4.1JqM
    X-Request-Id: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
@@ -155,12 +155,12 @@ Tulshibagwale                Standards Track                    [Page 2]
    A Principal is a JSON ([RFC8259]) object that has the following
    fields:
 
-   id:  REQUIRED, A field, whose value is of type string, which uniquely
-      identifies the user.  This identifier could be an email address,
-      or it might be an internal identifier such as a UUID or employee
-      ID.
+   id:  REQUIRED.  A field, whose value is of type string, which
+      uniquely identifies the user.  This identifier could be an email
+      address, or it might be an internal identifier such as a UUID or
+      employee ID.
 
-   ipAddress:  OPTIONAL, A field, whose value is of type string, which
+   ipAddress:  OPTIONAL.  A field, whose value is of type string, which
       is a [RFC4001] text representation of the IP Address
 
 
@@ -170,7 +170,7 @@ Tulshibagwale                Standards Track                    [Page 3]
                                   azapi                        June 2023
 
 
-   deviceId:  OPTIONAL, A field, whose value is of type string, which
+   deviceId:  OPTIONAL.  A field, whose value is of type string, which
       uniquely identifies the device of the Principal
 
    The following non-normative example describes a Principal:
@@ -188,13 +188,13 @@ Tulshibagwale                Standards Track                    [Page 3]
    An Asset is the target of an access request.  It is a JSON
    ([RFC8259]) object that has the following fields:
 
-   id:  REQUIRED, the asset Id of the asset.  It's value is a string
+   id:  REQUIRED.  The asset Id of the asset.  It's value is a string
       specifying the identifier of the asset
 
-   type:  OPTIONAL, the type of the asset.  It's value is a string that
+   type:  OPTIONAL.  The type of the asset.  It's value is a string that
       specifies the type of the asset
 
-   attributeNames:  OPTIONAL, an array of strings, each string
+   attributeNames:  OPTIONAL.  An array of strings, each string
       representing the name of an attribute of the asset.
 
    The following is a non-normative example of an Asset:
@@ -265,10 +265,10 @@ Tulshibagwale                Standards Track                    [Page 4]
 
    action:  REQUIRED.  The type of access that is to be performed.  Its
       value is a string that describes the action.  This value of this
-      field is as described in the Actions (Section 3.6) section.
+      field is as described in the Actions section (Section 3.6).
 
    asset:  REQUIRED.  The asset about which this query is.  It's format
-      is as described in the Assets (Section 3.5) section
+      is as described in the Assets section (Section 3.5)
 
    The following is a non-normative example of an Asset Query:
 
@@ -293,7 +293,7 @@ Tulshibagwale                Standards Track                    [Page 5]
        }
    }
 
-   {#example-asset-query title="Example Asset Query"}
+                       Figure 4: Example Asset Query
 
 3.8.  Query Decision
 
@@ -311,18 +311,18 @@ Tulshibagwale                Standards Track                    [Page 5]
    decision, represented as a JSON object.  It has the following fields:
 
    action:  OPTIONAL.  The action for which the decision is provided.
-      The format is as described in the Actions (Section 3.6) section
+      The format is as described in the Actions section (Section 3.6)
 
    asset:  OPTIONAL.  The asset for which the decision is provided.  The
-      format is as described in the Assets (Section 3.5) section.  This
+      format is as described in the Assets section (Section 3.5).  This
       asset MAY be greater in scope than described in the Asset Query
       (Section 3.7), i.e. It MAY describe an asset more generally than
       specified in the Asset Query.  However, it MUST NOT be more
       specific than the asset described in the Asset Query.
 
    decision:  REQUIRED.  The decision for the above asset and action.
-      The format is as described in the Query Decision (Section 3.8)
-      section
+      The format is as described in the Query Decision section
+      (Section 3.8)
 
    The following is a non-normative example of an Asset Query Decision:
 
@@ -346,7 +346,7 @@ Tulshibagwale                Standards Track                    [Page 6]
        "decision": "deny"
    }
 
-   {#example-asset-query-decision title="Example Asset Query Decision"}
+                   Figure 5: Example Asset Query Decision
 
 3.10.  Access Evaluations API
 
@@ -361,11 +361,11 @@ Tulshibagwale                Standards Track                    [Page 6]
    The content of the request body is a JSON Object with the following
    fields:
 
-   principal:  A principal as described in the Principals (Section 3.4)
-      section
+   principal:  A principal as described in the Principals section
+      (Section 3.4)
 
-   queries:  An array of queries defined in Asset Query (Section 3.7)
-      section about access to specific assets
+   queries:  An array of queries defined in Asset Query section
+      (Section 3.7) about access to specific assets
 
    The following is a non-normative example of an Access Evaluation
    Request:
@@ -422,8 +422,7 @@ Tulshibagwale                Standards Track                    [Page 7]
      ]
    }
 
-   {#example-access-evaluation-request title="Example of an Access
-   Evaluation Request"}
+             Figure 6: Example of an Access Evaluation Request
 
 3.10.2.  Access Evaluation Response
 
@@ -439,9 +438,10 @@ Tulshibagwale                Standards Track                    [Page 7]
 
    principal:  REQUIRED.  The principal for which the response is being
       issued.  The format of this field is as described in the
-      Principals (Section 3.4) section
+      Principals section (Section 3.4)
 
    decisions:  REQUIRED.  An array of Asset Query Decisions as described
+      in the Asset Query Decision section (Section 3.9)
 
 
 
@@ -449,8 +449,6 @@ Tulshibagwale                Standards Track                    [Page 8]
 
                                   azapi                        June 2023
 
-
-      in the Asset Query Decision (Section 3.9) section
 
    evaluationDuration:  REQUIRED.  The time in milliseconds, in integer
       format, that it took to respond to the Access Evaluation Request.
@@ -487,8 +485,7 @@ Tulshibagwale                Standards Track                    [Page 8]
      "evaluationDuration": 30
    }
 
-   {#example-access-evaluation-response title="Example of an Access
-   Evaluation Response"}
+             Figure 7: Example of an Access Evaluation Response
 
 3.11.  Search API
 
@@ -497,6 +494,9 @@ Tulshibagwale                Standards Track                    [Page 8]
 
    The Access Search API is available at the relative URL search via the
    POST HTTP method
+
+
+
 
 
 
@@ -525,7 +525,7 @@ Tulshibagwale                Standards Track                    [Page 9]
 
    action:  REQUIRED.  The type of access that is to be performed.  Its
       value is a string that describes the action.  This value of this
-      field is as described in the Actions (Section 3.6) section.
+      field is as described in the Actions section (Section 3.6).
 
    The following is a non-normative example of a Search Request:
 
@@ -537,7 +537,7 @@ Tulshibagwale                Standards Track                    [Page 9]
        "action": "delete",
    }
 
-   {#example-search-request title="Example Access Request"}
+                      Figure 8: Example Access Request
 
 3.11.2.  Search Response
 
@@ -553,7 +553,7 @@ Tulshibagwale                Standards Track                    [Page 9]
 
    principal:  REQUIRED.  The principal for which the response is being
       issued.  The format of this field is as described in the
-      Principals (Section 3.4) section
+      Principals section (Section 3.4)
 
 
 
@@ -563,7 +563,7 @@ Tulshibagwale                Standards Track                   [Page 10]
 
 
    decisions:  REQUIRED.  An array of Asset Query Decisions as described
-      in the Asset Query Decision (Section 3.9) section
+      in the Asset Query Decision section (Section 3.9)
 
    nextPageToken:  OPTIONAL.  A string that MAY be used in a Search
       Request to fetch the next set of responses.
@@ -599,7 +599,7 @@ Tulshibagwale                Standards Track                   [Page 10]
      "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
    }
 
-   {#example-search-response title="Example of an Search Response"}
+                  Figure 9: Example of an Search Response
 
 4.  IANA Considerations
 

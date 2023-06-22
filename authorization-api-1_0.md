@@ -94,7 +94,7 @@ This API SHALL be authenticated using the OAuth 2.0 Bearer access token ({{RFC67
 All requests to the API MUST have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. The request identifier SHALL be provided using the HTTP Header `X-Request-Id`. The value of this header is an arbitrary string. The following non-normative example describes this header:
 
 ~~~ http
-POST /access/v1/evaluations HTTP 1.1
+POST /access/v1/evaluations HTTP/1.1
 Authorization: Bearer mF_9.B5f-4.1JqM
 X-Request-Id: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
@@ -106,13 +106,13 @@ A Principal is the user or robotic principal about whom the Authorization API is
 A Principal is a JSON ({{RFC8259}}) object that has the following fields:
 
 id:
-: REQUIRED, A field, whose value is of type `string`, which uniquely identifies the user. This identifier could be an email address, or it might be an internal identifier such as a UUID or employee ID.
+: REQUIRED. A field, whose value is of type `string`, which uniquely identifies the user. This identifier could be an email address, or it might be an internal identifier such as a UUID or employee ID.
 
 ipAddress:
-: OPTIONAL, A field, whose value is of type `string`, which is a {{RFC4001}} text representation of the IP Address
+: OPTIONAL. A field, whose value is of type `string`, which is a {{RFC4001}} text representation of the IP Address
 
 deviceId:
-: OPTIONAL, A field, whose value is of type `string`, which uniquely identifies the device of the Principal
+: OPTIONAL. A field, whose value is of type `string`, which uniquely identifies the device of the Principal
 
 The following non-normative example describes a Principal:
 
@@ -129,13 +129,13 @@ The following non-normative example describes a Principal:
 An Asset is the target of an access request. It is a JSON ({{RFC8259}}) object that has the following fields:
 
 id:
-: REQUIRED, the asset Id of the asset. It's value is a `string` specifying the identifier of the asset
+: REQUIRED. The asset Id of the asset. It's value is a `string` specifying the identifier of the asset
 
 type:
-: OPTIONAL, the type of the asset. It's value is a `string` that specifies the type of the asset
+: OPTIONAL. The type of the asset. It's value is a `string` that specifies the type of the asset
 
 attributeNames:
-: OPTIONAL, an array of strings, each string representing the name of an attribute of the asset.
+: OPTIONAL. An array of strings, each string representing the name of an attribute of the asset.
 
 The following is a non-normative example of an Asset:
 
@@ -182,10 +182,10 @@ Any action that is not one of the above is a custom action. Policies MAY incorpo
 An Asset Query is a question about whether a principal can access a specific asset. It is a JSON object with the following fields:
 
 action:
-: REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the Actions ({{actions}}) section.
+: REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the Actions section ({{actions}}).
 
 asset:
-: REQUIRED. The asset about which this query is. It's format is as described in the Assets ({{assets}}) section
+: REQUIRED. The asset about which this query is. It's format is as described in the Assets section ({{assets}})
 
 The following is a non-normative example of an Asset Query:
 
@@ -201,7 +201,7 @@ The following is a non-normative example of an Asset Query:
     }
 }
 ~~~
-{#example-asset-query title="Example Asset Query"}
+{: #example-asset-query title="Example Asset Query"}
 
 ## Query Decision {#query-decision}
 A query decision is a JSON `string` which can have one of the following values:
@@ -217,13 +217,13 @@ A query decision is a JSON `string` which can have one of the following values:
 An Asset Query Decision is a tuple of an asset, action and a decision, represented as a JSON object. It has the following fields:
 
 action:
-: OPTIONAL. The action for which the decision is provided. The format is as described in the Actions ({{actions}}) section
+: OPTIONAL. The action for which the decision is provided. The format is as described in the Actions section ({{actions}})
 
 asset:
-: OPTIONAL. The asset for which the decision is provided. The format is as described in the Assets ({{assets}}) section. This asset MAY be greater in scope than described in the Asset Query ({{asset-query}}), i.e. It MAY describe an asset more generally than specified in the Asset Query. However, it MUST NOT be more specific than the asset described in the Asset Query.
+: OPTIONAL. The asset for which the decision is provided. The format is as described in the Assets section ({{assets}}). This asset MAY be greater in scope than described in the Asset Query ({{asset-query}}), i.e. It MAY describe an asset more generally than specified in the Asset Query. However, it MUST NOT be more specific than the asset described in the Asset Query.
 
 decision:
-: REQUIRED. The decision for the above `asset` and `action`. The format is as described in the Query Decision ({{query-decision}}) section
+: REQUIRED. The decision for the above `asset` and `action`. The format is as described in the Query Decision section ({{query-decision}})
 
 The following is a non-normative example of an Asset Query Decision:
 
@@ -236,7 +236,7 @@ The following is a non-normative example of an Asset Query Decision:
     "decision": "deny"
 }
 ~~~
-{#example-asset-query-decision title="Example Asset Query Decision"}
+{: #example-asset-query-decision title="Example Asset Query Decision"}
 
 ## Access Evaluations API
 The access evaluations API is a means for a PEP to request decisions for a number of assets for a single request context.
@@ -247,10 +247,10 @@ The Access Evaluations API is available at the relative URL `evaluations` via th
 The content of the request body is a JSON Object with the following fields:
 
 principal:
-: A principal as described in the Principals ({{principals}}) section
+: A principal as described in the Principals section ({{principals}})
 
 queries:
-: An array of queries defined in Asset Query ({{asset-query}}) section about access to specific assets
+: An array of queries defined in Asset Query section ({{asset-query}}) about access to specific assets
 
 The following is a non-normative example of an Access Evaluation Request:
 
@@ -283,7 +283,7 @@ Authorization: <myoauthtoken>
   ]
 }
 ~~~
-{#example-access-evaluation-request title="Example of an Access Evaluation Request"}
+{: #example-access-evaluation-request title="Example of an Access Evaluation Request"}
 
 ### Access Evaluation Response
 The success response to an Access Evaluation Request is an Access Evaluation Response. It is a HTTP response of type `application/json`. It's body is a JSON object that contains the following fields:
@@ -295,10 +295,10 @@ exp:
 : REQUIRED. The time in `integer` format, expressed at epoch milliseconds, after which the response SHOULD NOT be used
 
 principal:
-: REQUIRED. The principal for which the response is being issued. The format of this field is as described in the Principals ({{principals}}) section
+: REQUIRED. The principal for which the response is being issued. The format of this field is as described in the Principals section ({{principals}})
 
 decisions:
-: REQUIRED. An array of Asset Query Decisions as described in the Asset Query Decision ({{asset-query-decision}}) section
+: REQUIRED. An array of Asset Query Decisions as described in the Asset Query Decision section ({{asset-query-decision}})
 
 evaluationDuration:
 : REQUIRED. The time in milliseconds, in `integer` format, that it took to respond to the Access Evaluation Request.
@@ -335,7 +335,7 @@ Content-type: application/json
   "evaluationDuration": 30
 }
 ~~~
-{#example-access-evaluation-response title="Example of an Access Evaluation Response"}
+{: #example-access-evaluation-response title="Example of an Access Evaluation Response"}
 
 ## Search API
 The Access Search API enables a PEP to find out all assets a principal has access to.
@@ -354,7 +354,7 @@ pageSize:
 The content of a Search Request body is a JSON object with a single field, `action` as described below:
 
 action:
-: REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the Actions ({{actions}}) section.
+: REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the Actions section ({{actions}}).
 
 The following is a non-normative example of a Search Request:
 
@@ -367,7 +367,7 @@ Authorization: <myoauthtoken>
     "action": "delete",
 }
 ~~~
-{#example-search-request title="Example Access Request"}
+{: #example-search-request title="Example Access Request"}
 
 ### Search Response {#search-response}
 The success response to a Search Request is a Search Response. It is a HTTP response of type `application/json`. It's body is a JSON object that contains the following fields:
@@ -379,10 +379,10 @@ exp:
 : REQUIRED. The time in `integer` format, expressed at epoch milliseconds, after which the response SHOULD NOT be used
 
 principal:
-: REQUIRED. The principal for which the response is being issued. The format of this field is as described in the Principals ({{principals}}) section
+: REQUIRED. The principal for which the response is being issued. The format of this field is as described in the Principals section ({{principals}})
 
 decisions:
-: REQUIRED. An array of Asset Query Decisions as described in the Asset Query Decision ({{asset-query-decision}}) section
+: REQUIRED. An array of Asset Query Decisions as described in the Asset Query Decision section ({{asset-query-decision}})
 
 nextPageToken:
 : OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.
@@ -419,7 +419,7 @@ Content-type: application/json
   "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
 }
 ~~~
-{#example-search-response title="Example of an Search Response"}
+{: #example-search-response title="Example of an Search Response"}
 
 
 
