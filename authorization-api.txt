@@ -38,12 +38,12 @@ Table of Contents
      3.11. Search API  . . . . . . . . . . . . . . . . . . . . . . .   9
        3.11.1.  Search Request . . . . . . . . . . . . . . . . . . .  10
        3.11.2.  Search Response  . . . . . . . . . . . . . . . . . .  10
-   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
-   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
-   6.  Normative References  . . . . . . . . . . . . . . . . . . . .  11
+   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
+   6.  Normative References  . . . . . . . . . . . . . . . . . . . .  12
    Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  12
    Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  12
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  12
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  13
 
 
 
@@ -520,12 +520,14 @@ Tulshibagwale                Standards Track                    [Page 9]
       number of items but SHOULD NOT return a number of items that is
       greater than this value
 
-   The content of a Search Request body is a JSON object with a single
-   field, action as described below:
+   The content of a Search Request body is a JSON object with the
+   following fields:
 
-   action:  REQUIRED.  The type of access that is to be performed.  Its
-      value is a string that describes the action.  This value of this
-      field is as described in the Actions section (Section 3.6).
+   principal:  A principal as described in the Principals section
+      (Section 3.4)
+
+   queries:  REQUIRED.  An array of string values as described in the
+      Actions section (Section 3.6).
 
    The following is a non-normative example of a Search Request:
 
@@ -534,7 +536,11 @@ Tulshibagwale                Standards Track                    [Page 9]
    Authorization: <myoauthtoken>
 
    {
-       "action": "delete",
+     "principal": {
+       "id": "atul@sgnl.ai"
+
+     }
+     "queries": ["delete", "read"],
    }
 
                       Figure 8: Example Access Request
@@ -548,12 +554,6 @@ Tulshibagwale                Standards Track                    [Page 9]
    iat:  REQUIRED.  The issued at time in integer format, expressed as
       epoch milliseconds
 
-   exp:  REQUIRED.  The time in integer format, expressed at epoch
-      milliseconds, after which the response SHOULD NOT be used
-
-   principal:  REQUIRED.  The principal for which the response is being
-      issued.  The format of this field is as described in the
-      Principals section (Section 3.4)
 
 
 
@@ -561,6 +561,13 @@ Tulshibagwale                Standards Track                   [Page 10]
 
                                   azapi                        June 2023
 
+
+   exp:  REQUIRED.  The time in integer format, expressed at epoch
+      milliseconds, after which the response SHOULD NOT be used
+
+   principal:  REQUIRED.  The principal for which the response is being
+      issued.  The format of this field is as described in the
+      Principals section (Section 3.4)
 
    decisions:  REQUIRED.  An array of Asset Query Decisions as described
       in the Asset Query Decision section (Section 3.9)
@@ -581,7 +588,7 @@ Tulshibagwale                Standards Track                   [Page 10]
      }
      "decisions": [
        {
-         "action": "read",
+         "action": "delete",
          "asset": {
            "type": "customer"
          },
@@ -601,6 +608,16 @@ Tulshibagwale                Standards Track                   [Page 10]
 
                   Figure 9: Example of an Search Response
 
+
+
+
+
+
+Tulshibagwale                Standards Track                   [Page 11]
+
+                                  azapi                        June 2023
+
+
 4.  IANA Considerations
 
    TBS
@@ -610,13 +627,6 @@ Tulshibagwale                Standards Track                   [Page 10]
    TBS
 
 6.  Normative References
-
-
-
-Tulshibagwale                Standards Track                   [Page 11]
-
-                                  azapi                        June 2023
-
 
    [RFC4001]  Daniele, M., Haberman, B., Routhier, S., and J.
               Schoenwaelder, "Textual Conventions for Internet Network
@@ -656,6 +666,14 @@ Contributors
 
    Marc Jordan
    SGNL
+
+
+
+Tulshibagwale                Standards Track                   [Page 12]
+
+                                  azapi                        June 2023
+
+
    Email: marc@sgnl.ai
 
 
@@ -666,27 +684,9 @@ Contributors
 
 Author's Address
 
-
-
-
-Tulshibagwale                Standards Track                   [Page 12]
-
-                                  azapi                        June 2023
-
-
    Atul Tulshibagwale (editor)
    SGNL
    Email: atul@sgnl.ai
-
-
-
-
-
-
-
-
-
-
 
 
 

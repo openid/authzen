@@ -351,10 +351,13 @@ pageToken:
 pageSize:
 : OPTIONAL. The maximum number of `decision` items in a Search Response ({{search-response}}). The API MAY return a smaller number of items but SHOULD NOT return a number of items that is greater than this value
 
-The content of a Search Request body is a JSON object with a single field, `action` as described below:
+The content of a Search Request body is a JSON object with the following fields:
 
-action:
-: REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the Actions section ({{actions}}).
+principal:
+: A principal as described in the Principals section ({{principals}})
+
+queries:
+: REQUIRED. An array of `string` values as described in the Actions section ({{actions}}).
 
 The following is a non-normative example of a Search Request:
 
@@ -364,7 +367,11 @@ Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM
 Authorization: <myoauthtoken>
 
 {
-    "action": "delete",
+  "principal": {
+    "id": "atul@sgnl.ai"
+    
+  }
+  "queries": ["delete", "read"],
 }
 ~~~
 {: #example-search-request title="Example Access Request"}
@@ -401,7 +408,7 @@ Content-type: application/json
   }
   "decisions": [
     {
-      "action": "read",
+      "action": "delete",
       "asset": {
         "type": "customer"
       },
