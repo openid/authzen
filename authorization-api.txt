@@ -538,7 +538,7 @@ Tulshibagwale                Standards Track                    [Page 9]
    {
      "principal": {
        "id": "atul@sgnl.ai"
-
+       "ipAddress": "172.217.22.14",
      }
      "queries": ["delete", "read"],
    }
@@ -585,6 +585,7 @@ Tulshibagwale                Standards Track                   [Page 10]
      "exp": 1234568890,
      "principal": {
        "id": "atul@sgnl.ai"
+       "ipAddress": "172.217.22.14",
      }
      "decisions": [
        {
@@ -607,7 +608,6 @@ Tulshibagwale                Standards Track                   [Page 10]
    }
 
                   Figure 9: Example of an Search Response
-
 
 
 

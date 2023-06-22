@@ -369,7 +369,7 @@ Authorization: <myoauthtoken>
 {
   "principal": {
     "id": "atul@sgnl.ai"
-    
+    "ipAddress": "172.217.22.14",
   }
   "queries": ["delete", "read"],
 }
@@ -405,6 +405,7 @@ Content-type: application/json
   "exp": 1234568890,
   "principal": {
     "id": "atul@sgnl.ai"
+    "ipAddress": "172.217.22.14",
   }
   "decisions": [
     {
