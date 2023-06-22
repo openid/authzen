@@ -135,7 +135,7 @@ type:
 : OPTIONAL. The type of the asset. It's value is a `string` that specifies the type of the asset
 
 attributeNames:
-: OPTIONAL. An array of strings, each string representing the name of an attribute of the asset.
+: OPTIONAL. An array of `string`s, each string representing the name of an attribute of the asset.
 
 The following is a non-normative example of an Asset:
 
@@ -212,7 +212,6 @@ A query decision is a JSON `string` which can have one of the following values:
 "deny":
 : The access request is denied and MUST NOT be permitted to go forward
 
-
 ## Asset Query Decision {#asset-query-decision}
 An Asset Query Decision is a tuple of an asset, action and a decision, represented as a JSON object. It has the following fields:
 
@@ -237,6 +236,33 @@ The following is a non-normative example of an Asset Query Decision:
 }
 ~~~
 {: #example-asset-query-decision title="Example Asset Query Decision"}
+
+## Collections {#collections}
+An API request or response MAY contain a collection of items, such as an array of strings representing various attribute names, or an array of Asset Query Decision objects ({{asset-query-decision}}). The objects in a collection MAY overlap in scope. For example:
+
+~~~ json
+[
+    {
+        "asset": {
+            "id": "1234",
+            "attributeNames": [
+              "homeAddress",
+              "title"
+            ]
+        },
+        "decision": "deny"
+    },
+    {
+        "asset": {
+            "id": "1234"
+        },
+        "decision": "allow"
+    }
+]
+~~~
+{: #collection-example title="Example Overlapping Collection"}
+
+The receiver of a collection MUST interpret the collection in a way that results in the least-privilege access. In the above example, this means that the principal has access to the asset identified by "1234", but not to the "homeAddress" and "title" attributes of that asset.
 
 ## Access Evaluations API
 The access evaluations API is a means for a PEP to request decisions for a number of assets for a single request context.

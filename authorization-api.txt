@@ -32,19 +32,19 @@ Table of Contents
      3.7.  Asset Query . . . . . . . . . . . . . . . . . . . . . . .   5
      3.8.  Query Decision  . . . . . . . . . . . . . . . . . . . . .   6
      3.9.  Asset Query Decision  . . . . . . . . . . . . . . . . . .   6
-     3.10. Access Evaluations API  . . . . . . . . . . . . . . . . .   7
-       3.10.1.  Access Evaluation Request  . . . . . . . . . . . . .   7
-       3.10.2.  Access Evaluation Response . . . . . . . . . . . . .   8
-     3.11. Search API  . . . . . . . . . . . . . . . . . . . . . . .   9
-       3.11.1.  Search Request . . . . . . . . . . . . . . . . . . .  10
-       3.11.2.  Search Response  . . . . . . . . . . . . . . . . . .  10
+     3.10. Collections . . . . . . . . . . . . . . . . . . . . . . .   7
+     3.11. Access Evaluations API  . . . . . . . . . . . . . . . . .   7
+       3.11.1.  Access Evaluation Request  . . . . . . . . . . . . .   8
+       3.11.2.  Access Evaluation Response . . . . . . . . . . . . .   9
+     3.12. Search API  . . . . . . . . . . . . . . . . . . . . . . .  10
+       3.12.1.  Search Request . . . . . . . . . . . . . . . . . . .  10
+       3.12.2.  Search Response  . . . . . . . . . . . . . . . . . .  11
    4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
    6.  Normative References  . . . . . . . . . . . . . . . . . . . .  12
-   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  12
-   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  12
+   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  13
+   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  13
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  13
-
 
 
 
@@ -348,15 +348,56 @@ Tulshibagwale                Standards Track                    [Page 6]
 
                    Figure 5: Example Asset Query Decision
 
-3.10.  Access Evaluations API
+3.10.  Collections
+
+   An API request or response MAY contain a collection of items, such as
+   an array of strings representing various attribute names, or an array
+   of Asset Query Decision objects (Section 3.9).  The objects in a
+   collection MAY overlap in scope.  For example:
+
+   [
+       {
+           "asset": {
+               "id": "1234",
+               "attributeNames": [
+                 "homeAddress",
+                 "title"
+               ]
+           },
+           "decision": "deny"
+       },
+       {
+           "asset": {
+               "id": "1234"
+           },
+           "decision": "allow"
+       }
+   ]
+
+                  Figure 6: Example Overlapping Collection
+
+   The receiver of a collection MUST interpret the collection in a way
+   that results in the least-privilege access.  In the above example,
+   this means that the principal has access to the asset identified by
+   "1234", but not to the "homeAddress" and "title" attributes of that
+   asset.
+
+3.11.  Access Evaluations API
 
    The access evaluations API is a means for a PEP to request decisions
    for a number of assets for a single request context.
 
+
+
+Tulshibagwale                Standards Track                    [Page 7]
+
+                                  azapi                        June 2023
+
+
    The Access Evaluations API is available at the relative URL
    /evaluations/ via the POST HTTP method.
 
-3.10.1.  Access Evaluation Request
+3.11.1.  Access Evaluation Request
 
    The content of the request body is a JSON Object with the following
    fields:
@@ -369,30 +410,6 @@ Tulshibagwale                Standards Track                    [Page 6]
 
    The following is a non-normative example of an Access Evaluation
    Request:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Tulshibagwale                Standards Track                    [Page 7]
-
-                                  azapi                        June 2023
-
 
    POST /evaluations HTTP/1.1
    Host: pdp.mycompany.com
@@ -422,9 +439,18 @@ Tulshibagwale                Standards Track                    [Page 7]
      ]
    }
 
-             Figure 6: Example of an Access Evaluation Request
+             Figure 7: Example of an Access Evaluation Request
 
-3.10.2.  Access Evaluation Response
+
+
+
+
+Tulshibagwale                Standards Track                    [Page 8]
+
+                                  azapi                        June 2023
+
+
+3.11.2.  Access Evaluation Response
 
    The success response to an Access Evaluation Request is an Access
    Evaluation Response.  It is a HTTP response of type application/json.
@@ -443,18 +469,42 @@ Tulshibagwale                Standards Track                    [Page 7]
    decisions:  REQUIRED.  An array of Asset Query Decisions as described
       in the Asset Query Decision section (Section 3.9)
 
-
-
-Tulshibagwale                Standards Track                    [Page 8]
-
-                                  azapi                        June 2023
-
-
    evaluationDuration:  REQUIRED.  The time in milliseconds, in integer
       format, that it took to respond to the Access Evaluation Request.
 
    Following is a non-normative example of an Access Evaluation
    Response:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Tulshibagwale                Standards Track                    [Page 9]
+
+                                  azapi                        June 2023
+
 
    HTTP/1.1 OK
    Content-type: application/json
@@ -485,9 +535,9 @@ Tulshibagwale                Standards Track                    [Page 8]
      "evaluationDuration": 30
    }
 
-             Figure 7: Example of an Access Evaluation Response
+             Figure 8: Example of an Access Evaluation Response
 
-3.11.  Search API
+3.12.  Search API
 
    The Access Search API enables a PEP to find out all assets a
    principal has access to.
@@ -495,28 +545,25 @@ Tulshibagwale                Standards Track                    [Page 8]
    The Access Search API is available at the relative URL /search/ via
    the POST HTTP method
 
-
-
-
-
-
-
-Tulshibagwale                Standards Track                    [Page 9]
-
-                                  azapi                        June 2023
-
-
-3.11.1.  Search Request
+3.12.1.  Search Request
 
    A Search Request has request parameters and a request body.  The
    request parameters are:
 
    pageToken:  OPTIONAL.  A string value that is returned in a previous
-      Search Response (Section 3.11.2), which indicates that the request
+      Search Response (Section 3.12.2), which indicates that the request
       is a continuation of a previous request
 
+
+
+
+Tulshibagwale                Standards Track                   [Page 10]
+
+                                  azapi                        June 2023
+
+
    pageSize:  OPTIONAL.  The maximum number of decision items in a
-      Search Response (Section 3.11.2).  The API MAY return a smaller
+      Search Response (Section 3.12.2).  The API MAY return a smaller
       number of items but SHOULD NOT return a number of items that is
       greater than this value
 
@@ -543,9 +590,9 @@ Tulshibagwale                Standards Track                    [Page 9]
      "queries": ["delete", "read"],
    }
 
-                      Figure 8: Example Access Request
+                      Figure 9: Example Access Request
 
-3.11.2.  Search Response
+3.12.2.  Search Response
 
    The success response to a Search Request is a Search Response.  It is
    a HTTP response of type application/json.  It's body is a JSON object
@@ -553,14 +600,6 @@ Tulshibagwale                Standards Track                    [Page 9]
 
    iat:  REQUIRED.  The issued at time in integer format, expressed as
       epoch milliseconds
-
-
-
-
-Tulshibagwale                Standards Track                   [Page 10]
-
-                                  azapi                        June 2023
-
 
    exp:  REQUIRED.  The time in integer format, expressed at epoch
       milliseconds, after which the response SHOULD NOT be used
@@ -571,6 +610,13 @@ Tulshibagwale                Standards Track                   [Page 10]
 
    decisions:  REQUIRED.  An array of Asset Query Decisions as described
       in the Asset Query Decision section (Section 3.9)
+
+
+
+Tulshibagwale                Standards Track                   [Page 11]
+
+                                  azapi                        June 2023
+
 
    nextPageToken:  OPTIONAL.  A string that MAY be used in a Search
       Request to fetch the next set of responses.
@@ -607,16 +653,7 @@ Tulshibagwale                Standards Track                   [Page 10]
      "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
    }
 
-                  Figure 9: Example of an Search Response
-
-
-
-
-
-Tulshibagwale                Standards Track                   [Page 11]
-
-                                  azapi                        June 2023
-
+                  Figure 10: Example of an Search Response
 
 4.  IANA Considerations
 
@@ -627,6 +664,15 @@ Tulshibagwale                Standards Track                   [Page 11]
    TBS
 
 6.  Normative References
+
+
+
+
+
+Tulshibagwale                Standards Track                   [Page 12]
+
+                                  azapi                        June 2023
+
 
    [RFC4001]  Daniele, M., Haberman, B., Routhier, S., and J.
               Schoenwaelder, "Textual Conventions for Internet Network
@@ -666,14 +712,6 @@ Contributors
 
    Marc Jordan
    SGNL
-
-
-
-Tulshibagwale                Standards Track                   [Page 12]
-
-                                  azapi                        June 2023
-
-
    Email: marc@sgnl.ai
 
 
@@ -683,6 +721,14 @@ Tulshibagwale                Standards Track                   [Page 12]
 
 
 Author's Address
+
+
+
+
+Tulshibagwale                Standards Track                   [Page 13]
+
+                                  azapi                        June 2023
+
 
    Atul Tulshibagwale (editor)
    SGNL
@@ -725,4 +771,14 @@ Author's Address
 
 
 
-Tulshibagwale                Standards Track                   [Page 13]
+
+
+
+
+
+
+
+
+
+
+Tulshibagwale                Standards Track                   [Page 14]
