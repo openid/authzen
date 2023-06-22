@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference  anchor='RFC6749' target='https://www.rfc-editor.org/info/rfc6749'>
+<front>
+<title>The OAuth 2.0 Authorization Framework</title>
+<author initials='D.' surname='Hardt' fullname='D. Hardt' role='editor'><organization /></author>
+<date year='2012' month='October' />
+<abstract><t>The OAuth 2.0 authorization framework enables a third-party application to obtain limited access to an HTTP service, either on behalf of a resource owner by orchestrating an approval interaction between the resource owner and the HTTP service, or by allowing the third-party application to obtain access on its own behalf.  This specification replaces and obsoletes the OAuth 1.0 protocol described in RFC 5849.  [STANDARDS-TRACK]</t></abstract>
+</front>
+<seriesInfo name='RFC' value='6749'/>
+<seriesInfo name='DOI' value='10.17487/RFC6749'/>
+</reference>

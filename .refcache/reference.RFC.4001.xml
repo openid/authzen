@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference  anchor='RFC4001' target='https://www.rfc-editor.org/info/rfc4001'>
+<front>
+<title>Textual Conventions for Internet Network Addresses</title>
+<author initials='M.' surname='Daniele' fullname='M. Daniele'><organization /></author>
+<author initials='B.' surname='Haberman' fullname='B. Haberman'><organization /></author>
+<author initials='S.' surname='Routhier' fullname='S. Routhier'><organization /></author>
+<author initials='J.' surname='Schoenwaelder' fullname='J. Schoenwaelder'><organization /></author>
+<date year='2005' month='February' />
+<abstract><t>This MIB module defines textual conventions to represent commonly used Internet network layer addressing information.  The intent is that these textual conventions will be imported and used in MIB modules that would otherwise define their own representations.  [STANDARDS-TRACK]</t></abstract>
+</front>
+<seriesInfo name='RFC' value='4001'/>
+<seriesInfo name='DOI' value='10.17487/RFC4001'/>
+</reference>

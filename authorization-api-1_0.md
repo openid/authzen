@@ -3,7 +3,6 @@ stand_alone: true
 ipr: none
 cat: std # Check
 submissiontype: IETF
-area: General [REPLACE]
 wg: OpenID TBD
 
 docname: authorization-api-1_0
@@ -38,6 +37,7 @@ normative:
   RFC4001: # text representation of IP addresses
   RFC5234: # REPLACE
   RFC6749: #OAuth
+  RFC6750: #OAuth 2.0 Bearer Tokens
   RFC8259: #JSON
   XACML:
     title: eXtensible Access Control Markup Language (XACML) Version 1.1
@@ -49,26 +49,11 @@ normative:
     - name: Tim Moses (Ed.)
       role: editor
       org: Entrust
-informative:
-  exampleRefMin:
-    title: Title [REPLACE]
-    author:
-    - name: Givenname Surname[REPLACE]
-      org: (ignored here anyway)
-    - name: Givenname Surname1 Surname2
-      surname: Surname1 Surname2 # needed for Spanish names etc.
-      org: (ignored here anyway)
     date: 2006
-  exampleRefOrg:
-    target: http://www.example.com/
-    title: Title [REPLACE]
-    author:
-    - org: Organization [REPLACE]
-    date: 1984-04
 
 --- abstract
 
-Abstract [REPLACE]
+TBD
 
 --- middle
 
@@ -197,10 +182,10 @@ Any action that is not one of the above is a custom action. Policies MAY incorpo
 An Access Query is a question about whether a principal can access a specific asset. It is a JSON object with the following fields:
 
 action:
-: REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the {{#actions}} section.
+: REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the {{actions}} section.
 
 asset:
-: REQUIRED. The asset about which this query is. It's format is as described in the {{#assets}} section
+: REQUIRED. The asset about which this query is. It's format is as described in the {{assets}} section
 
 The following is a non-normative example of an Access Query:
 
@@ -231,13 +216,13 @@ An access decision is a JSON `string` which can have one of the following values
 An Access Query Decision is a tuple of an asset, action and a decision, represented as a JSON object. It has the following fields:
 
 action:
-: The action for which the decision is provided. The format is as described in the {{#actions}} section
+: The action for which the decision is provided. The format is as described in the {{actions}} section
 
 asset:
-: The asset for which the decision is provided. The format is as described in the {{#assets}} section. This asset MAY be greater in scope than described in the Access Query ({{#access-query}}), i.e. It MAY describe an asset more generally than specified in the Access Query. However, it MUST NOT be more specific than the asset described in the Access Query.
+: The asset for which the decision is provided. The format is as described in the {{assets}} section. This asset MAY be greater in scope than described in the Access Query ({{access-query}}), i.e. It MAY describe an asset more generally than specified in the Access Query. However, it MUST NOT be more specific than the asset described in the Access Query.
 
 decision:
-: The decision for the above `asset` and `action`. The format is as described in the {{#access-decision}} section
+: The decision for the above `asset` and `action`. The format is as described in the {{access-decision}} section
 
 The following is a non-normative example of an Access Query Decision:
 
@@ -261,10 +246,10 @@ The Access Evaluations API is available at the relative URL `evaluations` via th
 The content of the request body is a JSON Object with the following fields:
 
 principal:
-: A principal as described in the {{#principals}} section
+: A principal as described in the {{principals}} section
 
 queries:
-: An array of queries defined in section {{#access-query}} about access to specific assets
+: An array of queries defined in section {{access-query}} about access to specific assets
 
 ~~~ http
 POST /evaluations HTTP/1.1
@@ -306,10 +291,10 @@ exp:
 : REQUIRED. The time in `integer` format, expressed at epoch milliseconds, after which the response SHOULD NOT be used
 
 principal:
-: REQUIRED. The principal for which the response is being issued. The format of this field is as described in the {{#principals}} section
+: REQUIRED. The principal for which the response is being issued. The format of this field is as described in the {{principals}} section
 
 decisions:
-: REQUIRED. An array of Access Query Decisions as described in the {{#access-query-decisions}} section
+: REQUIRED. An array of Access Query Decisions as described in the {{access-query-decision}} section
 
 evaluationDuration:
 : REQUIRED. The time in milliseconds, in `integer` format, that it took to respond to the Access Evaluation Request.
@@ -347,15 +332,16 @@ Content-type: application/json
 
 # IANA Considerations {#IANA}
 
-This memo includes no request to IANA. [CHECK]
+TBS
 
 
 # Security Considerations {#Security}
 
-This document should not affect the security of the Internet. [CHECK]
+TBS
 
 
 --- back
+
 
 # Acknowledgements {#Acknowledgements}
 {: numbered="false"}
