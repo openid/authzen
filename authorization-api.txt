@@ -44,7 +44,7 @@ Table of Contents
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .  13
    6.  Normative References  . . . . . . . . . . . . . . . . . . . .  13
    Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  13
-   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  13
+   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  14
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  14
 
 
@@ -398,7 +398,8 @@ Tulshibagwale                Standards Track                    [Page 7]
 
    The following error responses are common to all methods of the
    Authorization API.  The error response is indicated by an HTTP status
-   code that indicates error (a numeric value greater than 299)
+   code (Section 15 of [RFC9110]) that indicates error (a numeric value
+   greater than 299)
 
    The following errors are indicated by the status codes defined below:
 
@@ -437,7 +438,6 @@ Tulshibagwale                Standards Track                    [Page 7]
 
    The following is a non-normative example of an Access Evaluation
    Request:
-
 
 
 
@@ -708,6 +708,11 @@ Tulshibagwale                Standards Track                   [Page 12]
               DOI 10.17487/RFC8259, December 2017,
               <https://www.rfc-editor.org/info/rfc8259>.
 
+   [RFC9110]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+              Ed., "HTTP Semantics", STD 97, RFC 9110,
+              DOI 10.17487/RFC9110, June 2022,
+              <https://www.rfc-editor.org/info/rfc9110>.
+
    [XACML]    Godik, S., Ed. and T. M. (Ed.), Ed., "eXtensible Access
               Control Markup Language (XACML) Version 1.1", 2006,
               <https://www.oasis-open.org/committees/xacml/repository/
@@ -718,11 +723,6 @@ Acknowledgements
    This template uses extracts from templates written by Pekka Savola,
    Elwyn Davies and Henrik Levkowetz.
 
-Contributors
-
-   Marc Jordan
-   SGNL
-
 
 
 Tulshibagwale                Standards Track                   [Page 13]
@@ -730,6 +730,10 @@ Tulshibagwale                Standards Track                   [Page 13]
                                   azapi                        June 2023
 
 
+Contributors
+
+   Marc Jordan
+   SGNL
    Email: marc@sgnl.ai
 
 
@@ -743,10 +747,6 @@ Author's Address
    Atul Tulshibagwale (editor)
    SGNL
    Email: atul@sgnl.ai
-
-
-
-
 
 
 
