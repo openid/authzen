@@ -59,10 +59,10 @@ TBD
 
 # Introduction
 
-Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in {{XACML}}. Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
+Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML ({{XACML}}). Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
 
 ## Model
-The Authorization API is a REST API published by the PDP, to which the PEP acts as a client. The Authorization API is itself authorized using OAuth 2.0 {{RFC6749}}
+The Authorization API is a REST API published by the PDP, to which the PEP acts as a client. The Authorization API is itself authorized using OAuth 2.0 ({{RFC6749}})
 
 ## Features
 The Authorization API has two main features:
@@ -88,7 +88,7 @@ The Authorization API has two parts, Access Evaluation and Search. Each of these
 This document describes the API version 1. Any updates to this API through subsequent revisions of this document or through other documents MAY augment this API, but MUST NOT modify the API described here. Augmentation MAY include additional API methods or additional parameters to existing API methods, additional authorization mechanisms or additional optional headers in API requests. All API methods for version 1 MUST be immediately preceded by the relative URL path `/v1/`.
 
 ## API Authorization
-This API SHALL be authenticated using the OAuth 2.0 Bearer access token {{RFC6750}} to authorize API calls
+This API SHALL be authenticated using the OAuth 2.0 Bearer access token ({{RFC6750}}) to authorize API calls
 
 ## Request Identification
 All requests to the API MUST have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. The request identifier SHALL be provided using the HTTP Header `X-Request-Id`. The value of this header is an arbitrary string. The following non-normative example describes this header:
@@ -103,7 +103,7 @@ X-Request-Id: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ## Principals {#principals}
 A Principal is the user or robotic principal about whom the Authorization API is being invoked. The Principal may be requesting access at the time the Authorization API is invoked, or the Principal may be of interest in a Search API call.
 
-A Principal is a JSON {{RFC8259}} object that has the following fields:
+A Principal is a JSON ({{RFC8259}}) object that has the following fields:
 
 id:
 : REQUIRED, A field, whose value is of type `string`, which uniquely identifies the user. This identifier could be an email address, or it might be an internal identifier such as a UUID or employee ID.
@@ -126,7 +126,7 @@ The following non-normative example describes a Principal:
 {: #principalexample title="Example Principal Object"}
 
 ## Assets {#assets}
-An Asset is the target of an access request. It is a JSON {{RFC8259}} object that has the following fields:
+An Asset is the target of an access request. It is a JSON ({{RFC8259}}) object that has the following fields:
 
 id:
 : REQUIRED, the asset Id of the asset. It's value is a `string` specifying the identifier of the asset
@@ -178,16 +178,16 @@ Policies MAY incorporate common action names to provide different decisions base
 ### Custom Actions
 Any action that is not one of the above is a custom action. Policies MAY incorporate custom action names if decisions need to be taken differently for different custom actions
 
-## Access Query {#access-query}
-An Access Query is a question about whether a principal can access a specific asset. It is a JSON object with the following fields:
+## Asset Query {#asset-query}
+An Asset Query is a question about whether a principal can access a specific asset. It is a JSON object with the following fields:
 
 action:
-: REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the {{actions}} section.
+: REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the Actions ({{actions}}) section.
 
 asset:
-: REQUIRED. The asset about which this query is. It's format is as described in the {{assets}} section
+: REQUIRED. The asset about which this query is. It's format is as described in the Assets ({{assets}}) section
 
-The following is a non-normative example of an Access Query:
+The following is a non-normative example of an Asset Query:
 
 ~~~ json
 {
@@ -201,10 +201,10 @@ The following is a non-normative example of an Access Query:
     }
 }
 ~~~
-{#example-access-query title="Example Access Query"}
+{#example-asset-query title="Example Asset Query"}
 
-## Access Decision {#access-decision}
-An access decision is a JSON `string` which can have one of the following values:
+## Query Decision {#query-decision}
+A query decision is a JSON `string` which can have one of the following values:
 
 "allow":
 : The access request is permitted to go forward
@@ -212,19 +212,20 @@ An access decision is a JSON `string` which can have one of the following values
 "deny":
 : The access request is denied and MUST NOT be permitted to go forward
 
-## Access Query Decision {#access-query-decision}
-An Access Query Decision is a tuple of an asset, action and a decision, represented as a JSON object. It has the following fields:
+
+## Asset Query Decision {#asset-query-decision}
+An Asset Query Decision is a tuple of an asset, action and a decision, represented as a JSON object. It has the following fields:
 
 action:
-: The action for which the decision is provided. The format is as described in the {{actions}} section
+: OPTIONAL. The action for which the decision is provided. The format is as described in the Actions ({{actions}}) section
 
 asset:
-: The asset for which the decision is provided. The format is as described in the {{assets}} section. This asset MAY be greater in scope than described in the Access Query ({{access-query}}), i.e. It MAY describe an asset more generally than specified in the Access Query. However, it MUST NOT be more specific than the asset described in the Access Query.
+: OPTIONAL. The asset for which the decision is provided. The format is as described in the Assets ({{assets}}) section. This asset MAY be greater in scope than described in the Asset Query ({{asset-query}}), i.e. It MAY describe an asset more generally than specified in the Asset Query. However, it MUST NOT be more specific than the asset described in the Asset Query.
 
 decision:
-: The decision for the above `asset` and `action`. The format is as described in the {{access-decision}} section
+: REQUIRED. The decision for the above `asset` and `action`. The format is as described in the Query Decision ({{query-decision}}) section
 
-The following is a non-normative example of an Access Query Decision:
+The following is a non-normative example of an Asset Query Decision:
 
 ~~~ json
 {
@@ -235,10 +236,10 @@ The following is a non-normative example of an Access Query Decision:
     "decision": "deny"
 }
 ~~~
-{#example-access-query-decision title="Example Access Query Decision"}
+{#example-asset-query-decision title="Example Asset Query Decision"}
 
 ## Access Evaluations API
-The access evaluations is a means for a PEP to request decisions for a number of assets for a single request context.
+The access evaluations API is a means for a PEP to request decisions for a number of assets for a single request context.
 
 The Access Evaluations API is available at the relative URL `evaluations` via the `POST` HTTP method.
 
@@ -246,10 +247,12 @@ The Access Evaluations API is available at the relative URL `evaluations` via th
 The content of the request body is a JSON Object with the following fields:
 
 principal:
-: A principal as described in the {{principals}} section
+: A principal as described in the Principals ({{principals}}) section
 
 queries:
-: An array of queries defined in section {{access-query}} about access to specific assets
+: An array of queries defined in Asset Query ({{asset-query}}) section about access to specific assets
+
+The following is a non-normative example of an Access Evaluation Request:
 
 ~~~ http
 POST /evaluations HTTP/1.1
@@ -280,6 +283,7 @@ Authorization: <myoauthtoken>
   ]
 }
 ~~~
+{#example-access-evaluation-request title="Example of an Access Evaluation Request"}
 
 ### Access Evaluation Response
 The success response to an Access Evaluation Request is an Access Evaluation Response. It is a HTTP response of type `application/json`. It's body is a JSON object that contains the following fields:
@@ -291,13 +295,15 @@ exp:
 : REQUIRED. The time in `integer` format, expressed at epoch milliseconds, after which the response SHOULD NOT be used
 
 principal:
-: REQUIRED. The principal for which the response is being issued. The format of this field is as described in the {{principals}} section
+: REQUIRED. The principal for which the response is being issued. The format of this field is as described in the Principals ({{principals}}) section
 
 decisions:
-: REQUIRED. An array of Access Query Decisions as described in the {{access-query-decision}} section
+: REQUIRED. An array of Asset Query Decisions as described in the Asset Query Decision ({{asset-query-decision}}) section
 
 evaluationDuration:
 : REQUIRED. The time in milliseconds, in `integer` format, that it took to respond to the Access Evaluation Request.
+
+Following is a non-normative example of an Access Evaluation Response:
 
 ~~~ http
 HTTP/1.1 OK
@@ -329,6 +335,93 @@ Content-type: application/json
   "evaluationDuration": 30
 }
 ~~~
+{#example-access-evaluation-response title="Example of an Access Evaluation Response"}
+
+## Search API
+The Access Search API enables a PEP to find out all assets a principal has access to.
+
+The Access Search API is available at the relative URL `search` via the `POST` HTTP method
+
+### Search Request
+A Search Request has request parameters and a request body. The request parameters are:
+
+pageToken:
+: OPTIONAL. A string value that is returned in a previous Search Response ({{search-response}}), which indicates that the request is a continuation of a previous request
+
+pageSize:
+: OPTIONAL. The maximum number of `decision` items in a Search Response ({{search-response}}). The API MAY return a smaller number of items but SHOULD NOT return a number of items that is greater than this value
+
+The content of a Search Request body is a JSON object with a single field, `action` as described below:
+
+action:
+: REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the Actions ({{actions}}) section.
+
+The following is a non-normative example of a Search Request:
+
+~~~ http
+POST /search HTTP/1.1
+Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM2Q4"&pageSize=2
+Authorization: <myoauthtoken>
+
+{
+    "action": "delete",
+}
+~~~
+{#example-search-request title="Example Access Request"}
+
+### Search Response {#search-response}
+The success response to a Search Request is a Search Response. It is a HTTP response of type `application/json`. It's body is a JSON object that contains the following fields:
+
+iat:
+: REQUIRED. The issued at time in `integer` format, expressed as epoch milliseconds
+
+exp:
+: REQUIRED. The time in `integer` format, expressed at epoch milliseconds, after which the response SHOULD NOT be used
+
+principal:
+: REQUIRED. The principal for which the response is being issued. The format of this field is as described in the Principals ({{principals}}) section
+
+decisions:
+: REQUIRED. An array of Asset Query Decisions as described in the Asset Query Decision ({{asset-query-decision}}) section
+
+nextPageToken:
+: OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.
+
+Following is a non-normative example of an Search Response:
+
+~~~ http
+HTTP/1.1 OK
+Content-type: application/json
+
+{
+  "iat": 1234567890,
+  "exp": 1234568890,
+  "principal": {
+    "id": "atul@sgnl.ai"
+  }
+  "decisions": [
+    {
+      "action": "read",
+      "asset": {
+        "type": "customer"
+      },
+      "decision": "deny"
+    },
+    {
+      "action": "read",
+      "asset": {
+        "id": "efgh",
+        "type": "customer",
+      },
+      "decision": "allow"
+    }
+  ],
+  "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
+}
+~~~
+{#example-search-response title="Example of an Search Response"}
+
+
 
 # IANA Considerations {#IANA}
 

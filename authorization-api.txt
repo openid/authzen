@@ -4,7 +4,7 @@
 
 OpenID TBD                                         A. Tulshibagwale, Ed.
                                                                     SGNL
-                                                            21 June 2023
+                                                            22 June 2023
 
 
                            Authorization API
@@ -16,40 +16,40 @@ Abstract
 
 Table of Contents
 
-   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   1
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Model . . . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.2.  Features  . . . . . . . . . . . . . . . . . . . . . . . .   2
    2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   2
    3.  API Specification . . . . . . . . . . . . . . . . . . . . . .   2
-     3.1.  API Version . . . . . . . . . . . . . . . . . . . . . . .   2
+     3.1.  API Version . . . . . . . . . . . . . . . . . . . . . . .   3
      3.2.  API Authorization . . . . . . . . . . . . . . . . . . . .   3
      3.3.  Request Identification  . . . . . . . . . . . . . . . . .   3
      3.4.  Principals  . . . . . . . . . . . . . . . . . . . . . . .   3
      3.5.  Assets  . . . . . . . . . . . . . . . . . . . . . . . . .   4
      3.6.  Actions . . . . . . . . . . . . . . . . . . . . . . . . .   4
-       3.6.1.  Common Actions  . . . . . . . . . . . . . . . . . . .   4
+       3.6.1.  Common Actions  . . . . . . . . . . . . . . . . . . .   5
        3.6.2.  Custom Actions  . . . . . . . . . . . . . . . . . . .   5
-     3.7.  Access Query  . . . . . . . . . . . . . . . . . . . . . .   5
-     3.8.  Access Decision . . . . . . . . . . . . . . . . . . . . .   6
-     3.9.  Access Query Decision . . . . . . . . . . . . . . . . . .   6
-     3.10. Access Evaluations API  . . . . . . . . . . . . . . . . .   6
+     3.7.  Asset Query . . . . . . . . . . . . . . . . . . . . . . .   5
+     3.8.  Query Decision  . . . . . . . . . . . . . . . . . . . . .   6
+     3.9.  Asset Query Decision  . . . . . . . . . . . . . . . . . .   6
+     3.10. Access Evaluations API  . . . . . . . . . . . . . . . . .   7
        3.10.1.  Access Evaluation Request  . . . . . . . . . . . . .   7
-       3.10.2.  Access Evaluation Response . . . . . . . . . . . . .   7
-   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
-   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
-   6.  Normative References  . . . . . . . . . . . . . . . . . . . .   9
-   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .   9
-   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .   9
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  10
+       3.10.2.  Access Evaluation Response . . . . . . . . . . . . .   8
+     3.11. Search API  . . . . . . . . . . . . . . . . . . . . . . .   9
+       3.11.1.  Search Request . . . . . . . . . . . . . . . . . . .  10
+       3.11.2.  Search Response  . . . . . . . . . . . . . . . . . .  10
+   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
+   6.  Normative References  . . . . . . . . . . . . . . . . . . . .  11
+   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  12
+   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  12
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  12
 
-1.  Introduction
 
-   Computational services often implement access control within their
-   components by separating Policy Decision Points (PDPs) from Policy
-   Enforcement Points (PEPs).  PDPs and PEPs are defined in [XACML].
-   Communication between PDPs and PEPs follows similar patterns across
-   different software and services that require or provide authorization
-   information.  The Authorization API described in this document
+
+
+
+
 
 
 
@@ -58,15 +58,23 @@ Tulshibagwale                Standards Track                    [Page 1]
                                   azapi                        June 2023
 
 
-   enables different providers to offer PDP and PEP capabilities without
-   having to bind themselves to one particular implementation of a PDP
-   or PEP.
+1.  Introduction
+
+   Computational services often implement access control within their
+   components by separating Policy Decision Points (PDPs) from Policy
+   Enforcement Points (PEPs).  PDPs and PEPs are defined in XACML
+   ([XACML]).  Communication between PDPs and PEPs follows similar
+   patterns across different software and services that require or
+   provide authorization information.  The Authorization API described
+   in this document enables different providers to offer PDP and PEP
+   capabilities without having to bind themselves to one particular
+   implementation of a PDP or PEP.
 
 1.1.  Model
 
    The Authorization API is a REST API published by the PDP, to which
    the PEP acts as a client.  The Authorization API is itself authorized
-   using OAuth 2.0 [RFC6749]
+   using OAuth 2.0 ([RFC6749])
 
 1.2.  Features
 
@@ -94,6 +102,18 @@ Tulshibagwale                Standards Track                    [Page 1]
    The Authorization API has two parts, Access Evaluation and Search.
    Each of these is defined below:
 
+
+
+
+
+
+
+
+Tulshibagwale                Standards Track                    [Page 2]
+
+                                  azapi                        June 2023
+
+
 3.1.  API Version
 
    This document describes the API version 1.  Any updates to this API
@@ -105,19 +125,10 @@ Tulshibagwale                Standards Track                    [Page 1]
    methods for version 1 MUST be immediately preceded by the relative
    URL path /v1/.
 
-
-
-
-
-Tulshibagwale                Standards Track                    [Page 2]
-
-                                  azapi                        June 2023
-
-
 3.2.  API Authorization
 
    This API SHALL be authenticated using the OAuth 2.0 Bearer access
-   token [RFC6750] to authorize API calls
+   token ([RFC6750]) to authorize API calls
 
 3.3.  Request Identification
 
@@ -141,7 +152,8 @@ Tulshibagwale                Standards Track                    [Page 2]
    access at the time the Authorization API is invoked, or the Principal
    may be of interest in a Search API call.
 
-   A Principal is a JSON [RFC8259] object that has the following fields:
+   A Principal is a JSON ([RFC8259]) object that has the following
+   fields:
 
    id:  REQUIRED, A field, whose value is of type string, which uniquely
       identifies the user.  This identifier could be an email address,
@@ -150,6 +162,13 @@ Tulshibagwale                Standards Track                    [Page 2]
 
    ipAddress:  OPTIONAL, A field, whose value is of type string, which
       is a [RFC4001] text representation of the IP Address
+
+
+
+Tulshibagwale                Standards Track                    [Page 3]
+
+                                  azapi                        June 2023
+
 
    deviceId:  OPTIONAL, A field, whose value is of type string, which
       uniquely identifies the device of the Principal
@@ -162,20 +181,12 @@ Tulshibagwale                Standards Track                    [Page 2]
        "deviceId": "8:65:ee:17:7e:0b"
    }
 
-
-
-
-Tulshibagwale                Standards Track                    [Page 3]
-
-                                  azapi                        June 2023
-
-
                      Figure 2: Example Principal Object
 
 3.5.  Assets
 
-   An Asset is the target of an access request.  It is a JSON [RFC8259]
-   object that has the following fields:
+   An Asset is the target of an access request.  It is a JSON
+   ([RFC8259]) object that has the following fields:
 
    id:  REQUIRED, the asset Id of the asset.  It's value is a string
       specifying the identifier of the asset
@@ -208,6 +219,13 @@ Tulshibagwale                Standards Track                    [Page 3]
    or shared across a applications but not listed in the common actions
    below
 
+
+
+Tulshibagwale                Standards Track                    [Page 4]
+
+                                  azapi                        June 2023
+
+
 3.6.1.  Common Actions
 
    The following common actions are defined herein:
@@ -218,13 +236,6 @@ Tulshibagwale                Standards Track                    [Page 3]
 
    "create":  The action to create a new entity, which MAY be defined by
       the asset field in the request
-
-
-
-Tulshibagwale                Standards Track                    [Page 4]
-
-                                  azapi                        June 2023
-
 
    "read":  The action to read the content.  Based on the asset being
       accessed, this could mean a list functionality or reading an
@@ -247,19 +258,29 @@ Tulshibagwale                Standards Track                    [Page 4]
    MAY incorporate custom action names if decisions need to be taken
    differently for different custom actions
 
-3.7.  Access Query
+3.7.  Asset Query
 
-   An Access Query is a question about whether a principal can access a
+   An Asset Query is a question about whether a principal can access a
    specific asset.  It is a JSON object with the following fields:
 
    action:  REQUIRED.  The type of access that is to be performed.  Its
       value is a string that describes the action.  This value of this
-      field is as described in the Section 3.6 section.
+      field is as described in the Actions (Section 3.6) section.
 
    asset:  REQUIRED.  The asset about which this query is.  It's format
-      is as described in the Section 3.5 section
+      is as described in the Assets (Section 3.5) section
 
-   The following is a non-normative example of an Access Query:
+   The following is a non-normative example of an Asset Query:
+
+
+
+
+
+
+Tulshibagwale                Standards Track                    [Page 5]
+
+                                  azapi                        June 2023
+
 
    {
        "action": "stream",
@@ -272,45 +293,50 @@ Tulshibagwale                Standards Track                    [Page 4]
        }
    }
 
-   {#example-access-query title="Example Access Query"}
+   {#example-asset-query title="Example Asset Query"}
 
+3.8.  Query Decision
 
-
-
-Tulshibagwale                Standards Track                    [Page 5]
-
-                                  azapi                        June 2023
-
-
-3.8.  Access Decision
-
-   An access decision is a JSON string which can have one of the
-   following values:
+   A query decision is a JSON string which can have one of the following
+   values:
 
    "allow":  The access request is permitted to go forward
 
    "deny":  The access request is denied and MUST NOT be permitted to go
       forward
 
-3.9.  Access Query Decision
+3.9.  Asset Query Decision
 
-   An Access Query Decision is a tuple of an asset, action and a
+   An Asset Query Decision is a tuple of an asset, action and a
    decision, represented as a JSON object.  It has the following fields:
 
-   action:  The action for which the decision is provided.  The format
-      is as described in the Section 3.6 section
+   action:  OPTIONAL.  The action for which the decision is provided.
+      The format is as described in the Actions (Section 3.6) section
 
-   asset:  The asset for which the decision is provided.  The format is
-      as described in the Section 3.5 section.  This asset MAY be
-      greater in scope than described in the Access Query (Section 3.7),
-      i.e. It MAY describe an asset more generally than specified in the
-      Access Query.  However, it MUST NOT be more specific than the
-      asset described in the Access Query.
+   asset:  OPTIONAL.  The asset for which the decision is provided.  The
+      format is as described in the Assets (Section 3.5) section.  This
+      asset MAY be greater in scope than described in the Asset Query
+      (Section 3.7), i.e. It MAY describe an asset more generally than
+      specified in the Asset Query.  However, it MUST NOT be more
+      specific than the asset described in the Asset Query.
 
-   decision:  The decision for the above asset and action.  The format
-      is as described in the Section 3.8 section
+   decision:  REQUIRED.  The decision for the above asset and action.
+      The format is as described in the Query Decision (Section 3.8)
+      section
 
-   The following is a non-normative example of an Access Query Decision:
+   The following is a non-normative example of an Asset Query Decision:
+
+
+
+
+
+
+
+
+Tulshibagwale                Standards Track                    [Page 6]
+
+                                  azapi                        June 2023
+
 
    {
        "action": "stream",
@@ -320,33 +346,53 @@ Tulshibagwale                Standards Track                    [Page 5]
        "decision": "deny"
    }
 
-   {#example-access-query-decision title="Example Access Query
-   Decision"}
+   {#example-asset-query-decision title="Example Asset Query Decision"}
 
 3.10.  Access Evaluations API
 
-   The access evaluations is a means for a PEP to request decisions for
-   a number of assets for a single request context.
+   The access evaluations API is a means for a PEP to request decisions
+   for a number of assets for a single request context.
 
    The Access Evaluations API is available at the relative URL
    evaluations via the POST HTTP method.
-
-
-
-Tulshibagwale                Standards Track                    [Page 6]
-
-                                  azapi                        June 2023
-
 
 3.10.1.  Access Evaluation Request
 
    The content of the request body is a JSON Object with the following
    fields:
 
-   principal:  A principal as described in the Section 3.4 section
+   principal:  A principal as described in the Principals (Section 3.4)
+      section
 
-   queries:  An array of queries defined in section Section 3.7 about
-      access to specific assets
+   queries:  An array of queries defined in Asset Query (Section 3.7)
+      section about access to specific assets
+
+   The following is a non-normative example of an Access Evaluation
+   Request:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Tulshibagwale                Standards Track                    [Page 7]
+
+                                  azapi                        June 2023
+
 
    POST /evaluations HTTP/1.1
    Host: pdp.mycompany.com
@@ -376,6 +422,9 @@ Tulshibagwale                Standards Track                    [Page 6]
      ]
    }
 
+   {#example-access-evaluation-request title="Example of an Access
+   Evaluation Request"}
+
 3.10.2.  Access Evaluation Response
 
    The success response to an Access Evaluation Request is an Access
@@ -386,25 +435,28 @@ Tulshibagwale                Standards Track                    [Page 6]
       epoch milliseconds
 
    exp:  REQUIRED.  The time in integer format, expressed at epoch
-
-
-
-Tulshibagwale                Standards Track                    [Page 7]
-
-                                  azapi                        June 2023
-
-
       milliseconds, after which the response SHOULD NOT be used
 
    principal:  REQUIRED.  The principal for which the response is being
       issued.  The format of this field is as described in the
-      Section 3.4 section
+      Principals (Section 3.4) section
 
-   decisions:  REQUIRED.  An array of Access Query Decisions as
-      described in the Section 3.9 section
+   decisions:  REQUIRED.  An array of Asset Query Decisions as described
+
+
+
+Tulshibagwale                Standards Track                    [Page 8]
+
+                                  azapi                        June 2023
+
+
+      in the Asset Query Decision (Section 3.9) section
 
    evaluationDuration:  REQUIRED.  The time in milliseconds, in integer
       format, that it took to respond to the Access Evaluation Request.
+
+   Following is a non-normative example of an Access Evaluation
+   Response:
 
    HTTP/1.1 OK
    Content-type: application/json
@@ -435,26 +487,136 @@ Tulshibagwale                Standards Track                    [Page 7]
      "evaluationDuration": 30
    }
 
-4.  IANA Considerations
+   {#example-access-evaluation-response title="Example of an Access
+   Evaluation Response"}
 
-   TBS
+3.11.  Search API
+
+   The Access Search API enables a PEP to find out all assets a
+   principal has access to.
+
+   The Access Search API is available at the relative URL search via the
+   POST HTTP method
 
 
 
 
-
-
-
-Tulshibagwale                Standards Track                    [Page 8]
+Tulshibagwale                Standards Track                    [Page 9]
 
                                   azapi                        June 2023
 
+
+3.11.1.  Search Request
+
+   A Search Request has request parameters and a request body.  The
+   request parameters are:
+
+   pageToken:  OPTIONAL.  A string value that is returned in a previous
+      Search Response (Section 3.11.2), which indicates that the request
+      is a continuation of a previous request
+
+   pageSize:  OPTIONAL.  The maximum number of decision items in a
+      Search Response (Section 3.11.2).  The API MAY return a smaller
+      number of items but SHOULD NOT return a number of items that is
+      greater than this value
+
+   The content of a Search Request body is a JSON object with a single
+   field, action as described below:
+
+   action:  REQUIRED.  The type of access that is to be performed.  Its
+      value is a string that describes the action.  This value of this
+      field is as described in the Actions (Section 3.6) section.
+
+   The following is a non-normative example of a Search Request:
+
+   POST /search HTTP/1.1
+   Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM2Q4"&pageSize=2
+   Authorization: <myoauthtoken>
+
+   {
+       "action": "delete",
+   }
+
+   {#example-search-request title="Example Access Request"}
+
+3.11.2.  Search Response
+
+   The success response to a Search Request is a Search Response.  It is
+   a HTTP response of type application/json.  It's body is a JSON object
+   that contains the following fields:
+
+   iat:  REQUIRED.  The issued at time in integer format, expressed as
+      epoch milliseconds
+
+   exp:  REQUIRED.  The time in integer format, expressed at epoch
+      milliseconds, after which the response SHOULD NOT be used
+
+   principal:  REQUIRED.  The principal for which the response is being
+      issued.  The format of this field is as described in the
+      Principals (Section 3.4) section
+
+
+
+Tulshibagwale                Standards Track                   [Page 10]
+
+                                  azapi                        June 2023
+
+
+   decisions:  REQUIRED.  An array of Asset Query Decisions as described
+      in the Asset Query Decision (Section 3.9) section
+
+   nextPageToken:  OPTIONAL.  A string that MAY be used in a Search
+      Request to fetch the next set of responses.
+
+   Following is a non-normative example of an Search Response:
+
+   HTTP/1.1 OK
+   Content-type: application/json
+
+   {
+     "iat": 1234567890,
+     "exp": 1234568890,
+     "principal": {
+       "id": "atul@sgnl.ai"
+     }
+     "decisions": [
+       {
+         "action": "read",
+         "asset": {
+           "type": "customer"
+         },
+         "decision": "deny"
+       },
+       {
+         "action": "read",
+         "asset": {
+           "id": "efgh",
+           "type": "customer",
+         },
+         "decision": "allow"
+       }
+     ],
+     "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
+   }
+
+   {#example-search-response title="Example of an Search Response"}
+
+4.  IANA Considerations
+
+   TBS
 
 5.  Security Considerations
 
    TBS
 
 6.  Normative References
+
+
+
+Tulshibagwale                Standards Track                   [Page 11]
+
+                                  azapi                        June 2023
+
 
    [RFC4001]  Daniele, M., Haberman, B., Routhier, S., and J.
               Schoenwaelder, "Textual Conventions for Internet Network
@@ -497,21 +659,20 @@ Contributors
    Email: marc@sgnl.ai
 
 
-
-
-
-
-Tulshibagwale                Standards Track                    [Page 9]
-
-                                  azapi                        June 2023
-
-
    Erik Gustavson
    SGNL
    Email: erik@sgnl.ai
 
 
 Author's Address
+
+
+
+
+Tulshibagwale                Standards Track                   [Page 12]
+
+                                  azapi                        June 2023
+
 
    Atul Tulshibagwale (editor)
    SGNL
@@ -557,4 +718,11 @@ Author's Address
 
 
 
-Tulshibagwale                Standards Track                   [Page 10]
+
+
+
+
+
+
+
+Tulshibagwale                Standards Track                   [Page 13]
