@@ -76,13 +76,13 @@ Principal:
 : The user or robotic principal about whom the Authorization API call is being made
 
 Asset:
-: The target of the request; the resource that the principal about which the Authorization API is being made
+: The target of the request; the resource about which the Authorization API is being made
 
 Action:
 : The method by which the Principal relates to the Asset in an Authorization API call.
 
 # API Specification
-The Authorization API has two parts, Access Evaluation and Search. Each of these is defined below:
+The Authorization API has two parts, Access Evaluation and Search. Each of these is defined below.
 
 ## API Version
 This document describes the API version 1. Any updates to this API through subsequent revisions of this document or through other documents MAY augment this API, but MUST NOT modify the API described here. Augmentation MAY include additional API methods or additional parameters to existing API methods, additional authorization mechanisms or additional optional headers in API requests. All API methods for version 1 MUST be immediately preceded by the relative URL path `/v1/`.
@@ -241,7 +241,7 @@ The following is a non-normative example of an Asset Query Decision:
 ## Access Evaluations API
 The access evaluations API is a means for a PEP to request decisions for a number of assets for a single request context.
 
-The Access Evaluations API is available at the relative URL `evaluations` via the `POST` HTTP method.
+The Access Evaluations API is available at the relative URL `/evaluations/` via the `POST` HTTP method.
 
 ### Access Evaluation Request
 The content of the request body is a JSON Object with the following fields:
@@ -340,7 +340,7 @@ Content-type: application/json
 ## Search API
 The Access Search API enables a PEP to find out all assets a principal has access to.
 
-The Access Search API is available at the relative URL `search` via the `POST` HTTP method
+The Access Search API is available at the relative URL `/search/` via the `POST` HTTP method
 
 ### Search Request
 A Search Request has request parameters and a request body. The request parameters are:

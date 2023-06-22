@@ -91,8 +91,8 @@ Tulshibagwale                Standards Track                    [Page 1]
    Principal:  The user or robotic principal about whom the
       Authorization API call is being made
 
-   Asset:  The target of the request; the resource that the principal
-      about which the Authorization API is being made
+   Asset:  The target of the request; the resource about which the
+      Authorization API is being made
 
    Action:  The method by which the Principal relates to the Asset in an
       Authorization API call.
@@ -100,7 +100,7 @@ Tulshibagwale                Standards Track                    [Page 1]
 3.  API Specification
 
    The Authorization API has two parts, Access Evaluation and Search.
-   Each of these is defined below:
+   Each of these is defined below.
 
 
 
@@ -354,7 +354,7 @@ Tulshibagwale                Standards Track                    [Page 6]
    for a number of assets for a single request context.
 
    The Access Evaluations API is available at the relative URL
-   evaluations via the POST HTTP method.
+   /evaluations/ via the POST HTTP method.
 
 3.10.1.  Access Evaluation Request
 
@@ -492,8 +492,8 @@ Tulshibagwale                Standards Track                    [Page 8]
    The Access Search API enables a PEP to find out all assets a
    principal has access to.
 
-   The Access Search API is available at the relative URL search via the
-   POST HTTP method
+   The Access Search API is available at the relative URL /search/ via
+   the POST HTTP method
 
 
 
