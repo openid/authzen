@@ -266,7 +266,7 @@ An API request or response MAY contain a collection of items, such as an array o
 The receiver of a collection MUST interpret the collection in a way that results in the least-privilege access. In the above example, this means that the principal has access to the asset identified by "1234", but not to the "homeAddress" and "title" attributes of that asset.
 
 ## Error Responses
-The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTP status code ({{Section 15 of RFC9110}}) that indicates error (a numeric value greater than 299)
+The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTP status code ({{Section 15 of RFC9110}}) that indicates error.
 
 The following errors are indicated by the status codes defined below:
 

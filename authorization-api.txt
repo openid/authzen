@@ -398,8 +398,7 @@ Tulshibagwale                Standards Track                    [Page 7]
 
    The following error responses are common to all methods of the
    Authorization API.  The error response is indicated by an HTTP status
-   code (Section 15 of [RFC9110]) that indicates error (a numeric value
-   greater than 299)
+   code (Section 15 of [RFC9110]) that indicates error.
 
    The following errors are indicated by the status codes defined below:
 
@@ -438,6 +437,7 @@ Tulshibagwale                Standards Track                    [Page 7]
 
    The following is a non-normative example of an Access Evaluation
    Request:
+
 
 
 
