@@ -188,11 +188,11 @@ Tulshibagwale                Standards Track                    [Page 3]
    An Asset is the target of an access request.  It is a JSON
    ([RFC8259]) object that has the following fields:
 
-   id:  OPTIONAL.  The asset Id of the asset.  It's value is a string
+   id:  OPTIONAL.  The asset Id of the asset.  Its value is a string
       specifying the identifier of the asset.  This field MAY be omitted
       to indicate a class of assets
 
-   type:  OPTIONAL.  The type of the asset.  It's value is a string that
+   type:  OPTIONAL.  The type of the asset.  Its value is a string that
       specifies the type of the asset
 
    attributeNames:  OPTIONAL.  An array of strings, each string
@@ -282,8 +282,8 @@ Tulshibagwale                Standards Track                    [Page 5]
                                   azapi                        June 2023
 
 
-   asset:  REQUIRED.  The asset to which this query relates.  It's
-      format is as described in the Assets section (Section 3.5)
+   asset:  REQUIRED.  The asset to which this query relates.  Its format
+      is as described in the Assets section (Section 3.5)
 
    The following is a non-normative example of an Asset Query:
 
@@ -487,7 +487,7 @@ Tulshibagwale                Standards Track                    [Page 8]
 
    The success response to an Access Evaluation Request is an Access
    Evaluation Response.  It is a HTTP response of type application/json.
-   It's body is a JSON object that contains the following fields:
+   Its body is a JSON object that contains the following fields:
 
    iat:  REQUIRED.  The issued at time in integer format, expressed as
       epoch milliseconds
@@ -604,7 +604,7 @@ Tulshibagwale                Standards Track                   [Page 10]
 3.13.2.  Search Response
 
    The success response to a Search Request is a Search Response.  It is
-   a HTTP response of type application/json.  It's body is a JSON object
+   a HTTP response of type application/json.  Its body is a JSON object
    that contains the following fields:
 
    iat:  REQUIRED.  The issued at time in integer format, expressed as

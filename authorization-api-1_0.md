@@ -130,10 +130,10 @@ The following non-normative example describes a Principal:
 An Asset is the target of an access request. It is a JSON ({{RFC8259}}) object that has the following fields:
 
 id:
-: OPTIONAL. The asset Id of the asset. It's value is a `string` specifying the identifier of the asset. This field MAY be omitted to indicate a class of assets
+: OPTIONAL. The asset Id of the asset. Its value is a `string` specifying the identifier of the asset. This field MAY be omitted to indicate a class of assets
 
 type:
-: OPTIONAL. The type of the asset. It's value is a `string` that specifies the type of the asset
+: OPTIONAL. The type of the asset. Its value is a `string` that specifies the type of the asset
 
 attributeNames:
 : OPTIONAL. An array of `string`s, each string representing the name of an attribute of the asset.
@@ -186,7 +186,7 @@ action:
 : REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the Actions section ({{actions}}).
 
 asset:
-: REQUIRED. The asset to which this query relates. It's format is as described in the Assets section ({{assets}})
+: REQUIRED. The asset to which this query relates. Its format is as described in the Assets section ({{assets}})
 
 The following is a non-normative example of an Asset Query:
 
@@ -330,7 +330,7 @@ Authorization: <myoauthtoken>
 {: #example-access-evaluation-request title="Example of an Access Evaluation Request"}
 
 ### Access Evaluation Response
-The success response to an Access Evaluation Request is an Access Evaluation Response. It is a HTTP response of type `application/json`. It's body is a JSON object that contains the following fields:
+The success response to an Access Evaluation Request is an Access Evaluation Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
 
 iat:
 : REQUIRED. The issued at time in `integer` format, expressed as epoch milliseconds
@@ -421,7 +421,7 @@ Authorization: <myoauthtoken>
 {: #example-search-request title="Example Access Request"}
 
 ### Search Response {#search-response}
-The success response to a Search Request is a Search Response. It is a HTTP response of type `application/json`. It's body is a JSON object that contains the following fields:
+The success response to a Search Request is a Search Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
 
 iat:
 : REQUIRED. The issued at time in `integer` format, expressed as epoch milliseconds
