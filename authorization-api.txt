@@ -4,7 +4,7 @@
 
 OpenID TBD                                         A. Tulshibagwale, Ed.
                                                                     SGNL
-                                                            22 June 2023
+                                                            23 June 2023
 
 
                            Authorization API
@@ -26,7 +26,7 @@ Table of Contents
      3.3.  Request Identification  . . . . . . . . . . . . . . . . .   3
      3.4.  Principals  . . . . . . . . . . . . . . . . . . . . . . .   3
      3.5.  Assets  . . . . . . . . . . . . . . . . . . . . . . . . .   4
-     3.6.  Actions . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     3.6.  Actions . . . . . . . . . . . . . . . . . . . . . . . . .   5
        3.6.1.  Common Actions  . . . . . . . . . . . . . . . . . . .   5
        3.6.2.  Custom Actions  . . . . . . . . . . . . . . . . . . .   5
      3.7.  Asset Query . . . . . . . . . . . . . . . . . . . . . . .   5
@@ -94,7 +94,7 @@ Tulshibagwale                Standards Track                    [Page 1]
    Asset:  The target of the request; the resource about which the
       Authorization API is being made
 
-   Action:  The method by which the Principal relates to the Asset in an
+   Action:  The operation the Principal has attempted on the Asset in an
       Authorization API call.
 
 3.  API Specification
@@ -188,8 +188,9 @@ Tulshibagwale                Standards Track                    [Page 3]
    An Asset is the target of an access request.  It is a JSON
    ([RFC8259]) object that has the following fields:
 
-   id:  REQUIRED.  The asset Id of the asset.  It's value is a string
-      specifying the identifier of the asset
+   id:  OPTIONAL.  The asset Id of the asset.  It's value is a string
+      specifying the identifier of the asset.  This field MAY be omitted
+      to indicate a class of assets
 
    type:  OPTIONAL.  The type of the asset.  It's value is a string that
       specifies the type of the asset
@@ -211,13 +212,12 @@ Tulshibagwale                Standards Track                    [Page 3]
 
                           Figure 3: Example Asset
 
-3.6.  Actions
 
-   An action is the type of access that the requester intends to
-   perform.  There are common actions defined herein, or the action may
-   be custom, which could be specific to the application being accessed
-   or shared across a applications but not listed in the common actions
-   below
+
+
+
+
+
 
 
 
@@ -225,6 +225,14 @@ Tulshibagwale                Standards Track                    [Page 4]
 
                                   azapi                        June 2023
 
+
+3.6.  Actions
+
+   An action is the type of access that the requester intends to
+   perform.  There are common actions defined herein, or the action may
+   be custom, which could be specific to the application being accessed
+   or shared across a applications but not listed in the common actions
+   below
 
 3.6.1.  Common Actions
 
@@ -267,20 +275,17 @@ Tulshibagwale                Standards Track                    [Page 4]
       value is a string that describes the action.  This value of this
       field is as described in the Actions section (Section 3.6).
 
-   asset:  REQUIRED.  The asset about which this query is.  It's format
-      is as described in the Assets section (Section 3.5)
-
-   The following is a non-normative example of an Asset Query:
-
-
-
-
 
 
 Tulshibagwale                Standards Track                    [Page 5]
 
                                   azapi                        June 2023
 
+
+   asset:  REQUIRED.  The asset to which this query relates.  It's
+      format is as described in the Assets section (Section 3.5)
+
+   The following is a non-normative example of an Asset Query:
 
    {
        "action": "stream",
@@ -324,12 +329,7 @@ Tulshibagwale                Standards Track                    [Page 5]
       The format is as described in the Query Decision section
       (Section 3.8)
 
-   The following is a non-normative example of an Asset Query Decision:
-
-
-
-
-
+   reason:  OPTIONAL.  A free-form statement about why the decision was
 
 
 
@@ -338,12 +338,18 @@ Tulshibagwale                Standards Track                    [Page 6]
                                   azapi                        June 2023
 
 
+      made.  It can include URLs or other pointers so that a user can
+      self-serve themselves to remediate the situation.
+
+   The following is a non-normative example of an Asset Query Decision:
+
    {
        "action": "stream",
        "asset": {
            "id": "1234"
        },
-       "decision": "deny"
+       "decision": "deny",
+       "reason": "Device not compliant. Go to https://devicemgmt.com/myco to re-register your device"
    }
 
                    Figure 5: Example Asset Query Decision
@@ -376,12 +382,6 @@ Tulshibagwale                Standards Track                    [Page 6]
 
                   Figure 6: Example Overlapping Collection
 
-   The receiver of a collection MUST interpret the collection in a way
-   that results in the least-privilege access.  In the above example,
-   this means that the principal has access to the asset identified by
-   "1234", but not to the "homeAddress" and "title" attributes of that
-   asset.
-
 
 
 
@@ -393,6 +393,12 @@ Tulshibagwale                Standards Track                    [Page 7]
 
                                   azapi                        June 2023
 
+
+   The receiver of a collection MUST interpret the collection in a way
+   that results in the least-privilege access.  In the above example,
+   this means that the principal has access to the asset identified by
+   "1234", but not to the "homeAddress" and "title" attributes of that
+   asset.
 
 3.11.  Error Responses
 
@@ -418,7 +424,7 @@ Tulshibagwale                Standards Track                    [Page 7]
 
 3.12.  Access Evaluations API
 
-   The access evaluations API is a means for a PEP to request decisions
+   The Access Evaluations API is a means for a PEP to request decisions
    for a number of assets for a single request context.
 
    The Access Evaluations API is available at the relative URL
@@ -429,17 +435,11 @@ Tulshibagwale                Standards Track                    [Page 7]
    The content of the request body is a JSON Object with the following
    fields:
 
-   principal:  A principal as described in the Principals section
-      (Section 3.4)
+   principal:  REQUIRED.  A principal as described in the Principals
+      section (Section 3.4)
 
-   queries:  An array of queries defined in Asset Query section
-      (Section 3.7) about access to specific assets
-
-   The following is a non-normative example of an Access Evaluation
-   Request:
-
-
-
+   queries:  REQUIRED.  An array of queries defined in Asset Query
+      section (Section 3.7) about access to specific assets
 
 
 
@@ -449,6 +449,9 @@ Tulshibagwale                Standards Track                    [Page 8]
 
                                   azapi                        June 2023
 
+
+   The following is a non-normative example of an Access Evaluation
+   Request:
 
    POST /evaluations HTTP/1.1
    Host: pdp.mycompany.com
@@ -496,15 +499,15 @@ Tulshibagwale                Standards Track                    [Page 8]
       issued.  The format of this field is as described in the
       Principals section (Section 3.4)
 
-   decisions:  REQUIRED.  An array of Asset Query Decisions as described
-      in the Asset Query Decision section (Section 3.9)
-
 
 
 Tulshibagwale                Standards Track                    [Page 9]
 
                                   azapi                        June 2023
 
+
+   decisions:  REQUIRED.  An array of Asset Query Decisions as described
+      in the Asset Query Decision section (Section 3.9)
 
    evaluationDuration:  REQUIRED.  The time in milliseconds, in integer
       format, that it took to respond to the Access Evaluation Request.
@@ -554,9 +557,6 @@ Tulshibagwale                Standards Track                    [Page 9]
 
 
 
-
-
-
 Tulshibagwale                Standards Track                   [Page 10]
 
                                   azapi                        June 2023
@@ -579,8 +579,8 @@ Tulshibagwale                Standards Track                   [Page 10]
    The content of a Search Request body is a JSON object with the
    following fields:
 
-   principal:  A principal as described in the Principals section
-      (Section 3.4)
+   principal:  REQUIRED.  A principal as described in the Principals
+      section (Section 3.4)
 
    queries:  REQUIRED.  An array of string values as described in the
       Actions section (Section 3.6).
