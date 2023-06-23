@@ -80,7 +80,7 @@ Asset:
 : The target of the request; the resource about which the Authorization API is being made
 
 Action:
-: The method by which the Principal relates to the Asset in an Authorization API call.
+: The operation the Principal has attempted on the Asset in an Authorization API call.
 
 # API Specification
 The Authorization API has two parts, Access Evaluation and Search. Each of these is defined below.
@@ -130,7 +130,7 @@ The following non-normative example describes a Principal:
 An Asset is the target of an access request. It is a JSON ({{RFC8259}}) object that has the following fields:
 
 id:
-: REQUIRED. The asset Id of the asset. It's value is a `string` specifying the identifier of the asset
+: OPTIONAL. The asset Id of the asset. It's value is a `string` specifying the identifier of the asset. This field MAY be omitted to indicate a class of assets
 
 type:
 : OPTIONAL. The type of the asset. It's value is a `string` that specifies the type of the asset
@@ -186,7 +186,7 @@ action:
 : REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the Actions section ({{actions}}).
 
 asset:
-: REQUIRED. The asset about which this query is. It's format is as described in the Assets section ({{assets}})
+: REQUIRED. The asset to which this query relates. It's format is as described in the Assets section ({{assets}})
 
 The following is a non-normative example of an Asset Query:
 
@@ -225,6 +225,9 @@ asset:
 decision:
 : REQUIRED. The decision for the above `asset` and `action`. The format is as described in the Query Decision section ({{query-decision}})
 
+reason:
+: OPTIONAL. A free-form statement about why the decision was made. It can include URLs or other pointers so that a user can self-serve themselves to remediate the situation.
+
 The following is a non-normative example of an Asset Query Decision:
 
 ~~~ json
@@ -233,7 +236,8 @@ The following is a non-normative example of an Asset Query Decision:
     "asset": {
         "id": "1234"
     },
-    "decision": "deny"
+    "decision": "deny",
+    "reason": "Device not compliant. Go to https://devicemgmt.com/myco to re-register your device"
 }
 ~~~
 {: #example-asset-query-decision title="Example Asset Query Decision"}
@@ -279,7 +283,7 @@ The following errors are indicated by the status codes defined below:
 {: #table-error-status-codes title="Error status codes"}
 
 ## Access Evaluations API
-The access evaluations API is a means for a PEP to request decisions for a number of assets for a single request context.
+The Access Evaluations API is a means for a PEP to request decisions for a number of assets for a single request context.
 
 The Access Evaluations API is available at the relative URL `/evaluations/` via the `POST` HTTP method.
 
@@ -287,10 +291,10 @@ The Access Evaluations API is available at the relative URL `/evaluations/` via 
 The content of the request body is a JSON Object with the following fields:
 
 principal:
-: A principal as described in the Principals section ({{principals}})
+: REQUIRED. A principal as described in the Principals section ({{principals}})
 
 queries:
-: An array of queries defined in Asset Query section ({{asset-query}}) about access to specific assets
+: REQUIRED. An array of queries defined in Asset Query section ({{asset-query}}) about access to specific assets
 
 The following is a non-normative example of an Access Evaluation Request:
 
@@ -394,7 +398,7 @@ pageSize:
 The content of a Search Request body is a JSON object with the following fields:
 
 principal:
-: A principal as described in the Principals section ({{principals}})
+: REQUIRED. A principal as described in the Principals section ({{principals}})
 
 queries:
 : REQUIRED. An array of `string` values as described in the Actions section ({{actions}}).
