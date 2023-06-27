@@ -80,7 +80,13 @@ Asset:
 : The target of the request; the resource about which the Authorization API is being made
 
 Action:
-: The operation the Principal has attempted on the Asset in an Authorization API call.
+: The operation the Principal has attempted on the Asset in an Authorization API call
+
+PDP:
+: Policy Decision Point. The component or system that provides authorization decisions over the network interface defined here as the Authorization API
+
+PEP:
+: Policy Enforcement Point. The component or system that requests decisions from the PDP and enforces access to specific requests based on the decisions obtained from the PDP
 
 # API Specification
 The Authorization API has two parts, Access Evaluation and Search. Each of these is defined below.
@@ -92,14 +98,24 @@ This document describes the API version 1. Any updates to this API through subse
 This API SHALL be authenticated using the OAuth 2.0 Bearer access token ({{RFC6750}}) to authorize API calls
 
 ## Request Identification
-All requests to the API MUST have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. The request identifier SHALL be provided using the HTTP Header `X-Request-Id`. The value of this header is an arbitrary string. The following non-normative example describes this header:
+All requests to the API MAY have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. If present, the request identifier SHALL be provided using the HTTP Header `X-Request-ID`. The value of this header is an arbitrary string. The following non-normative example describes this header:
 
 ~~~ http
 POST /access/v1/evaluations HTTP/1.1
 Authorization: Bearer mF_9.B5f-4.1JqM
-X-Request-Id: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #requestidexample title="Request Id Example"}
+
+## Request Identification in a Response
+A PDP responding to an Authorization API request MUST include a request identifier in the response. The request identifier is specified in the HTTP Response header: `X-Request-ID`. If the PEP specified a request identifier in the request, the PDP MUST include the same identifier in the response to that request. If the PEP has not specified a request identifier in the request, the PDP MUST generate a new request identifier in its response to the PEP. The following is an non-normative example of an HTTP Response with this header:
+
+~~~ http
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+~~~
+{: #example-response-request-id title="Example HTTP response with a Request Id"}
 
 ## Principals {#principals}
 A Principal is the user or robotic principal about whom the Authorization API is being invoked. The Principal may be requesting access at the time the Authorization API is invoked, or the Principal may be of interest in a Search API call.
@@ -107,7 +123,7 @@ A Principal is the user or robotic principal about whom the Authorization API is
 A Principal is a JSON ({{RFC8259}}) object that has the following fields:
 
 id:
-: REQUIRED. A field, whose value is of type `string`, which uniquely identifies the user. This identifier could be an email address, or it might be an internal identifier such as a UUID or employee ID.
+: REQUIRED. A field, whose value is of type `string`, which uniquely identifies the user within the scope of a PEP. This identifier could be an email address, or it might be an internal identifier such as a UUID or employee ID.
 
 ipAddress:
 : OPTIONAL. A field, whose value is of type `string`, which is a {{RFC4001}} text representation of the IP Address
@@ -130,7 +146,7 @@ The following non-normative example describes a Principal:
 An Asset is the target of an access request. It is a JSON ({{RFC8259}}) object that has the following fields:
 
 id:
-: OPTIONAL. The asset Id of the asset. Its value is a `string` specifying the identifier of the asset. This field MAY be omitted to indicate a class of assets
+: OPTIONAL. The unique identifier of the asset within the scope of the PEP. Its value is a `string` specifying the identifier of the asset. This field MAY be omitted to indicate a class of assets
 
 type:
 : OPTIONAL. The type of the asset. Its value is a `string` that specifies the type of the asset
@@ -355,6 +371,7 @@ The following is a non-normative example of an Access Evaluation Request:
 POST /evaluations HTTP/1.1
 Host: pdp.mycompany.com
 Authorization: <myoauthtoken>
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
   "principal": {
@@ -395,7 +412,7 @@ principal:
 : REQUIRED. The principal for which the response is being issued. The format of this field is as described in the Principals section ({{principals}})
 
 decisions:
-: REQUIRED. An array of Asset Query Decisions as described in the Asset Query Decision section ({{asset-query-decision}})
+: REQUIRED. An array of Asset Query Decisions as described in the Asset Query Decision section ({{asset-query-decision}}).
 
 reasons:
 : OPTIONAL. An array of Reason Objects ({{reason-object}}) which provide details of every reason identifier specified in the `decisions` field.  This field is REQUIRED if there is at least one decision in the `decisions` field that specifies a `reason_ids` field. The content of the `reasons` field MUST provide details of every identifier in the `reason_ids` fields in the `decisions` array.
@@ -408,6 +425,7 @@ Following is a non-normative example of an Access Evaluation Response:
 ~~~ http
 HTTP/1.1 OK
 Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
   "iat": 1234567890,
@@ -524,6 +542,7 @@ Following is a non-normative example of an Search Response:
 ~~~ http
 HTTP/1.1 OK
 Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
 
 {
   "iat": 1234567890,
