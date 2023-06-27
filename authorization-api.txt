@@ -4,7 +4,7 @@
 
 OpenID TBD                                         A. Tulshibagwale, Ed.
                                                                     SGNL
-                                                            26 June 2023
+                                                            27 June 2023
 
 
                            Authorization API
@@ -20,35 +20,35 @@ Table of Contents
      1.1.  Model . . . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.2.  Features  . . . . . . . . . . . . . . . . . . . . . . . .   2
    2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   2
-   3.  API Specification . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  API Specification . . . . . . . . . . . . . . . . . . . . . .   3
      3.1.  API Version . . . . . . . . . . . . . . . . . . . . . . .   3
      3.2.  API Authorization . . . . . . . . . . . . . . . . . . . .   3
      3.3.  Request Identification  . . . . . . . . . . . . . . . . .   3
-     3.4.  Principals  . . . . . . . . . . . . . . . . . . . . . . .   3
-     3.5.  Assets  . . . . . . . . . . . . . . . . . . . . . . . . .   4
-     3.6.  Actions . . . . . . . . . . . . . . . . . . . . . . . . .   5
-       3.6.1.  Common Actions  . . . . . . . . . . . . . . . . . . .   5
-       3.6.2.  Custom Actions  . . . . . . . . . . . . . . . . . . .   5
-     3.7.  Asset Query . . . . . . . . . . . . . . . . . . . . . . .   5
-     3.8.  Decisions . . . . . . . . . . . . . . . . . . . . . . . .   6
-       3.8.1.  Query Decision  . . . . . . . . . . . . . . . . . . .   6
-       3.8.2.  Reasons . . . . . . . . . . . . . . . . . . . . . . .   6
-       3.8.3.  Asset Query Decision  . . . . . . . . . . . . . . . .   7
-     3.9.  Collections . . . . . . . . . . . . . . . . . . . . . . .   8
-     3.10. Error Responses . . . . . . . . . . . . . . . . . . . . .   9
-     3.11. Access Evaluations API  . . . . . . . . . . . . . . . . .  10
-       3.11.1.  Access Evaluation Request  . . . . . . . . . . . . .  10
-       3.11.2.  Access Evaluation Response . . . . . . . . . . . . .  11
-     3.12. Search API  . . . . . . . . . . . . . . . . . . . . . . .  13
-       3.12.1.  Search Request . . . . . . . . . . . . . . . . . . .  13
-       3.12.2.  Search Response  . . . . . . . . . . . . . . . . . .  14
+     3.4.  Request Identification in a Response  . . . . . . . . . .   3
+     3.5.  Principals  . . . . . . . . . . . . . . . . . . . . . . .   4
+     3.6.  Assets  . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     3.7.  Actions . . . . . . . . . . . . . . . . . . . . . . . . .   5
+       3.7.1.  Common Actions  . . . . . . . . . . . . . . . . . . .   5
+       3.7.2.  Custom Actions  . . . . . . . . . . . . . . . . . . .   6
+     3.8.  Asset Query . . . . . . . . . . . . . . . . . . . . . . .   6
+     3.9.  Decisions . . . . . . . . . . . . . . . . . . . . . . . .   6
+       3.9.1.  Query Decision  . . . . . . . . . . . . . . . . . . .   6
+       3.9.2.  Reasons . . . . . . . . . . . . . . . . . . . . . . .   7
+       3.9.3.  Asset Query Decision  . . . . . . . . . . . . . . . .   8
+     3.10. Collections . . . . . . . . . . . . . . . . . . . . . . .   9
+     3.11. Error Responses . . . . . . . . . . . . . . . . . . . . .   9
+     3.12. Access Evaluations API  . . . . . . . . . . . . . . . . .  10
+       3.12.1.  Access Evaluation Request  . . . . . . . . . . . . .  10
+       3.12.2.  Access Evaluation Response . . . . . . . . . . . . .  11
+     3.13. Search API  . . . . . . . . . . . . . . . . . . . . . . .  13
+       3.13.1.  Search Request . . . . . . . . . . . . . . . . . . .  13
+       3.13.2.  Search Response  . . . . . . . . . . . . . . . . . .  14
    4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  16
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .  16
    6.  Normative References  . . . . . . . . . . . . . . . . . . . .  16
    Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  17
    Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  17
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  17
-
 
 
 
@@ -95,15 +95,15 @@ Tulshibagwale                Standards Track                    [Page 1]
       Authorization API is being made
 
    Action:  The operation the Principal has attempted on the Asset in an
-      Authorization API call.
+      Authorization API call
 
-3.  API Specification
+   PDP:  Policy Decision Point.  The component or system that provides
+      authorization decisions over the network interface defined here as
+      the Authorization API
 
-   The Authorization API has two parts, Access Evaluation and Search.
-   Each of these is defined below.
-
-
-
+   PEP:  Policy Enforcement Point.  The component or system that
+      requests decisions from the PDP and enforces access to specific
+      requests based on the decisions obtained from the PDP
 
 
 
@@ -113,6 +113,11 @@ Tulshibagwale                Standards Track                    [Page 2]
 
                                   azapi                        June 2023
 
+
+3.  API Specification
+
+   The Authorization API has two parts, Access Evaluation and Search.
+   Each of these is defined below.
 
 3.1.  API Version
 
@@ -132,20 +137,46 @@ Tulshibagwale                Standards Track                    [Page 2]
 
 3.3.  Request Identification
 
-   All requests to the API MUST have request identifiers to uniquely
+   All requests to the API MAY have request identifiers to uniquely
    identify them.  The API client (PEP) is responsible for generating
-   the request identifier.  The request identifier SHALL be provided
-   using the HTTP Header X-Request-Id.  The value of this header is an
-   arbitrary string.  The following non-normative example describes this
-   header:
+   the request identifier.  If present, the request identifier SHALL be
+   provided using the HTTP Header X-Request-ID.  The value of this
+   header is an arbitrary string.  The following non-normative example
+   describes this header:
 
    POST /access/v1/evaluations HTTP/1.1
    Authorization: Bearer mF_9.B5f-4.1JqM
-   X-Request-Id: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+   X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
                         Figure 1: Request Id Example
 
-3.4.  Principals
+3.4.  Request Identification in a Response
+
+   A PDP responding to an Authorization API request MUST include a
+   request identifier in the response.  The request identifier is
+   specified in the HTTP Response header: X-Request-ID.  If the PEP
+   specified a request identifier in the request, the PDP MUST include
+   the same identifier in the response to that request.  If the PEP has
+   not specified a request identifier in the request, the PDP MUST
+   generate a new request identifier in its response to the PEP.  The
+   following is an non-normative example of an HTTP Response with this
+   header:
+
+
+
+
+Tulshibagwale                Standards Track                    [Page 3]
+
+                                  azapi                        June 2023
+
+
+   HTTP/1.1 OK
+   Content-type: application/json
+   X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+             Figure 2: Example HTTP response with a Request Id
+
+3.5.  Principals
 
    A Principal is the user or robotic principal about whom the
    Authorization API is being invoked.  The Principal may be requesting
@@ -156,19 +187,12 @@ Tulshibagwale                Standards Track                    [Page 2]
    fields:
 
    id:  REQUIRED.  A field, whose value is of type string, which
-      uniquely identifies the user.  This identifier could be an email
-      address, or it might be an internal identifier such as a UUID or
-      employee ID.
+      uniquely identifies the user within the scope of a PEP.  This
+      identifier could be an email address, or it might be an internal
+      identifier such as a UUID or employee ID.
 
    ipAddress:  OPTIONAL.  A field, whose value is of type string, which
       is a [RFC4001] text representation of the IP Address
-
-
-
-Tulshibagwale                Standards Track                    [Page 3]
-
-                                  azapi                        June 2023
-
 
    deviceId:  OPTIONAL.  A field, whose value is of type string, which
       uniquely identifies the device of the Principal
@@ -181,18 +205,27 @@ Tulshibagwale                Standards Track                    [Page 3]
        "deviceId": "8:65:ee:17:7e:0b"
    }
 
-                     Figure 2: Example Principal Object
+                     Figure 3: Example Principal Object
 
-3.5.  Assets
+3.6.  Assets
 
    An Asset is the target of an access request.  It is a JSON
    ([RFC8259]) object that has the following fields:
 
-   id:  OPTIONAL.  The asset Id of the asset.  Its value is a string
-      specifying the identifier of the asset.  This field MAY be omitted
-      to indicate a class of assets
+   id:  OPTIONAL.  The unique identifier of the asset within the scope
+      of the PEP.  Its value is a string specifying the identifier of
+      the asset.  This field MAY be omitted to indicate a class of
+      assets
 
    type:  OPTIONAL.  The type of the asset.  Its value is a string that
+
+
+
+Tulshibagwale                Standards Track                    [Page 4]
+
+                                  azapi                        June 2023
+
+
       specifies the type of the asset
 
    attributeNames:  OPTIONAL.  An array of strings, each string
@@ -210,23 +243,9 @@ Tulshibagwale                Standards Track                    [Page 3]
        ]
    }
 
-                          Figure 3: Example Asset
+                          Figure 4: Example Asset
 
-
-
-
-
-
-
-
-
-
-Tulshibagwale                Standards Track                    [Page 4]
-
-                                  azapi                        June 2023
-
-
-3.6.  Actions
+3.7.  Actions
 
    An action is the type of access that the requester intends to
    perform.  There are common actions defined herein, or the action may
@@ -234,7 +253,7 @@ Tulshibagwale                Standards Track                    [Page 4]
    or shared across a applications but not listed in the common actions
    below
 
-3.6.1.  Common Actions
+3.7.1.  Common Actions
 
    The following common actions are defined herein:
 
@@ -255,25 +274,6 @@ Tulshibagwale                Standards Track                    [Page 4]
       request
 
    "delete":  The action to delete an entity.  The entity MAY be
-      identified by the asset in the request
-
-   Policies MAY incorporate common action names to provide different
-   decisions based on the action
-
-3.6.2.  Custom Actions
-
-   Any action that is not one of the above is a custom action.  Policies
-   MAY incorporate custom action names if decisions need to be taken
-   differently for different custom actions
-
-3.7.  Asset Query
-
-   An Asset Query is a question about whether a principal can access a
-   specific asset.  It is a JSON object with the following fields:
-
-   action:  REQUIRED.  The type of access that is to be performed.  Its
-      value is a string that describes the action.  This value of this
-      field is as described in the Actions section (Section 3.6).
 
 
 
@@ -282,8 +282,28 @@ Tulshibagwale                Standards Track                    [Page 5]
                                   azapi                        June 2023
 
 
+      identified by the asset in the request
+
+   Policies MAY incorporate common action names to provide different
+   decisions based on the action
+
+3.7.2.  Custom Actions
+
+   Any action that is not one of the above is a custom action.  Policies
+   MAY incorporate custom action names if decisions need to be taken
+   differently for different custom actions
+
+3.8.  Asset Query
+
+   An Asset Query is a question about whether a principal can access a
+   specific asset.  It is a JSON object with the following fields:
+
+   action:  REQUIRED.  The type of access that is to be performed.  Its
+      value is a string that describes the action.  This value of this
+      field is as described in the Actions section (Section 3.7).
+
    asset:  REQUIRED.  The asset to which this query relates.  Its format
-      is as described in the Assets section (Section 3.5)
+      is as described in the Assets section (Section 3.6)
 
    The following is a non-normative example of an Asset Query:
 
@@ -298,28 +318,36 @@ Tulshibagwale                Standards Track                    [Page 5]
        }
    }
 
-                       Figure 4: Example Asset Query
+                       Figure 5: Example Asset Query
 
-3.8.  Decisions
+3.9.  Decisions
 
    Decisions are provided by the PDP in response to requests from the
    PEP.
 
-3.8.1.  Query Decision
+3.9.1.  Query Decision
 
    A query decision is a JSON string which can have one of the following
    values:
+
+
+
+
+Tulshibagwale                Standards Track                    [Page 6]
+
+                                  azapi                        June 2023
+
 
    "allow":  The access request is permitted to go forward
 
    "deny":  The access request is denied and MUST NOT be permitted to go
       forward
 
-3.8.2.  Reasons
+3.9.2.  Reasons
 
    Reasons MUST be provided by the PDP when the Query Decision is deny.
 
-3.8.2.1.  Reason Field
+3.9.2.1.  Reason Field
 
    A Reason Field is a JSON object that has keys and values of type
    string.  The key name is comprised of a two-letter language code, and
@@ -331,24 +359,17 @@ Tulshibagwale                Standards Track                    [Page 5]
        "en": "location restriction violation"
    }
 
-
-
-Tulshibagwale                Standards Track                    [Page 6]
-
-                                  azapi                        June 2023
-
-
-             Figure 5: Example Reason Field with no reason code
+             Figure 6: Example Reason Field with no reason code
 
    {
        "en" : "Access attempt from multiple regions.",
        "es-410": "Intento de acceso desde varias regiones."
    }
 
-        Figure 6: Example Reason Field with reason code and multiple
+        Figure 7: Example Reason Field with reason code and multiple
                                language keys
 
-3.8.2.2.  Reason Object
+3.9.2.2.  Reason Object
 
    A Reason Object specifies a particular reason.  It is a JSON object
    that has the following fields:
@@ -359,11 +380,19 @@ Tulshibagwale                Standards Track                    [Page 6]
    reason_admin:  OPTIONAL.  The reason, which MUST NOT be shared with
       the user, but useful for administrative purposes that indicates
       why the access was denied.  The value of this field is a Reason
-      Field object (Section 3.8.2.1).
+      Field object (Section 3.9.2.1).
 
    reason_user:  OPTIONAL.  The reason, which MAY be shared with the
       user that indicates why the access was denied.  The value of this
-      field is a Reason Field object (Section 3.8.2.1)
+      field is a Reason Field object (Section 3.9.2.1)
+
+
+
+
+Tulshibagwale                Standards Track                    [Page 7]
+
+                                  azapi                        June 2023
+
 
    The following is a non-normative example of a Reason Object:
 
@@ -378,34 +407,26 @@ Tulshibagwale                Standards Track                    [Page 6]
      }
    }
 
-                    Figure 7: Example of a Reason Object
+                    Figure 8: Example of a Reason Object
 
-3.8.3.  Asset Query Decision
+3.9.3.  Asset Query Decision
 
    An Asset Query Decision is a tuple of an asset, action and a
    decision, represented as a JSON object.  It has the following fields:
 
    action:  OPTIONAL.  The action for which the decision is provided.
-
-
-
-Tulshibagwale                Standards Track                    [Page 7]
-
-                                  azapi                        June 2023
-
-
-      The format is as described in the Actions section (Section 3.6)
+      The format is as described in the Actions section (Section 3.7)
 
    asset:  OPTIONAL.  The asset for which the decision is provided.  The
-      format is as described in the Assets section (Section 3.5).  This
+      format is as described in the Assets section (Section 3.6).  This
       asset MAY be greater in scope than described in the Asset Query
-      (Section 3.7), i.e. It MAY describe an asset more generally than
+      (Section 3.8), i.e. It MAY describe an asset more generally than
       specified in the Asset Query.  However, it MUST NOT be more
       specific than the asset described in the Asset Query.
 
    decision:  REQUIRED.  The decision for the above asset and action.
       The format is as described in the Query Decision section
-      (Section 3.8.1)
+      (Section 3.9.1)
 
    reason_ids:  OPTIONAL.  An array of reason identifiers that indicate
       specific resons why the asset query was denied
@@ -421,27 +442,6 @@ Tulshibagwale                Standards Track                    [Page 7]
        "reason_ids": [0,2,3]
    }
 
-                   Figure 8: Example Asset Query Decision
-
-3.9.  Collections
-
-   An API request or response MAY contain a collection of items, such as
-   an array of strings representing various attribute names, or an array
-   of Asset Query Decision objects (Section 3.8.3).  The objects in a
-   collection MAY overlap in scope.  For example:
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -449,6 +449,15 @@ Tulshibagwale                Standards Track                    [Page 8]
 
                                   azapi                        June 2023
 
+
+                   Figure 9: Example Asset Query Decision
+
+3.10.  Collections
+
+   An API request or response MAY contain a collection of items, such as
+   an array of strings representing various attribute names, or an array
+   of Asset Query Decision objects (Section 3.9.3).  The objects in a
+   collection MAY overlap in scope.  For example:
 
    [
        {
@@ -470,7 +479,7 @@ Tulshibagwale                Standards Track                    [Page 8]
        }
    ]
 
-                  Figure 9: Example Overlapping Collection
+                 Figure 10: Example Overlapping Collection
 
    The receiver of a collection MUST interpret the collection in a way
    that results in the least-privilege access.  In the above example,
@@ -478,22 +487,13 @@ Tulshibagwale                Standards Track                    [Page 8]
    "1234", but not to the "homeAddress" and "title" attributes of that
    asset.
 
-3.10.  Error Responses
+3.11.  Error Responses
 
    The following error responses are common to all methods of the
    Authorization API.  The error response is indicated by an HTTP status
    code (Section 15 of [RFC9110]) that indicates error.
 
    The following errors are indicated by the status codes defined below:
-
-
-
-
-
-
-
-
-
 
 
 
@@ -520,7 +520,7 @@ Tulshibagwale                Standards Track                    [Page 9]
 
                         Table 1: Error status codes
 
-3.11.  Access Evaluations API
+3.12.  Access Evaluations API
 
    The Access Evaluations API is a means for a PEP to request decisions
    for a number of assets for a single request context.
@@ -528,16 +528,16 @@ Tulshibagwale                Standards Track                    [Page 9]
    The Access Evaluations API is available at the relative URL
    /evaluations/ via the POST HTTP method.
 
-3.11.1.  Access Evaluation Request
+3.12.1.  Access Evaluation Request
 
    The content of the request body is a JSON Object with the following
    fields:
 
    principal:  REQUIRED.  A principal as described in the Principals
-      section (Section 3.4)
+      section (Section 3.5)
 
    queries:  REQUIRED.  An array of queries defined in Asset Query
-      section (Section 3.7) about access to specific assets
+      section (Section 3.8) about access to specific assets
 
    The following is a non-normative example of an Access Evaluation
    Request:
@@ -565,6 +565,7 @@ Tulshibagwale                Standards Track                   [Page 10]
    POST /evaluations HTTP/1.1
    Host: pdp.mycompany.com
    Authorization: <myoauthtoken>
+   X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
    {
      "principal": {
@@ -590,9 +591,9 @@ Tulshibagwale                Standards Track                   [Page 10]
      ]
    }
 
-             Figure 10: Example of an Access Evaluation Request
+             Figure 11: Example of an Access Evaluation Request
 
-3.11.2.  Access Evaluation Response
+3.12.2.  Access Evaluation Response
 
    The success response to an Access Evaluation Request is an Access
    Evaluation Response.  It is a HTTP response of type application/json.
@@ -606,10 +607,9 @@ Tulshibagwale                Standards Track                   [Page 10]
 
    principal:  REQUIRED.  The principal for which the response is being
       issued.  The format of this field is as described in the
-      Principals section (Section 3.4)
+      Principals section (Section 3.5)
 
    decisions:  REQUIRED.  An array of Asset Query Decisions as described
-      in the Asset Query Decision section (Section 3.8.3)
 
 
 
@@ -618,7 +618,9 @@ Tulshibagwale                Standards Track                   [Page 11]
                                   azapi                        June 2023
 
 
-   reasons:  OPTIONAL.  An array of Reason Objects (Section 3.8.2.2)
+      in the Asset Query Decision section (Section 3.9.3).
+
+   reasons:  OPTIONAL.  An array of Reason Objects (Section 3.9.2.2)
       which provide details of every reason identifier specified in the
       decisions field.  This field is REQUIRED if there is at least one
       decision in the decisions field that specifies a reason_ids field.
@@ -633,6 +635,7 @@ Tulshibagwale                Standards Track                   [Page 11]
 
    HTTP/1.1 OK
    Content-type: application/json
+   X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
    {
      "iat": 1234567890,
@@ -663,9 +666,6 @@ Tulshibagwale                Standards Track                   [Page 11]
          "id": 0,
          "reason_admin": {
            "en": "Request failed policy C076E82F"
-         },
-         "reason_user": {
-           "en-403": "Insufficient privileges. Contact your administrator",
 
 
 
@@ -674,6 +674,9 @@ Tulshibagwale                Standards Track                   [Page 12]
                                   azapi                        June 2023
 
 
+         },
+         "reason_user": {
+           "en-403": "Insufficient privileges. Contact your administrator",
            "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
          }
        },
@@ -690,9 +693,9 @@ Tulshibagwale                Standards Track                   [Page 12]
      "evaluationDuration": 30
    }
 
-            Figure 11: Example of an Access Evaluation Response
+            Figure 12: Example of an Access Evaluation Response
 
-3.12.  Search API
+3.13.  Search API
 
    The Access Search API enables a PEP to find out all assets a
    principal has access to.
@@ -700,17 +703,17 @@ Tulshibagwale                Standards Track                   [Page 12]
    The Access Search API is available at the relative URL /search/ via
    the POST HTTP method
 
-3.12.1.  Search Request
+3.13.1.  Search Request
 
    A Search Request has request parameters and a request body.  The
    request parameters are:
 
    pageToken:  OPTIONAL.  A string value that is returned in a previous
-      Search Response (Section 3.12.2), which indicates that the request
+      Search Response (Section 3.13.2), which indicates that the request
       is a continuation of a previous request
 
    pageSize:  OPTIONAL.  The maximum number of decision items in a
-      Search Response (Section 3.12.2).  The API MAY return a smaller
+      Search Response (Section 3.13.2).  The API MAY return a smaller
       number of items but SHOULD NOT return a number of items that is
       greater than this value
 
@@ -718,10 +721,7 @@ Tulshibagwale                Standards Track                   [Page 12]
    following fields:
 
    principal:  REQUIRED.  A principal as described in the Principals
-      section (Section 3.4)
-
-   queries:  REQUIRED.  An array of string values as described in the
-      Actions section (Section 3.6).
+      section (Section 3.5)
 
 
 
@@ -729,6 +729,9 @@ Tulshibagwale                Standards Track                   [Page 13]
 
                                   azapi                        June 2023
 
+
+   queries:  REQUIRED.  An array of string values as described in the
+      Actions section (Section 3.7).
 
    The following is a non-normative example of a Search Request:
 
@@ -744,9 +747,9 @@ Tulshibagwale                Standards Track                   [Page 13]
      "queries": ["delete", "read"],
    }
 
-                     Figure 12: Example Access Request
+                     Figure 13: Example Access Request
 
-3.12.2.  Search Response
+3.13.2.  Search Response
 
    The success response to a Search Request is a Search Response.  It is
    a HTTP response of type application/json.  Its body is a JSON object
@@ -760,12 +763,12 @@ Tulshibagwale                Standards Track                   [Page 13]
 
    principal:  REQUIRED.  The principal for which the response is being
       issued.  The format of this field is as described in the
-      Principals section (Section 3.4)
+      Principals section (Section 3.5)
 
    decisions:  REQUIRED.  An array of Asset Query Decisions as described
-      in the Asset Query Decision section (Section 3.8.3)
+      in the Asset Query Decision section (Section 3.9.3)
 
-   reasons:  OPTIONAL.  An array of Reason Objects (Section 3.8.2.2)
+   reasons:  OPTIONAL.  An array of Reason Objects (Section 3.9.2.2)
       that describe the reason for each reason identified in the
       decisions field.  This field is REQUIRED if there is at least one
       decision in the decisions field that specifies a reason_ids field.
@@ -775,9 +778,6 @@ Tulshibagwale                Standards Track                   [Page 13]
    nextPageToken:  OPTIONAL.  A string that MAY be used in a Search
       Request to fetch the next set of responses.
 
-   Following is a non-normative example of an Search Response:
-
-
 
 
 
@@ -786,8 +786,11 @@ Tulshibagwale                Standards Track                   [Page 14]
                                   azapi                        June 2023
 
 
+   Following is a non-normative example of an Search Response:
+
    HTTP/1.1 OK
    Content-type: application/json
+   X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
 
    {
      "iat": 1234567890,
@@ -831,9 +834,6 @@ Tulshibagwale                Standards Track                   [Page 14]
          },
          "reason_user": {
            "en-404": "Invalid request."
-         }
-       }
-     ]
 
 
 
@@ -842,10 +842,13 @@ Tulshibagwale                Standards Track                   [Page 15]
                                   azapi                        June 2023
 
 
+         }
+       }
+     ]
      "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
    }
 
-                  Figure 13: Example of an Search Response
+                  Figure 14: Example of an Search Response
 
 4.  IANA Considerations
 
@@ -886,10 +889,7 @@ Tulshibagwale                Standards Track                   [Page 15]
               DOI 10.17487/RFC9110, June 2022,
               <https://www.rfc-editor.org/info/rfc9110>.
 
-   [XACML]    Godik, S., Ed. and T. M. (Ed.), Ed., "eXtensible Access
-              Control Markup Language (XACML) Version 1.1", 2006,
-              <https://www.oasis-open.org/committees/xacml/repository/
-              cs-xacml-specification-1.1.pdf>.
+
 
 
 
@@ -897,6 +897,11 @@ Tulshibagwale                Standards Track                   [Page 16]
 
                                   azapi                        June 2023
 
+
+   [XACML]    Godik, S., Ed. and T. M. (Ed.), Ed., "eXtensible Access
+              Control Markup Language (XACML) Version 1.1", 2006,
+              <https://www.oasis-open.org/committees/xacml/repository/
+              cs-xacml-specification-1.1.pdf>.
 
 Acknowledgements
 
@@ -920,11 +925,6 @@ Author's Address
    Atul Tulshibagwale (editor)
    SGNL
    Email: atul@sgnl.ai
-
-
-
-
-
 
 
 
