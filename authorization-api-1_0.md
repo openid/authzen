@@ -249,6 +249,22 @@ reason_admin:
 reason_user:
 : OPTIONAL. The reason, which MAY be shared with the user that indicates why the access was denied. The value of this field is a Reason Field object ({{reason-field}})
 
+The following is a non-normative example of a Reason Object:
+
+~~~json
+{
+  "id": 0,
+  "reason_admin": {
+    "en": "Request failed policy C076E82F"
+  },
+  "reason_user": {
+    "en-403": "Insufficient privileges. Contact your administrator",
+    "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
+  }
+}
+~~~
+{: #example-reason-object title="Example of a Reason Object"}
+
 ### Asset Query Decision {#asset-query-decision}
 An Asset Query Decision is a tuple of an asset, action and a decision, represented as a JSON object. It has the following fields:
 
@@ -580,5 +596,6 @@ TBS
 This template uses extracts from templates written by
 {{{Pekka Savola}}}, {{{Elwyn Davies}}} and
 {{{Henrik Levkowetz}}}.
+
 
 

@@ -36,18 +36,18 @@ Table of Contents
        3.8.3.  Asset Query Decision  . . . . . . . . . . . . . . . .   7
      3.9.  Collections . . . . . . . . . . . . . . . . . . . . . . .   8
      3.10. Error Responses . . . . . . . . . . . . . . . . . . . . .   9
-     3.11. Access Evaluations API  . . . . . . . . . . . . . . . . .   9
-       3.11.1.  Access Evaluation Request  . . . . . . . . . . . . .   9
-       3.11.2.  Access Evaluation Response . . . . . . . . . . . . .  10
-     3.12. Search API  . . . . . . . . . . . . . . . . . . . . . . .  12
-       3.12.1.  Search Request . . . . . . . . . . . . . . . . . . .  12
-       3.12.2.  Search Response  . . . . . . . . . . . . . . . . . .  13
-   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
-   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  15
-   6.  Normative References  . . . . . . . . . . . . . . . . . . . .  15
-   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  16
-   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  16
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  16
+     3.11. Access Evaluations API  . . . . . . . . . . . . . . . . .  10
+       3.11.1.  Access Evaluation Request  . . . . . . . . . . . . .  10
+       3.11.2.  Access Evaluation Response . . . . . . . . . . . . .  11
+     3.12. Search API  . . . . . . . . . . . . . . . . . . . . . . .  13
+       3.12.1.  Search Request . . . . . . . . . . . . . . . . . . .  13
+       3.12.2.  Search Response  . . . . . . . . . . . . . . . . . .  14
+   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  16
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  16
+   6.  Normative References  . . . . . . . . . . . . . . . . . . . .  16
+   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  17
+   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  17
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  17
 
 
 
@@ -365,12 +365,35 @@ Tulshibagwale                Standards Track                    [Page 6]
       user that indicates why the access was denied.  The value of this
       field is a Reason Field object (Section 3.8.2.1)
 
+   The following is a non-normative example of a Reason Object:
+
+   {
+     "id": 0,
+     "reason_admin": {
+       "en": "Request failed policy C076E82F"
+     },
+     "reason_user": {
+       "en-403": "Insufficient privileges. Contact your administrator",
+       "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
+     }
+   }
+
+                    Figure 7: Example of a Reason Object
+
 3.8.3.  Asset Query Decision
 
    An Asset Query Decision is a tuple of an asset, action and a
    decision, represented as a JSON object.  It has the following fields:
 
    action:  OPTIONAL.  The action for which the decision is provided.
+
+
+
+Tulshibagwale                Standards Track                    [Page 7]
+
+                                  azapi                        June 2023
+
+
       The format is as described in the Actions section (Section 3.6)
 
    asset:  OPTIONAL.  The asset for which the decision is provided.  The
@@ -387,13 +410,6 @@ Tulshibagwale                Standards Track                    [Page 6]
    reason_ids:  OPTIONAL.  An array of reason identifiers that indicate
       specific resons why the asset query was denied
 
-
-
-Tulshibagwale                Standards Track                    [Page 7]
-
-                                  azapi                        June 2023
-
-
    The following is a non-normative example of an Asset Query Decision:
 
    {
@@ -405,7 +421,7 @@ Tulshibagwale                Standards Track                    [Page 7]
        "reason_ids": [0,2,3]
    }
 
-                   Figure 7: Example Asset Query Decision
+                   Figure 8: Example Asset Query Decision
 
 3.9.  Collections
 
@@ -413,6 +429,26 @@ Tulshibagwale                Standards Track                    [Page 7]
    an array of strings representing various attribute names, or an array
    of Asset Query Decision objects (Section 3.8.3).  The objects in a
    collection MAY overlap in scope.  For example:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Tulshibagwale                Standards Track                    [Page 8]
+
+                                  azapi                        June 2023
+
 
    [
        {
@@ -434,21 +470,13 @@ Tulshibagwale                Standards Track                    [Page 7]
        }
    ]
 
-                  Figure 8: Example Overlapping Collection
+                  Figure 9: Example Overlapping Collection
 
    The receiver of a collection MUST interpret the collection in a way
    that results in the least-privilege access.  In the above example,
    this means that the principal has access to the asset identified by
    "1234", but not to the "homeAddress" and "title" attributes of that
    asset.
-
-
-
-
-Tulshibagwale                Standards Track                    [Page 8]
-
-                                  azapi                        June 2023
-
 
 3.10.  Error Responses
 
@@ -457,6 +485,26 @@ Tulshibagwale                Standards Track                    [Page 8]
    code (Section 15 of [RFC9110]) that indicates error.
 
    The following errors are indicated by the status codes defined below:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Tulshibagwale                Standards Track                    [Page 9]
+
+                                  azapi                        June 2023
+
 
             +======+================+=========================+
             | Code | Description    | HTTP Body Content       |
@@ -501,7 +549,15 @@ Tulshibagwale                Standards Track                    [Page 8]
 
 
 
-Tulshibagwale                Standards Track                    [Page 9]
+
+
+
+
+
+
+
+
+Tulshibagwale                Standards Track                   [Page 10]
 
                                   azapi                        June 2023
 
@@ -534,7 +590,7 @@ Tulshibagwale                Standards Track                    [Page 9]
      ]
    }
 
-             Figure 9: Example of an Access Evaluation Request
+             Figure 10: Example of an Access Evaluation Request
 
 3.11.2.  Access Evaluation Response
 
@@ -557,7 +613,7 @@ Tulshibagwale                Standards Track                    [Page 9]
 
 
 
-Tulshibagwale                Standards Track                   [Page 10]
+Tulshibagwale                Standards Track                   [Page 11]
 
                                   azapi                        June 2023
 
@@ -613,7 +669,7 @@ Tulshibagwale                Standards Track                   [Page 10]
 
 
 
-Tulshibagwale                Standards Track                   [Page 11]
+Tulshibagwale                Standards Track                   [Page 12]
 
                                   azapi                        June 2023
 
@@ -634,7 +690,7 @@ Tulshibagwale                Standards Track                   [Page 11]
      "evaluationDuration": 30
    }
 
-            Figure 10: Example of an Access Evaluation Response
+            Figure 11: Example of an Access Evaluation Response
 
 3.12.  Search API
 
@@ -669,7 +725,7 @@ Tulshibagwale                Standards Track                   [Page 11]
 
 
 
-Tulshibagwale                Standards Track                   [Page 12]
+Tulshibagwale                Standards Track                   [Page 13]
 
                                   azapi                        June 2023
 
@@ -688,7 +744,7 @@ Tulshibagwale                Standards Track                   [Page 12]
      "queries": ["delete", "read"],
    }
 
-                     Figure 11: Example Access Request
+                     Figure 12: Example Access Request
 
 3.12.2.  Search Response
 
@@ -725,7 +781,7 @@ Tulshibagwale                Standards Track                   [Page 12]
 
 
 
-Tulshibagwale                Standards Track                   [Page 13]
+Tulshibagwale                Standards Track                   [Page 14]
 
                                   azapi                        June 2023
 
@@ -781,7 +837,7 @@ Tulshibagwale                Standards Track                   [Page 13]
 
 
 
-Tulshibagwale                Standards Track                   [Page 14]
+Tulshibagwale                Standards Track                   [Page 15]
 
                                   azapi                        June 2023
 
@@ -789,7 +845,7 @@ Tulshibagwale                Standards Track                   [Page 14]
      "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
    }
 
-                  Figure 12: Example of an Search Response
+                  Figure 13: Example of an Search Response
 
 4.  IANA Considerations
 
@@ -837,7 +893,7 @@ Tulshibagwale                Standards Track                   [Page 14]
 
 
 
-Tulshibagwale                Standards Track                   [Page 15]
+Tulshibagwale                Standards Track                   [Page 16]
 
                                   azapi                        June 2023
 
@@ -893,4 +949,4 @@ Author's Address
 
 
 
-Tulshibagwale                Standards Track                   [Page 16]
+Tulshibagwale                Standards Track                   [Page 17]
