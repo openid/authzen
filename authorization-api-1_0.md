@@ -204,7 +204,10 @@ The following is a non-normative example of an Asset Query:
 ~~~
 {: #example-asset-query title="Example Asset Query"}
 
-## Query Decision {#query-decision}
+## Decisions
+Decisions are provided by the PDP in response to requests from the PEP.
+
+### Query Decision {#query-decision}
 A query decision is a JSON `string` which can have one of the following values:
 
 "allow":
@@ -213,7 +216,40 @@ A query decision is a JSON `string` which can have one of the following values:
 "deny":
 : The access request is denied and MUST NOT be permitted to go forward
 
-## Asset Query Decision {#asset-query-decision}
+### Reasons
+Reasons MUST be provided by the PDP when the Query Decision is `deny`. 
+
+#### Reason Field {#reason-field}
+A Reason Field is a JSON object that has keys and values of type `string`. The key name is comprised of a two-letter language code, and optionally a hyphen followed by a string of decimal digits that is a reason code. The following are non-normative examples of Reason Field objects:
+
+~~~ json
+{
+    "en": "location restriction violation"
+}
+~~~
+{: #example-reason-field-no-code title="Example Reason Field with no reason code"}
+
+~~~ json
+{
+    "en" : "Access attempt from multiple regions.",
+    "es-410": "Intento de acceso desde varias regiones."
+}
+~~~
+{: #example-reason-field-with-code title="Example Reason Field with reason code and multiple language keys"}
+
+#### Reason Object {#reason-object}
+A Reason Object specifies a particular reason. It is a JSON object that has the following fields:
+
+id:
+: REQUIRED. A numeric value of that specifies the reason within the scope of a particular response
+
+reason_admin:
+: OPTIONAL. The reason, which MUST NOT be shared with the user, but useful for administrative purposes that indicates why the access was denied. The value of this field is a Reason Field object ({{reason-field}}).
+
+reason_user:
+: OPTIONAL. The reason, which MAY be shared with the user that indicates why the access was denied. The value of this field is a Reason Field object ({{reason-field}})
+
+### Asset Query Decision {#asset-query-decision}
 An Asset Query Decision is a tuple of an asset, action and a decision, represented as a JSON object. It has the following fields:
 
 action:
@@ -225,8 +261,8 @@ asset:
 decision:
 : REQUIRED. The decision for the above `asset` and `action`. The format is as described in the Query Decision section ({{query-decision}})
 
-reason:
-: OPTIONAL. A free-form statement about why the decision was made. It can include URLs or other pointers so that a user can self-serve themselves to remediate the situation.
+reason_ids:
+: OPTIONAL. An array of reason identifiers that indicate specific resons why the asset query was denied
 
 The following is a non-normative example of an Asset Query Decision:
 
@@ -237,7 +273,7 @@ The following is a non-normative example of an Asset Query Decision:
         "id": "1234"
     },
     "decision": "deny",
-    "reason": "Device not compliant. Go to https://devicemgmt.com/myco to re-register your device"
+    "reason_ids": [0,2,3]
 }
 ~~~
 {: #example-asset-query-decision title="Example Asset Query Decision"}
@@ -255,7 +291,8 @@ An API request or response MAY contain a collection of items, such as an array o
               "title"
             ]
         },
-        "decision": "deny"
+        "decision": "deny",
+        "reason_ids": [1]
     },
     {
         "asset": {
@@ -344,6 +381,9 @@ principal:
 decisions:
 : REQUIRED. An array of Asset Query Decisions as described in the Asset Query Decision section ({{asset-query-decision}})
 
+reasons:
+: OPTIONAL. An array of Reason Objects ({{reason-object}}) which provide details of every reason identifier specified in the `decisions` field.  This field is REQUIRED if there is at least one decision in the `decisions` field that specifies a `reason_ids` field. The content of the `reasons` field MUST provide details of every identifier in the `reason_ids` fields in the `decisions` array.
+
 evaluationDuration:
 : REQUIRED. The time in milliseconds, in `integer` format, that it took to respond to the Access Evaluation Request.
 
@@ -365,7 +405,8 @@ Content-type: application/json
       "asset": {
         "type": "customer"
       },
-      "decision": "deny"
+      "decision": "deny",
+      "reasons": [1]
     },
     {
       "action": "read",
@@ -374,6 +415,27 @@ Content-type: application/json
         "type": "customer",
       },
       "decision": "allow"
+    }
+  ],
+  "reasons": [
+    {
+      "id": 0,
+      "reason_admin": {
+        "en": "Request failed policy C076E82F"
+      },
+      "reason_user": {
+        "en-403": "Insufficient privileges. Contact your administrator",
+        "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
+      }
+    },
+    {
+      "id": 1,
+      "reason_admin": {
+        "en-410": "Access attempt from multiple regions"
+      },
+      "reason_user": {
+        "en": "Insufficient privileges. Contact your administrator"
+      }
     }
   ],
   "evaluationDuration": 30
@@ -435,6 +497,9 @@ principal:
 decisions:
 : REQUIRED. An array of Asset Query Decisions as described in the Asset Query Decision section ({{asset-query-decision}})
 
+reasons:
+: OPTIONAL. An array of Reason Objects ({{reason-object}}) that describe the reason for each reason identified in the `decisions` field. This field is REQUIRED if there is at least one decision in the `decisions` field that specifies a `reason_ids` field. The content of the `reasons` field MUST provide details of every identifier in the `reason_ids` fields in the `decisions` array.
+
 nextPageToken:
 : OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.
 
@@ -458,6 +523,7 @@ Content-type: application/json
         "type": "customer"
       },
       "decision": "deny"
+      "reason_ids": [1,2]
     },
     {
       "action": "read",
@@ -468,6 +534,26 @@ Content-type: application/json
       "decision": "allow"
     }
   ],
+  "reasons": [
+    {
+      "id": 1,
+      "reason_admin": {
+        "en-403": "Default action. No policy matches request."
+      }
+      "reason_user": {
+        "en": "Default action. No policy matches request."
+      }
+    },
+    {
+      "id": 2,
+      "reason_admin": {
+        "en-404": "Could not find specified resource"
+      },
+      "reason_user": {
+        "en-404": "Invalid request."
+      }
+    }
+  ]
   "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
 }
 ~~~
@@ -494,4 +580,5 @@ TBS
 This template uses extracts from templates written by
 {{{Pekka Savola}}}, {{{Elwyn Davies}}} and
 {{{Henrik Levkowetz}}}.
+
 
