@@ -1,2 +1,2 @@
-# authzapi
-Proposed standard for an Authorization API
+# Authorization API Proposal
+
