@@ -54,7 +54,7 @@ normative:
 
 --- abstract
 
-The Authorization API enables Policy Distribution Points (PDPs) and Policy Enforcement Points (PEPs) to communicate authorization requests and decisions to each other without requiring knowledge of each other's inner workings. The Authorization API is served by the PDP and is called by the PEP. The Authorization API includes an Evaluations endpoint, which provides specific access decisions and a Search endpoint, which provides generalized access capabilities.
+The Authorization API enables Policy Decision Points (PDPs) and Policy Enforcement Points (PEPs) to communicate authorization requests and decisions to each other without requiring knowledge of each other's inner workings. The Authorization API is served by the PDP and is called by the PEP. The Authorization API includes an Evaluations endpoint, which provides specific access decisions and a Search endpoint, which provides generalized access capabilities.
 
 --- middle
 
