@@ -32,7 +32,7 @@ contributor: # Same structure as author list, but goes into contributors
 - name: Erik Gustavson
   org: SGNL
   email: erik@sgnl.ai
--name: Omri Gazitt
+- name: Omri Gazitt
   org: Aserto
   email: omri@aserto.com
 
