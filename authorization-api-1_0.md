@@ -32,6 +32,9 @@ contributor: # Same structure as author list, but goes into contributors
 - name: Erik Gustavson
   org: SGNL
   email: erik@sgnl.ai
+-name: Omri Gazitt
+  org: Aserto
+  email: omri@aserto.com
 
 normative:
   RFC4001: # text representation of IP addresses
@@ -63,7 +66,9 @@ The Authorization API enables Policy Decision Points (PDPs) and Policy Enforceme
 Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML ({{XACML}}). Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
 
 ## Model
-The Authorization API is a REST API published by the PDP, to which the PEP acts as a client. The Authorization API is itself authorized using OAuth 2.0 ({{RFC6749}})
+The Authorization API is a REST API published by the PDP, to which the PEP acts as a client. 
+
+Authorization for the Authorization API itself is out of scope for this document, since authorization for REST APIs is well-documented elsewhere. For example, the Authorization API MAY support authorization using an `Authorization` header, using a `basic` or `bearer` token. Support for OAuth 2.0 ({{RFC6749}}) is RECOMMENDED. 
 
 ## Features
 The Authorization API has two main features:
