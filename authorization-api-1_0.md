@@ -35,6 +35,9 @@ contributor: # Same structure as author list, but goes into contributors
 - name: Omri Gazitt
   org: Aserto
   email: omri@aserto.com
+- name: Alex Babeanu
+  org: 3Edges
+  email: alex@3edges.com
 
 normative:
   RFC4001: # text representation of IP addresses
@@ -599,7 +602,184 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
 ~~~
 {: #example-search-response title="Example of an Search Response"}
 
+## Reverse-Search API
+The Access Reverse Search API does the reverse of the Search API: it enables a PEP or client to find out all the principals that can access a given asset.
 
+The Access Reverse Search API is available at the relative URL `/reversesearch/` via the `POST` HTTP method
+
+### Reverse-Search Request
+A Reverse-Search Request has request parameters and a request body. The request parameters are:
+
+pageToken:
+: OPTIONAL. A string value that is returned in a previous Reverse-Search Response ({{reverse-search-response}}), which indicates that the request is a continuation of a previous request
+
+pageSize:
+: OPTIONAL. The maximum number of `decision` items in a Reverse-Search Response ({{reverse-search-response}}). The API MAY return a smaller number of items but SHOULD NOT return a number of items that is greater than this value
+
+The content of a Reverse Search Request body is a JSON object with the following fields:
+
+asset:
+: REQUIRED. An asset as described in the Assets section ({{assets}})
+
+queries:
+: REQUIRED. An array of `string` values as described in the Actions section ({{actions}}).
+
+The following is a non-normative example of a Reverse-Search Request:
+
+~~~ http
+POST /reversesearch HTTP/1.1
+Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM2Q4"&pageSize=2
+Authorization: <myoauthtoken>
+
+{
+  "asset": {
+    "id": "somevalue",
+    "type": "document",
+    "attributeNames": [
+        "author",
+        "createDate",
+        "lastUpdated"
+    ]
+   },
+  "queries": ["delete", "read", "write"]
+}
+~~~
+{: #example-reverse-search-request title="Example Reverse Search Request"}
+
+### Reverse Search Response {#reverse-search-response}
+The success response to a Reverse Search Request is a Reverse Search Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
+
+iat:
+: REQUIRED. The issued at time in `integer` format, expressed as epoch milliseconds
+
+principal:
+: REQUIRED. The principal for which the response is being issued. The format of this field is as described in the Assets section ({{principals}})
+
+results:
+: REQUIRED. An array of Principal Query results as described below ({{principal-query-result}}).
+
+reasons:
+: OPTIONAL. An array of Reason Objects ({{reason-object}}) that describe the reason for each reason identified in the `decisions` field. This field is REQUIRED if there is at least one decision in the `decisions` field that specifies a `reason_ids` field. The content of the `reasons` field MUST provide details of every identifier in the `reason_ids` fields in the `decisions` array.
+
+nextPageToken:
+: OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.
+
+#### Principal Query Result {{principal-query-result}}
+A Principal Query Result is JSON object combining a principal, a list of asset attribute names and an action. Given that a Principal Query result is expected to be the response to a reverse-Search, only positive matches should be returned; i.e., only those principals that match the search criteria (those principals that are allowed to access the provided Asset Attributes). Any principals absent from the results do not have any access to the Asset. 
+A Principal Query Result has the following fields:
+
+actions:
+: OPTIONAL. An Array of the action for which the decision is provided. The format is as described in the Actions section ({{actions}}). The values in this list should match the values provided as queries in the Reverse-Search request.
+
+attributeNames:
+: OPTIONAL. An Array of attribute names of the asset for which the response applies. The attribute is provided only if attributes were part of the reverse-search request. In that case, the attribute names must match those that are part of the request.
+
+principal:
+: REQUIRED. The principal for which the decision is provided. The format is as described in the Principals section ({{principals}}). 
+
+reason_ids:
+: OPTIONAL. An array of reason identifiers that indicate specific reasons why the asset query was denied
+
+The following is a non-normative example of a Principal Query Decision:
+
+~~~ json
+{
+    "actions": ["delete", "read", "write"],
+    "attributeNames": [
+        "author",
+        "createDate",
+        "lastUpdated"
+    ],
+    "principal": {
+        "id": "alex@3edges.com"
+    },
+    "reason_ids": [0,2,3]
+}
+~~~
+{: #example-principal-query-decision title="Example Principal Query Decision"}
+
+Following is a non-normative example of a Reverse Search Response:
+
+~~~ http
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
+
+{
+  "iat": 1234567890,
+  "asset": {
+    "id": "somevalue",
+    "type": "document",
+    "attributeNames": [
+      "author",
+      "createDate",
+      "lastUpdated"
+    ]
+  },
+  "queries": [
+    "write",
+    "read"
+  ],
+  "decisions": [
+    {
+      "action": "write",
+      "attributeNames": [
+        "author"
+      ],
+      "principal": {
+        "id": "alex@3edges.com"
+      },
+      "reason_ids": [3]
+    },
+    {
+      "action": "read",
+      "attributeNames": [
+        "author",
+        "createDate",
+        "lastUpdated"
+      ],
+      "principal": {
+        "id": "alex@3edges.com"
+      },
+      "reason_ids": [1,3]
+    },
+    {
+      "action": "read",
+      "attributeNames": [
+        "author",
+        "createDate",
+        "lastUpdated"
+      ],
+      "principal": {
+        "id": "Janet@3edges.com"
+      },
+      "reason_ids": [2]
+    }
+  ],
+  "reasons": [
+    {
+      "id": 1,
+      "reason_admin": {
+        "en-200": "Subject is an admin."
+      },
+      "reason_user": {
+        "en": "Default action. No policy matches request."
+      }
+    },
+    {
+      "id": 3,
+      "reason_admin": {
+        "en-200": "Matches Policy ID: 001."
+      },
+      "reason_user": {
+        "en-200": "Subject authorized."
+      }
+    }
+  ],
+  "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
+}
+~~~
+{: #example-reverse-search-response title="Example of a Reverse Search Response"}
 
 # IANA Considerations {#IANA}
 
