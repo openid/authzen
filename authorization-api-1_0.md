@@ -664,7 +664,7 @@ reasons:
 nextPageToken:
 : OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.
 
-#### Principal Query Result {{principal-query-result}}
+#### Principal Query Result {#principal-query-result}
 A Principal Query Result is JSON object combining a principal, a list of asset attribute names and an action. Given that a Principal Query result is expected to be the response to a reverse-Search, only positive matches should be returned; i.e., only those principals that match the search criteria (those principals that are allowed to access the provided Asset Attributes). Any principals absent from the results do not have any access to the Asset. 
 A Principal Query Result has the following fields:
 
