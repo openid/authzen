@@ -602,21 +602,21 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
 ~~~
 {: #example-search-response title="Example of an Search Response"}
 
-## Reverse-Search API
-The Access Reverse Search API does the reverse of the Search API: it enables a PEP or client to find out all the principals that can access a given asset.
+## Subject Search API
+The Access Subject Search API does the reverse of the Search API: it enables a PEP or client to find out all the principals that can access a given asset.
 
-The Access Reverse Search API is available at the relative URL `/reversesearch/` via the `POST` HTTP method
+The Access Subject Search API is available at the relative URL `/subjectsearch/` via the `POST` HTTP method
 
-### Reverse-Search Request
-A Reverse-Search Request has request parameters and a request body. The request parameters are:
+### Subject Search Request
+A Subject Search Request has request parameters and a request body. The request parameters are:
 
 pageToken:
-: OPTIONAL. A string value that is returned in a previous Reverse-Search Response ({{reverse-search-response}}), which indicates that the request is a continuation of a previous request
+: OPTIONAL. A string value that is returned in a previous Subject Search Response ({{subject-search-response}}), which indicates that the request is a continuation of a previous request
 
 pageSize:
-: OPTIONAL. The maximum number of `decision` items in a Reverse-Search Response ({{reverse-search-response}}). The API MAY return a smaller number of items but SHOULD NOT return a number of items that is greater than this value
+: OPTIONAL. The maximum number of `decision` items in a Subject Search Response ({{subject-search-response}}). The API MAY return a smaller number of items but SHOULD NOT return a number of items that is greater than this value
 
-The content of a Reverse Search Request body is a JSON object with the following fields:
+The content of a Subject Search Request body is a JSON object with the following fields:
 
 asset:
 : REQUIRED. An asset as described in the Assets section ({{assets}})
@@ -624,10 +624,10 @@ asset:
 queries:
 : REQUIRED. An array of `string` values as described in the Actions section ({{actions}}).
 
-The following is a non-normative example of a Reverse-Search Request:
+The following is a non-normative example of a Subject Search Request:
 
 ~~~ http
-POST /reversesearch HTTP/1.1
+POST /subjectsearch HTTP/1.1
 Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM2Q4"&pageSize=2
 Authorization: <myoauthtoken>
 
@@ -644,10 +644,10 @@ Authorization: <myoauthtoken>
   "queries": ["delete", "read", "write"]
 }
 ~~~
-{: #example-reverse-search-request title="Example Reverse Search Request"}
+{: #example-subject-search-request title="Example Subject Search Request"}
 
-### Reverse Search Response {#reverse-search-response}
-The success response to a Reverse Search Request is a Reverse Search Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
+### Subject Search Response {#subject-search-response}
+The success response to a Subject Search Request is a Subject Search Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
 
 iat:
 : REQUIRED. The issued at time in `integer` format, expressed as epoch milliseconds
@@ -665,14 +665,14 @@ nextPageToken:
 : OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.
 
 #### Principal Query Result {#principal-query-result}
-A Principal Query Result is JSON object combining a principal, a list of asset attribute names and an action. Given that a Principal Query result is expected to be the response to a reverse-Search, only positive matches should be returned; i.e., only those principals that match the search criteria (those principals that are allowed to access the provided Asset Attributes). Any principals absent from the results do not have any access to the Asset. 
+A Principal Query Result is JSON object combining a principal, a list of asset attribute names and an action. Given that a Principal Query result is expected to be the response to a Subject Search, only positive matches should be returned; i.e., only those principals that match the search criteria (those principals that are allowed to access the provided Asset Attributes). Any principals absent from the results do not have any access to the Asset. 
 A Principal Query Result has the following fields:
 
 actions:
-: OPTIONAL. An Array of the action for which the decision is provided. The format is as described in the Actions section ({{actions}}). The values in this list should match the values provided as queries in the Reverse-Search request.
+: OPTIONAL. An Array of the action for which the decision is provided. The format is as described in the Actions section ({{actions}}). The values in this list should match the values provided as queries in the Subject Search request.
 
 attributeNames:
-: OPTIONAL. An Array of attribute names of the asset for which the response applies. The attribute is provided only if attributes were part of the reverse-search request. In that case, the attribute names must match those that are part of the request.
+: OPTIONAL. An Array of attribute names of the asset for which the response applies. The attribute is provided only if attributes were part of the Subject search request. In that case, the attribute names must match those that are part of the request.
 
 principal:
 : REQUIRED. The principal for which the decision is provided. The format is as described in the Principals section ({{principals}}). 
@@ -698,7 +698,7 @@ The following is a non-normative example of a Principal Query Decision:
 ~~~
 {: #example-principal-query-decision title="Example Principal Query Decision"}
 
-Following is a non-normative example of a Reverse Search Response:
+Following is a non-normative example of a Subject Search Response:
 
 ~~~ http
 HTTP/1.1 OK
@@ -779,7 +779,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
   "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
 }
 ~~~
-{: #example-reverse-search-response title="Example of a Reverse Search Response"}
+{: #example-subject-search-response title="Example of a Subject Search Response"}
 
 # IANA Considerations {#IANA}
 
