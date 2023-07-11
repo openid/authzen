@@ -74,18 +74,18 @@ Authorization for the Authorization API itself is out of scope for this document
 The Authorization API has two main features:
 
 * An Access Evaluations API, which enables a PEP to find out if a specific request can be permitted to access specific resources
-* A Search API, which enables a PEP to discover all assets that a principal has access to, by specifying conditions for the access
+* A Search API, which enables a PEP to discover all resources that a subject has access to, by specifying conditions for the access
 
 # Terminology
 
-Principal:
+Subject:
 : The user or robotic principal about whom the Authorization API call is being made
 
-Asset:
+Resource:
 : The target of the request; the resource about which the Authorization API is being made
 
 Action:
-: The operation the Principal has attempted on the Asset in an Authorization API call
+: The operation the Subject has attempted on the Resource in an Authorization API call
 
 PDP:
 : Policy Decision Point. The component or system that provides authorization decisions over the network interface defined here as the Authorization API
@@ -122,10 +122,10 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-response-request-id title="Example HTTP response with a Request Id"}
 
-## Principals {#principals}
-A Principal is the user or robotic principal about whom the Authorization API is being invoked. The Principal may be requesting access at the time the Authorization API is invoked, or the Principal may be of interest in a Search API call.
+## Subjects {#subjects}
+A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked, or the Subject may be of interest in a Search API call.
 
-A Principal is a JSON ({{RFC8259}}) object that has the following fields:
+A Subject is a JSON ({{RFC8259}}) object that has the following fields:
 
 id:
 : REQUIRED. A field, whose value is of type `string`, which uniquely identifies the user within the scope of a PEP. This identifier could be an email address, or it might be an internal identifier such as a UUID or employee ID.
@@ -134,9 +134,9 @@ ipAddress:
 : OPTIONAL. A field, whose value is of type `string`, which is a {{RFC4001}} text representation of the IP Address
 
 deviceId:
-: OPTIONAL. A field, whose value is of type `string`, which uniquely identifies the device of the Principal
+: OPTIONAL. A field, whose value is of type `string`, which uniquely identifies the device of the Subject
 
-The following non-normative example describes a Principal:
+The following non-normative example describes a Subject:
 
 ~~~ json
 {
@@ -145,21 +145,21 @@ The following non-normative example describes a Principal:
     "deviceId": "8:65:ee:17:7e:0b"
 }
 ~~~
-{: #principalexample title="Example Principal Object"}
+{: #subjectexample title="Example Subject Object"}
 
-## Assets {#assets}
-An Asset is the target of an access request. It is a JSON ({{RFC8259}}) object that has the following fields:
+## Resources {#resources}
+An Resource is the target of an access request. It is a JSON ({{RFC8259}}) object that has the following fields:
 
 id:
-: OPTIONAL. The unique identifier of the asset within the scope of the PEP. Its value is a `string` specifying the identifier of the asset. This field MAY be omitted to indicate a class of assets
+: OPTIONAL. The unique identifier of the resource within the scope of the PEP. Its value is a `string` specifying the identifier of the resource. This field MAY be omitted to indicate a class of resources
 
 type:
-: OPTIONAL. The type of the asset. Its value is a `string` that specifies the type of the asset
+: OPTIONAL. The type of the resource. Its value is a `string` that specifies the type of the resource
 
 attributeNames:
-: OPTIONAL. An array of `string`s, each string representing the name of an attribute of the asset.
+: OPTIONAL. An array of `string`s, each string representing the name of an attribute of the resource.
 
-The following is a non-normative example of an Asset:
+The following is a non-normative example of an Resource:
 
 ~~~json
 {
@@ -172,7 +172,7 @@ The following is a non-normative example of an Asset:
     ]
 }
 ~~~
-{: #assetexample title="Example Asset"}
+{: #resourceexample title="Example Resource"}
 
 ## Actions {#actions}
 An action is the type of access that the requester intends to perform. There are common actions defined herein, or the action may be custom, which could be specific to the application being accessed or shared across a applications but not listed in the common actions below
@@ -184,37 +184,37 @@ The following common actions are defined herein:
 : A generic action that could mean any type of access. This is useful if the policy or application is not interested in different decisions for different types of actions
 
 "create":
-: The action to create a new entity, which MAY be defined by the `asset` field in the request
+: The action to create a new entity, which MAY be defined by the `resource` field in the request
 
 "read":
-: The action to read the content. Based on the asset being accessed, this could mean a list functionality or reading an individual asset contents
+: The action to read the content. Based on the resource being accessed, this could mean a list functionality or reading an individual resource contents
 
 "update":
-: The action to update the content of an existing entity. This MAY represent a partial update or an entire replacement of the entity. The entity MAY be identified by the asset in the request
+: The action to update the content of an existing entity. This MAY represent a partial update or an entire replacement of the entity. The entity MAY be identified by the resource in the request
 
 "delete":
-: The action to delete an entity. The entity MAY be identified by the asset in the request
+: The action to delete an entity. The entity MAY be identified by the resource in the request
 
 Policies MAY incorporate common action names to provide different decisions based on the action
 
 ### Custom Actions
 Any action that is not one of the above is a custom action. Policies MAY incorporate custom action names if decisions need to be taken differently for different custom actions
 
-## Asset Query {#asset-query}
-An Asset Query is a question about whether a principal can access a specific asset. It is a JSON object with the following fields:
+## Resource Query {#resource-query}
+An Resource Query is a question about whether a subject can access a specific resource. It is a JSON object with the following fields:
 
 action:
 : REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the Actions section ({{actions}}).
 
-asset:
-: REQUIRED. The asset to which this query relates. Its format is as described in the Assets section ({{assets}})
+resource:
+: REQUIRED. The resource to which this query relates. Its format is as described in the Resources section ({{resources}})
 
-The following is a non-normative example of an Asset Query:
+The following is a non-normative example of an Resource Query:
 
 ~~~ json
 {
     "action": "stream",
-    "asset": {
+    "resource": {
         "id": "1234",
         "type": "webcam",
         "attributeNames": [
@@ -223,7 +223,7 @@ The following is a non-normative example of an Asset Query:
     }
 }
 ~~~
-{: #example-asset-query title="Example Asset Query"}
+{: #example-resource-query title="Example Resource Query"}
 
 ## Decisions
 Decisions are provided by the PDP in response to requests from the PEP.
@@ -286,42 +286,42 @@ The following is a non-normative example of a Reason Object:
 ~~~
 {: #example-reason-object title="Example of a Reason Object"}
 
-### Asset Query Decision {#asset-query-decision}
-An Asset Query Decision is a tuple of an asset, action and a decision, represented as a JSON object. It has the following fields:
+### Resource Query Decision {#resource-query-decision}
+An Resource Query Decision is a tuple of an resource, action and a decision, represented as a JSON object. It has the following fields:
 
 action:
 : OPTIONAL. The action for which the decision is provided. The format is as described in the Actions section ({{actions}})
 
-asset:
-: OPTIONAL. The asset for which the decision is provided. The format is as described in the Assets section ({{assets}}). This asset MAY be greater in scope than described in the Asset Query ({{asset-query}}), i.e. It MAY describe an asset more generally than specified in the Asset Query. However, it MUST NOT be more specific than the asset described in the Asset Query.
+resource:
+: OPTIONAL. The resource for which the decision is provided. The format is as described in the Resources section ({{resources}}). This resource MAY be greater in scope than described in the Resource Query ({{resource-query}}), i.e. It MAY describe an resource more generally than specified in the Resource Query. However, it MUST NOT be more specific than the resource described in the Resource Query.
 
 decision:
-: REQUIRED. The decision for the above `asset` and `action`. The format is as described in the Query Decision section ({{query-decision}})
+: REQUIRED. The decision for the above `resource` and `action`. The format is as described in the Query Decision section ({{query-decision}})
 
 reason_ids:
-: OPTIONAL. An array of reason identifiers that indicate specific resons why the asset query was denied
+: OPTIONAL. An array of reason identifiers that indicate specific resons why the resource query was denied
 
-The following is a non-normative example of an Asset Query Decision:
+The following is a non-normative example of an Resource Query Decision:
 
 ~~~ json
 {
     "action": "stream",
-    "asset": {
+    "resource": {
         "id": "1234"
     },
     "decision": "deny",
     "reason_ids": [0,2,3]
 }
 ~~~
-{: #example-asset-query-decision title="Example Asset Query Decision"}
+{: #example-resource-query-decision title="Example Resource Query Decision"}
 
 ## Collections {#collections}
-An API request or response MAY contain a collection of items, such as an array of strings representing various attribute names, or an array of Asset Query Decision objects ({{asset-query-decision}}). The objects in a collection MAY overlap in scope. For example:
+An API request or response MAY contain a collection of items, such as an array of strings representing various attribute names, or an array of Resource Query Decision objects ({{resource-query-decision}}). The objects in a collection MAY overlap in scope. For example:
 
 ~~~ json
 [
     {
-        "asset": {
+        "resource": {
             "id": "1234",
             "attributeNames": [
               "homeAddress",
@@ -332,7 +332,7 @@ An API request or response MAY contain a collection of items, such as an array o
         "reason_ids": [1]
     },
     {
-        "asset": {
+        "resource": {
             "id": "1234"
         },
         "decision": "allow"
@@ -341,7 +341,7 @@ An API request or response MAY contain a collection of items, such as an array o
 ~~~
 {: #collection-example title="Example Overlapping Collection"}
 
-The receiver of a collection MUST interpret the collection in a way that results in the least-privilege access. In the above example, this means that the principal has access to the asset identified by "1234", but not to the "homeAddress" and "title" attributes of that asset.
+The receiver of a collection MUST interpret the collection in a way that results in the least-privilege access. In the above example, this means that the subject has access to the resource identified by "1234", but not to the "homeAddress" and "title" attributes of that resource.
 
 ## Error Responses
 The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTP status code ({{Section 15 of RFC9110}}) that indicates error.
@@ -357,18 +357,18 @@ The following errors are indicated by the status codes defined below:
 {: #table-error-status-codes title="Error status codes"}
 
 ## Access Evaluations API
-The Access Evaluations API is a means for a PEP to request decisions for a number of assets for a single request context.
+The Access Evaluations API is a means for a PEP to request decisions for a number of resources for a single request context.
 
 The Access Evaluations API is available at the relative URL `/evaluations/` via the `POST` HTTP method.
 
 ### Access Evaluation Request
 The content of the request body is a JSON Object with the following fields:
 
-principal:
-: REQUIRED. A principal as described in the Principals section ({{principals}})
+subject:
+: REQUIRED. A subject as described in the Subjects section ({{subjects}})
 
 queries:
-: REQUIRED. An array of queries defined in Asset Query section ({{asset-query}}) about access to specific assets
+: REQUIRED. An array of queries defined in Resource Query section ({{resource-query}}) about access to specific resources
 
 The following is a non-normative example of an Access Evaluation Request:
 
@@ -379,19 +379,19 @@ Authorization: <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
-  "principal": {
+  "subject": {
     "id": "atul@sgnl.ai",
   },
   "queries": [
     {
       "action": "read",
-      "asset": {
+      "resource": {
         "type": "customer"
       }
     },
     {
       "action": "read",
-      "asset": {
+      "resource": {
         "id": "efgh",
         "type": "customer",
         "attributeNames": [
@@ -413,11 +413,11 @@ iat:
 exp:
 : REQUIRED. The time in `integer` format, expressed at epoch milliseconds, after which the response SHOULD NOT be used
 
-principal:
-: REQUIRED. The principal for which the response is being issued. The format of this field is as described in the Principals section ({{principals}})
+subject:
+: REQUIRED. The subject for which the response is being issued. The format of this field is as described in the Subjects section ({{subjects}})
 
 decisions:
-: REQUIRED. An array of Asset Query Decisions as described in the Asset Query Decision section ({{asset-query-decision}}).
+: REQUIRED. An array of Resource Query Decisions as described in the Resource Query Decision section ({{resource-query-decision}}).
 
 reasons:
 : OPTIONAL. An array of Reason Objects ({{reason-object}}) which provide details of every reason identifier specified in the `decisions` field.  This field is REQUIRED if there is at least one decision in the `decisions` field that specifies a `reason_ids` field. The content of the `reasons` field MUST provide details of every identifier in the `reason_ids` fields in the `decisions` array.
@@ -435,13 +435,13 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {
   "iat": 1234567890,
   "exp": 1234568890,
-  "principal": {
+  "subject": {
     "id": "atul@sgnl.ai"
   }
   "decisions": [
     {
       "action": "read",
-      "asset": {
+      "resource": {
         "type": "customer"
       },
       "decision": "deny",
@@ -449,7 +449,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
     },
     {
       "action": "read",
-      "asset": {
+      "resource": {
         "id": "efgh",
         "type": "customer",
       },
@@ -483,7 +483,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #example-access-evaluation-response title="Example of an Access Evaluation Response"}
 
 ## Search API
-The Access Search API enables a PEP to find out all assets a principal has access to.
+The Access Search API enables a PEP to find out all resources a subject has access to.
 
 The Access Search API is available at the relative URL `/search/` via the `POST` HTTP method
 
@@ -498,8 +498,8 @@ pageSize:
 
 The content of a Search Request body is a JSON object with the following fields:
 
-principal:
-: REQUIRED. A principal as described in the Principals section ({{principals}})
+subject:
+: REQUIRED. A subject as described in the Subjects section ({{subjects}})
 
 queries:
 : REQUIRED. An array of `string` values as described in the Actions section ({{actions}}).
@@ -512,7 +512,7 @@ Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM
 Authorization: <myoauthtoken>
 
 {
-  "principal": {
+  "subject": {
     "id": "atul@sgnl.ai"
     "ipAddress": "172.217.22.14",
   }
@@ -530,11 +530,11 @@ iat:
 exp:
 : REQUIRED. The time in `integer` format, expressed at epoch milliseconds, after which the response SHOULD NOT be used
 
-principal:
-: REQUIRED. The principal for which the response is being issued. The format of this field is as described in the Principals section ({{principals}})
+subject:
+: REQUIRED. The subject for which the response is being issued. The format of this field is as described in the Subjects section ({{subjects}})
 
 decisions:
-: REQUIRED. An array of Asset Query Decisions as described in the Asset Query Decision section ({{asset-query-decision}})
+: REQUIRED. An array of Resource Query Decisions as described in the Resource Query Decision section ({{resource-query-decision}})
 
 reasons:
 : OPTIONAL. An array of Reason Objects ({{reason-object}}) that describe the reason for each reason identified in the `decisions` field. This field is REQUIRED if there is at least one decision in the `decisions` field that specifies a `reason_ids` field. The content of the `reasons` field MUST provide details of every identifier in the `reason_ids` fields in the `decisions` array.
@@ -552,14 +552,14 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
 {
   "iat": 1234567890,
   "exp": 1234568890,
-  "principal": {
+  "subject": {
     "id": "atul@sgnl.ai"
     "ipAddress": "172.217.22.14",
   }
   "decisions": [
     {
       "action": "delete",
-      "asset": {
+      "resource": {
         "type": "customer"
       },
       "decision": "deny"
@@ -567,7 +567,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
     },
     {
       "action": "read",
-      "asset": {
+      "resource": {
         "id": "efgh",
         "type": "customer",
       },
