@@ -100,7 +100,7 @@ The Authorization API has two parts, Access Evaluation and Search. Each of these
 This document describes the API version 1. Any updates to this API through subsequent revisions of this document or through other documents MAY augment this API, but MUST NOT modify the API described here. Augmentation MAY include additional API methods or additional parameters to existing API methods, additional authorization mechanisms or additional optional headers in API requests. All API methods for version 1 MUST be immediately preceded by the relative URL path `/v1/`.
 
 ## API Authorization
-This API SHALL be authenticated using the OAuth 2.0 Bearer access token ({{RFC6750}}) to authorize API calls
+API calls SHALL be authorized with OAuth 2.0 access tokens ({{RFC6750}}). Implementors MAY use bearer tokens or sender constrained tokens, depending on the organizations policy.
 
 ## Request Identification
 All requests to the API MAY have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. If present, the request identifier SHALL be provided using the HTTP Header `X-Request-ID`. The value of this header is an arbitrary string. The following non-normative example describes this header:
