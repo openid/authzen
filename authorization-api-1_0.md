@@ -485,13 +485,13 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-access-evaluation-response title="Example of an Access Evaluation Response"}
 
-## Search API
-The Access Search API enables a PEP to find out all resources a subject has access to.
+## Resource Search API
+The Resource Access Search API enables a PEP to find out all resources a subject has access to.
 
-The Access Search API is available at the relative URL `/search/` via the `POST` HTTP method
+The Resource Access Search API is available at the relative URL `/resourcesearch/` via the `POST` HTTP method
 
-### Search Request
-A Search Request has request parameters and a request body. The request parameters are:
+### Resource Search Request
+A Resource Search Request has request parameters and a request body. The request parameters are:
 
 pageToken:
 : OPTIONAL. A string value that is returned in a previous Search Response ({{search-response}}), which indicates that the request is a continuation of a previous request
@@ -510,7 +510,7 @@ queries:
 The following is a non-normative example of a Search Request:
 
 ~~~ http
-POST /search HTTP/1.1
+POST /resourcesearch HTTP/1.1
 Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM2Q4"&pageSize=2
 Authorization: <myoauthtoken>
 
@@ -524,8 +524,8 @@ Authorization: <myoauthtoken>
 ~~~
 {: #example-search-request title="Example Access Request"}
 
-### Search Response {#search-response}
-The success response to a Search Request is a Search Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
+### Resource Search Response {#search-response}
+The success response to a Resource Search Request is a Resource Search Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
 
 iat:
 : REQUIRED. The issued at time in `integer` format, expressed as epoch milliseconds
@@ -600,10 +600,10 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
   "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
 }
 ~~~
-{: #example-search-response title="Example of an Search Response"}
+{: #example-resource-search-response title="Example of a Resource Search Response"}
 
 ## Subject Search API
-The Access Subject Search API does the reverse of the Search API: it enables a PEP or client to find out all the principals that can access a given asset.
+The Access Subject Search API does the reverse of the Search API: it enables a PEP or client to find out all the subjects that can access a given resource.
 
 The Access Subject Search API is available at the relative URL `/subjectsearch/` via the `POST` HTTP method
 
@@ -656,7 +656,7 @@ principal:
 : REQUIRED. The principal for which the response is being issued. The format of this field is as described in the Assets section ({{principals}})
 
 results:
-: REQUIRED. An array of Principal Query results as described below ({{principal-query-result}}).
+: REQUIRED. An array of Principal Query results as described below ({{subject-query-result}}).
 
 reasons:
 : OPTIONAL. An array of Reason Objects ({{reason-object}}) that describe the reason for each reason identified in the `decisions` field. This field is REQUIRED if there is at least one decision in the `decisions` field that specifies a `reason_ids` field. The content of the `reasons` field MUST provide details of every identifier in the `reason_ids` fields in the `decisions` array.
@@ -664,9 +664,9 @@ reasons:
 nextPageToken:
 : OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.
 
-#### Principal Query Result {#principal-query-result}
-A Principal Query Result is JSON object combining a principal, a list of asset attribute names and an action. Given that a Principal Query result is expected to be the response to a Subject Search, only positive matches should be returned; i.e., only those principals that match the search criteria (those principals that are allowed to access the provided Asset Attributes). Any principals absent from the results do not have any access to the Asset. 
-A Principal Query Result has the following fields:
+#### Subject Query Result {#subject-query-result}
+A Subject Query Result is JSON object combining a subject, a list of asset attribute names and an action. Given that a Subject Query result is expected to be the response to a Subject Search, only positive matches should be returned; i.e., only those subjects that match the search criteria (those subjects that are allowed to access the provided Resource Attributes). Any Subjects absent from the results do not have any access to the Asset. 
+A Subject Query Result has the following fields:
 
 actions:
 : OPTIONAL. An Array of the action for which the decision is provided. The format is as described in the Actions section ({{actions}}). The values in this list should match the values provided as queries in the Subject Search request.
@@ -674,13 +674,13 @@ actions:
 attributeNames:
 : OPTIONAL. An Array of attribute names of the asset for which the response applies. The attribute is provided only if attributes were part of the Subject search request. In that case, the attribute names must match those that are part of the request.
 
-principal:
-: REQUIRED. The principal for which the decision is provided. The format is as described in the Principals section ({{principals}}). 
+subject:
+: REQUIRED. The subject for which the decision is provided. The format is as described in the Principals section ({{principals}}). 
 
 reason_ids:
 : OPTIONAL. An array of reason identifiers that indicate specific reasons why the asset query was denied
 
-The following is a non-normative example of a Principal Query Decision:
+The following is a non-normative example of a Subject Query Decision:
 
 ~~~ json
 {
@@ -690,13 +690,13 @@ The following is a non-normative example of a Principal Query Decision:
         "createDate",
         "lastUpdated"
     ],
-    "principal": {
+    "subject": {
         "id": "alex@3edges.com"
     },
     "reason_ids": [0,2,3]
 }
 ~~~
-{: #example-principal-query-decision title="Example Principal Query Decision"}
+{: #example-subject-query-decision title="Example Subject Query Decision"}
 
 Following is a non-normative example of a Subject Search Response:
 
@@ -726,7 +726,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
       "attributeNames": [
         "author"
       ],
-      "principal": {
+      "subject": {
         "id": "alex@3edges.com"
       },
       "reason_ids": [3]
@@ -738,7 +738,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
         "createDate",
         "lastUpdated"
       ],
-      "principal": {
+      "subject": {
         "id": "alex@3edges.com"
       },
       "reason_ids": [1,3]
@@ -750,7 +750,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
         "createDate",
         "lastUpdated"
       ],
-      "principal": {
+      "subject": {
         "id": "Janet@3edges.com"
       },
       "reason_ids": [2]
