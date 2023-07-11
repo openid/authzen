@@ -618,8 +618,8 @@ pageSize:
 
 The content of a Subject Search Request body is a JSON object with the following fields:
 
-asset:
-: REQUIRED. An asset as described in the Assets section ({{assets}})
+resource:
+: REQUIRED. A resource as described in the Resources section ({{resources}})
 
 queries:
 : REQUIRED. An array of `string` values as described in the Actions section ({{actions}}).
@@ -632,7 +632,7 @@ Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM
 Authorization: <myoauthtoken>
 
 {
-  "asset": {
+  "resource": {
     "id": "somevalue",
     "type": "document",
     "attributeNames": [
@@ -652,11 +652,11 @@ The success response to a Subject Search Request is a Subject Search Response. I
 iat:
 : REQUIRED. The issued at time in `integer` format, expressed as epoch milliseconds
 
-principal:
-: REQUIRED. The principal for which the response is being issued. The format of this field is as described in the Assets section ({{principals}})
+subject:
+: REQUIRED. The subject for which the response is being issued. The format of this field is as described in the Subjects section ({{subjects}})
 
 results:
-: REQUIRED. An array of Principal Query results as described below ({{subject-query-result}}).
+: REQUIRED. An array of Subject Query results as described below ({{subject-query-result}}).
 
 reasons:
 : OPTIONAL. An array of Reason Objects ({{reason-object}}) that describe the reason for each reason identified in the `decisions` field. This field is REQUIRED if there is at least one decision in the `decisions` field that specifies a `reason_ids` field. The content of the `reasons` field MUST provide details of every identifier in the `reason_ids` fields in the `decisions` array.
@@ -665,20 +665,20 @@ nextPageToken:
 : OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.
 
 #### Subject Query Result {#subject-query-result}
-A Subject Query Result is JSON object combining a subject, a list of asset attribute names and an action. Given that a Subject Query result is expected to be the response to a Subject Search, only positive matches should be returned; i.e., only those subjects that match the search criteria (those subjects that are allowed to access the provided Resource Attributes). Any Subjects absent from the results do not have any access to the Asset. 
+A Subject Query Result is JSON object combining a subject, a list of resource attribute names and an action. Given that a Subject Query result is expected to be the response to a Subject Search, only positive matches should be returned; i.e., only those subjects that match the search criteria (those subjects that are allowed to access the provided Resource Attributes). Any Subjects absent from the results do not have any access to the Resource. 
 A Subject Query Result has the following fields:
 
 actions:
 : OPTIONAL. An Array of the action for which the decision is provided. The format is as described in the Actions section ({{actions}}). The values in this list should match the values provided as queries in the Subject Search request.
 
 attributeNames:
-: OPTIONAL. An Array of attribute names of the asset for which the response applies. The attribute is provided only if attributes were part of the Subject search request. In that case, the attribute names must match those that are part of the request.
+: OPTIONAL. An Array of attribute names of the resource for which the response applies. The attribute is provided only if attributes were part of the Subject search request. In that case, the attribute names must match those that are part of the request.
 
 subject:
-: REQUIRED. The subject for which the decision is provided. The format is as described in the Principals section ({{principals}}). 
+: REQUIRED. The subject for which the decision is provided. The format is as described in the Subjects section ({{subjects}}). 
 
 reason_ids:
-: OPTIONAL. An array of reason identifiers that indicate specific reasons why the asset query was denied
+: OPTIONAL. An array of reason identifiers that indicate specific reasons why the resource query was denied
 
 The following is a non-normative example of a Subject Query Decision:
 
@@ -707,7 +707,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
 
 {
   "iat": 1234567890,
-  "asset": {
+  "resource": {
     "id": "somevalue",
     "type": "document",
     "attributeNames": [
