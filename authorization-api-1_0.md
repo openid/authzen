@@ -524,8 +524,31 @@ Authorization: <myoauthtoken>
 ~~~
 {: #example-search-request title="Example Access Request"}
 
+### Resource Query result {#resource-query-result}
+A Resource Query Result is a JSON object representing a single result for a Resource Search Request. The Resource Query result always convey a positive ("Allow") decision.
+Its body is a JSON object with teh following fields:
+
+action:
+: REQUIRED. The action that the subject is granted on this resource.
+
+resource:
+: REQUIRED. An object representing the resource.
+
+The following is a non-normative example of a Resource Query Result:
+
+~~~ json
+{
+    "action": "stream",
+    "resource": {
+        "id": "1234"
+    }
+}
+~~~
+{: #example-resource-query-result title="Example Resource Query Result"}
+
 ### Resource Search Response {#search-response}
-The success response to a Resource Search Request is a Resource Search Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
+The success response to a Resource Search Request is a Resource Search Response. It is a HTTP response of type `application/json`. The Resource Search Response contains only positive results: only those Resources that the given Subject has access to. Any Resources not returned are therefore not accessible by the subject.
+Its body is a JSON object that contains the following fields:
 
 iat:
 : REQUIRED. The issued at time in `integer` format, expressed as epoch milliseconds
@@ -537,15 +560,12 @@ subject:
 : REQUIRED. The subject for which the response is being issued. The format of this field is as described in the Subjects section ({{subjects}})
 
 decisions:
-: REQUIRED. An array of Resource Query Decisions as described in the Resource Query Decision section ({{resource-query-decision}})
-
-reasons:
-: OPTIONAL. An array of Reason Objects ({{reason-object}}) that describe the reason for each reason identified in the `decisions` field. This field is REQUIRED if there is at least one decision in the `decisions` field that specifies a `reason_ids` field. The content of the `reasons` field MUST provide details of every identifier in the `reason_ids` fields in the `decisions` array.
+: REQUIRED. An array of Resource Query Results as described in the Resource Query Result section ({{resource-query-result}}).
 
 nextPageToken:
 : OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.
 
-Following is a non-normative example of an Search Response:
+Following is a non-normative example of a Resource Search Response:
 
 ~~~ http
 HTTP/1.1 OK
@@ -561,42 +581,20 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
   }
   "decisions": [
     {
-      "action": "delete",
-      "resource": {
-        "type": "customer"
-      },
-      "decision": "deny"
-      "reason_ids": [1,2]
-    },
-    {
       "action": "read",
       "resource": {
         "id": "efgh",
         "type": "customer",
-      },
-      "decision": "allow"
-    }
-  ],
-  "reasons": [
-    {
-      "id": 1,
-      "reason_admin": {
-        "en-403": "Default action. No policy matches request."
-      }
-      "reason_user": {
-        "en": "Default action. No policy matches request."
       }
     },
     {
-      "id": 2,
-      "reason_admin": {
-        "en-404": "Could not find specified resource"
-      },
-      "reason_user": {
-        "en-404": "Invalid request."
+      "action": "delete",
+      "resource": {
+        "id": "report.docx",
+        "type": "Document",
       }
     }
-  ]
+  ],
   "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
 }
 ~~~
@@ -655,17 +653,14 @@ iat:
 subject:
 : REQUIRED. The subject for which the response is being issued. The format of this field is as described in the Subjects section ({{subjects}})
 
-results:
+decisions:
 : REQUIRED. An array of Subject Query results as described below ({{subject-query-result}}).
-
-reasons:
-: OPTIONAL. An array of Reason Objects ({{reason-object}}) that describe the reason for each reason identified in the `decisions` field. This field is REQUIRED if there is at least one decision in the `decisions` field that specifies a `reason_ids` field. The content of the `reasons` field MUST provide details of every identifier in the `reason_ids` fields in the `decisions` array.
 
 nextPageToken:
 : OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.
 
 #### Subject Query Result {#subject-query-result}
-A Subject Query Result is JSON object combining a subject, a list of resource attribute names and an action. Given that a Subject Query result is expected to be the response to a Subject Search, only positive matches should be returned; i.e., only those subjects that match the search criteria (those subjects that are allowed to access the provided Resource Attributes). Any Subjects absent from the results do not have any access to the Resource. 
+A Subject Query Result is array of Subject Query Decisions ({{example-subject-query-decision}}). It is JSON object combining a subject, a list of resource attribute names and an action. Given that a Subject Query result is expected to be the response to a Subject Search, only positive matches should be returned; i.e., only those subjects that match the search criteria (those subjects that are allowed to access the provided Resource Attributes). Any Subjects absent from the results do not have any access to the Resource. 
 A Subject Query Result has the following fields:
 
 actions:
@@ -676,9 +671,6 @@ attributeNames:
 
 subject:
 : REQUIRED. The subject for which the decision is provided. The format is as described in the Subjects section ({{subjects}}). 
-
-reason_ids:
-: OPTIONAL. An array of reason identifiers that indicate specific reasons why the resource query was denied
 
 The following is a non-normative example of a Subject Query Decision:
 
@@ -692,8 +684,7 @@ The following is a non-normative example of a Subject Query Decision:
     ],
     "subject": {
         "id": "alex@3edges.com"
-    },
-    "reason_ids": [0,2,3]
+    }
 }
 ~~~
 {: #example-subject-query-decision title="Example Subject Query Decision"}
@@ -728,8 +719,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
       ],
       "subject": {
         "id": "alex@3edges.com"
-      },
-      "reason_ids": [3]
+      }
     },
     {
       "action": "read",
@@ -740,8 +730,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
       ],
       "subject": {
         "id": "alex@3edges.com"
-      },
-      "reason_ids": [1,3]
+      }
     },
     {
       "action": "read",
@@ -752,27 +741,6 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
       ],
       "subject": {
         "id": "Janet@3edges.com"
-      },
-      "reason_ids": [2]
-    }
-  ],
-  "reasons": [
-    {
-      "id": 1,
-      "reason_admin": {
-        "en-200": "Subject is an admin."
-      },
-      "reason_user": {
-        "en": "Default action. No policy matches request."
-      }
-    },
-    {
-      "id": 3,
-      "reason_admin": {
-        "en-200": "Matches Policy ID: 001."
-      },
-      "reason_user": {
-        "en-200": "Subject authorized."
       }
     }
   ],
