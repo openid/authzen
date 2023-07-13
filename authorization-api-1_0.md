@@ -35,6 +35,9 @@ contributor: # Same structure as author list, but goes into contributors
 - name: Omri Gazitt
   org: Aserto
   email: omri@aserto.com
+- name: Alex Babeanu
+  org: 3Edges
+  email: alex@3edges.com
 
 normative:
   RFC4001: # text representation of IP addresses
@@ -482,13 +485,13 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-access-evaluation-response title="Example of an Access Evaluation Response"}
 
-## Search API
-The Access Search API enables a PEP to find out all resources a subject has access to.
+## Resource Search API
+The Resource Access Search API enables a PEP to find out all resources a subject has access to.
 
-The Access Search API is available at the relative URL `/search/` via the `POST` HTTP method
+The Resource Access Search API is available at the relative URL `/resourcesearch/` via the `POST` HTTP method
 
-### Search Request
-A Search Request has request parameters and a request body. The request parameters are:
+### Resource Search Request
+A Resource Search Request has request parameters and a request body. The request parameters are:
 
 pageToken:
 : OPTIONAL. A string value that is returned in a previous Search Response ({{search-response}}), which indicates that the request is a continuation of a previous request
@@ -507,7 +510,7 @@ queries:
 The following is a non-normative example of a Search Request:
 
 ~~~ http
-POST /search HTTP/1.1
+POST /resourcesearch HTTP/1.1
 Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM2Q4"&pageSize=2
 Authorization: <myoauthtoken>
 
@@ -521,8 +524,31 @@ Authorization: <myoauthtoken>
 ~~~
 {: #example-search-request title="Example Access Request"}
 
-### Search Response {#search-response}
-The success response to a Search Request is a Search Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
+### Resource Query result {#resource-query-result}
+A Resource Query Result is a JSON object representing a single result for a Resource Search Request. The Resource Query result always convey a positive ("Allow") decision.
+Its body is a JSON object with teh following fields:
+
+action:
+: REQUIRED. The action that the subject is granted on this resource.
+
+resource:
+: REQUIRED. An object representing the resource.
+
+The following is a non-normative example of a Resource Query Result:
+
+~~~ json
+{
+    "action": "stream",
+    "resource": {
+        "id": "1234"
+    }
+}
+~~~
+{: #example-resource-query-result title="Example Resource Query Result"}
+
+### Resource Search Response {#search-response}
+The success response to a Resource Search Request is a Resource Search Response. It is a HTTP response of type `application/json`. The Resource Search Response contains only positive results: only those Resources that the given Subject has access to. Any Resources not returned are therefore not accessible by the subject.
+Its body is a JSON object that contains the following fields:
 
 iat:
 : REQUIRED. The issued at time in `integer` format, expressed as epoch milliseconds
@@ -534,15 +560,12 @@ subject:
 : REQUIRED. The subject for which the response is being issued. The format of this field is as described in the Subjects section ({{subjects}})
 
 decisions:
-: REQUIRED. An array of Resource Query Decisions as described in the Resource Query Decision section ({{resource-query-decision}})
-
-reasons:
-: OPTIONAL. An array of Reason Objects ({{reason-object}}) that describe the reason for each reason identified in the `decisions` field. This field is REQUIRED if there is at least one decision in the `decisions` field that specifies a `reason_ids` field. The content of the `reasons` field MUST provide details of every identifier in the `reason_ids` fields in the `decisions` array.
+: REQUIRED. An array of Resource Query Results as described in the Resource Query Result section ({{resource-query-result}}).
 
 nextPageToken:
 : OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.
 
-Following is a non-normative example of an Search Response:
+Following is a non-normative example of a Resource Search Response:
 
 ~~~ http
 HTTP/1.1 OK
@@ -558,48 +581,173 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
   }
   "decisions": [
     {
-      "action": "delete",
-      "resource": {
-        "type": "customer"
-      },
-      "decision": "deny"
-      "reason_ids": [1,2]
-    },
-    {
       "action": "read",
       "resource": {
         "id": "efgh",
         "type": "customer",
-      },
-      "decision": "allow"
-    }
-  ],
-  "reasons": [
-    {
-      "id": 1,
-      "reason_admin": {
-        "en-403": "Default action. No policy matches request."
-      }
-      "reason_user": {
-        "en": "Default action. No policy matches request."
       }
     },
     {
-      "id": 2,
-      "reason_admin": {
-        "en-404": "Could not find specified resource"
-      },
-      "reason_user": {
-        "en-404": "Invalid request."
+      "action": "delete",
+      "resource": {
+        "id": "report.docx",
+        "type": "Document",
       }
     }
-  ]
+  ],
   "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
 }
 ~~~
-{: #example-search-response title="Example of an Search Response"}
+{: #example-resource-search-response title="Example of a Resource Search Response"}
 
+## Subject Search API
+The Access Subject Search API does the reverse of the Search API: it enables a PEP or client to find out all the subjects that can access a given resource.
 
+The Access Subject Search API is available at the relative URL `/subjectsearch/` via the `POST` HTTP method
+
+### Subject Search Request
+A Subject Search Request has request parameters and a request body. The request parameters are:
+
+pageToken:
+: OPTIONAL. A string value that is returned in a previous Subject Search Response ({{subject-search-response}}), which indicates that the request is a continuation of a previous request
+
+pageSize:
+: OPTIONAL. The maximum number of `decision` items in a Subject Search Response ({{subject-search-response}}). The API MAY return a smaller number of items but SHOULD NOT return a number of items that is greater than this value
+
+The content of a Subject Search Request body is a JSON object with the following fields:
+
+resource:
+: REQUIRED. A resource as described in the Resources section ({{resources}})
+
+queries:
+: REQUIRED. An array of `string` values as described in the Actions section ({{actions}}).
+
+The following is a non-normative example of a Subject Search Request:
+
+~~~ http
+POST /subjectsearch HTTP/1.1
+Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM2Q4"&pageSize=2
+Authorization: <myoauthtoken>
+
+{
+  "resource": {
+    "id": "somevalue",
+    "type": "document",
+    "attributeNames": [
+        "author",
+        "createDate",
+        "lastUpdated"
+    ]
+   },
+  "queries": ["delete", "read", "write"]
+}
+~~~
+{: #example-subject-search-request title="Example Subject Search Request"}
+
+### Subject Search Response {#subject-search-response}
+The success response to a Subject Search Request is a Subject Search Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
+
+iat:
+: REQUIRED. The issued at time in `integer` format, expressed as epoch milliseconds
+
+subject:
+: REQUIRED. The subject for which the response is being issued. The format of this field is as described in the Subjects section ({{subjects}})
+
+decisions:
+: REQUIRED. An array of Subject Query results as described below ({{subject-query-result}}).
+
+nextPageToken:
+: OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.
+
+#### Subject Query Result {#subject-query-result}
+A Subject Query Result is array of Subject Query Decisions ({{example-subject-query-decision}}). It is JSON object combining a subject, a list of resource attribute names and an action. Given that a Subject Query result is expected to be the response to a Subject Search, only positive matches should be returned; i.e., only those subjects that match the search criteria (those subjects that are allowed to access the provided Resource Attributes). Any Subjects absent from the results do not have any access to the Resource. 
+A Subject Query Result has the following fields:
+
+actions:
+: OPTIONAL. An Array of the action for which the decision is provided. The format is as described in the Actions section ({{actions}}). The values in this list should match the values provided as queries in the Subject Search request.
+
+attributeNames:
+: OPTIONAL. An Array of attribute names of the resource for which the response applies. The attribute is provided only if attributes were part of the Subject search request. In that case, the attribute names must match those that are part of the request.
+
+subject:
+: REQUIRED. The subject for which the decision is provided. The format is as described in the Subjects section ({{subjects}}). 
+
+The following is a non-normative example of a Subject Query Decision:
+
+~~~ json
+{
+    "actions": ["delete", "read", "write"],
+    "attributeNames": [
+        "author",
+        "createDate",
+        "lastUpdated"
+    ],
+    "subject": {
+        "id": "alex@3edges.com"
+    }
+}
+~~~
+{: #example-subject-query-decision title="Example Subject Query Decision"}
+
+Following is a non-normative example of a Subject Search Response:
+
+~~~ http
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
+
+{
+  "iat": 1234567890,
+  "resource": {
+    "id": "somevalue",
+    "type": "document",
+    "attributeNames": [
+      "author",
+      "createDate",
+      "lastUpdated"
+    ]
+  },
+  "queries": [
+    "write",
+    "read"
+  ],
+  "decisions": [
+    {
+      "action": "write",
+      "attributeNames": [
+        "author"
+      ],
+      "subject": {
+        "id": "alex@3edges.com"
+      }
+    },
+    {
+      "action": "read",
+      "attributeNames": [
+        "author",
+        "createDate",
+        "lastUpdated"
+      ],
+      "subject": {
+        "id": "alex@3edges.com"
+      }
+    },
+    {
+      "action": "read",
+      "attributeNames": [
+        "author",
+        "createDate",
+        "lastUpdated"
+      ],
+      "subject": {
+        "id": "Janet@3edges.com"
+      }
+    }
+  ],
+  "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
+}
+~~~
+{: #example-subject-search-response title="Example of a Subject Search Response"}
 
 # IANA Considerations {#IANA}
 
