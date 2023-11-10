@@ -1,0 +1,28 @@
+## Attendees
+Allan Foster, Phil Hunt, Alex B., Gail Hodges, Dani Katzman, Roland Baum, Sean O’Dell, Darin M, Victor L, Srini Marreddy, Andrew Hughes
+## Agenda
+- Approval of Sean O'Dell as co-chair
+- Review action items from last call
+- Discuss open issues on GitHub
+## Notes
+- Sean approved as co-chair of AuthZEN, congratulations!
+- Review of action items
+  - Folks are still signing up for slack - remember that messages are only stored for 90 days
+  - Several new issues were added to the repo since last week, more discussion about that belo
+  - Alex did not have time to post the design patterns material and there was more discussion about this topic as well
+- There were several questions raised during general discussion, some of which are already captured as issues in the repo
+  - What is a subject, what is an action?
+  - How does the PDP respond if it does not have a policy corresponding to the request?
+  - Should the PEP be blind to what policies are stored in the PDP or should the PEP know what data to send with the access request?
+  - Do we delineate between security and business policies?
+  - The PEP could be a simple function or part of a complex action or set of actions
+  - Some PEPs may want a response that is beyond just Permit/Deny
+  - We have to be careful to not be too prescriptive
+  - Is it possible to answer open ended questions with graphDB based system? Alex replies in the affirmative
+- Andrew expressed concern that we are bouncing between different levels of complexity. Suggests that thing about categories of interaction patterns:
+  - Is there more than one interaction pattern for asking for a Permit/Deny response?
+  - Is there more than one interaction pattern for asking for an open ended request?
+## Action items
+- Alex and Roland will work on the design patterns use case document
+- We will add items directly in the issues list, where needed, starting with the next meeting
+- Should we cancel any of the calls around U.S. Thanksgiving?
