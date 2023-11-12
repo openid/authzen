@@ -19,24 +19,24 @@ jobs:
           ruby-version: '3.1'
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.10' 
+          python-version: '3.10'
       - name: Install kramdown-rfc
         run: gem install kramdown-rfc
       - name: Install xml2rfc
         run: pip install xml2rfc
       - name: Convert to rfc xml
-        run: kramdown-rfc2629 authorization-api-1_0.md > authorization-api-1_0.xml
+        run: kramdown-rfc2629 api/authorization-api-1_0.md > api/authorization-api-1_0.xml
       - name: Render HTML
-        run: xml2rfc authorization-api-1_0.xml --html -o index.html
+        run: xml2rfc api/authorization-api-1_0.xml --html -o index.html
       - name: Render Text
-        run: xml2rfc authorization-api-1_0.xml --text
+        run: xml2rfc api/authorization-api-1_0.xml --text
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: output
           path: |
             index.html
-            authorization-api-1_0.xml
+            api/authorization-api-1_0.xml
   publish-to-pages:
     if: github.ref == 'refs/heads/main'
     needs: [build-rfc]
