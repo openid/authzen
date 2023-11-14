@@ -101,12 +101,9 @@ This is the traditional Policy-Enforcement-Point / Policy-Decision-Point model d
 
 ![traditional ABAC](images/traditional-ABAC.png)
 
-Traditional ABAC architecture
+*Traditional ABAC architecture*
 
-[ABAC Architecture]: https://py-abac.readthedocs.io/en/latest/concepts.html "ABAC Architecture"
-[RFC-2753]: https://datatracker.ietf.org/doc/html/rfc2753 "RFC 2753"
-
-(Source: [ABAC Architecture], see also [RFC-2753] )
+(Source: <https://py-abac.readthedocs.io/en/latest/concepts.html>, see also <https://datatracker.ietf.org/doc/html/rfc2753> )
 
 In this traditional model, the Policy Enforcement Point (PEP)  “ is a component at a network node and PDP is a remote entity that may reside at a policy server.” Even if both PEP and PDP can be colocated, it is understood that they are distinct components.
 
