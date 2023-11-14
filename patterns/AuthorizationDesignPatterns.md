@@ -23,16 +23,16 @@ author:
   name: Alexandre Babeanu
   org: 3Edges
   email: alex@3edges.com
-  contributor: # Same structure as author list, but goes into contributors
+contributor: # Same structure as author list, but goes into contributors
 - name: Gerry Gebel
   org: Strata
-  email:
+  email: gerry@strata.io
 - name: Omri Gazitt
   org: Aserto
   email: omri@aserto.com
 - name: Pieter Kasselman 
   org: Microsoft
-  email:
+  email: pieter.kasselman@microsoft.com
 
 --- abstract
 
@@ -45,10 +45,6 @@ There are several possible architectures and design patterns for authorization s
 # Background
 
 Authorization is a hard problem, everybody seems to agree. This document introduces the concept of "Authorization Design patterns”, a list of the various common architectures typically found in authorization systems. The purpose of these patterns is to provide ways for practitioners to make sense of these complexities, and tools to overcome them. This document thus tries to provide an exhaustive catalogue of such patterns, similar to what exists in the software development world (see for example: [https://refactoring.guru/design-patterns](https://refactoring.guru/design-patterns) ).
-
-# Contents
-
-[TOC]
 
 # Introduction
 
@@ -99,13 +95,7 @@ Choosing the right PAD for any given requirement is generally mainly dependent o
 
 This is the traditional Policy-Enforcement-Point / Policy-Decision-Point model described in the XACML standard in 2003, and still the de-facto current standard for authorization.
 
-![traditional ABAC](images/traditional-ABAC.png)
-
-*Traditional ABAC architecture*
-
-(Sources: https://py-abac.readthedocs.io/en/latest/concepts.html, see also https://datatracker.ietf.org/doc/html/rfc2753 )
-
-In this traditional model, the Policy Enforcement Point (PEP)  “ is a component at a network node and PDP is a remote entity that may reside at a policy server.” Even if both PEP and PDP can be colocated, it is understood that they are distinct components.
+In this traditional model, the Policy Enforcement Point (PEP)  “is a component at a network node and PDP is a remote entity that may reside at a policy server.” Even if both PEP and PDP can be colocated, it is understood that they are distinct components.
 
 The PEP component is a proxy-like agent placed in front of the resource to protect and serves as its “authorization firewall”. It captures all requests incoming to the Resource Server, and asks the PDP to decide whether to allow or deny each request. 
 
@@ -113,6 +103,9 @@ The Resource Server/Service/Thing only ever receives the requests that are allow
 
 The PEP works here at the protocol level, typically over HTTP (it is basically a reverse-proxy server).
 
+Refer also to the following sources for architecture diagrams and detailed definitions:
+* [Core ABAC concepts](https://py-abac.readthedocs.io/en/latest/concepts.html)
+* [RFC-2753](https://datatracker.ietf.org/doc/html/rfc2753)
 
 ### When to use
 
