@@ -99,11 +99,14 @@ Choosing the right PAD for any given requirement is generally mainly dependent o
 
 This is the traditional Policy-Enforcement-Point / Policy-Decision-Point model described in the XACML standard in 2003, and still the de-facto current standard for authorization.
 
-![alt_text](images/traditional-ABAC.png "traditional ABAC")
+![traditional ABAC](images/traditional-ABAC.png)
 
-Traditional ABAC architecture 
+Traditional ABAC architecture
 
-(Source: [https://py-abac.readthedocs.io/en/latest/concepts.html](https://py-abac.readthedocs.io/en/latest/concepts.html), see also RFC 2753 - [https://datatracker.ietf.org/doc/html/rfc2753](https://datatracker.ietf.org/doc/html/rfc2753) )
+[ABAC Architecture]: https://py-abac.readthedocs.io/en/latest/concepts.html "ABAC Architecture"
+[RFC-2753]: https://datatracker.ietf.org/doc/html/rfc2753 "RFC 2753"
+
+(Source: [ABAC Architecture], see also [RFC-2753] )
 
 In this traditional model, the Policy Enforcement Point (PEP)  “ is a component at a network node and PDP is a remote entity that may reside at a policy server.” Even if both PEP and PDP can be colocated, it is understood that they are distinct components.
 
@@ -128,7 +131,7 @@ The PEP works here at the protocol level, typically over HTTP (it is basically a
 
 
 * **COTS software** - they have their internal logic, each is different.
-* **GraphQL APIs **- this is an anti-pattern for GraphQL, and against best practices. Authorization must be at the business logic level.
+* **GraphQL APIs** - this is an anti pattern for GraphQL, and against best practices. Authorization must be at the business logic level.
 * **API Gateways** - The API Gateway itself is a proxy. one would therefore not add another proxy (a PEP) in front of it. Instead, the trick here is to make the Gateway itself behave like a PEP - see “External API Call” pattern below. .
 
 
@@ -150,7 +153,7 @@ The PEP works here at the protocol level, typically over HTTP (it is basically a
 
 ## Provisioning
 
-In this model, the Authorization service changes the security settings of the resources it protects, using that Resource’s own APIs or protocols. This is generally done through Connectors, and typically happens during regular provisioning/deprovisioning processes. This pattern therefore requires a provisioning tool or platform.
+In this model, the Authorization service changes the security settings of the resources it protects, using that Resource’s own APIs or protocols. This is generally done through Connectors, and typically happens during regular provisioning or deprovisioning processes. This pattern therefore requires a provisioning tool or platform.
 
 
 ### When to use
@@ -189,7 +192,7 @@ In this model, the Authorization service changes the security settings of the re
 
 ## External API Call (Resource-Enforcer pattern)
 
-In this model, the resource server itself makes API calls to an external Dynamic Authorization system that acts as the PDP. T<span style="text-decoration:underline;">he PEP resides here inside the resource server’s own business logic</span>, and is generally just a code wrapper around this external authorization call. From the PDP standpoint, there’s really no PEP, the resource itself enforces the authz decisions.
+In this model, the resource server itself makes API calls to an external Dynamic Authorization system that acts as the PDP. The PEP resides here inside the resource server’s own business logic, and is generally just a code wrapper around this external authorization call. From the PDP standpoint, there’s really no PEP, the resource itself enforces the authz decisions.
 
 This is the most flexible way to integrate external authorization as it can be used by most resource types, including legacy apps.
 
@@ -204,7 +207,7 @@ This is the most flexible way to integrate external authorization as it can be u
 * **Smart IoT devices or gateways** : some IoT devices can make API calls.
 * **API Gateways** : probably the only way to integrate with those systems also. As seen above, the trick here is to make the Gateway itself behave like a PEP, or a resource, by issuing Decision requests through the PDP’s API.
 
-<span style="text-decoration:underline;">_Note_</span>: An API Gateway or any other proxy, will likely only be able to enforce coarse-grained policies, since it can only access the request itself (Method, Body, Access_token). By contrast, the resource service has full understanding of the context of the authorization. It knows what the resource context is (could be in the URL, could be inside the body, or may need to be retrieved from the resource service itself using a request parameter as a key).
+*Note*: An API Gateway or any other proxy, will likely only be able to enforce coarse-grained policies, since it can only access the request itself (Method, Body, Access_token). By contrast, the resource service has full understanding of the context of the authorization. It knows what the resource context is (could be in the URL, could be inside the body, or may need to be retrieved from the resource service itself using a request parameter as a key).
 
 
 ### When not to use
@@ -285,160 +288,40 @@ These events could use the Shared Signals Framework specification (SSF - ([https
 
 ### When to use
 
-
-
 * Could be used in all cases, in particular if/when COTS adopt the SSF.
 
-
 ### Benefits
-
-
 
 * This approach completely de-couples PEP, Resource and PDP. As long as they all adhere to the same Event formats, all components can use any methodology, protocol or language as needed. Defining a common Message format is arguably easier than defining a common language or set of API definitions for authorization.
 * Allows for much better scaling. One can imagine spinning-up many instances of PDPs to consume large numbers of Authorization messages in parallel, as needed.
 * Most organisations that manage large datasets already use Streaming technologies and data meshes, it would not be a stretch for them to add some authorization topics to those. The Authorization Mesh is a kind of Data Mesh.
 * There are several free or open-source Streaming platforms, which should help smaller organisations adopt the technology too.
 
-
 ### Notes
-
-
 
 * _May_ require a streaming platform (e.g., Apache Kafka)
 * Requires some additional conventions/work, in particular to ensure event ordering and tracking authorization requests (i.e., which event to send to which topic).
 * Using a tightly coupled architecture like that described in SSF may lead to latency issues and timeouts.
-
-
-# 
-
 
 # Conclusion
 
 **Legend**:
 
 ➖ : Could be used with extra effort or limitations
-
 ✅ : Appropriate to use
-
 ❌ : Not Appropriate to use
 
-
-<table>
-  <tr>
-   <td>
-   </td>
-   <td>Legacy App
-   </td>
-   <td>SPA
-   </td>
-   <td>Custom App
-   </td>
-   <td>COTS
-   </td>
-   <td>REST API
-   </td>
-   <td>GraphQL API
-   </td>
-   <td>IoT
-   </td>
-   <td>Micro Service
-   </td>
-   <td>API Gtwy
-   </td>
-  </tr>
-  <tr>
-   <td>Traditional PEP
-   </td>
-   <td>✅
-   </td>
-   <td>➖
-   </td>
-   <td>✅
-   </td>
-   <td>❌
-   </td>
-   <td>✅
-   </td>
-   <td>❌
-   </td>
-   <td>✅
-   </td>
-   <td>✅
-   </td>
-   <td>❌
-   </td>
-  </tr>
-  <tr>
-   <td>Provisioning
-   </td>
-   <td>➖*
-   </td>
-   <td>➖*
-   </td>
-   <td>➖*
-   </td>
-   <td>✅
-   </td>
-   <td>➖*
-   </td>
-   <td>➖*
-   </td>
-   <td>❌
-   </td>
-   <td>➖*
-   </td>
-   <td>➖*
-   </td>
-  </tr>
-  <tr>
-   <td>External API
-   </td>
-   <td>✅
-   </td>
-   <td>✅
-   </td>
-   <td>✅
-   </td>
-   <td>➖**
-   </td>
-   <td>✅
-   </td>
-   <td>✅
-   </td>
-   <td>✅
-   </td>
-   <td>✅
-   </td>
-   <td>✅
-   </td>
-  </tr>
-  <tr>
-   <td>User Journey
-   </td>
-   <td>✅
-   </td>
-   <td>✅
-   </td>
-   <td>✅
-   </td>
-   <td>➖**
-   </td>
-   <td>✅
-   </td>
-   <td>✅
-   </td>
-   <td>✅
-   </td>
-   <td>✅
-   </td>
-   <td>✅
-   </td>
-  </tr>
-</table>
-
-
+|-----------------+------------+-----+------------+------+----------+-------------+-----+---------------+----------|
+|                 | Legacy App | SPA | Custom App | COTS | REST API | GraphQL API | IoT | Micro Service | API Gtwy |
+|-----------------+------------+-----+------------+------+----------+-------------+-----+---------------+----------|
+| Traditional PEP |     ✅     | ➖  |     ✅     |  ❌  |    ✅   |      ❌     | ✅  |       ✅      |    ❌    |
+|-----------------+------------+-----+------------+------+----------+-------------+-----+---------------+----------|
+|  Provisioning   |     ➖*    | ➖* |     ➖*    |  ✅  |    ➖*  |      ➖*    | ❌  |       ➖*     |    ➖*   |
+|-----------------+------------+-----+------------+------+----------+-------------+-----+---------------+----------|
+|  External API   |     ✅     |  ✅ |     ✅     | ➖** |    ✅   |      ✅     | ✅  |       ✅      |    ✅    |
+|-----------------+------------+-----+------------+------+----------+-------------+-----+---------------+----------|
+|  User Journey   |     ✅     |  ✅ |     ✅     | ➖** |    ✅   |      ✅     | ✅  |       ✅      |    ✅    |
+|-----------------+------------+-----+------------+------+----------+-------------+-----+---------------+----------|
 
     * :  Use only if provisioning to a central store (e.g., AD/LDAP) that the resource uses.
-
-
     ** : Only if the resource supports it
