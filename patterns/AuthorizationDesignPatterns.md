@@ -1,13 +1,46 @@
-# Authorization Design Patterns
-
-**Contributors**
-
-- Alex Babeanu - 3Edges
-- Gerry Gebel - Strata
-- Omri Gazitt - Aserto
-- Pieter Kasselman - Microsoft
-
 ---
+stand_alone: true
+ipr: none
+cat: std # Check
+submissiontype: IETF
+wg: OpenID AuthZEN
+
+docname: AuthorizationDesignPatterns
+
+title: Authorization Design Patterns
+abbrev: azpatt
+lang: en
+kw:
+- Authorization
+- Access Management
+- Design Pattern
+- PDP
+- PEP
+
+author:
+- role: editor # remove if not true
+  ins: A. Babeanu
+  name: Alexandre Babeanu
+  org: 3Edges
+  email: alex@3edges.com
+  contributor: # Same structure as author list, but goes into contributors
+- name: Gerry Gebel
+  org: Strata
+  email:
+- name: Omri Gazitt
+  org: Aserto
+  email: omri@aserto.com
+- name: Pieter Kasselman 
+  org: Microsoft
+  email:
+
+--- abstract
+
+There are several possible architectures and design patterns for authorization systems. This document details the following patterns: traditional PEP/PDP, Provisioning, External API, User Journeys, Microservices and Authorization Mesh. It details how and when to use each of the patterns. This document is expected to guide the authorization system implementers and integrators, as well as suggest the best possible authorization model to use for each pattern.
+
+--- middle
+
+# Authorization Design Patterns
 
 # Background
 

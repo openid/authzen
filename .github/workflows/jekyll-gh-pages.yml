@@ -24,19 +24,32 @@ jobs:
         run: gem install kramdown-rfc
       - name: Install xml2rfc
         run: pip install xml2rfc
-      - name: Convert to rfc xml
+      - name: Convert Authz API to rfc xml
         run: kramdown-rfc2629 api/authorization-api-1_0.md > api/authorization-api-1_0.xml
-      - name: Render HTML
+      - name: Render Authz API HTML
         run: xml2rfc api/authorization-api-1_0.xml --html -o index.html
-      - name: Render Text
+      - name: Render Authz API Text
         run: xml2rfc api/authorization-api-1_0.xml --text
-      - name: Upload artifact
+      - name: Upload Authz API artifact
         uses: actions/upload-artifact@v2
         with:
           name: output
           path: |
             index.html
             api/authorization-api-1_0.xml
+      - name: Convert Authz Design Patterns to rfc xml
+        run: kramdown-rfc2629 patterns/AuthorizationDesignPatterns.md > patterns/AuthorizationDesignPatterns.xml
+      - name: Render Authz Design Patterns HTML
+        run: xml2rfc patterns/AuthorizationDesignPatterns.xml --html -o patterns.html
+      - name: Render Authz Design Patterns Text
+        run: xml2rfc patterns/AuthorizationDesignPatterns.xml --text
+      - name: Upload Authz Design Patterns artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: output
+          path: |
+            patterns.html
+            patterns/AuthorizationDesignPatterns.xml
   publish-to-pages:
     if: github.ref == 'refs/heads/main'
     needs: [build-rfc]
