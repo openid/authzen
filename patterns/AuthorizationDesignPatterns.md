@@ -103,7 +103,7 @@ This is the traditional Policy-Enforcement-Point / Policy-Decision-Point model d
 
 *Traditional ABAC architecture*
 
-(Source: <https://py-abac.readthedocs.io/en/latest/concepts.html>, see also <https://datatracker.ietf.org/doc/html/rfc2753> )
+(Sources: https://py-abac.readthedocs.io/en/latest/concepts.html, see also https://datatracker.ietf.org/doc/html/rfc2753 )
 
 In this traditional model, the Policy Enforcement Point (PEP)  “ is a component at a network node and PDP is a remote entity that may reside at a policy server.” Even if both PEP and PDP can be colocated, it is understood that they are distinct components.
 
@@ -194,7 +194,7 @@ In this model, the resource server itself makes API calls to an external Dynamic
 This is the most flexible way to integrate external authorization as it can be used by most resource types, including legacy apps.
 
 
-## When to use
+### When to use
 
 
 
@@ -258,7 +258,7 @@ Generally requires 2 authorizations.
 
 Given that a first authorization happens here at the IdP level, during authentication, a 2nd authorization process is likely necessary in the Resource in order to ensure the subject, once authenticated with the right Assurance Level, can only access the right protected items.
 
-<span style="text-decoration:underline;">_For Example_</span>, accessing a PAM system may require Authentication Assurance Level 2 or higher; but once authenticated, the subject doesn’t necessarily have access to all the vaults and secrets.
+_For Example_, accessing a PAM system may require Authentication Assurance Level 2 or higher; but once authenticated, the subject doesn’t necessarily have access to all the vaults and secrets.
 
 
 ## Microservices
