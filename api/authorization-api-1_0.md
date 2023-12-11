@@ -46,6 +46,7 @@ normative:
   RFC6750: #OAuth 2.0 Bearer Tokens
   RFC8259: #JSON
   RFC9110: # HTTP Semantics
+  RFC9493: # Subject Identifiers for SETs
   XACML:
     title: eXtensible Access Control Markup Language (XACML) Version 1.1
     target: https://www.oasis-open.org/committees/xacml/repository/cs-xacml-specification-1.1.pdf
@@ -128,27 +129,61 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ## Subjects {#subjects}
 A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked, or the Subject may be of interest in a Search API call.
 
-A Subject is a JSON ({{RFC8259}}) object that has the following fields:
+A Subject is in the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}. A Subject MUST include at least one identifier, but MAY include more than one identifier if the format of the field is of type `aliases`.
 
-id:
-: REQUIRED. A field, whose value is of type `string`, which uniquely identifies the user within the scope of a PEP. This identifier could be an email address, or it might be an internal identifier such as a UUID or employee ID.
+The following new Subject Identifier Formats SHALL be added to the `Security Event Identifier Formats Registry` IANA Repository, as defined in the {{IANA}} section below:
 
-ipAddress:
-: OPTIONAL. A field, whose value is of type `string`, which is a {{RFC4001}} text representation of the IP Address
+### IP Address {#subject-ip-address}
+The IP Address of the Subject. The IP Address Subject Identifier Format is identified by the name `ip_address`. It identifies the IP Address of the subject, identified with an `ip_address` field, whose value is a textual representation of an IP Address, as defined in `Textual Conventions for Internet Network Addresses` {{RFC4001}}.
 
-deviceId:
-: OPTIONAL. A field, whose value is of type `string`, which uniquely identifies the device of the Subject
-
-The following non-normative example describes a Subject:
+The following is a non-normative example of a Subject Identifier Format of type IP Address:
 
 ~~~ json
 {
-    "id": "atul@sgnl.ai",
-    "ipAddress": "172.217.22.14",
-    "deviceId": "8:65:ee:17:7e:0b"
+  "format": "ip_address",
+  "ip_address": "172.217.22.14"
 }
 ~~~
-{: #subjectexample title="Example Subject Object"}
+{: #ipaddresssubjectexample title="Example IP Address format Subject Identifier"}
+
+### Device Identifier {#subject-device-id}
+The Device Identifier of the Subject. The Device Identifier Subject Identifier Format is identified by the name `device_id`. It identifies the Device Identifier of the subject, identified with a `device_id` field, whose value is a string representation of the device identifier.
+
+The following is a non-normative example of a Subject Identifier Format of type  Device Identifier:
+
+~~~ json
+{
+  "format": "device_id",
+  "device_id": "8:65:ee:17:7e:0b"
+}
+~~~
+{: #deviceidssubjectexample title="Example Device Identifier format Subject Identifier"}
+
+### Multiple Subject Identifier Formats {#subject-multi-format}
+A Subject may be described using multiple formats, using the `aliases` Subject Identifier Format. The individual subject identifiers within the `aliases` Subject Identifier Format are interpreted to mean different attributes of the same Subject.
+
+The following non-normative example describes a Subject with multiple formats:
+
+~~~ json
+{
+  "format": "aliases",
+  "identifiers": [
+    {
+      "format": "email",
+      "email": "atul@sgnl.ai"
+    },
+    {
+      "format": "ip_address",
+      "ip_address": "172.217.22.14"
+    },
+    {
+      "format": "device_id",
+      "device_id": "8:65:ee:17:7e:0b"
+    }
+  ]
+}
+~~~
+{: #subjectexample title="Example Subject Identifier using multiple formats"}
 
 ## Resources {#resources}
 An Resource is the target of an access request. It is a JSON ({{RFC8259}}) object that has the following fields:
@@ -383,7 +418,8 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
   "subject": {
-    "id": "atul@sgnl.ai",
+    "format": "email",
+    "email": "atul@sgnl.ai",
   },
   "queries": [
     {
@@ -516,8 +552,19 @@ Authorization: <myoauthtoken>
 
 {
   "subject": {
-    "id": "atul@sgnl.ai"
-    "ipAddress": "172.217.22.14",
+    {
+      "format": "aliases",
+      "identifiers": [
+        {
+          "format": "email",
+          "email": "atul@sgnl.ai"
+        },
+        {
+          "format": "ip_address",
+          "ip_address": "172.217.22.14"
+        }
+      ]
+    }
   }
   "queries": ["delete", "read"],
 }
@@ -576,9 +623,20 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
   "iat": 1234567890,
   "exp": 1234568890,
   "subject": {
-    "id": "atul@sgnl.ai"
-    "ipAddress": "172.217.22.14",
-  }
+    {
+      "format": "aliases",
+      "identifiers": [
+        {
+          "format": "email",
+          "email": "atul@sgnl.ai"
+        },
+        {
+          "format": "ip_address",
+          "ip_address": "172.217.22.14"
+        }
+      ]
+    }
+  },
   "decisions": [
     {
       "action": "read",
@@ -682,9 +740,12 @@ The following is a non-normative example of a Subject Query Decision:
         "createDate",
         "lastUpdated"
     ],
-    "subject": {
-        "id": "alex@3edges.com"
+  "subject": {
+    {
+      "format": "email",
+      "email": "alex@3edges.com"
     }
+  }
 }
 ~~~
 {: #example-subject-query-decision title="Example Subject Query Decision"}
@@ -718,7 +779,8 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
         "author"
       ],
       "subject": {
-        "id": "alex@3edges.com"
+        "format": "email",
+        "email": "alex@3edges.com"
       }
     },
     {
@@ -729,7 +791,8 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
         "lastUpdated"
       ],
       "subject": {
-        "id": "alex@3edges.com"
+        "format": "email",
+        "email": "alex@3edges.com"
       }
     },
     {
@@ -740,9 +803,10 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
         "lastUpdated"
       ],
       "subject": {
-        "id": "Janet@3edges.com"
+        "format": "email",
+        "email": "janet@3edges.com"
       }
-    }
+   }
   ],
   "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
 }
@@ -751,8 +815,21 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
 
 # IANA Considerations {#IANA}
 
-TBS
+The following Subject Identifier Formats SHALL be added to the "Security Event Identifier Formats" Registry as described in "Subject Identifiers for Security Event Tokens" {{RFC9493}}:
 
+## IP Address {#ipaddress-registry-entry}
+
+* Format Name: ip_address
+* Format Description: A value that describes a subject through its IP Address
+* Change Controller: OpenID Foundation
+* Reference: Section {{subject-ip-address}} of the Authorization API specification
+
+## Device Identifier {#deviceid-registry-entry}
+
+* Format Name: device_id
+* Format Description: A value that describes a subject through its device identifier
+* Change Controller: OpenID Foundation
+* Reference: Section {{subject-device-id}} of the Authorization API specification
 
 # Security Considerations {#Security}
 
