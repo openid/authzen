@@ -151,13 +151,12 @@ The following is a non-normative example of a Resource:
 
 ~~~json
 {
-    "id": "somevalue",
-    "type": "user",
-    "attributeNames": [
-        "homeAddress",
-        "birthDate",
-        "employeeId"
-    ]
+    "id": "123",
+    "type": "book",
+    "libraryRecord":{
+      "title": "ABAC's new hit",
+      "isbn": "978-0593383322"
+    }
 }
 ~~~
 {: #resourceexample title="Example Resource"}
@@ -167,31 +166,21 @@ An action is the type of access that the requester intends to perform. There are
 
 #### Common Action Values (non-normative)
 The following common actions are defined herein:
-
-"access":
-: A generic action that could mean any type of access. This is useful if the policy or application is not interested in different decisions for different types of actions
-
-"create":
-: The action to create a new entity, which MAY be defined by the `resource` field in the request
-
-"read":
-: The action to read the content. Based on the resource being accessed, this could mean a list functionality or reading an individual resource's contents
-
-"update":
-: The action to update the content of an existing entity. This MAY represent a partial update or an entire replacement of the entity. The entity MAY be identified by the resource in the request
-
-"delete":
-: The action to delete an entity. The entity MAY be identified by the resource in the request
+*  **access**: A generic action that could mean any type of access. This is useful if the policy or application is not interested in different decisions for different types of actions
+* **create**: The action to create a new entity, which MAY be defined by the `resource` field in the request
+* **read**: The action to read the content. Based on the resource being accessed, this could mean a list functionality or reading an individual resource's contents
+* **update**: The action to update the content of an existing entity. This MAY represent a partial update or an entire replacement of the entity. The entity MAY be identified by the resource in the request
+* **delete**: The action to delete an entity. The entity MAY be identified by the resource in the request
 
 Policies MAY incorporate common action names to provide different decisions based on the action
 
 #### Custom Actions
-Any action that is not one of the above is a custom action. Policies MAY incorporate custom action names if decisions need to be taken differently for different custom actions
+Any action that is not one of the above is custom. Policies MAY incorporate custom action names if decisions need to be taken differently for different custom actions
 
 ### Context {#context}
 The Context object is a set of attributes that represent environmental or contextual data about the request such as time of day. It is a JSON ({{RFC8259}}) object that is constructed just like a Subject, Resource, or Action object.
 
-### The Request
+### The Access Evaluation API Request
 
 The request follows a format similar to that used in XACML-JSON (TBD add normative reference) or AWS Cedar i.e. a collection of _attributes_ grouped together in categories that reflect the grammatical purpose or function of said attribute. This specification defines 4 such categories as aforementioned:
 
@@ -217,7 +206,6 @@ The request follows a format similar to that used in XACML-JSON (TBD add normati
     },
     "Action":{
         "method": "GET"
-
     },
     "Context":{
         "time": "1985-10-26T01:22-07:00"
@@ -225,9 +213,68 @@ The request follows a format similar to that used in XACML-JSON (TBD add normati
 }
 ~~~
 
-### The Response
+### The Access Evaluation API Response
+
+The simplest form of a response is simply a string representing a decision. In this specification, assuming the evaluation was successful, there are only 2 possible responses:
+
+* **allow**: The access request is permitted to go forward
+* **deny**: The access request is denied and MUST NOT be permitted to go forward
+
+#### Additional Parameters
+
+In addition to a decision, a response may contain:
+
+* A list of identifiers representing the items (policies, graph nodes, tuples) that were used in the decision-making process
+* A list of reasons as to why access is permitted or denied.
+
+##### Reasons
+Reasons MAY be provided by the PDP. 
+
+###### Reason Field {#reason-field}
+A Reason Field is a JSON object that has keys and values of type `string`. The following are non-normative examples of Reason Field objects:
+
+~~~ json
+{
+    "en": "location restriction violation"
+}
+~~~
 
 
+#### Reason Object {#reason-object}
+A Reason Object specifies a particular reason. It is a JSON object that has the following fields:
+
+id:
+: REQUIRED. A numeric value of that specifies the reason within the scope of a particular response
+
+reason_admin:
+: OPTIONAL. The reason, which MUST NOT be shared with the user, but useful for administrative purposes that indicates why the access was denied. The value of this field is a Reason Field object ({{reason-field}}).
+
+reason_user:
+: OPTIONAL. The reason, which MAY be shared with the user that indicates why the access was denied. The value of this field is a Reason Field object ({{reason-field}})
+
+The following is a non-normative example of a Reason Object:
+
+~~~json
+{
+  "id": 0,
+  "reason_admin": {
+    "en": "Request failed policy C076E82F"
+  },
+  "reason_user": {
+    "en-403": "Insufficient privileges. Contact your administrator",
+    "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
+  }
+}
+~~~
+{: #example-reason-object title="Example of a Reason Object"}
+
+#### Sample Response (non-normative)
+
+  ~~~json
+  {
+    "Decision": "Permit"
+  }
+  ~~~
 
 
 
@@ -258,66 +305,8 @@ The following is a non-normative example of an Resource Query:
 ~~~
 {: #example-resource-query title="Example Resource Query"}
 
-## Decisions
-Decisions are provided by the PDP in response to requests from the PEP.
 
-### Query Decision {#query-decision}
-A query decision is a JSON `string` which can have one of the following values:
 
-"allow":
-: The access request is permitted to go forward
-
-"deny":
-: The access request is denied and MUST NOT be permitted to go forward
-
-### Reasons
-Reasons MUST be provided by the PDP when the Query Decision is `deny`. 
-
-#### Reason Field {#reason-field}
-A Reason Field is a JSON object that has keys and values of type `string`. The key name is comprised of a two-letter language code, and optionally a hyphen followed by a string of decimal digits that is a reason code. The following are non-normative examples of Reason Field objects:
-
-~~~ json
-{
-    "en": "location restriction violation"
-}
-~~~
-{: #example-reason-field-no-code title="Example Reason Field with no reason code"}
-
-~~~ json
-{
-    "en" : "Access attempt from multiple regions.",
-    "es-410": "Intento de acceso desde varias regiones."
-}
-~~~
-{: #example-reason-field-with-code title="Example Reason Field with reason code and multiple language keys"}
-
-#### Reason Object {#reason-object}
-A Reason Object specifies a particular reason. It is a JSON object that has the following fields:
-
-id:
-: REQUIRED. A numeric value of that specifies the reason within the scope of a particular response
-
-reason_admin:
-: OPTIONAL. The reason, which MUST NOT be shared with the user, but useful for administrative purposes that indicates why the access was denied. The value of this field is a Reason Field object ({{reason-field}}).
-
-reason_user:
-: OPTIONAL. The reason, which MAY be shared with the user that indicates why the access was denied. The value of this field is a Reason Field object ({{reason-field}})
-
-The following is a non-normative example of a Reason Object:
-
-~~~json
-{
-  "id": 0,
-  "reason_admin": {
-    "en": "Request failed policy C076E82F"
-  },
-  "reason_user": {
-    "en-403": "Insufficient privileges. Contact your administrator",
-    "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
-  }
-}
-~~~
-{: #example-reason-object title="Example of a Reason Object"}
 
 ### Resource Query Decision {#resource-query-decision}
 An Resource Query Decision is a tuple of an resource, action and a decision, represented as a JSON object. It has the following fields:
