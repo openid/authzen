@@ -25,6 +25,11 @@ author:
   name: Atul Tulshibagwale
   org: SGNL
   email: atul@sgnl.ai
+- role: editor # remove if not true
+  ins: D. Brossard
+  name: David Brossard
+  org: Axiomatics
+  email: david.brossard@axiomatics.com  
 contributor: # Same structure as author list, but goes into contributors
 - name: Marc Jordan
   org: SGNL
@@ -66,78 +71,56 @@ The Authorization API enables Policy Decision Points (PDPs) and Policy Enforceme
 
 # Introduction
 
-Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML ({{XACML}}). Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
+Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML ({{XACML}}) and NIST's ABAC SP 800-162. Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
 
 ## Model
-The Authorization API is a REST API published by the PDP, to which the PEP acts as a client. 
+The Authorization API is a transport-agnostic API published by the PDP, to which the PEP acts as a client. The Transport section of this specification will detail possible bindings e.g. REST. 
 
 Authorization for the Authorization API itself is out of scope for this document, since authorization for REST APIs is well-documented elsewhere. For example, the Authorization API MAY support authorization using an `Authorization` header, using a `basic` or `bearer` token. Support for OAuth 2.0 ({{RFC6749}}) is RECOMMENDED. 
 
 ## Features
 The Authorization API has two main features:
 
-* An Access Evaluations API, which enables a PEP to find out if a specific request can be permitted to access specific resources
-* A Search API, which enables a PEP to discover all resources that a subject has access to, by specifying conditions for the access
-
-# Terminology
-
-Subject:
-: The user or robotic principal about whom the Authorization API call is being made
-
-Resource:
-: The target of the request; the resource about which the Authorization API is being made
-
-Action:
-: The operation the Subject has attempted on the Resource in an Authorization API call
-
-PDP:
-: Policy Decision Point. The component or system that provides authorization decisions over the network interface defined here as the Authorization API
-
-PEP:
-: Policy Enforcement Point. The component or system that requests decisions from the PDP and enforces access to specific requests based on the decisions obtained from the PDP
+* An Access Evaluation API, which enables a PEP to find out if a specific request can be permitted to access specific resources. Examples include
+  * Can Alice view document #123?
+  * Can a manager print?
+* A Search API, which enables a PEP to ask open-ended questions. This feature is sometimes referred to as partial evaluation, reverse querying, or contextual access queries by other frameworks. Examples include
+  * What can Alice do?
+  * Who can access record #123?
 
 # API Specification
-The Authorization API has two parts, Access Evaluation and Search. Each of these is defined below.
+The Authorization API has two parts, Access Evaluation and Search. Each of these is defined below. The definition is transport-agnostic. Refer to the Transport section for example bindings.
 
 ## API Version
-This document describes the API version 1. Any updates to this API through subsequent revisions of this document or through other documents MAY augment this API, but MUST NOT modify the API described here. Augmentation MAY include additional API methods or additional parameters to existing API methods, additional authorization mechanisms or additional optional headers in API requests. All API methods for version 1 MUST be immediately preceded by the relative URL path `/v1/`.
+This document describes the API version 1. Any updates to this API through subsequent revisions of this document or other documents MAY augment this API, but MUST NOT modify the API described here. Augmentation MAY include additional API methods or additional parameters to existing API methods, additional authorization mechanisms, or additional optional headers in API requests. All API methods for version 1 MUST be immediately preceded by the relative URL path `/v1/`.
 
-## API Authorization
-API calls SHALL be authorized with OAuth 2.0 access tokens ({{RFC6750}}). Implementors MAY use bearer tokens or sender constrained tokens, depending on the organizations policy.
+## Information Model
 
-## Request Identification
-All requests to the API MAY have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. If present, the request identifier SHALL be provided using the HTTP Header `X-Request-ID`. The value of this header is an arbitrary string. The following non-normative example describes this header:
-
-~~~ http
-POST /access/v1/evaluations HTTP/1.1
-Authorization: Bearer mF_9.B5f-4.1JqM
-X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
-~~~
-{: #requestidexample title="Request Id Example"}
-
-## Request Identification in a Response
-A PDP responding to an Authorization API request MUST include a request identifier in the response. The request identifier is specified in the HTTP Response header: `X-Request-ID`. If the PEP specified a request identifier in the request, the PDP MUST include the same identifier in the response to that request. If the PEP has not specified a request identifier in the request, the PDP MUST generate a new request identifier in its response to the PEP. The following is an non-normative example of an HTTP Response with this header:
-
-~~~ http
-HTTP/1.1 OK
-Content-type: application/json
-X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
-~~~
-{: #example-response-request-id title="Example HTTP response with a Request Id"}
-
-## Subjects {#subjects}
+### Subjects {#subjects}
 A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked, or the Subject may be of interest in a Search API call.
 
-A Subject is a JSON ({{RFC8259}}) object that has the following fields:
+A Subject is a JSON ({{RFC8259}}) object that contains any number of key-value pair attributes e.g. 
+~~~json
+"username" : "Alice",
+"department": "Sales"
+~~~
+
+An attribute can be single-valued or multi-valued. It can be a primitive type (string, boolean...) or a complex type such as a JSON object.
+
+#### Sample Fields
+
+Here are sample fields:
 
 id:
-: REQUIRED. A field, whose value is of type `string`, which uniquely identifies the user within the scope of a PEP. This identifier could be an email address, or it might be an internal identifier such as a UUID or employee ID.
+: OPTIONAL. A field, whose value is of type `string`, which uniquely identifies the user within the scope of a PEP. This identifier could be an email address, or it might be an internal identifier such as a UUID or employee ID.
 
 ipAddress:
 : OPTIONAL. A field, whose value is of type `string`, which is a {{RFC4001}} text representation of the IP Address
 
 deviceId:
 : OPTIONAL. A field, whose value is of type `string`, which uniquely identifies the device of the Subject
+
+#### Example (non-normative)
 
 The following non-normative example describes a Subject:
 
@@ -150,8 +133,10 @@ The following non-normative example describes a Subject:
 ~~~
 {: #subjectexample title="Example Subject Object"}
 
-## Resources {#resources}
-An Resource is the target of an access request. It is a JSON ({{RFC8259}}) object that has the following fields:
+### Resources {#resources}
+A Resource is the target of an access request. It is a JSON ({{RFC8259}}) object that is constructed just like a Subject object.
+
+#### Sample Fields
 
 id:
 : OPTIONAL. The unique identifier of the resource within the scope of the PEP. Its value is a `string` specifying the identifier of the resource. This field MAY be omitted to indicate a class of resources
@@ -159,10 +144,10 @@ id:
 type:
 : OPTIONAL. The type of the resource. Its value is a `string` that specifies the type of the resource
 
-attributeNames:
-: OPTIONAL. An array of `string`s, each string representing the name of an attribute of the resource.
 
-The following is a non-normative example of an Resource:
+#### Example (non-normative)
+
+The following is a non-normative example of a Resource:
 
 ~~~json
 {
@@ -177,10 +162,10 @@ The following is a non-normative example of an Resource:
 ~~~
 {: #resourceexample title="Example Resource"}
 
-## Actions {#actions}
-An action is the type of access that the requester intends to perform. There are common actions defined herein, or the action may be custom, which could be specific to the application being accessed or shared across a applications but not listed in the common actions below
+### Actions {#actions}
+An action is the type of access that the requester intends to perform. There are common actions defined herein, or the action may be custom, which could be specific to the application being accessed or shared across applications but not listed in the common actions below. Action is a JSON ({{RFC8259}}) object that is constructed just like a Subject or Resource object.
 
-### Common Actions
+#### Common Action Values (non-normative)
 The following common actions are defined herein:
 
 "access":
@@ -190,7 +175,7 @@ The following common actions are defined herein:
 : The action to create a new entity, which MAY be defined by the `resource` field in the request
 
 "read":
-: The action to read the content. Based on the resource being accessed, this could mean a list functionality or reading an individual resource contents
+: The action to read the content. Based on the resource being accessed, this could mean a list functionality or reading an individual resource's contents
 
 "update":
 : The action to update the content of an existing entity. This MAY represent a partial update or an entire replacement of the entity. The entity MAY be identified by the resource in the request
@@ -200,8 +185,53 @@ The following common actions are defined herein:
 
 Policies MAY incorporate common action names to provide different decisions based on the action
 
-### Custom Actions
+#### Custom Actions
 Any action that is not one of the above is a custom action. Policies MAY incorporate custom action names if decisions need to be taken differently for different custom actions
+
+### Context {#context}
+The Context object is a set of attributes that represent environmental or contextual data about the request such as time of day. It is a JSON ({{RFC8259}}) object that is constructed just like a Subject, Resource, or Action object.
+
+### The Request
+
+The request follows a format similar to that used in XACML-JSON (TBD add normative reference) or AWS Cedar i.e. a collection of _attributes_ grouped together in categories that reflect the grammatical purpose or function of said attribute. This specification defines 4 such categories as aforementioned:
+
+* The subject (or principal) of type Subject
+* The action (or verb) of type Action
+* The resource of type Resource
+* The context (or environment) of type Context
+
+#### Example (non-normative)
+
+~~~json
+{
+    "Subject":{
+        "id": {
+            "username": "Art",
+            "jwt": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MiIsIm5hbWUiOiJBcnQgVmFuZGVsYXkiLCJpYXQiOjE1MTYyMzkwMjJ9.QR3kS983lnaRVM1ZVJ_TM7XxJDPppELnCSCV_upUHQIGs28mB4JE_VqC9WBlcCYIYZn_E3r1RXarnFBe5UAy9g"
+        }
+
+    },
+    "Resource":{
+        "path": "/api/account/123"
+
+    },
+    "Action":{
+        "method": "GET"
+
+    },
+    "Context":{
+        "time": "1985-10-26T01:22-07:00"
+    }
+}
+~~~
+
+### The Response
+
+
+
+
+
+
 
 ## Resource Query {#resource-query}
 An Resource Query is a question about whether a subject can access a specific resource. It is a JSON object with the following fields:
@@ -749,6 +779,30 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
 ~~~
 {: #example-subject-search-response title="Example of a Subject Search Response"}
 
+# Transport
+
+## REST Binding
+
+## Request Identification
+All requests to the API MAY have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. If present, the request identifier SHALL be provided using the HTTP Header `X-Request-ID`. The value of this header is an arbitrary string. The following non-normative example describes this header:
+
+~~~ http
+POST /access/v1/evaluations HTTP/1.1
+Authorization: Bearer mF_9.B5f-4.1JqM
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+~~~
+{: #requestidexample title="Request Id Example"}
+
+## Request Identification in a Response
+A PDP responding to an Authorization API request MUST include a request identifier in the response. The request identifier is specified in the HTTP Response header: `X-Request-ID`. If the PEP specified a request identifier in the request, the PDP MUST include the same identifier in the response to that request. If the PEP has not specified a request identifier in the request, the PDP MUST generate a new request identifier in its response to the PEP. The following is an non-normative example of an HTTP Response with this header:
+
+~~~ http
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+~~~
+{: #example-response-request-id title="Example HTTP response with a Request Id"}
+
 # IANA Considerations {#IANA}
 
 TBS
@@ -760,6 +814,23 @@ TBS
 
 
 --- back
+
+# Terminology
+
+Subject:
+: The user or robotic principal about whom the Authorization API call is being made
+
+Resource:
+: The target of the request; the resource about which the Authorization API is being made
+
+Action:
+: The operation the Subject has attempted on the Resource in an Authorization API call
+
+PDP:
+: Policy Decision Point. The component or system that provides authorization decisions over the network interface defined here as the Authorization API
+
+PEP:
+: Policy Enforcement Point. The component or system that requests decisions from the PDP and enforces access to specific requests based on the decisions obtained from the PDP
 
 
 # Acknowledgements {#Acknowledgements}
