@@ -81,12 +81,16 @@ Authorization for the Authorization API itself is out of scope for this document
 ## Features
 The Authorization API has two main features:
 
-* An Access Evaluation API, which enables a PEP to find out if a specific request can be permitted to access specific resources. Examples include
+* An Access Evaluation API, which enables a PEP to find out if a specific request can be permitted to access specific resources. The following are non-normative examples:
   * Can Alice view document #123?
   * Can a manager print?
-* A Search API, which enables a PEP to ask open-ended questions. This feature is sometimes referred to as partial evaluation, reverse querying, or contextual access queries by other frameworks. Examples include
+* A Search API, which enables a PEP to ask open-ended questions. This feature is sometimes referred to as partial evaluation, reverse querying, or contextual access queries by other frameworks. The following are non-normative examples:
+  * What can happen?
   * What can Alice do?
   * Who can access record #123?
+  * Who can edit medical records between 8 am and 3 pm?
+  * Who can edit?
+  * What can happen at 3 pm from Glasgow?
 
 # API Specification
 The Authorization API has two parts, Access Evaluation and Search. Each of these is defined below. The definition is transport-agnostic. Refer to the Transport section for example bindings.
