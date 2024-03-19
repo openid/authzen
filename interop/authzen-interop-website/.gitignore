@@ -1,18 +1,8 @@
-.refcache
-.DS_store
-*.xml
-*.html
-*.txt
-.idea
-
 # Dependencies
-*/node_modules
+/node_modules
 
 # Production
-*/build
-
-# testing
-coverage
+/build
 
 # Generated files
 .docusaurus
@@ -28,7 +18,3 @@ coverage
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-.pnp
-.pnp.js
-todo.db
