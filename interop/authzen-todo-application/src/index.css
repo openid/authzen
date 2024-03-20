@@ -30,3 +30,23 @@ code {
   cursor: pointer;
   font-size: 20px;
 }
+
+.separator {
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 10px;
+}
+
+.pdp-info {
+  align-content: center;
+  display: flex;
+  font-size: 25px;
+  flex-wrap: nowrap;
+  align-items: center;
+  margin-bottom: 10px;
+  cursor: default;
+  text-align: left;
+}
+
+.pdp-select {
+  min-width: 250px;
+}

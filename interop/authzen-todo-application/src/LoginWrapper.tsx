@@ -11,7 +11,7 @@ export function LoginWrapper() {
   const { userData } = auth;
   const isAuthenticated = userData?.id_token ? true : false;
   const [loggedIn, setLoggedIn] = useState(false);
-  const [pdp, setPdp] = useState<string>("");
+  const [pdp, setPdp] = useState<string>(localStorage.getItem("pdp") ?? "");
 
   useEffect(() => {
     if (!auth.isLoading && !isAuthenticated) {

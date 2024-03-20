@@ -16,15 +16,21 @@ const ErrorWithLink: React.FC = () => (
       running.
     </p>
     <p>
-      <a href="https://github.com/aserto-demo/todo-application#backends" target="_blank" rel="noreferrer">
-        Refer to the docs to download and start a server in the language of your choice. </a>
+      <a
+        href="https://github.com/aserto-demo/todo-application#backends"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Refer to the docs to download and start a server in the language of your
+        choice.{" "}
+      </a>
     </p>
   </div>
 );
 
 type PDP = {
   name: string;
-}
+};
 
 export const App: React.FC<AppProps> = (props) => {
   const auth = useAuth();
@@ -36,6 +42,8 @@ export const App: React.FC<AppProps> = (props) => {
   const [showCompleted, setShowCompleted] = useState<boolean>(true);
   const [showActive, setShowActive] = useState<boolean>(true);
   const user: User = useUser(props.user.sub);
+  const storedPdpOption = localStorage.getItem("pdp");
+  const currentPdpOption = storedPdpOption ? { name: storedPdpOption } : (pdps && pdps[0]);
 
   const errorHandler = (errorText: string, close?: number | false) => {
     const autoClose = close === undefined ? 3000 : close;
@@ -73,10 +81,7 @@ export const App: React.FC<AppProps> = (props) => {
       });
     } catch (e) {
       if (e instanceof TypeError && e.message === "Failed to fetch") {
-        errorHandler(
-          "",
-          false
-        );
+        errorHandler("", false);
       } else e instanceof Error && errorHandler(e.message);
       return;
     }
@@ -91,7 +96,7 @@ export const App: React.FC<AppProps> = (props) => {
         setTodos(todos);
       } catch (e) {
         if (e instanceof TypeError && e.message === "Failed to fetch") {
-          errorHandler("",false);
+          errorHandler("", false);
         } else e instanceof Error && errorHandler(e.message);
       }
     };
@@ -113,16 +118,25 @@ export const App: React.FC<AppProps> = (props) => {
     const list = async () => {
       try {
         const pdps: string[] = await listPdps();
-        setPdps(pdps.map((pdp) => { return { name: pdp } }));
+        setPdps(
+          pdps.map((pdp) => {
+            return { name: pdp };
+          })
+        );
       } catch (e) {
         if (e instanceof TypeError && e.message === "Failed to fetch") {
-          errorHandler("",false);
+          errorHandler("", false);
         } else e instanceof Error && errorHandler(e.message);
       }
     };
 
     list();
   }, [listPdps]);
+
+  const storePdp: ((pdp: string) => void) = useCallback((pdp: string) => {
+    setPdp(pdp);
+    localStorage.setItem("pdp", pdp);
+  }, [setPdp])
 
   useEffect(() => {
     getPdps();
@@ -203,18 +217,19 @@ export const App: React.FC<AppProps> = (props) => {
       <footer className="info">
         <div className="user-controls">
           <>
-            <div className="user-info">
-              <span className="user-name">
-                Authorize using: &nbsp;&nbsp;
-              </span>
-              <Select
-                isSearchable={false}
-                options={pdps}
-                defaultValue={pdps[0]}
-                getOptionLabel={(pdp: PDP) => pdp.name }
-                getOptionValue={(pdp: PDP) => pdp.name }
-                onChange={(option) => setPdp(option!.name)}
-              />
+            <div className="pdp-info">
+              <span className="user-name">Authorize using: &nbsp;</span>
+              {pdps.length && (
+                <Select
+                  className="pdp-select"
+                  isSearchable={false}
+                  options={pdps}
+                  defaultValue={currentPdpOption}
+                  getOptionLabel={(pdp: PDP) => pdp.name}
+                  getOptionValue={(pdp: PDP) => pdp.name}
+                  onChange={(option) => storePdp(option!.name)}
+                />
+              )}
             </div>
             <div className="user-info">
               <span className="user-name">
@@ -234,7 +249,7 @@ export const App: React.FC<AppProps> = (props) => {
                 </span>
               ) : null}
             </div>
-            <div className="seperator"></div>
+            <div className="separator"></div>
             <div className="auth-button">
               <div onClick={() => auth.signOut()}>Log Out</div>
             </div>
