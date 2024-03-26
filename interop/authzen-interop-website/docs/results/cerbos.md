@@ -4,14 +4,14 @@ sidebar_position: 2
 
 # Cerbos
 
-Interop results for the Aserto implementation hosted at https://cerbos-authzen-pdp-piy6w63peq-ey.a.run.app.
+Interop results for the [Cerbos](https://cerbos.dev) implementation hosted at `https://authzen-proxy-demo.cerbos.dev`.
 
 ## Test results
 
 ```bash
-yarn test https://cerbos-authzen-pdp-piy6w63peq-ey.a.run.app
+yarn test https://authzen-proxy-demo.cerbos.dev
 yarn run v1.22.19
-$ ./scripts/test.sh https://cerbos-authzen-pdp-piy6w63peq-ey.a.run.app
+$ ./scripts/test.sh https://authzen-proxy-demo.cerbos.dev
 >>> checking decisions
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"beth@the-smiths.com"}}
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"}}
