@@ -38,7 +38,7 @@ export class Server {
     todo.ID = uuidv4();
     try {
       const user = await this.directory.getUserByIdentity(req.auth.sub);
-      todo.OwnerID = user.key
+      todo.OwnerID = user.id;
 
       await this.store.insert(todo);
       res.json({ msg: "Todo created" });
