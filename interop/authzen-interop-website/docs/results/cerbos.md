@@ -1,17 +1,17 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 ---
 
-# Aserto
+# Cerbos
 
-Interop results for the [Aserto](https://www.aserto.com/) implementation hosted at `https://authzen-proxy.demo.aserto.com`.
+Interop results for the [Cerbos](https://cerbos.dev) implementation hosted at `https://authzen-proxy-demo.cerbos.dev`.
 
 ## Test results
 
 ```bash
-yarn test
+yarn test https://authzen-proxy-demo.cerbos.dev
 yarn run v1.22.19
-$ ./scripts/test.sh
+$ ./scripts/test.sh https://authzen-proxy-demo.cerbos.dev
 >>> checking decisions
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"beth@the-smiths.com"}}
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"}}
@@ -54,4 +54,6 @@ PASS REQ:{"subject":{"identity":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTE
 PASS REQ:{"subject":{"identity":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_delete_todo"},"resource":{"type":"todo","ownerID":"rick@the-citadel.com"}}
 PASS REQ:{"subject":{"identity":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_delete_todo"},"resource":{"type":"todo","ownerID":"jerry@the-smiths.com"}}
 <<< done checking decisions
+
+
 ```

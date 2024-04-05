@@ -119,7 +119,7 @@ const config = {
           //   ],
           // },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} OpenID Foundation`,
+        copyright: `Copyright © ${new Date().getFullYear()} OpenID Foundation, contributed with <span role="img" aria-label="heart">❤️</span> by <a href="https://www.aserto.com/" target="_blank">Aserto</a>.`,
       },
       prism: {
         theme: prismThemes.github,
