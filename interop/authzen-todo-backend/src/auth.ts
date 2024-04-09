@@ -61,7 +61,7 @@ export const authzMiddleware = (store) => {
     ) => {
       const pdpHeader = req.headers["x_authzen_pdp"] as string;
       const pdpBaseName = (pdpHeader && pdps[pdpHeader]) ?? AUTHZEN_PDP_URL;
-      const authorizerUrl = `${pdpBaseName}/access/v1/evaluations`
+      const authorizerUrl = `${pdpBaseName}/access/v1/evaluation`
       log(`Authorizer: ${authorizerUrl}`);
       const pdpAuthHeader = (pdpHeader && AUTHZEN_PDP_API_KEYS[pdpHeader])
       const headers: Record<string, string> = {
