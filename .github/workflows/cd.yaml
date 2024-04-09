@@ -15,10 +15,6 @@ env:
   IMAGE_NAME: authzen-todo-backend
   VAULT_ADDR: https://vault.eng.aserto.com/
 
-defaults:
-  run:
-    working-directory: ./interop/authzen-todo-backend
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
