@@ -30,6 +30,11 @@ author:
   name: David Brossard
   org: Axiomatics
   email: david.brossard@axiomatics.com  
+- role: editor # remove if not true
+  ins: O. Gazitt
+  name: Omri Gazitt
+  org: Aserto
+  email: omri@aserto.com  
 contributor: # Same structure as author list, but goes into contributors
 - name: Marc Jordan
   org: SGNL
@@ -37,9 +42,6 @@ contributor: # Same structure as author list, but goes into contributors
 - name: Erik Gustavson
   org: SGNL
   email: erik@sgnl.ai
-- name: Omri Gazitt
-  org: Aserto
-  email: omri@aserto.com
 - name: Alex Babeanu
   org: 3Edges
   email: alex@3edges.com
@@ -130,9 +132,9 @@ The following non-normative example describes a Subject:
 
 ~~~ json
 {
-    "id": "atul@sgnl.ai",
-    "ipAddress": "172.217.22.14",
-    "deviceId": "8:65:ee:17:7e:0b"
+  "id": "atul@sgnl.ai",
+  "ipAddress": "172.217.22.14",
+  "deviceId": "8:65:ee:17:7e:0b"
 }
 ~~~
 {: #subjectexample title="Example Subject Object"}
@@ -155,12 +157,12 @@ The following is a non-normative example of a Resource:
 
 ~~~json
 {
-    "id": "123",
-    "type": "book",
-    "libraryRecord":{
-      "title": "ABAC's new hit",
-      "isbn": "978-0593383322"
-    }
+  "id": "123",
+  "type": "book",
+  "libraryRecord":{
+    "title": "ABAC's new hit",
+    "isbn": "978-0593383322"
+  }
 }
 ~~~
 {: #resourceexample title="Example Resource"}
@@ -197,36 +199,34 @@ The request follows a format similar to that used in XACML-JSON (TBD add normati
 
 ~~~json
 {
-    "Subject":{
-        "id": {
-            "username": "Art",
-            "jwt": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MiIsIm5hbWUiOiJBcnQgVmFuZGVsYXkiLCJpYXQiOjE1MTYyMzkwMjJ9.QR3kS983lnaRVM1ZVJ_TM7XxJDPppELnCSCV_upUHQIGs28mB4JE_VqC9WBlcCYIYZn_E3r1RXarnFBe5UAy9g"
-        }
-
-    },
-    "Resource":{
-        "path": "/api/account/123"
-
-    },
-    "Action":{
-        "method": "GET"
-    },
-    "Context":{
-        "time": "1985-10-26T01:22-07:00"
+  "subject":{
+    "id": {
+      "username": "Art",
+      "jwt": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MiIsIm5hbWUiOiJBcnQgVmFuZGVsYXkiLCJpYXQiOjE1MTYyMzkwMjJ9.QR3kS983lnaRVM1ZVJ_TM7XxJDPppELnCSCV_upUHQIGs28mB4JE_VqC9WBlcCYIYZn_E3r1RXarnFBe5UAy9g"
     }
+  },
+  "resource":{
+    "path": "/api/account/123"
+  },
+  "action":{
+    "method": "GET"
+  },
+  "context":{
+    "time": "1985-10-26T01:22-07:00"
+  }
 }
 ~~~
 
 ### The Access Evaluation API Response
 
-The simplest form of a response is simply a string representing a decision. In this specification, assuming the evaluation was successful, there are only 2 possible responses:
+The simplest form of a response is simply a boolean representing a decision. In this specification, assuming the evaluation was successful, there are only 2 possible responses:
 
-* **allow**: The access request is permitted to go forward
-* **deny**: The access request is denied and MUST NOT be permitted to go forward
+* `true`: The access request is permitted to go forward
+* `false`: The access request is denied and MUST NOT be permitted to go forward
 
 #### Additional Parameters
 
-In addition to a decision, a response may contain:
+In addition to a `decision`, a response may contain:
 
 * A list of identifiers representing the items (policies, graph nodes, tuples) that were used in the decision-making process
 * A list of reasons as to why access is permitted or denied.
@@ -239,10 +239,9 @@ A Reason Field is a JSON object that has keys and values of type `string`. The f
 
 ~~~ json
 {
-    "en": "location restriction violation"
+  "en": "location restriction violation"
 }
 ~~~
-
 
 #### Reason Object {#reason-object}
 A Reason Object specifies a particular reason. It is a JSON object that has the following fields:
@@ -274,15 +273,11 @@ The following is a non-normative example of a Reason Object:
 
 #### Sample Response (non-normative)
 
-  ~~~json
-  {
-    "Decision": "Permit"
-  }
-  ~~~
-
-
-
-
+~~~json
+{
+  "decision": true
+}
+~~~
 
 ## Resource Query {#resource-query}
 An Resource Query is a question about whether a subject can access a specific resource. It is a JSON object with the following fields:
@@ -297,20 +292,18 @@ The following is a non-normative example of an Resource Query:
 
 ~~~ json
 {
-    "action": "stream",
-    "resource": {
-        "id": "1234",
-        "type": "webcam",
-        "attributeNames": [
-            "lowRes",
-            "motionOnly"]
-    }
+  "action": "stream",
+  "resource": {
+    "id": "1234",
+    "type": "webcam",
+    "attributeNames": [
+      "lowRes",
+      "motionOnly"
+    ]
+  }
 }
 ~~~
 {: #example-resource-query title="Example Resource Query"}
-
-
-
 
 ### Resource Query Decision {#resource-query-decision}
 An Resource Query Decision is a tuple of an resource, action and a decision, represented as a JSON object. It has the following fields:
@@ -331,12 +324,12 @@ The following is a non-normative example of an Resource Query Decision:
 
 ~~~ json
 {
-    "action": "stream",
-    "resource": {
-        "id": "1234"
-    },
-    "decision": "deny",
-    "reason_ids": [0,2,3]
+  "action": "stream",
+  "resource": {
+    "id": "1234"
+  },
+  "decision": "deny",
+  "reason_ids": [0,2,3]
 }
 ~~~
 {: #example-resource-query-decision title="Example Resource Query Decision"}
@@ -346,23 +339,23 @@ An API request or response MAY contain a collection of items, such as an array o
 
 ~~~ json
 [
-    {
-        "resource": {
-            "id": "1234",
-            "attributeNames": [
-              "homeAddress",
-              "title"
-            ]
-        },
-        "decision": "deny",
-        "reason_ids": [1]
+  {
+    "resource": {
+      "id": "1234",
+      "attributeNames": [
+        "homeAddress",
+        "title"
+      ]
     },
-    {
-        "resource": {
-            "id": "1234"
-        },
-        "decision": "allow"
-    }
+    "decision": "deny",
+    "reason_ids": [1]
+  },
+  {
+    "resource": {
+      "id": "1234"
+    },
+    "decision": "allow"
+  }
 ]
 ~~~
 {: #collection-example title="Example Overlapping Collection"}
@@ -388,6 +381,79 @@ The Access Evaluations API is a means for a PEP to request decisions for a numbe
 The Access Evaluations API is available at the relative URL `/evaluations/` via the `POST` HTTP method.
 
 ### Access Evaluation Request
+
+subject:
+: REQUIRED. A subject as described in the Subjects section ({{subjects}})
+
+action:
+: REQUIRED. An action as described in the Actions section ({{actions}})
+
+resource:
+: OPTIONAL. A resource as described in the Resources section ({{resources}})
+
+context:
+: OPTIONAL. The environment/context attributes, as described in the Context section ({{context}})
+
+The following is a non-normative example of an Access Evaluation Request:
+
+~~~ http
+POST /access/v1/evaluation HTTP/1.1
+Host: pdp.mycompany.com
+Authorization: <myoauthtoken>
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "subject": {
+    "id": "omri@aserto.com",
+  },
+  "action": {
+    "action": "can_read"
+  },
+  "resource": {
+    "type": "todo",
+    "id": "1"
+  },
+  "context": {
+  }
+}
+~~~
+{: #example-access-evaluation-request title="Example of an Access Evaluation Request"}
+
+### Access Evaluation Response
+The success response to an Access Evaluation Request is an Access Evaluation Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
+
+decision:
+: REQUIRED. A boolean value (`true` or `false`) as described in the Resource Query Decision section ({{resource-query-decision}}).
+
+iat:
+: OPTIONAL. The issued at time in `integer` format, expressed as epoch milliseconds
+
+exp:
+: OPTIONAL. The time in `integer` format, expressed at epoch milliseconds, after which the response SHOULD NOT be used
+
+reasons:
+: OPTIONAL. A Reason Object ({{reason-object}}) which provide details around the decision.
+
+evaluationDuration:
+: OPTIONAL. The time in milliseconds, in `integer` format, that it took to respond to the Access Evaluation Request.
+
+Following is a non-normative example of an Access Evaluation Response:
+
+~~~ http
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "decision": true
+}
+~~~
+{: #example-access-evaluation-response title="Example of an Access Evaluation Response"}
+
+### Access Evaluations Request
+
+This API is used for boxcarring more than one request to a PDP.
+
 The content of the request body is a JSON Object with the following fields:
 
 subject:
@@ -396,10 +462,10 @@ subject:
 queries:
 : REQUIRED. An array of queries defined in Resource Query section ({{resource-query}}) about access to specific resources
 
-The following is a non-normative example of an Access Evaluation Request:
+The following is a non-normative example of an Access Evaluations Request:
 
 ~~~ http
-POST /evaluations HTTP/1.1
+POST /access/v1/evaluations HTTP/1.1
 Host: pdp.mycompany.com
 Authorization: <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
@@ -428,10 +494,10 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
   ]
 }
 ~~~
-{: #example-access-evaluation-request title="Example of an Access Evaluation Request"}
+{: #example-access-evaluations-request title="Example of an Access Evaluations Request"}
 
-### Access Evaluation Response
-The success response to an Access Evaluation Request is an Access Evaluation Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
+### Access Evaluations Response
+The success response to an Access Evaluations Request is an Access Evaluations Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
 
 iat:
 : REQUIRED. The issued at time in `integer` format, expressed as epoch milliseconds
@@ -451,7 +517,7 @@ reasons:
 evaluationDuration:
 : REQUIRED. The time in milliseconds, in `integer` format, that it took to respond to the Access Evaluation Request.
 
-Following is a non-normative example of an Access Evaluation Response:
+Following is a non-normative example of an Access Evaluations Response:
 
 ~~~ http
 HTTP/1.1 OK
@@ -506,7 +572,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
   "evaluationDuration": 30
 }
 ~~~
-{: #example-access-evaluation-response title="Example of an Access Evaluation Response"}
+{: #example-access-evaluations-response title="Example of an Access Evaluation Response"}
 
 ## Resource Search API
 The Resource Access Search API enables a PEP to find out all resources a subject has access to.
@@ -561,10 +627,10 @@ The following is a non-normative example of a Resource Query Result:
 
 ~~~ json
 {
-    "action": "stream",
-    "resource": {
-        "id": "1234"
-    }
+  "action": "stream",
+  "resource": {
+    "id": "1234"
+  }
 }
 ~~~
 {: #example-resource-query-result title="Example Resource Query Result"}
@@ -657,9 +723,9 @@ Authorization: <myoauthtoken>
     "id": "somevalue",
     "type": "document",
     "attributeNames": [
-        "author",
-        "createDate",
-        "lastUpdated"
+      "author",
+      "createDate",
+      "lastUpdated"
     ]
    },
   "queries": ["delete", "read", "write"]
@@ -699,15 +765,15 @@ The following is a non-normative example of a Subject Query Decision:
 
 ~~~ json
 {
-    "actions": ["delete", "read", "write"],
-    "attributeNames": [
-        "author",
-        "createDate",
-        "lastUpdated"
-    ],
-    "subject": {
-        "id": "alex@3edges.com"
-    }
+  "actions": ["delete", "read", "write"],
+  "attributeNames": [
+    "author",
+    "createDate",
+    "lastUpdated"
+  ],
+  "subject": {
+    "id": "alex@3edges.com"
+  }
 }
 ~~~
 {: #example-subject-query-decision title="Example Subject Query Decision"}
