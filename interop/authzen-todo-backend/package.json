@@ -10,7 +10,7 @@
     "docker-build": "scripts/docker-build.sh",
     "docker-run": "scripts/docker-run.sh",
     "tsc": "tsc --noEmit --incremental",
-    "release": "npm version patch && git push --follow-tags",
+    "release": "./scripts/release.sh",
     "test": "./scripts/test.sh"
   },
   "keywords": [],
