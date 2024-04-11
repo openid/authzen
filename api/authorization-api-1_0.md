@@ -219,14 +219,32 @@ The request follows a format similar to that used in XACML-JSON (TBD add normati
 
 ### The Access Evaluation API Response
 
-The simplest form of a response is simply a boolean representing a decision. In this specification, assuming the evaluation was successful, there are only 2 possible responses:
+The simplest form of a response is simply a boolean representing a decision, indicated by a `"decision"` field. In this specification, assuming the evaluation was successful, there are only 2 possible responses:
 
 * `true`: The access request is permitted to go forward
 * `false`: The access request is denied and MUST NOT be permitted to go forward
 
-#### Additional Parameters
+#### Query Decision {#query-decision}
 
-In addition to a `decision`, a response may contain:
+The following is a non-normative example of a simple query decision:
+
+~~~ json
+{
+  "decision": true
+}
+~~~
+
+#### Additional context in a response
+
+In addition to a `"decision"`, a response may contain a `"context"` field which can be any JSON object.  This context can convey additional information that can be used by the PEP as part of the decision evaluation process. Examples include:
+
+* XACML's notion of "advice" and "obligations"
+* Hints for rendering UI state
+* Instructions for step-up authentication
+
+#### Example context
+
+An implementation MAY follow a structured approach to `"context"`, in which it presents the reasons that an authorization request failed.
 
 * A list of identifiers representing the items (policies, graph nodes, tuples) that were used in the decision-making process
 * A list of reasons as to why access is permitted or denied.
@@ -243,7 +261,7 @@ A Reason Field is a JSON object that has keys and values of type `string`. The f
 }
 ~~~
 
-#### Reason Object {#reason-object}
+###### Reason Object {#reason-object}
 A Reason Object specifies a particular reason. It is a JSON object that has the following fields:
 
 id:
@@ -271,11 +289,21 @@ The following is a non-normative example of a Reason Object:
 ~~~
 {: #example-reason-object title="Example of a Reason Object"}
 
-#### Sample Response (non-normative)
+#### Sample Response with additional context (non-normative)
 
 ~~~json
 {
-  "decision": true
+  "decision": true,
+  "context": {
+    "id": 0,
+    "reason_admin": {
+      "en": "Request failed policy C076E82F"
+    },
+    "reason_user": {
+      "en-403": "Insufficient privileges. Contact your administrator",
+      "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
+    }
+  }
 }
 ~~~
 
@@ -431,8 +459,8 @@ iat:
 exp:
 : OPTIONAL. The time in `integer` format, expressed at epoch milliseconds, after which the response SHOULD NOT be used
 
-reasons:
-: OPTIONAL. A Reason Object ({{reason-object}}) which provide details around the decision.
+context:
+: OPTIONAL. A JSON object that provides additional evaluation context.
 
 evaluationDuration:
 : OPTIONAL. The time in milliseconds, in `integer` format, that it took to respond to the Access Evaluation Request.
@@ -500,13 +528,13 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 The success response to an Access Evaluations Request is an Access Evaluations Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
 
 iat:
-: REQUIRED. The issued at time in `integer` format, expressed as epoch milliseconds
+: OPTIONAL. The issued at time in `integer` format, expressed as epoch milliseconds
 
 exp:
-: REQUIRED. The time in `integer` format, expressed at epoch milliseconds, after which the response SHOULD NOT be used
+: OPTIONAL. The time in `integer` format, expressed at epoch milliseconds, after which the response SHOULD NOT be used
 
 subject:
-: REQUIRED. The subject for which the response is being issued. The format of this field is as described in the Subjects section ({{subjects}})
+: OPTIONAL. The subject for which the response is being issued. The format of this field is as described in the Subjects section ({{subjects}})
 
 decisions:
 : REQUIRED. An array of Resource Query Decisions as described in the Resource Query Decision section ({{resource-query-decision}}).
@@ -515,7 +543,7 @@ reasons:
 : OPTIONAL. An array of Reason Objects ({{reason-object}}) which provide details of every reason identifier specified in the `decisions` field.  This field is REQUIRED if there is at least one decision in the `decisions` field that specifies a `reason_ids` field. The content of the `reasons` field MUST provide details of every identifier in the `reason_ids` fields in the `decisions` array.
 
 evaluationDuration:
-: REQUIRED. The time in milliseconds, in `integer` format, that it took to respond to the Access Evaluation Request.
+: OPTIONAL. The time in milliseconds, in `integer` format, that it took to respond to the Access Evaluation Request.
 
 Following is a non-normative example of an Access Evaluations Response:
 
