@@ -224,7 +224,7 @@ For the other two users, Beth and Jerry, the decision is `false`.
 
 Edit (complete) a todo. 
 
-The policy allows the operation if the subject's `roles` attribute contains the `evil_genius` role, OR if the user is the owner of the todo.
+The policy allows the operation if the subject's `roles` attribute contains the `evil_genius` role, OR if the subject's `roles` contains the `editor` role AND the subject is the owner of the todo.
 
 The `resource` contains an attribute called `ownerID` which contains the `id` of the owner (which is defined in the "Attributes" section above, and is the email address of the owner).
 
@@ -289,7 +289,7 @@ For a different value of `ownerID`, the decision will be `false`:
 
 Delete a todo. 
 
-The policy allows the operation if the subject's `roles` attribute contains the `admin` role, OR if the user is the owner of the todo.
+The policy allows the operation if the subject's `roles` attribute contains the `admin` role, OR if the subject's `roles` contains the `editor` role AND the subject is the owner of the todo.
 
 The `resource` contains an attribute called `ownerID` which contains the `id` of the owner (which is defined in the "Attributes" section above, and is the email address of the owner).
 
