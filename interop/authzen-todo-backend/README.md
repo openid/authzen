@@ -23,8 +23,15 @@ AUTHZEN_PDP_URL=https://authorizer.domain.com
 AUTHZEN_PDP_API_KEY=basic YOUR_API_KEY
 ```
 
-## Start the server
+## Start the server in developer mode
 
 ```shell
+yarn dev
+```
+
+## Build and start the server
+
+```shell
+yarn build
 yarn start
 ```
