@@ -14,7 +14,8 @@ import * as pdps from "./pdps.json";
 dotenvExpand.expand(dotenv.config());
 
 // default PDP
-const { AUTHZEN_PDP_URL, AUTHZEN_PDP_API_KEYS = {} } = process.env;
+const { AUTHZEN_PDP_URL, AUTHZEN_PDP_API_KEY } = process.env;
+const AUTHZEN_PDP_API_KEYS = AUTHZEN_PDP_API_KEY ? JSON.parse(AUTHZEN_PDP_API_KEY) : {}
 
 export const checkJwt = jwt({
   // Dynamically provide a signing key based on the kid in the header and the signing keys provided by the JWKS endpoint

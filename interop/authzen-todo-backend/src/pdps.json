@@ -1,5 +1,6 @@
 {
   "Aserto": "https://authzen-proxy.demo.aserto.com",
   "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
-  "Kogito": "https://authzen-proxy-demo.azerad.org"
+  "Kogito": "https://authzen-proxy-demo.azerad.org",
+  "SGNL": "https://authzen.sgnlapis.cloud"
 }
