@@ -9,7 +9,7 @@ Interop results for the [SGNL](https://sgnl.ai/) implementation hosted at `http:
 ## Test results
 
 ```bash
-AUTHZEN_PDP_API_KEY='Bearer <token>' yarn test http://authzen.sgnlapis.cloud
+AUTHZEN_PDP_API_KEY='Bearer <token>' yarn test https://authzen.sgnlapis.cloud
 yarn run v1.22.22
 $ ./scripts/test.sh http://authzen.sgnlapis.cloud
 >>> checking decisions
