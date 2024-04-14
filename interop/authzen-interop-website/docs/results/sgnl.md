@@ -4,14 +4,14 @@ sidebar_position: 4
 
 # SGNL
 
-Interop results for the [SGNL](https://sgnl.ai/) implementation hosted at `http://authzen.sgnlapis.cloud`.
+Interop results for the [SGNL](https://sgnl.ai/) implementation hosted at `https://authzen.sgnlapis.cloud`.
 
 ## Test results
 
 ```bash
 AUTHZEN_PDP_API_KEY='Bearer <token>' yarn test https://authzen.sgnlapis.cloud
 yarn run v1.22.22
-$ ./scripts/test.sh http://authzen.sgnlapis.cloud
+$ ./scripts/test.sh https://authzen.sgnlapis.cloud
 >>> checking decisions
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"beth@the-smiths.com"}}
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"}}
