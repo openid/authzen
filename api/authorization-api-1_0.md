@@ -71,6 +71,66 @@ The Authorization API enables Policy Decision Points (PDPs) and Policy Enforceme
 
 --- middle
 
+# Table of Contents
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [Table of Contents](#table-of-contents)
+- [Introduction](#introduction)
+  - [Model](#model)
+  - [Features](#features)
+- [API Specification](#api-specification)
+  - [API Version](#api-version)
+  - [Information Model](#information-model)
+    - [Subjects](#subjects)
+      - [Sample Fields](#sample-fields)
+      - [Example (non-normative)](#example-non-normative)
+    - [Resources](#resources)
+      - [Sample Fields](#sample-fields-1)
+      - [Example (non-normative)](#example-non-normative-1)
+    - [Actions](#actions)
+      - [Common Action Values (non-normative)](#common-action-values-non-normative)
+      - [Custom Actions](#custom-actions)
+    - [Context](#context)
+- [The Access Evaluation API](#the-access-evaluation-api)
+  - [The Access Evaluation API Request](#the-access-evaluation-api-request)
+    - [Endpoint](#endpoint)
+    - [Example (non-normative)](#example-non-normative-2)
+  - [The Access Evaluation API Response](#the-access-evaluation-api-response)
+    - [Query Decision](#query-decision)
+    - [Additional context in a response](#additional-context-in-a-response)
+      - [Example context](#example-context)
+        - [Reasons](#reasons)
+          - [Reason Field](#reason-field)
+          - [Reason Object](#reason-object)
+      - [Sample Response with additional context (non-normative)](#sample-response-with-additional-context-non-normative)
+  - [Error Responses](#error-responses)
+  - [The Access Evaluations API](#the-access-evaluations-api)
+    - [Access Evaluations Request](#access-evaluations-request)
+    - [Access Evaluations Response](#access-evaluations-response)
+    - [Access Evaluations Request](#access-evaluations-request-1)
+    - [Access Evaluations Response](#access-evaluations-response-1)
+  - [Resource Search API](#resource-search-api)
+    - [Resource Search Request](#resource-search-request)
+    - [Resource Query result](#resource-query-result)
+    - [Resource Search Response](#search-response)
+  - [Subject Search API](#subject-search-api)
+    - [Subject Search Request](#subject-search-request)
+    - [Subject Search Response](#subject-search-response)
+      - [Subject Query Result](#subject-query-result)
+- [Transport](#transport)
+  - [REST Binding](#rest-binding)
+  - [Request Identification](#request-identification)
+  - [Request Identification in a Response](#request-identification-in-a-response)
+- [IANA Considerations](#IANA)
+- [Security Considerations](#Security)
+- [Terminology](#terminology)
+- [Acknowledgements](#Acknowledgements)
+
+<!-- /code_chunk_output -->
+
+
 # Introduction
 
 Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML ({{XACML}}) and NIST's ABAC SP 800-162. Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
@@ -93,6 +153,10 @@ The Authorization API has two main features:
   * Who can edit medical records between 8 am and 3 pm?
   * Who can edit?
   * What can happen at 3 pm from Glasgow?
+
+The Access Evaluation API exists in two flavors:
+* A single request/response exchange
+* A multiple decision request/response exchange whereby an API request contains multiple authorization requests and the response contains as many authorization decisions.
 
 # API Specification
 The Authorization API has two parts, Access Evaluation and Search. Each of these is defined below. The definition is transport-agnostic. Refer to the Transport section for example bindings.
@@ -181,21 +245,27 @@ The following common actions are defined herein:
 Policies MAY incorporate common action names to provide different decisions based on the action
 
 #### Custom Actions
-Any action that is not one of the above is custom. Policies MAY incorporate custom action names if decisions need to be taken differently for different custom actions
+Any action that is not one of the above is custom. Policies MAY incorporate custom action names if decisions need to be taken differently for different custom actions. Examples of custom actions include _transfer_, _send_...
 
 ### Context {#context}
 The Context object is a set of attributes that represent environmental or contextual data about the request such as time of day. It is a JSON ({{RFC8259}}) object that is constructed just like a Subject, Resource, or Action object.
 
-### The Access Evaluation API Request
+# The Access Evaluation API
 
-The request follows a format similar to that used in XACML-JSON (TBD add normative reference) or AWS Cedar i.e. a collection of _attributes_ grouped together in categories that reflect the grammatical purpose or function of said attribute. This specification defines 4 such categories as aforementioned:
+## The Access Evaluation API Request
+
+The request follows a format similar to that used in [XACML-JSON](https://docs.oasis-open.org/xacml/xacml-json-http/v1.1/xacml-json-http-v1.1.html) (TBD add normative reference) or AWS Cedar i.e. a collection of _attributes_ grouped together in categories that reflect the grammatical purpose or function of said attribute. This specification defines 4 such categories as [previously aforementioned](#Model):
 
 * The subject (or principal) of type Subject
 * The action (or verb) of type Action
 * The resource of type Resource
 * The context (or environment) of type Context
 
-#### Example (non-normative)
+### Endpoint
+The Access Evaluations API is available at the relative URL `/evaluation/` via the `POST` HTTP method. The path must include the version slug e.g. `v1` as described in [API Version](API-Version).
+
+
+### Example (non-normative)
 
 ~~~json
 {
@@ -217,14 +287,14 @@ The request follows a format similar to that used in XACML-JSON (TBD add normati
 }
 ~~~
 
-### The Access Evaluation API Response
+## The Access Evaluation API Response
 
 The simplest form of a response is simply a boolean representing a decision, indicated by a `"decision"` field. In this specification, assuming the evaluation was successful, there are only 2 possible responses:
 
 * `true`: The access request is permitted to go forward
 * `false`: The access request is denied and MUST NOT be permitted to go forward
 
-#### Query Decision {#query-decision}
+### Query Decision {#query-decision}
 
 The following is a non-normative example of a simple query decision:
 
@@ -234,7 +304,7 @@ The following is a non-normative example of a simple query decision:
 }
 ~~~
 
-#### Additional context in a response
+### Additional context in a response
 
 In addition to a `"decision"`, a response may contain a `"context"` field which can be any JSON object.  This context can convey additional information that can be used by the PEP as part of the decision evaluation process. Examples include:
 
@@ -307,89 +377,6 @@ The following is a non-normative example of a Reason Object:
 }
 ~~~
 
-## Resource Query {#resource-query}
-An Resource Query is a question about whether a subject can access a specific resource. It is a JSON object with the following fields:
-
-action:
-: REQUIRED. The type of access that is to be performed. Its value is a `string` that describes the action. This value of this field is as described in the Actions section ({{actions}}).
-
-resource:
-: REQUIRED. The resource to which this query relates. Its format is as described in the Resources section ({{resources}})
-
-The following is a non-normative example of an Resource Query:
-
-~~~ json
-{
-  "action": "stream",
-  "resource": {
-    "id": "1234",
-    "type": "webcam",
-    "attributeNames": [
-      "lowRes",
-      "motionOnly"
-    ]
-  }
-}
-~~~
-{: #example-resource-query title="Example Resource Query"}
-
-### Resource Query Decision {#resource-query-decision}
-An Resource Query Decision is a tuple of an resource, action and a decision, represented as a JSON object. It has the following fields:
-
-action:
-: OPTIONAL. The action for which the decision is provided. The format is as described in the Actions section ({{actions}})
-
-resource:
-: OPTIONAL. The resource for which the decision is provided. The format is as described in the Resources section ({{resources}}). This resource MAY be greater in scope than described in the Resource Query ({{resource-query}}), i.e. It MAY describe an resource more generally than specified in the Resource Query. However, it MUST NOT be more specific than the resource described in the Resource Query.
-
-decision:
-: REQUIRED. The decision for the above `resource` and `action`. The format is as described in the Query Decision section ({{query-decision}})
-
-reason_ids:
-: OPTIONAL. An array of reason identifiers that indicate specific resons why the resource query was denied
-
-The following is a non-normative example of an Resource Query Decision:
-
-~~~ json
-{
-  "action": "stream",
-  "resource": {
-    "id": "1234"
-  },
-  "decision": "deny",
-  "reason_ids": [0,2,3]
-}
-~~~
-{: #example-resource-query-decision title="Example Resource Query Decision"}
-
-## Collections {#collections}
-An API request or response MAY contain a collection of items, such as an array of strings representing various attribute names, or an array of Resource Query Decision objects ({{resource-query-decision}}). The objects in a collection MAY overlap in scope. For example:
-
-~~~ json
-[
-  {
-    "resource": {
-      "id": "1234",
-      "attributeNames": [
-        "homeAddress",
-        "title"
-      ]
-    },
-    "decision": "deny",
-    "reason_ids": [1]
-  },
-  {
-    "resource": {
-      "id": "1234"
-    },
-    "decision": "allow"
-  }
-]
-~~~
-{: #collection-example title="Example Overlapping Collection"}
-
-The receiver of a collection MUST interpret the collection in a way that results in the least-privilege access. In the above example, this means that the subject has access to the resource identified by "1234", but not to the "homeAddress" and "title" attributes of that resource.
-
 ## Error Responses
 The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTP status code ({{Section 15 of RFC9110}}) that indicates error.
 
@@ -403,36 +390,25 @@ The following errors are indicated by the status codes defined below:
 | 500  | Internal error | An error message string |
 {: #table-error-status-codes title="Error status codes"}
 
-## Access Evaluations API
-The Access Evaluations API is a means for a PEP to request decisions for a number of resources for a single request context.
+## The Access Evaluations API
+The Access Evaluations API is a means for a PEP to send in a single request multiple authorization requests and receive within a single response multiple authorization decisions.
 
-The Access Evaluations API is available at the relative URL `/evaluations/` via the `POST` HTTP method.
+The Access Evaluations API is available at the relative URL `/evaluations/` via the `POST` HTTP method. The path must include the version slug e.g. `v1` as described in [API Version](API-Version).
 
-### Access Evaluation Request
+### Access Evaluations Request
 
-subject:
-: REQUIRED. A subject as described in the Subjects section ({{subjects}})
+The request to the Evaluations API is an array of single requests as described in the Access Evaluation API section.
 
-action:
-: REQUIRED. An action as described in the Actions section ({{actions}})
+In addition, an identifier field is introduced to be able to correlate authorization request with the authorization decision received in the response. The value for the identifier must be unique across the context of the API request/response. UUID may be used.
 
-resource:
-: OPTIONAL. A resource as described in the Resources section ({{resources}})
+The following is a non-normative example of an _Access Evaluations Request_:
 
-context:
-: OPTIONAL. The environment/context attributes, as described in the Context section ({{context}})
+~~~ json
 
-The following is a non-normative example of an Access Evaluation Request:
-
-~~~ http
-POST /access/v1/evaluation HTTP/1.1
-Host: pdp.mycompany.com
-Authorization: <myoauthtoken>
-X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
-
-{
+[{
+  "identifier": "ab003bd2-9330-47c1-b5aa-715685ec56ed",
   "subject": {
-    "id": "omri@aserto.com",
+    "id": "beth@the-smiths.com",
   },
   "action": {
     "action": "can_read"
@@ -443,40 +419,40 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
   },
   "context": {
   }
-}
+},{
+  "identifier": "918409ea-df1c-4642-b665-8c380c7d4adb",
+  "subject": {
+    "id": "beth@the-smiths.com",
+  },
+  "action": {
+    "action": "can_update"
+  },
+  "resource": {
+    "type": "todo",
+    "id": "1"
+  },
+  "context": {
+  }
+}]
 ~~~
 {: #example-access-evaluation-request title="Example of an Access Evaluation Request"}
 
-### Access Evaluation Response
-The success response to an Access Evaluation Request is an Access Evaluation Response. It is a HTTP response of type `application/json`. Its body is a JSON object that contains the following fields:
+### Access Evaluations Response
+The success response to an Access Evaluations Request is an Access Evaluations Response. It is a HTTP response of type `application/json`. Its body is a JSON array of a JSON object as described in [The Access Evaluation API Response](#the-access-evaluation-api-response). Additionally, in order to correlate the individual decisions with the original authorization requests, the identifier field used in the request must be added.
 
-decision:
-: REQUIRED. A boolean value (`true` or `false`) as described in the Resource Query Decision section ({{resource-query-decision}}).
+Following is a non-normative example of an Access Evaluations Response:
 
-iat:
-: OPTIONAL. The issued at time in `integer` format, expressed as epoch milliseconds
+~~~ json
 
-exp:
-: OPTIONAL. The time in `integer` format, expressed at epoch milliseconds, after which the response SHOULD NOT be used
-
-context:
-: OPTIONAL. A JSON object that provides additional evaluation context.
-
-evaluationDuration:
-: OPTIONAL. The time in milliseconds, in `integer` format, that it took to respond to the Access Evaluation Request.
-
-Following is a non-normative example of an Access Evaluation Response:
-
-~~~ http
-HTTP/1.1 OK
-Content-type: application/json
-X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
-
-{
+[{
+  "identifier": "ab003bd2-9330-47c1-b5aa-715685ec56ed",
   "decision": true
-}
+},{
+  "identifier": "918409ea-df1c-4642-b665-8c380c7d4adb",
+  "decision": false
+}]
 ~~~
-{: #example-access-evaluation-response title="Example of an Access Evaluation Response"}
+{: #example-access-evaluation-response title="Example of an Access Evaluations Response"}
 
 ### Access Evaluations Request
 
