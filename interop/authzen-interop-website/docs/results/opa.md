@@ -1,17 +1,17 @@
 ---
-sidebar_position: 1
+sidebar_position: 8
 ---
 
-# Aserto
+# Open Policy Agent
 
-Interop results for the [Aserto](https://www.aserto.com/) implementation hosted at https://authzen-proxy.demo.aserto.com.
+Interop results for the [OPA](https://openpolicyagent.org/) implementation hosted at `https://authzen-opa-proxy.demo.aserto.com`.
 
 ## Test results
 
 ```bash
-yarn test
-yarn run v1.22.19
-$ ./scripts/test.sh
+yarn test https://authzen-opa-proxy.demo.aserto.com
+yarn run v1.22.22
+$ ./scripts/test.sh https://authzen-opa-proxy.demo.aserto.com
 >>> checking decisions
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"beth@the-smiths.com"}}
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"}}
@@ -54,4 +54,5 @@ PASS REQ:{"subject":{"identity":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTE
 PASS REQ:{"subject":{"identity":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_delete_todo"},"resource":{"type":"todo","ownerID":"rick@the-citadel.com"}}
 PASS REQ:{"subject":{"identity":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_delete_todo"},"resource":{"type":"todo","ownerID":"jerry@the-smiths.com"}}
 <<< done checking decisions
+
 ```

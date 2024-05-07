@@ -4,7 +4,7 @@ sidebar_position: 6
 
 # Topaz
 
-Interop results for the [Topaz](https://www.topaz.sh/) implementation hosted at `https://authzen-proxy-sidecar.demo.aserto.com`. Note that this implementation deploys a Topaz sidecar in the same pod as the proxy.
+Interop results for the [Topaz](https://www.topaz.sh/) implementation hosted at https://authzen-proxy-sidecar.demo.aserto.com. Note that this implementation deploys a Topaz sidecar in the same pod as the proxy.
 
 ## Test results
 

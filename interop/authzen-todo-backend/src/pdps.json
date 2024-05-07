@@ -4,6 +4,7 @@
   "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
   "HexaOPA": "https://interop.authzen.hexaorchestration.org",
   "Kogito": "https://authzen-proxy-demo.azerad.org",
+  "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
   "SGNL": "https://authzen.sgnlapis.cloud",
   "Topaz": "https://authzen-proxy-sidecar.demo.aserto.com"
 }
