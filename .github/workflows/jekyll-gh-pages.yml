@@ -40,7 +40,7 @@ jobs:
             index.html
             api/authorization-api-1_0.xml
       - name: Convert Authz API Original to rfc xml
-        run: kramdown-rfc2629 patterns/authorization-api-1_0-original.md > api/authorization-api-1_0-original.xml
+        run: kramdown-rfc2629 api/authorization-api-1_0-original.md > api/authorization-api-1_0-original.xml
       - name: Render Authz API Original HTML
         run: xml2rfc api/authorization-api-1_0-original.xml --html -o authorization-api-1_0-original.html
       - name: Render Authz API Original Text
