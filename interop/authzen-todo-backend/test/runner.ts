@@ -1,54 +1,98 @@
-import * as fs from "fs";
-import * as path from "path";
-import chalk from "chalk";
+import arrayToTable from "array-to-table";
+import clc from "cli-color";
 
-const OK_COLOR = chalk.green.bold;
-const ERR_COLOR = chalk.red.bold;
-const ATTN_COLOR = chalk.yellow.bold;
-
-const decisionsPath = path.resolve(__dirname, "test/decisions.json");
-const decisions = JSON.parse(fs.readFileSync(decisionsPath, "utf-8")).decisions;
+import { decisions } from "./decisions.json";
 
 const AUTHZEN_PDP_URL =
   process.argv[2] || "https://authzen-proxy.demo.aserto.com";
 const AUTHZEN_PDP_API_KEY = process.env.AUTHZEN_PDP_API_KEY;
 
-decisions.forEach(async (decision: any) => {
-  const REQ = decision.request;
-  const EXP = decision.expected;
+const FORMAT = process.argv[3] === "markdown" ? "markdown" : "console";
 
-  try {
-    const response = await fetch(`${AUTHZEN_PDP_URL}/access/v1/evaluation`, {
-      method: "POST",
-      headers: {
-        Authorization: AUTHZEN_PDP_API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(REQ),
-    });
+interface Result {
+  request: (typeof decisions)[number]["request"];
+  expected: (typeof decisions)[0]["expected"];
+  response?: boolean;
+  status: "PASS" | "FAIL" | "ERROR";
+  error?: string;
+}
 
-    const data = await response.json();
-    const RSP = data.decision || false;
+async function main() {
+  const results: Result[] = [];
 
-    if (JSON.stringify(EXP) === JSON.stringify(RSP)) {
-      console.log(OK_COLOR("PASS"), "REQ:", JSON.stringify(REQ));
-    } else {
-      console.log(
-        ERR_COLOR("FAIL"),
-        "REQ:",
-        JSON.stringify(REQ),
-        ATTN_COLOR("EXP:", JSON.stringify(EXP))
-      );
+  for (const decision of decisions) {
+    const REQ = decision.request;
+    const EXP = decision.expected;
+    try {
+      const response = await fetch(`${AUTHZEN_PDP_URL}/access/v1/evaluation`, {
+        method: "POST",
+        headers: {
+          Authorization: AUTHZEN_PDP_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(REQ),
+      });
+
+      const data = await response.json();
+      const RSP = data.decision || false;
+
+      results.push({
+        request: REQ,
+        response: RSP,
+        expected: EXP,
+        status: JSON.stringify(EXP) === JSON.stringify(RSP) ? "PASS" : "FAIL",
+      });
+    } catch (error) {
+      results.push({
+        request: REQ,
+        expected: EXP,
+        status: "ERROR",
+        error: error.message,
+      });
     }
-  } catch (error) {
-    console.error(
-      ERR_COLOR("ERROR"),
-      "REQ:",
-      JSON.stringify(REQ),
-      "Error:",
-      error.message
+  }
+
+  if (FORMAT === "console") {
+    results.forEach((result) => {
+      switch (result.status) {
+        case "PASS":
+          console.log(
+            clc.green("PASS"),
+            "REQ:",
+            JSON.stringify(result.request)
+          );
+          break;
+
+        case "FAIL":
+          console.log(clc.red("FAIL"), "REQ:", JSON.stringify(result.request));
+          break;
+
+        default:
+          console.log(
+            clc.yellow("ERROR"),
+            "REQ:",
+            JSON.stringify(result.request),
+            "Error:",
+            result.error
+          );
+          break;
+      }
+    });
+    console.log("<<< done checking decisions\n");
+  }
+
+  if (FORMAT === "markdown") {
+    console.log(
+      arrayToTable(
+        results.map((d) => {
+          return {
+            result: d.status,
+            request: JSON.stringify(d.request),
+          };
+        })
+      )
     );
   }
-});
+}
 
-console.log("<<< done checking decisions\n");
+main();
