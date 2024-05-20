@@ -427,7 +427,7 @@ The following is a non-normative example of an Access Evaluation Request:
 ~~~ http
 POST /access/v1/evaluation HTTP/1.1
 Host: pdp.mycompany.com
-Authorization: Bearer <myoauthtoken>
+Authorization: <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
@@ -495,7 +495,7 @@ The following is a non-normative example of an Access Evaluations Request:
 ~~~ http
 POST /access/v1/evaluations HTTP/1.1
 Host: pdp.mycompany.com
-Authorization: Bearer <myoauthtoken>
+Authorization: <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
@@ -627,9 +627,9 @@ queries:
 The following is a non-normative example of a Search Request:
 
 ~~~ http
-POST /resourcesearch?pageToken=NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM2Q4&pageSize=2 HTTP/1.1
-Host: pdp.mycompany.com
-Authorization: Bearer <myoauthtoken>
+POST /resourcesearch HTTP/1.1
+Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM2Q4"&pageSize=2
+Authorization: <myoauthtoken>
 
 {
   "subject": {
@@ -742,9 +742,9 @@ queries:
 The following is a non-normative example of a Subject Search Request:
 
 ~~~ http
-POST /subjectsearch?pageToken=NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM2Q4&pageSize=2 HTTP/1.1
-Host: pdp.mycompany.com
-Authorization: Bearer <myoauthtoken>
+POST /subjectsearch HTTP/1.1
+Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM2Q4"&pageSize=2
+Authorization: <myoauthtoken>
 
 {
   "resource": {

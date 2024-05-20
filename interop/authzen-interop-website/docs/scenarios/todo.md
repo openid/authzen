@@ -129,6 +129,7 @@ For simplicity, the policy always returns `true`.
     "name": "can_read_user"
   },
   "resource": {
+    "type": "user",
     "userID": "<email_OR_subject>"
   },
   "context": {
@@ -163,6 +164,7 @@ For simplicity, the policy always returns `true` for every user.
     "name": "can_read_todos"
   },
   "resource": {
+    "type": "todo"
   },
   "context": {
   }
@@ -196,6 +198,7 @@ The policy evaluates the subject's `roles` attribute to determine whether the us
     "name": "can_create_todo"
   },
   "resource": {
+    "type": "todo"
   },
   "context": {
   }

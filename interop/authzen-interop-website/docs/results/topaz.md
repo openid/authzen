@@ -1,17 +1,17 @@
 ---
-sidebar_position: 1
+sidebar_position: 6
 ---
 
-# Aserto
+# Topaz
 
-Interop results for the [Aserto](https://www.aserto.com/) implementation hosted at https://authzen-proxy.demo.aserto.com.
+Interop results for the [Topaz](https://www.topaz.sh/) implementation hosted at https://authzen-topaz-proxy.demo.aserto.com. Note that this implementation deploys a Topaz sidecar in the same pod as the proxy.
 
 ## Test results
 
 ```bash
-yarn test
-yarn run v1.22.19
-$ ./scripts/test.sh
+yarn test https://authzen-topaz-proxy.demo.aserto.com
+yarn run v1.22.22
+$ ./scripts/test.sh https://authzen-topaz-proxy.demo.aserto.com
 >>> checking decisions
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"beth@the-smiths.com"}}
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"}}
