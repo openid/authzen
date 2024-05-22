@@ -6,5 +6,6 @@
   "Kogito": "https://authzen-proxy-demo.azerad.org",
   "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
   "SGNL": "https://authzen.sgnlapis.cloud",
-  "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
+  "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
+  "3Edges": "https://api-authzen-authz.3edges.io"
 }
