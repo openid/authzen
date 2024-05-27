@@ -7,7 +7,7 @@
   "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
   "Rock Solid Knowledge": "https://authzen.identityserver.com",
   "SGNL": "https://authzen.sgnlapis.cloud",
-  "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app"
+  "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app",
   "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
   "3Edges": "https://api-authzen-authz.3edges.io"
 }
