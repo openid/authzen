@@ -7,7 +7,13 @@ const AUTHZEN_PDP_URL =
   process.argv[2] || "https://authzen-proxy.demo.aserto.com";
 const AUTHZEN_PDP_API_KEY = process.env.AUTHZEN_PDP_API_KEY;
 
-const FORMAT = process.argv[3] === "markdown" ? "markdown" : "console";
+enum OutputTypes {
+  MARKDOWN,
+  CONSOLE,
+}
+
+const FORMAT =
+  process.argv[3] === "markdown" ? OutputTypes.MARKDOWN : OutputTypes.CONSOLE;
 
 interface Result {
   request: (typeof decisions)[number]["request"];
@@ -36,52 +42,29 @@ async function main() {
       const data = await response.json();
       const RSP = data.decision || false;
 
-      results.push({
+      const result: Result = {
         request: REQ,
         response: RSP,
         expected: EXP,
         status: JSON.stringify(EXP) === JSON.stringify(RSP) ? "PASS" : "FAIL",
-      });
+      };
+
+      results.push(result);
+      if (FORMAT === OutputTypes.CONSOLE) logResult(result);
     } catch (error) {
-      results.push({
+      const result: Result = {
         request: REQ,
         expected: EXP,
         status: "ERROR",
         error: error.message,
-      });
+      };
+
+      results.push(result);
+      if (FORMAT === OutputTypes.CONSOLE) logResult(result);
     }
   }
 
-  if (FORMAT === "console") {
-    results.forEach((result) => {
-      switch (result.status) {
-        case "PASS":
-          console.log(
-            clc.green("PASS"),
-            "REQ:",
-            JSON.stringify(result.request)
-          );
-          break;
-
-        case "FAIL":
-          console.log(clc.red("FAIL"), "REQ:", JSON.stringify(result.request));
-          break;
-
-        default:
-          console.log(
-            clc.yellow("ERROR"),
-            "REQ:",
-            JSON.stringify(result.request),
-            "Error:",
-            result.error
-          );
-          break;
-      }
-    });
-    console.log("<<< done checking decisions\n");
-  }
-
-  if (FORMAT === "markdown") {
+  if (FORMAT === OutputTypes.MARKDOWN) {
     console.log(
       arrayToTable(
         results.map((d) => {
@@ -92,6 +75,28 @@ async function main() {
         })
       )
     );
+  }
+}
+
+function logResult(result: Result) {
+  switch (result.status) {
+    case "PASS":
+      console.log(clc.green("PASS"), "REQ:", JSON.stringify(result.request));
+      break;
+
+    case "FAIL":
+      console.log(clc.red("FAIL"), "REQ:", JSON.stringify(result.request));
+      break;
+
+    default:
+      console.log(
+        clc.yellow("ERROR"),
+        "REQ:",
+        JSON.stringify(result.request),
+        "Error:",
+        result.error
+      );
+      break;
   }
 }
 
