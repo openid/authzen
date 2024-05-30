@@ -4,14 +4,16 @@
   "description": "AuthZEN todo backend interop sample",
   "main": "src/index.ts",
   "scripts": {
-    "build": "rm -rf ./build && tsc",
+    "build": "yarn clean && tsc",
+    "clean": "rm -rf ./build",
     "start": "node build/src/index.js",
     "dev": "nodemon --ignore db/* ./src/index.ts",
     "docker-build": "scripts/docker-build.sh",
     "docker-run": "scripts/docker-run.sh",
     "tsc": "tsc --noEmit --incremental",
     "release": "npm version patch && git push --follow-tags",
-    "test": "npm run build && node build/test/runner.js"
+    "test": "node build/test/runner.js",
+    "test-clean": "yarn build && yarn test"
   },
   "keywords": [],
   "author": "Omri Gazitt <ogazitt@gmail.com>",
