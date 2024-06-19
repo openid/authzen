@@ -23,20 +23,20 @@ kw:
 # date: 2022-02-02 -- date is filled in automatically by xml2rfc if not given
 author:
 - role: editor # remove if not true
-  ins: A. Tulshibagwale
-  name: Atul Tulshibagwale
-  org: SGNL
-  email: atul@sgnl.ai
+  ins: O. Gazitt
+  name: Omri Gazitt
+  org: Aserto
+  email: omri@aserto.com  
 - role: editor # remove if not true
   ins: D. Brossard
   name: David Brossard
   org: Axiomatics
   email: david.brossard@axiomatics.com  
 - role: editor # remove if not true
-  ins: O. Gazitt
-  name: Omri Gazitt
-  org: Aserto
-  email: omri@aserto.com  
+  ins: A. Tulshibagwale
+  name: Atul Tulshibagwale
+  org: SGNL
+  email: atul@sgnl.ai
 contributor: # Same structure as author list, but goes into contributors
 - name: Marc Jordan
   org: SGNL
