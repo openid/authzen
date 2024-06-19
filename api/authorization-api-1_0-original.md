@@ -106,7 +106,7 @@ This document describes the API version 1. Any updates to this API through subse
 A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked, or the Subject may be of interest in a Search API call.
 
 A Subject is a JSON ({{RFC8259}}) object that contains any number of key-value pair attributes e.g. 
-~~~json
+~~~ json
 "username" : "Alice",
 "department": "Sales"
 ~~~
@@ -155,7 +155,7 @@ type:
 
 The following is a non-normative example of a Resource:
 
-~~~json
+~~~ json
 {
   "id": "123",
   "type": "book",
@@ -197,7 +197,7 @@ The request follows a format similar to that used in XACML-JSON (TBD add normati
 
 #### Example (non-normative)
 
-~~~json
+~~~ json
 {
   "subject":{
     "id": {
@@ -275,7 +275,7 @@ reason_user:
 
 The following is a non-normative example of a Reason Object:
 
-~~~json
+~~~ json
 {
   "id": 0,
   "reason_admin": {
@@ -291,7 +291,7 @@ The following is a non-normative example of a Reason Object:
 
 #### Sample Response with additional context (non-normative)
 
-~~~json
+~~~ json
 {
   "decision": true,
   "context": {
