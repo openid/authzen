@@ -19,6 +19,7 @@ kw:
   - Cedar
   - PDP
   - PEP
+  - ALFA
 # date: 2022-02-02 -- date is filled in automatically by xml2rfc if not given
 author:
 - role: editor # remove if not true
@@ -103,9 +104,32 @@ A Subject is a JSON ({{RFC8259}}) object that contains any number of key-value p
 `id`:
 : REQUIRED. The unique identifier of the Subject, scoped to the `type`, within the scope of the PEP. If specified, the value MUST follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
 
-A Subject MUST minimally contain a `type` and an `id`, and MAY contain any number of additional fields.
+A Subject MUST minimally contain a `type` and an `id`, and MAY contain zero or more additional fields.
 
 The following is a non-normative example of a subject:
+
+~~~ json
+{
+  "type": "user",
+  "id": "alice@acmecorp.com"
+}
+~~~
+{: #subject-example title="Example Subject"}
+
+#### Subject Identifier {#subject-identifier}
+The `id` field of a Subject MAY be any valid JSON value. It MAY be a string, or it MAY be a structured identifier. For example, it MAY follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
+
+The following is a non-normative example of a subject identifier as a simple string:
+
+~~~ json
+{
+  "type": "user",
+  "id": "alice@acmecorp.com"
+}
+~~~
+{: #subject-identifier-example-simple title="Example of Simple Subject Identifier"}
+
+The following is a non-normative example of a Subject Identifier in the {{RFC9493}} Email Identifier Format:
 
 ~~~ json
 {
@@ -116,39 +140,36 @@ The following is a non-normative example of a subject:
   }
 }
 ~~~
-{: #subject-example title="Example Subject"}
-
-#### Subject Identifier {#subject-identifier}
-The `id` field of a Subject MUST follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}. A Subject MUST include at least one identifier, but MAY include more than one identifier if the format of the field is of type `aliases`.
-
-The following is a non-normative example of a Subject Identifier in the Email Identifier Format:
-
-~~~ json
-{
-  "format" : "email",
-  "email": "alice@acmecorp.com"
-}
-~~~
-{: #subject-identifier-example title="Example Subject Identifier"}
+{: #subject-identifier-example-rfc9493 title="Example Subject Identifier as RFC9493 Subject"}
 
 #### Subject Type {#subject-type}
 Since {{RFC9493}} only concerns itself with the *format* of the identifier and not its *type*, every Subject MUST also include a string-valued `type` field, which identifies the type of Subject.
 
-The following is a non-normative example of a Subject of type `group` with a Subject Identifier in the Email Identifier Format:
+The following is a non-normative example of a Subject of type `group` with a Subject Identifier as a simple string:
+
+~~~ json
+{
+  "type": "group",
+  "id": "engineering@acmecorp.com"
+}
+~~~
+{: #subject-type-group-example title="Example Group Subject Type"}
+
+The following is a non-normative example of a Subject of type `group` with a Subject Identifier in the {{RFC9493}} Email Identifier Format:
 
 ~~~ json
 {
   "type": "group",
   "id": {
     "format" : "email",
-    "email": "alice@acmecorp.com"
+    "email": "engineering@acmecorp.com"
   }
 }
 ~~~
-{: #subject-type-example title="Example Subject Type"}
+{: #subject-type-example-rfc-9493 title="Example Subject Type in RFC9493 Format"}
 
 #### Subject Attributes {#subject-attributes}
-Many authorization systems are stateless, and expect the client (PEP) to pass in any attributes that are expected to be used in the evaluation of the authorization policy. To satisfy this requirement, Subjects MAY include any number of additional attributes as key-value pairs.
+Many authorization systems are stateless, and expect the client (PEP) to pass in any attributes that are expected to be used in the evaluation of the authorization policy. To satisfy this requirement, Subjects MAY include zero or more additional attributes as key-value pairs.
 
 An attribute can be single-valued or multi-valued. It can be a primitive type (string, boolean, number) or a complex type such as a JSON object or JSON array.
 
@@ -157,10 +178,7 @@ The following is a non-normative example of a Subject which adds a string-valued
 ~~~ json
 {
   "type": "user",
-  "id": {
-    "format" : "email",
-    "email": "alice@acmecorp.com"
-  },
+  "id": "alice@acmecorp.com",
   "department": "Sales"
 }
 ~~~
@@ -176,10 +194,7 @@ The following is a non-normative example of a subject which adds the `ip_address
 ~~~ json
 {
   "type": "user",
-  "id": {
-    "format" : "email",
-    "email": "alice@acmecorp.com"
-  },
+  "id": "alice@acmecorp.com",
   "department": "Sales",
   "ip_address": "172.217.22.14"
 }
@@ -195,10 +210,7 @@ The following is a non-normative example of a subject which adds the `device_id`
 ~~~ json
 {
   "type": "user",
-  "id": {
-    "format" : "email",
-    "email": "alice@acmecorp.com"
-  },
+  "id": "alice@acmecorp.com",
   "department": "Sales",
   "ip_address": "172.217.22.14",
   "device_id": "8:65:ee:17:7e:0b"
@@ -213,10 +225,21 @@ A Resource is the target of an access request. It is a JSON ({{RFC8259}}) object
 : REQUIRED. A `string` value that specifies the type of the Resource.
 
 `id`:
-: OPTIONAL. The unique identifier of the Resource, scoped to the `type`, within the scope of the PEP. If specified, the value MUST follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
+: OPTIONAL. The unique identifier of the Resource, scoped to the `type`, within the scope of the PEP. If specified, the value MAY be any valid JSON value, including a simple string. It also MAY follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
 
-#### Example (non-normative)
-The following is a non-normative example of a Resource containing a Subject Identifier in the Opaque Identifier Format:
+#### Examples (non-normative)
+
+The following is a non-normative example of a Resource with a `type` and a simple `id`:
+
+~~~ json
+{
+  "type": "book",
+  "id": "123"
+}
+~~~
+{: #resource-example title="Example Resource"}
+
+The following is a non-normative example of a Resource containing a Subject Identifier in the Opaque Identifier Format, with additional structured attributes:
 
 ~~~ json
 {
@@ -231,7 +254,7 @@ The following is a non-normative example of a Resource containing a Subject Iden
   }
 }
 ~~~
-{: #resource-example title="Example Resource"}
+{: #resource-example-structured title="Example Resource with Subject Identifier and Additional Attributes"}
 
 ### Actions {#actions}
 An Action is the type of access that the requester intends to perform.
@@ -251,7 +274,7 @@ The following is a non-normative example of an action:
 {: #action-example title="Example Action"}
 
 #### Common Action Values
-Since many services follow a Create-Read-Update-Delete convention, a set of common Actions are defined. That said, an Action may be custom, which could be specific to the application being accessed or shared across applications but not listed in the common Actions below.
+Since many services follow a Create-Read-Update-Delete convention, a set of common Actions are defined. That said, an Action may be specific to the application being accessed or shared across applications but not listed in the common Actions below.
 
 The following common Actions are defined:
 
@@ -262,9 +285,6 @@ The following common Actions are defined:
 - `can_delete`: The Action to delete a Resource. The specific entity MAY be identified by the Resource in the request.
 
 PDP Policies MAY incorporate common Action names to provide different decisions based on the Action.
-
-#### Custom Actions
-Any Action that is not one of the above is a custom Action.
 
 ### Context {#context}
 The Context object is a set of attributes that represent environmental or contextual data about the request such as time of day. It is a JSON ({{RFC8259}}) object.
@@ -294,6 +314,7 @@ The Access Evaluation request is a 4-tuple constructed of the four previously de
 : OPTIONAL. The context (or environment) of type Context.
 
 #### Example (non-normative)
+
 ~~~ json
 {
   "subject": {
@@ -371,7 +392,7 @@ A Reason Field is a JSON object that has keys and values of type `string`. The f
 A Reason Object specifies a particular reason. It is a JSON object that has the following fields:
 
 `id`:
-: REQUIRED. A numeric value of that specifies the reason within the scope of a particular response.
+: REQUIRED. A string value that specifies the reason within the scope of a particular response.
 
 `reason_admin`:
 : OPTIONAL. The reason, which MUST NOT be shared with the user, but useful for administrative purposes that indicates why the access was denied. The value of this field is a Reason Field object ({{reason-field}}).
@@ -383,7 +404,7 @@ The following is a non-normative example of a Reason Object:
 
 ~~~ json
 {
-  "id": 0,
+  "id": "0",
   "reason_admin": {
     "en": "Request failed policy C076E82F"
   },
@@ -396,11 +417,12 @@ The following is a non-normative example of a Reason Object:
 {: #example-reason-object title="Example of a Reason Object"}
 
 #### Sample Response with additional context (non-normative)
+
 ~~~ json
 {
   "decision": true,
   "context": {
-    "id": 0,
+    "id": "0",
     "reason_admin": {
       "en": "Request failed policy C076E82F"
     },
@@ -435,17 +457,11 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {
   "subject": {
     "type": "user",
-    "id": {
-      "format": "email",
-      "email": "omri@aserto.com"
-    }
+    "id": "alice@acmecorp.com"
   },
   "resource": {
     "type": "todo",
-    "id": {
-      "format": "opaque",
-      "value: "1"
-    }
+    "id": "1",
   },
   "action": {
     "name": "can_read"
@@ -458,7 +474,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #example-access-evaluation-request title="Example of an Access HTTPS Evaluation Request"}
 
 ### Access Evaluation HTTPS Response
-The success response to an Access Evaluation Request is an Access Evaluation Response. It is a HTTPS response with `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluation Response.
+The success response to an Access Evaluation Request is an Access Evaluation Response. It is a HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluation Response.
 
 Following is a non-normative example of an Access Evaluation HTTPS Response:
 
