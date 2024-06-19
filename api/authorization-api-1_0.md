@@ -102,9 +102,9 @@ A Subject is a JSON ({{RFC8259}}) object that contains any number of key-value p
 : REQUIRED. A `string` value that specifies the type of the Subject.
 
 `id`:
-: REQUIRED. The unique identifier of the Subject, scoped to the `type`, within the scope of the PEP. If specified, the value MUST follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
+: REQUIRED. The unique identifier of the Subject, scoped to the `type`.
 
-A Subject MUST minimally contain a `type` and an `id`, and MAY contain zero or more additional fields.
+A Subject MAY contain zero or more additional key-value pairs.
 
 The following is a non-normative example of a subject:
 
@@ -119,7 +119,7 @@ The following is a non-normative example of a subject:
 #### Subject Identifier {#subject-identifier}
 The `id` field of a Subject MAY be any valid JSON value. It MAY be a string, or it MAY be a structured identifier. For example, it MAY follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
 
-The following is a non-normative example of a subject identifier as a simple string:
+The following is a non-normative example of a Subject Identifier as a simple string:
 
 ~~~ json
 {
@@ -225,7 +225,7 @@ A Resource is the target of an access request. It is a JSON ({{RFC8259}}) object
 : REQUIRED. A `string` value that specifies the type of the Resource.
 
 `id`:
-: OPTIONAL. The unique identifier of the Resource, scoped to the `type`, within the scope of the PEP. If specified, the value MAY be any valid JSON value, including a simple string. It also MAY follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
+: OPTIONAL. The unique identifier of the Resource, scoped to the `type`. If specified, the value MAY be any valid JSON value, including a simple string. It also MAY follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
 
 #### Examples (non-normative)
 
