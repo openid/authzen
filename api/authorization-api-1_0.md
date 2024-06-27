@@ -326,8 +326,8 @@ The Access Evaluation request is a 4-tuple constructed of the four previously de
     }
   },
   "resource": {
-    "type": "path",
-    "path": "/api/account/123"
+    "type": "account",
+    "id": "123"
   },
   "action": {
     "name": "can_read",
