@@ -225,7 +225,7 @@ A Resource is the target of an access request. It is a JSON ({{RFC8259}}) object
 : REQUIRED. A `string` value that specifies the type of the Resource.
 
 `id`:
-: OPTIONAL. The unique identifier of the Resource, scoped to the `type`. If specified, the value MAY be any valid JSON value, including a simple string. It also MAY follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
+: REQUIRED. The unique identifier of the Resource, scoped to the `type`. The value MAY be any valid JSON value, including a simple string. It also MAY follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
 
 #### Examples (non-normative)
 
