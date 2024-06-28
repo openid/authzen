@@ -1,17 +1,15 @@
 ---
-sidebar_position: 1
+sidebar_position: 12
 ---
 
-# Aserto
+# Permit.io
 
-Interop results for the [Aserto](https://www.aserto.com/) implementation hosted at https://authzen-proxy.demo.aserto.com.
+Interop results for the [Permit.io](https://www.permit.io/) implementation hosted at [https://permit-authzen-interop.up.railway.app/](https://permit-authzen-interop.up.railway.app/).
+For more details, refer to the [interop code and documentation](https://github.com/permitio/permit-authzen-interop)
 
-## Test results
-
-```bash
-yarn test
-yarn run v1.22.19
-$ ./scripts/test.sh
+## Test Results
+```
+./test.sh https://permit-authzen-interop.up.railway.app
 >>> checking decisions
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"beth@the-smiths.com"}}
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"}}

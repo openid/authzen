@@ -37,6 +37,19 @@ jobs:
           path: |
             index.html
             api/authorization-api-1_0.xml
+      - name: Convert Authz API Original to rfc xml
+        run: kramdown-rfc2629 api/authorization-api-1_0-original.md > api/authorization-api-1_0-original.xml
+      - name: Render Authz API Original HTML
+        run: xml2rfc api/authorization-api-1_0-original.xml --html -o authorization-api-1_0-original.html
+      - name: Render Authz API Original Text
+        run: xml2rfc api/authorization-api-1_0-original.xml --text
+      - name: Upload Authz API Original artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: output
+          path: |
+            authorization-api-1_0-original.html
+            api/authorization-api-1_0-original.xml
       - name: Convert Authz Design Patterns to rfc xml
         run: kramdown-rfc2629 patterns/AuthorizationDesignPatterns.md > patterns/AuthorizationDesignPatterns.xml
       - name: Render Authz Design Patterns HTML
@@ -49,7 +62,7 @@ jobs:
           name: output
           path: |
             patterns.html
-            patterns/AuthorizationDesignPatterns.xml
+            patterns/AuthorizationDesignPatterns.xml            
   publish-to-pages:
     if: github.ref == 'refs/heads/main'
     needs: [build-rfc]

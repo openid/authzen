@@ -1,17 +1,17 @@
 ---
-sidebar_position: 1
+sidebar_position: 9
 ---
 
-# Aserto
+# 3Edges
 
-Interop results for the [Aserto](https://www.aserto.com/) implementation hosted at https://authzen-proxy.demo.aserto.com.
+Interop results for the [3Edges](https://www.3edges.com/) implementation hosted at https://api-authzen-authz.3edges.io. Note that this Authorizer service was built and deployed automatically by 3Edges without writing any code!
 
 ## Test results
 
 ```bash
-yarn test
-yarn run v1.22.19
-$ ./scripts/test.sh
+yarn test https://api-authzen-authz.3edges.io
+yarn run v1.22.22
+$ ./scripts/test.sh https://api-authzen-authz.3edges.io
 >>> checking decisions
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"beth@the-smiths.com"}}
 PASS REQ:{"subject":{"identity":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"},"action":{"name":"can_read_user"},"resource":{"type":"user","userID":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"}}
