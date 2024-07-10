@@ -24,7 +24,8 @@ jobs:
         run: gem install kramdown-rfc
       - name: Install xml2rfc
         run: pip install xml2rfc
-      - name: Convert Authz API to rfc xml
+
+      - name: Convert Authz API 1.0 to rfc xml
         run: kramdown-rfc2629 api/authorization-api-1_0.md > api/authorization-api-1_0.xml
       - name: Render Authz API HTML
         run: xml2rfc api/authorization-api-1_0.xml --html -o index.html
@@ -37,6 +38,21 @@ jobs:
           path: |
             index.html
             api/authorization-api-1_0.xml
+
+      - name: Convert Authz API 1.1 to rfc xml
+        run: kramdown-rfc2629 api/authorization-api-1_1.md > api/authorization-api-1_1.xml
+      - name: Render Authz API 1.1 HTML
+        run: xml2rfc api/authorization-api-1_1.xml --html -o authorization-api-1_1.html
+      - name: Render Authz API 1.1 Text
+        run: xml2rfc api/authorization-api-1_1.xml --text
+      - name: Upload Authz API 1.1 artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: output
+          path: |
+            authorization-api-1_1.html
+            api/authorization-api-1_1.xml      
+      
       - name: Convert Authz API Original to rfc xml
         run: kramdown-rfc2629 api/authorization-api-1_0-original.md > api/authorization-api-1_0-original.xml
       - name: Render Authz API Original HTML
@@ -50,6 +66,7 @@ jobs:
           path: |
             authorization-api-1_0-original.html
             api/authorization-api-1_0-original.xml
+
       - name: Convert Authz Design Patterns to rfc xml
         run: kramdown-rfc2629 patterns/AuthorizationDesignPatterns.md > patterns/AuthorizationDesignPatterns.xml
       - name: Render Authz Design Patterns HTML

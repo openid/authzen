@@ -5,7 +5,7 @@ cat: std # Check
 submissiontype: IETF
 wg: OpenID AuthZEN
 
-docname: authorization-api-1_0
+docname: authorization-api-1_1
 
 title: Authorization API
 abbrev: azapi
@@ -88,7 +88,7 @@ The core feature of the Authorization API is the Access Evaluation API, which en
 - Can a manager print?
 
 # API Version
-This document describes the API version 1. Any updates to this API through subsequent revisions of this document or other documents MAY augment this API, but MUST NOT modify the API described here. Augmentation MAY include additional API methods or additional parameters to existing API methods, additional authorization mechanisms, or additional optional headers in API requests. All API methods for version 1 MUST be immediately preceded by the relative URL path `/v1/`.
+This document describes the API version 1.1. Any updates to this API through subsequent revisions of this document or other documents MAY augment this API, but MUST NOT modify the API described here. Augmentation MAY include additional API methods or additional parameters to existing API methods, additional authorization mechanisms, or additional optional headers in API requests. All API methods for version 1.1 MUST be immediately preceded by the relative URL path `/v1/`.
 
 # Information Model
 The information model for requests and responses include the following entities: Subject, Action, Resource, Context, and Decision. These are all defined below.
@@ -302,6 +302,8 @@ The following is a non-normative example of a Context:
 
 The Access Evaluation API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for executing a single access evaluation.
 
+Evaluating multiple access evaluations within the scope of a single message exchange (also known as "boxcarring" requests) is covered in Access Evaluations API ({{access-evaluations-api}}).
+
 ## The Access Evaluation API Request {#access-evaluation-request}
 The Access Evaluation request is a 4-tuple constructed of the four previously defined entities:
 
@@ -440,6 +442,237 @@ The following is a non-normative example of a Reason Object:
 ~~~
 {: #response-with-context-example title="Example Response with Context"}
 
+# Access Evaluations API {#access-evaluations-api}
+
+The Access Evaluations API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for evaluating multiple access evaluations within the scope of a single message exchange (also known as "boxcarring" requests).
+
+## The Access Evaluations API Request {#access-evaluations-request}
+
+The Access Evaluation API Request builds on the information model presented in {{information-model}} and the 4-tuple defined in the Access Evaluation Request ({{access-evaluation-request}}).
+
+To send multiple access evaluation requests in a single message, the caller MAY add an `evaluations` key to the request. The `evaluations` key is an object-typed value, which contains a keyed list JSON objects, each typed as a 4-tuple, and specifying a discrete request. 
+
+If an `evaluations` key/value is NOT present, the Access Evaluations Request behaves in a backwards-compatible manner with the (single) Access Evaluation API Request ({{access-evaluation-request}}).
+
+If an `evaluations` key/value IS present and contains one or more objects, these form distinct requests that the PDP will evaluate. These requests are independent from each other, and may be executed sequentially or in parallel, left to the discretion of each implementation.
+
+If the `evaluations` key IS present and contains one or more objects, the top-level `subject`, `action`, `resource`, and `context` keys (4-tuple) in the request object MAY be omitted. However, if one or more of these values is present, they provide default values for their respective fields in the evaluation requests. This behavior is described in {{default-values}}.
+
+The following is a non-normative example for specifying three requests (keyed `eval-1`, `eval-2`, and `eval-3`), with no default values:
+
+~~~json
+{
+  "evaluations": {
+    "eval-1": {
+      "subject": {
+        "type": "user",
+        "id": "alice@acmecorp.com"
+      },
+      "action": {
+        "name": "can_read"
+      },
+      "resource": {
+        "type": "document",
+        "id": "boxcarring.md"
+      },
+      "context":{
+        "time": "2024-05-31T15:22-07:00"
+      }
+    },
+    "eval-2": {
+      "subject": {
+        "type": "user",
+        "id": "alice@acmecorp.com"
+      },
+      "action": {
+        "name": "can_read"
+      },
+      "resource": {
+        "type": "document",
+        "id": "subject-search.md"
+      },
+      "context":{
+        "time": "2024-05-31T15:22-07:00"
+      }
+    },
+    "eval-3": {
+      "subject": {
+        "type": "user",
+        "id": "alice@acmecorp.com"
+      },
+      "action": {
+        "name": "can_read"
+      },
+      "resource": {
+        "type": "document",
+        "id": "resource-search.md"
+      },
+      "context":{
+        "time": "2024-05-31T15:22-07:00"
+      }
+    }
+  }
+}
+~~~
+
+### Default values
+
+While the example above provides the most flexibility in specifying distinct values in each request for every evaluation, it is common for boxcarred requests to share one or more values of the 4-tuple. For example, evaluations MAY all refer to a single subject, and/or have the same contextual (environmental) attributes.
+
+Default values offer a more compact syntax that avoids over-duplication of request data.
+
+If any of the top-level `subject`, `action`, `resource`, and `context` keys are provided, they are treated as default values for the 4-tuples specified in the `evaluations` object. Any values specified in the 4-tuples present in the `evaluations` object take precedence over these default values.
+
+The following is a non-normative example for specifying three requests that refer to a single subject and context:
+
+~~~json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@acmecorp.com"
+  },
+  "context":{
+    "time": "2024-05-31T15:22-07:00"
+  },
+  "evaluations": {
+    "eval-1": {
+      "action": {
+        "name": "can_read"
+      },
+      "resource": {
+        "type": "document",
+        "id": "boxcarring.md"
+      }
+    },
+    "eval-2": {
+      "action": {
+        "name": "can_read"
+      },
+      "resource": {
+        "type": "document",
+        "id": "subject-search.md"
+      }
+    },
+    "eval-3": {
+      "action": {
+        "name": "can_read"
+      },
+      "resource": {
+        "type": "document",
+        "id": "resource-search.md"
+      }
+    }
+  }
+}
+~~~
+
+The following is a non-normative example for specifying three requests that refer to a single `subject` and `context`, with a default value for `action`, that is overridden by the third request:
+
+~~~json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@acmecorp.com"
+  },
+  "context":{
+    "time": "2024-05-31T15:22-07:00"
+  },
+  "action": {
+    "name": "can_read"
+  },
+  "evaluations": {
+    "eval-1": {
+      "resource": {
+        "type": "document",
+        "id": "boxcarring.md"
+      }
+    },
+    "eval-2": {
+      "resource": {
+        "type": "document",
+        "id": "subject-search.md"
+      }
+    },
+    "eval-3": {
+      "action": {
+        "name": "can_edit"
+      },
+      "resource": {
+        "type": "document",
+        "id": "resource-search.md"
+      }
+    }
+  ]
+}
+~~~
+
+## Access Evaluations API Response {#access-evaluations-response}
+
+Like the request format, the Access Evaluations Response format for an Access Evaluations Request adds an `evaluations` key that is object-typed, keyed by the request IDs in the `evaluations` object in the request. Each value of the evaluations object is typed as an Access Evaluation Response ({{access-evaluation-response}}).
+
+In case the `evaluations` key is present, it is RECOMMENDED that the `decision` key of the response will be omitted. If present, it can be ignored by the caller.
+
+The following is a non-normative example of a Access Evaluations Response to an Access Evaluations Request containing three evaluation objects:
+
+~~~json
+{
+  "evaluations": {
+    "eval-1": {
+      "decision": true
+    },
+    "eval-2": {
+      "decision": false,
+      "context": {
+        "reason": "resource not found"
+      }
+    },
+    "eval-3": {
+      "decision": false,
+      "context": {
+        "reason": "Subject is a viewer of the resource"
+      }
+    }
+  ]
+}
+~~~
+
+### Errors
+
+There are two types of errors, and they are handled differently:
+1. Transport-level errors, or errors that pertain to the entire payload.
+2. Errors in individual evaluations.
+
+The first type of error is handled at the transport level. For example, for the HTTP binding, the 4XX and 5XX codes indicate a general error that pertains to the entire payload, as described in Transport ({{transport}}).
+
+The second type of error is handled at the payload level. Decisions default to *closed* (i.e. `false`), but the `context` field can include errors that are specific to that request.
+
+The following is a non-normative example of a response to an Access Evaluations Request containing three evaluation objects, two of them demonstrating how errors can be returned for two of the evaluation requests:
+
+~~~json
+{
+  "evaluations": {
+    "eval-1": {
+      "decision": true
+    },
+    "eval-2": {
+      "decision": false,
+      "context": {
+        "error": {
+          "status": 404,
+          "message": "Resource not found"
+        }
+      }
+    },
+    "eval-3": {
+      "decision": false,
+      "context": {
+        "reason": "Subject is a viewer of the resource"
+      }
+    }
+  ]
+}
+~~~
+
 # Transport
 
 This specification defines an HTTPS binding which MUST be implemented by a compliant PDP.
@@ -492,7 +725,72 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
   "decision": true
 }
 ~~~
-{: #example-access-evaluation-response title="Example of an HTTPS Access Evaluation Response"}
+{: #example-access-evaluation-response title="Example of an HTTP Access Evaluation Response"}
+
+### Access Evaluations HTTPS Request
+The Access Evaluations Request is an HTTPS request with `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluations Request, as defined in {{access-evaluations-request}}.
+
+The following is a non-normative example of a the HTTPS binding of the Access Evaluations Request:
+
+~~~ http
+POST /access/v1/evaluations HTTP/1.1
+Host: pdp.mycompany.com
+Authorization: Bearer <myoauthtoken>
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@acmecorp.com"
+  },
+  "context":{
+    "time": "2024-05-31T15:22-07:00"
+  },
+  "action": {
+    "name": "can_read"
+  },
+  "evaluations": {
+    "eval-1": {
+      "resource": {
+        "type": "document",
+        "id": "boxcarring.md"
+      }
+    },
+    "eval-2": {
+      "resource": {
+        "type": "document",
+        "id": "subject-search.md"
+      }
+    },
+    "eval-3": {
+      "action": {
+        "name": "can_edit"
+      },
+      "resource": {
+        "type": "document",
+        "id": "resource-search.md"
+      }
+    }
+  ]
+}
+~~~
+{: #example-access-evaluations-request title="Example of an HTTPS Access Evaluations Request"}
+
+### HTTPS Access Evaluations Response
+The success response to an Access Evaluations Request is an Access Evaluations Response. It is a HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluations Response, as defined in {{access-evaluations-response}}.
+
+Following is a non-normative example of an HTTPS Access Evaluations Response:
+
+~~~ http
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "decision": true
+}
+~~~
+{: #example-access-evaluations-response title="Example of an HTTPS Access Evaluations Response"}
 
 ### Error Responses
 The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTPS status code ({{Section 15 of RFC9110}}) that indicates error.
