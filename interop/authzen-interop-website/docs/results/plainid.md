@@ -1,10 +1,10 @@
 ---
-sidebar_position: 6
+sidebar_position: 13
 ---
 
 # PlainID
 
-Interop results for the [PlainID](https://www.plainid.com/) implementation hosted at  https://authzeninteropt.se-plainid.com.
+Interop results for the [PlainID](https://www.plainid.com/) implementation hosted at https://authzeninteropt.se-plainid.com.
 
 ## Test results
 
