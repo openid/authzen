@@ -1,6 +1,6 @@
 {
   "name": "authzen-todo-backend",
-  "version": "0.1.4",
+  "version": "0.1.16",
   "description": "AuthZEN todo backend interop sample",
   "main": "src/index.ts",
   "scripts": {
