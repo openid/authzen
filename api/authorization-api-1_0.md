@@ -545,18 +545,18 @@ This specification does not introduce any new identifiers that would require reg
 
 In the ABAC architecture, the PEP-PDP connection is the most sensitive one and needs to be secured to guarantee:
 
- - integrity
- - confidentiality.
+ - Integrity
+ - Confidentiality
 
- As a result, the connection between the PEP and the PDP MUST be secured using the most adequate means given the choice of transport (e.g. HTTP REST).
+ As a result, the connection between the PEP and the PDP MUST be secured using the most adequate means given the choice of transport (e.g. TLS for HTTP REST).
 
 ## Policy Confidentiality and Sender Authentication
 
-Additionally, the PDP MAY want to authenticate the calling PEP. There are several ways authentication can be established. These ways are out of scope of this specification. They MAY include:
+Additionally, the PDP SHOULD authenticate the calling PEP. There are several ways authentication can be established. These ways are out of scope of this specification. They MAY include:
 
  - Mutual TLS
  - OAuth-based authentication
- - HTTP Basic authentication
+ - API key
 
  The choice and strength of either mechanism is not in scope.
 
@@ -568,7 +568,7 @@ Additionally, the PDP MAY want to authenticate the calling PEP. There are severa
 
  ## Availability & Denial of Service
 
- The PDP must apply reasonable protections to avoid common attacks tied to payload size, invalid JSON, nested JSON attacks, or memory consumption.
+ The PDP SHOULD apply reasonable protections to avoid common attacks tied to request payload size, the number of requests, invalid JSON, nested JSON attacks, or memory consumption. Rate limiting is one such way to address such issues.
 
 --- back
 
