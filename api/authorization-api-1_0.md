@@ -7,7 +7,7 @@ wg: OpenID AuthZEN
 
 docname: authorization-api-1_0
 
-title: Authorization API
+title: Authorization API 1.0
 abbrev: azapi
 lang: en
 kw:
