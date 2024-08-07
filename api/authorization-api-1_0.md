@@ -595,13 +595,12 @@ PEP:
 : Policy Enforcement Point. The component or system that requests decisions from the PDP and enforces access to specific requests based on the decisions obtained from the PDP.
 
 # Acknowledgements {#Acknowledgements}
-{: numbered="false"}
 
 This template uses extracts from templates written by
 {{{Pekka Savola}}}, {{{Elwyn Davies}}} and
 {{{Henrik Levkowetz}}}.
 
-# Appendix A. Notices
+# Notices {#Notices}
 Copyright (c) 2024 The OpenID Foundation.
 
 The OpenID Foundation (OIDF) grants to any Contributor, developer, implementer, or other interested party a non-exclusive, royalty free, worldwide copyright license to reproduce, prepare
