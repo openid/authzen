@@ -1,14 +1,3 @@
 {
-  "Aserto": "https://authzen-proxy.demo.aserto.com",
-  "Axiomatics": "https://pdp.alfa.guide",
-  "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
-  "HexaOPA": "https://interop.authzen.hexaorchestration.org",
-  "Kogito": "https://authzen-proxy-demo.azerad.org",
-  "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
-  "Permit.io": "https://permit-authzen-interop.up.railway.app",
-  "Rock Solid Knowledge": "https://authzen.identityserver.com",
-  "SGNL": "https://authzen.sgnlapis.cloud",
-  "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app",
-  "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
-  "3Edges": "https://api-authzen-authz.3edges.io"
+  "Cerbos": "https://authzen-proxy-demo.cerbos.dev"
 }

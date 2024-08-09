@@ -19,7 +19,9 @@ export interface ITodoService {
   listTodos: () => Promise<Todo[]>;
   createTodo: (todo: TodoValues) => Promise<Todo>;
   saveTodo: (id: string, values: TodoValues) => Promise<Todo[]>;
-  deleteTodo: (todo: Todo) => Promise<void | Response>;
+  deleteTodos: (
+    todoList: string[]
+  ) => Promise<{ result: Record<string, "DELETED" | "DENIED"> }>;
   getUser: (sub: string) => Promise<User>;
   listPdps: () => Promise<string[]>;
   setPdp: (pdp: string) => void;
@@ -27,8 +29,9 @@ export interface ITodoService {
 
 export interface TodoProps {
   todo: Todo;
+  selectedForDelete: boolean;
   handleCompletedChange: (todoId: string, completed: boolean) => void;
-  handleDeleteChange: (Todo: Todo) => void;
+  handleDeleteCheck: (markedForDeletion: boolean) => void;
 }
 
 export interface TodosPropsn {

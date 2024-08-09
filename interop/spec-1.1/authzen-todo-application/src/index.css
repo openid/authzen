@@ -50,3 +50,35 @@ code {
 .pdp-select {
   min-width: 300px;
 }
+
+.delete-checkbox {
+  display: block;
+	position: absolute;
+	top: 0;
+	right: 10px;
+	bottom: 0;
+	width: 30px;
+	height: 30px;
+	margin: auto 0;
+	font-size: 30px;
+	color: #949494;
+	transition: color 0.2s ease-out;
+}
+
+.delete-button {
+  background-color:red ;
+  padding: 5px;
+  margin: 10px;
+  color: white;
+  font-weight: bold;
+
+}
+.delete-button:disabled {
+  background-color: lightsalmon ;
+  padding: 5px;
+  margin: 10px;
+  color: white;
+  font-weight: bold;
+
+}
+

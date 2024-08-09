@@ -2,9 +2,11 @@ import React, { useContext } from "react";
 import { Todo, TodoValues, ITodoService, User } from "./interfaces";
 import { useQuery } from "react-query";
 
-const serviceContext = React.createContext(
-  { token: "", pdp: "", setPdp: (_: string) => {} }
-);
+const serviceContext = React.createContext({
+  token: "",
+  pdp: "",
+  setPdp: (_: string) => {},
+});
 
 const urls = {
   pdps: `${process.env.REACT_APP_API_ORIGIN}/pdps`,
@@ -46,15 +48,17 @@ export const useTodoService: () => ITodoService = () => {
     return await jsonOrError(response);
   };
 
-  const deleteTodo: (todo: Todo) => Promise<void | Response> = async (todo) => {
-    const response: Response = await fetch(urls.todo(todo.ID), {
+  const deleteTodos: (
+    todoList: string[]
+  ) => Promise<{ result: Record<string, "DELETED" | "DENIED"> }> = async (
+    todoList
+  ) => {
+    const response: Response = await fetch(urls.todos, {
       method: "DELETE",
-      body: JSON.stringify(todo),
+      body: JSON.stringify({ todos: todoList }),
       headers: headers,
     });
-    if (response.status !== 200) {
-      throw new Error(`${response.status}: ${response.statusText}`);
-    }
+    return await jsonOrError(response);
   };
 
   const getUser: (userId: string) => Promise<User> = async (userId) => {
@@ -71,7 +75,7 @@ export const useTodoService: () => ITodoService = () => {
     listTodos,
     createTodo,
     saveTodo,
-    deleteTodo,
+    deleteTodos,
     getUser,
     listPdps,
     setPdp,
@@ -80,7 +84,7 @@ export const useTodoService: () => ITodoService = () => {
 
 export const useUser: (userId: string) => User = (userId: string) => {
   const { getUser } = useTodoService();
-  const response = useQuery(['User', userId], () => {
+  const response = useQuery(["User", userId], () => {
     return getUser(userId);
   });
   return response.data as User;
@@ -97,14 +101,14 @@ const jsonOrError = async (response: Response): Promise<any> => {
 export type ServiceProps = {
   token: string;
   pdp: string;
-  setPdp: (pdp: string) => void
+  setPdp: (pdp: string) => void;
 };
 
 const TodoService: React.FC<React.PropsWithChildren<ServiceProps>> = ({
   children,
   token,
   pdp,
-  setPdp
+  setPdp,
 }) => {
   return (
     <serviceContext.Provider value={{ token, pdp, setPdp }}>

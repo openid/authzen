@@ -57,16 +57,22 @@ export class Server {
 
   async delete(req: JWTRequest, res: Response) {
     const result = {};
+    try {
+      await Promise.all(
+        req.body.todos.map(async (id) => {
+          console.log(req["authorization"]["evaluations"][id]);
+          if (req["authorization"]["evaluations"][id].decision) {
+            await this.store.delete(id);
+            result[id] = "DELETED";
+          } else {
+            result[id] = "DENIED";
+          }
+        })
+      );
 
-    for (const id in req.body.todos) {
-      if (req["authorization"][id].decision) {
-        await this.store.delete(req.params.id);
-        result[id] = "DELETED";
-      } else {
-        result[id] = "DENIED";
-      }
+      res.json({ result });
+    } catch (error) {
+      res.status(422).send({ error: (error as Error).message });
     }
-
-    res.json(result);
   }
 }

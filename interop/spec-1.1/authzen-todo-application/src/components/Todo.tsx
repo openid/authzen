@@ -43,10 +43,14 @@ export const Todo: React.FC<TodoProps> = (todoProps) => {
             />
           ) : null}
         </label>
-        <button
-          className="destroy"
-          onClick={() => todoProps.handleDeleteChange(todoProps.todo)}
-        ></button>
+        <input
+          className="delete-checkbox"
+          type="checkbox"
+          onChange={() =>
+            todoProps.handleDeleteCheck(!todoProps.selectedForDelete)
+          }
+          checked={todoProps.selectedForDelete}
+        />
       </div>
     </li>
   );

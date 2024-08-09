@@ -52,10 +52,6 @@ const resourceMapper = async (
       const todo = await store.get(req.params.id);
       return { ownerID: todo.OwnerID, type: "todo" };
     }
-    case "can_delete_todo": {
-      const todoToDelete = await store.get(req.params.id);
-      return { ownerID: todoToDelete.OwnerID, type: "todo" };
-    }
     default:
       return {};
   }
@@ -122,13 +118,20 @@ export const authzBoxcarMiddleware = (store: Store) => {
         headers.authorization = pdpAuthHeader;
       }
 
+      if (!req.body.todos) {
+        return res.status(502).send();
+      }
+
       const evaluations = {};
 
       await Promise.all(
-        req.body.todos.forEach(async (id: string) => {
-          evaluations[id] = {
-            resource: await resourceMapper(req, permission, store),
-          };
+        req.body.todos.map(async (id: string) => {
+          const todoToDelete = await store.get(id);
+          if (todoToDelete) {
+            evaluations[id] = {
+              resource: { id, ownerID: todoToDelete.OwnerID, type: "todo" },
+            };
+          }
         })
       );
 
@@ -143,10 +146,8 @@ export const authzBoxcarMiddleware = (store: Store) => {
         evaluations,
       };
 
-      log(data);
       const response = await axios.post(authorizerUrl, data, { headers });
-      log(response?.data);
-
+      console.log(JSON.stringify(data, null, 2), response.data);
       if (response?.data?.evaluations) {
         req["authorization"] = response.data;
         next();
