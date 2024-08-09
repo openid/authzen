@@ -43,13 +43,15 @@ export const App: React.FC<AppProps> = (props) => {
   const [showActive, setShowActive] = useState<boolean>(true);
   const user: User = useUser(props.user.sub);
   const storedPdpOption = localStorage.getItem("pdp");
-  const currentPdpOption = storedPdpOption ? { name: storedPdpOption } : (pdps && pdps[0]);
+  const currentPdpOption = storedPdpOption
+    ? { name: storedPdpOption }
+    : pdps && pdps[0];
 
   const errorHandler = (errorText: string, close?: number | false) => {
     const autoClose = close === undefined ? 3000 : close;
     const msg = close === false ? ErrorWithLink : "Error: " + errorText;
     toast.error(msg, {
-      position: "top-center",
+      position: "top-right",
       autoClose,
       hideProgressBar: false,
       closeOnClick: true,
@@ -133,10 +135,13 @@ export const App: React.FC<AppProps> = (props) => {
     list();
   }, [listPdps]);
 
-  const storePdp: ((pdp: string) => void) = useCallback((pdp: string) => {
-    setPdp(pdp);
-    localStorage.setItem("pdp", pdp);
-  }, [setPdp])
+  const storePdp: (pdp: string) => void = useCallback(
+    (pdp: string) => {
+      setPdp(pdp);
+      localStorage.setItem("pdp", pdp);
+    },
+    [setPdp]
+  );
 
   useEffect(() => {
     getPdps();

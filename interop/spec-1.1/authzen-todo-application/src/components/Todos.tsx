@@ -75,7 +75,7 @@ export const Todos: React.FC<TodosPropsn> = (props) => {
             Object.keys(result.result).forEach((key) => {
               if (result.result[key] === "DELETED") {
                 toast.info(`Todo ${key} deleted`, {
-                  position: "bottom-right",
+                  position: "top-right",
                   autoClose: 5000,
                   hideProgressBar: false,
                   closeOnClick: true,
@@ -85,7 +85,7 @@ export const Todos: React.FC<TodosPropsn> = (props) => {
                 });
               } else {
                 toast.error(`Permission denied deleting todo ${key}`, {
-                  position: "bottom-right",
+                  position: "top-right",
                   autoClose: 5000,
                   hideProgressBar: false,
                   closeOnClick: true,
