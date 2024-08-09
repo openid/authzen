@@ -548,7 +548,7 @@ In the ABAC architecture, the PEP-PDP connection is the most sensitive one and n
  - Integrity
  - Confidentiality
 
- As a result, the connection between the PEP and the PDP MUST be secured using the most adequate means given the choice of transport (e.g. TLS for HTTP REST).
+As a result, the connection between the PEP and the PDP MUST be secured using the most adequate means given the choice of transport (e.g. TLS for HTTP REST).
 
 ## Policy Confidentiality and Sender Authentication
 
@@ -616,5 +616,3 @@ not be available; neither does it represent that it has made any independent eff
 title, related to this specification, and the entire risk as to implementing this specification is assumed by the implementer. The OpenID Intellectual Property Rights policy requires
 contributors to offer a patent promise not to assert certain patent claims against other contributors and against implementers. The OpenID Foundation invites any interested party to bring
 to its attention any copyrights, patents, patent applications, or other proprietary rights that may cover technology that may be required to practice this specification.
-
-
