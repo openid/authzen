@@ -66,9 +66,6 @@ normative:
       org: Entrust
     date: 2006
 
-
-Hu, V., Ferraiolo, D., Chandramouli, R, Kuhn, R.
-
 informative:
   ABAC: 
     title: Attribute-Based Access Control
