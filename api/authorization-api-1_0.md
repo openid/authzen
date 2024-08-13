@@ -7,7 +7,7 @@ wg: OpenID AuthZEN
 
 docname: authorization-api-1_0
 
-title: Authorization API 1.0
+title: Authorization API 1.0 – draft 00
 abbrev: azapi
 lang: en
 kw:
@@ -599,6 +599,10 @@ PEP:
 This template uses extracts from templates written by
 {{{Pekka Savola}}}, {{{Elwyn Davies}}} and
 {{{Henrik Levkowetz}}}.
+
+# History
+
+- Draft 00: this version.
 
 # Notices {#Notices}
 Copyright (c) 2024 The OpenID Foundation.
