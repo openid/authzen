@@ -600,9 +600,14 @@ This template uses extracts from templates written by
 {{{Pekka Savola}}}, {{{Elwyn Davies}}} and
 {{{Henrik Levkowetz}}}.
 
-# History
+# Document History
 
-- Draft 00: this version.
+   [[ To be removed from the final specification ]]
+
+   -00 
+
+   *  Initial version
+
 
 # Notices {#Notices}
 Copyright (c) 2024 The OpenID Foundation.
