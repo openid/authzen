@@ -46,7 +46,7 @@ const resourceMapper = async (req: express.Request, permission: string, store) =
       return { ownerID: todo.OwnerID, id: todo.OwnerID, type: 'todo' };
     case 'can_delete_todo':
       const todoToDelete = await store.get(req.params.id);
-      return { ownerID: todoToDelete.OwnerID, id: todo.OwnerID, type: 'todo' };
+      return { ownerID: todoToDelete.OwnerID, id: todoToDelete.OwnerID, type: 'todo' };
     default:
       return {};
   }
