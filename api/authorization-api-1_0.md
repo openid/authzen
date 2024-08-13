@@ -66,6 +66,25 @@ normative:
       org: Entrust
     date: 2006
 
+informative:
+  ABAC: 
+    title: Attribute-Based Access Control
+    isbn: 9781630811341
+    date: 2018
+    target: https://us.artechhouse.com/Attribute-Based-Access-Control-P1911.aspx
+    author:
+      - name: Hu, V. 
+        org: NIST
+    author:
+      - name: Ferraiolo, D.
+        org: NIST 
+    author:
+      - name: Chandramouli, R
+        org: NIST 
+    author:
+      - name: Kuhn, R.
+        org: NIST 
+
 --- abstract
 
 The Authorization API enables Policy Decision Points (PDPs) and Policy Enforcement Points (PEPs) to communicate authorization requests and decisions to each other without requiring knowledge of each other's inner workings. The Authorization API is served by the PDP and is called by the PEP. The Authorization API includes an Evaluation endpoint, which provides specific access decisions. Other endpoints may be added in the future for other scenarios, including searching for subjects or resources.
@@ -73,7 +92,7 @@ The Authorization API enables Policy Decision Points (PDPs) and Policy Enforceme
 --- middle
 
 # Introduction
-Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML ({{XACML}}) and NIST's ABAC SP 800-162. Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
+Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML ({{XACML}}) and NIST's ABAC SP 800-162 ({{ABAC}}). Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
 
 # Model
 The Authorization API is a transport-agnostic API published by the PDP, to which the PEP acts as a client. Possible bindings of this specification, such as HTTPS or gRPC, are described in Transport ({{transport}}).
