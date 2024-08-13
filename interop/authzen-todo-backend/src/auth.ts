@@ -36,17 +36,17 @@ export const checkJwt = jwt({
 const resourceMapper = async (req: express.Request, permission: string, store) => {
   switch (permission) {
     case 'can_read_user':
-      return { type: 'user', userID: req.params.userID };
+      return { type: 'user', id: req.params.userID, userID: req.params.userID };
     case 'can_read_todos':
-      return { type: 'todo' };
+      return { type: 'todo', id: 'todo-1' };
     case 'can_create_todo':
-      return { type: 'todo' };
+      return { type: 'todo', id: 'todo-1' };
     case 'can_update_todo':
       const todo = await store.get(req.params.id);
-      return { ownerID: todo.OwnerID, type: 'todo' };
+      return { ownerID: todo.OwnerID, id: todo.OwnerID, type: 'todo' };
     case 'can_delete_todo':
       const todoToDelete = await store.get(req.params.id);
-      return { ownerID: todoToDelete.OwnerID, type: 'todo' };
+      return { ownerID: todoToDelete.OwnerID, id: todo.OwnerID, type: 'todo' };
     default:
       return {};
   }
@@ -74,6 +74,8 @@ export const authzMiddleware = (store) => {
       const data = {
         subject: {
           identity: req.auth?.sub,
+          type: 'user',
+          id: req.auth?.sub,
         },
         action: {
           name: permission,
