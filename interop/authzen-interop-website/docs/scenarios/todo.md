@@ -72,7 +72,7 @@ This will be extracted from the `sub` claim in the JWT passed in as a bearer tok
 These are noted below in JSON format, with the key being the PID string from the table above, and the value being a set of attributes associated with the user. 
 
 
-```json
+```js
 {
   "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs": {
     "id": "rick@the-citadel.com",
@@ -124,7 +124,7 @@ For simplicity, the policy always returns `true`.
 
 #### Request payload
 
-```json
+```js
 {
   "subject": {
     "type": "user",
@@ -152,7 +152,7 @@ For simplicity, the policy always returns `true`.
 
 For every subject and resource combination:
 
-```json
+```js
 {
   "decision": true
 }
@@ -166,7 +166,7 @@ For simplicity, the policy always returns `true` for every user.
 
 #### Request payload
 
-```json
+```js
 {
   "subject": {
     "type": "user",
@@ -193,7 +193,7 @@ For simplicity, the policy always returns `true` for every user.
 
 For every subject and resource combination:
 
-```json
+```js
 {
   "decision": true
 }
@@ -207,7 +207,7 @@ The policy evaluates the subject's `roles` attribute to determine whether the us
 
 #### Request payload
 
-```json
+```js
 {
   "subject": {
     "type": "user",
@@ -234,7 +234,7 @@ The policy evaluates the subject's `roles` attribute to determine whether the us
 
 Only users with a `roles` attribute that contains `admin` or `editor` return a `true` decision. In the user set above, this includes Rick, Morty, and Summer.
 
-```json
+```js
 {
   "decision": true
 }
@@ -242,7 +242,7 @@ Only users with a `roles` attribute that contains `admin` or `editor` return a `
 
 For the other two users, Beth and Jerry, the decision is `false`.
 
-```json
+```js
 {
   "decision": false
 }
@@ -258,7 +258,7 @@ The `resource` contains an attribute called `ownerID` which contains the `id` of
 
 #### Request payload
 
-```json
+```js
 {
   "subject": {
     "type": "user",
@@ -288,7 +288,7 @@ Only users with a `roles` attribute that contains `evil_genius` (Rick), OR the o
 
 For the user Morty, the following request will return a `true` decision:
 
-```json
+```js
 {
   "subject": {
     "type": "user",
@@ -308,7 +308,7 @@ For the user Morty, the following request will return a `true` decision:
 }
 ```
 
-```json
+```js
 {
   "decision": true
 }
@@ -316,7 +316,7 @@ For the user Morty, the following request will return a `true` decision:
 
 For a different value of `ownerID`, the decision will be `false`:
 
-```json
+```js
 {
   "decision": false
 }
@@ -333,7 +333,7 @@ The `resource` contains an attribute called `ownerID` which contains the `id` of
 
 #### Request payload
 
-```json
+```js
 {
   "subject": {
     "type": "user",
@@ -363,7 +363,7 @@ Only users with a `roles` attribute that contains `admin` (Rick), OR the owner o
 
 For the user Morty, the following request will return a `true` decision:
 
-```json
+```js
 {
   "subject": {
     "type": "user",
@@ -383,7 +383,7 @@ For the user Morty, the following request will return a `true` decision:
 }
 ```
 
-```json
+```js
 {
   "decision": true
 }
@@ -391,7 +391,7 @@ For the user Morty, the following request will return a `true` decision:
 
 For a different value of `ownerID`, the decision will be `false`:
 
-```json
+```js
 {
   "decision": false
 }
