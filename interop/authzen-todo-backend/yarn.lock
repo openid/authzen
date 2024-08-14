@@ -480,11 +480,6 @@ array-flatten@1.1.1:
   resolved "https://registry.npmjs.org/array-flatten/-/array-flatten-1.1.1.tgz"
   integrity sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg==
 
-array-to-table@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/array-to-table/-/array-to-table-1.0.1.tgz"
-  integrity sha512-TNCz52eAYD0/BHkQdmtSNWOyHC+E+gLYVUGcB+PkDi5JueyXwm8Q71S6ySdRd/Htmj+/HySnBUm4Rn+IkiVN7g==
-
 array-union@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/array-union/-/array-union-2.1.0.tgz"
