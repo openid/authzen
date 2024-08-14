@@ -1,4 +1,3 @@
-import arrayToTable from "array-to-table";
 import clc from "cli-color";
 
 import { decisions } from "./decisions.json";
@@ -98,6 +97,44 @@ function logResult(result: Result) {
       );
       break;
   }
+}
+
+/* inspired by https://github.com/nijikokun/array-to-table/blob/master/index.js */
+function arrayToTable (array, columns?, alignment = 'center') {
+  var table = ""
+  var separator = {
+    'left': ':---',
+    'right': '---:',
+    'center': '---'
+  }
+
+  // Generate column list
+  var cols = columns
+    ? columns.split(",")
+    : Object.keys(array[0])
+
+  // Generate table headers
+  table += `| ${cols.join(' | ')} |\r\n`
+
+  // Generate table header seperator
+  table += `| ${cols.map(function () {
+    return separator[alignment] || separator.center
+  }).join(' | ')} |\r\n`
+
+  // Generate table body
+  array.forEach(function (item) {
+
+    table += `| ${cols.map(function (key) {
+      if (key === 'request') {
+        return '`' + String(item[key] || '') + '`'
+      } else {
+        return String(item[key] || '')
+      }
+    }).join(' | ')} |\r\n`
+  })
+
+  // Return table
+  return table
 }
 
 main();
