@@ -18,10 +18,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Use Node.js 16.x
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v1
         with:
-          node-version: '16.x'
+          node-version: "20.x"
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -38,7 +38,7 @@ jobs:
       - name: tests
         run: yarn test
         env:
-          JEST_JUNIT_OUTPUT: 'reports/junit/js-test-results.xml'
+          JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
 
   typecheck:
     name: Run TypeScript checker
@@ -46,10 +46,10 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
-      - name: Use Node.js 16.x
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v1
         with:
-          node-version: '16.x'
+          node-version: "20.x"
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -65,4 +65,3 @@ jobs:
       - run: yarn install --frozen-lockfile
       - name: typecheck
         run: yarn tsc
-

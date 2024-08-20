@@ -21,6 +21,7 @@ export const useTodoService: () => ITodoService = () => {
 
   headers.append("Authorization", `Bearer ${token}`);
   headers.append("Content-Type", "application/json");
+  headers.append("X_AUTHZEN_API", "1.1");
   if (pdp) {
     headers.append("X_AUTHZEN_PDP", pdp);
   }

@@ -1,4 +1,4 @@
-FROM node:16-alpine AS builder
+FROM node:20-alpine AS builder
 
 RUN mkdir /app
 
@@ -13,7 +13,7 @@ RUN yarn install
 RUN yarn build
 
 
-FROM node:16-alpine
+FROM node:20-alpine
 
 RUN apk update && apk upgrade && apk add yarn git
 

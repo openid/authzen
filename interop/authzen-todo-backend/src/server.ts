@@ -4,7 +4,8 @@ import { Response } from "express";
 import { Todo } from "./interfaces";
 import { Store } from "./store";
 import { Directory } from "./directory";
-const pdps = require("./pdps.json");
+import pdpsv1_0 from "./pdps/v1.0.json";
+import pdpsv1_1 from "./pdps/v1.1.json";
 
 export class Server {
   store: Store;
@@ -15,8 +16,14 @@ export class Server {
     this.directory = new Directory();
   }
 
-  async listPdps(_: Request, res: Response) {
-    res.json(Object.keys(pdps));
+  async listPdps(req: Request, res: Response) {
+    const apiVersion = req.headers["x_authzen_api"] || "1.0";
+    if (apiVersion) {
+      if (apiVersion === "1.1") {
+        return res.json(Object.keys(pdpsv1_1));
+      }
+    }
+    return res.json(Object.keys(pdpsv1_0));
   }
 
   async getUser(req: JWTRequest, res: Response) {
@@ -56,6 +63,11 @@ export class Server {
   }
 
   async delete(req: JWTRequest, res: Response) {
+    await this.store.delete(req.params.id);
+    res.json({ msg: "Todo deleted" });
+  }
+
+  async deleteBoxcar(req: JWTRequest, res: Response) {
     const result = {};
     try {
       await Promise.all(

@@ -20,40 +20,41 @@ Store.open().then((store) => {
   const checkBoxcarAuthz = authzBoxcarMiddleware(store);
 
   app.get("/pdps", server.listPdps.bind(server));
-
   app.get(
     "/users/:userID",
     checkJwt,
     checkAuthz("can_read_user"),
     server.getUser.bind(server)
   );
-
   app.get(
     "/todos",
     checkJwt,
     checkAuthz("can_read_todos"),
     server.list.bind(server)
   );
-
   app.post(
     "/todos",
     checkJwt,
     checkAuthz("can_create_todo"),
     server.create.bind(server)
   );
-
   app.put(
     "/todos/:id",
     checkJwt,
     checkAuthz("can_update_todo"),
     server.update.bind(server)
   );
-
+  app.delete(
+    "/todos/:id",
+    checkJwt,
+    checkAuthz("can_delete_todo"),
+    server.delete.bind(server)
+  );
   app.delete(
     "/todos",
     checkJwt,
     checkBoxcarAuthz("can_delete_todo"),
-    server.delete.bind(server)
+    server.deleteBoxcar.bind(server)
   );
 
   app.listen(PORT, () => {

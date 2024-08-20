@@ -2,9 +2,11 @@ import React, { useContext } from "react";
 import { Todo, TodoValues, ITodoService, User } from "./interfaces";
 import { useQuery } from "react-query";
 
-const serviceContext = React.createContext(
-  { token: "", pdp: "", setPdp: (_: string) => {} }
-);
+const serviceContext = React.createContext({
+  token: "",
+  pdp: "",
+  setPdp: (_: string) => {},
+});
 
 const urls = {
   pdps: `${process.env.REACT_APP_API_ORIGIN}/pdps`,
@@ -19,6 +21,7 @@ export const useTodoService: () => ITodoService = () => {
 
   headers.append("Authorization", `Bearer ${token}`);
   headers.append("Content-Type", "application/json");
+  headers.append("X_AUTHZEN_API", "1.0");
   if (pdp) {
     headers.append("X_AUTHZEN_PDP", pdp);
   }
@@ -80,7 +83,7 @@ export const useTodoService: () => ITodoService = () => {
 
 export const useUser: (userId: string) => User = (userId: string) => {
   const { getUser } = useTodoService();
-  const response = useQuery(['User', userId], () => {
+  const response = useQuery(["User", userId], () => {
     return getUser(userId);
   });
   return response.data as User;
@@ -97,14 +100,14 @@ const jsonOrError = async (response: Response): Promise<any> => {
 export type ServiceProps = {
   token: string;
   pdp: string;
-  setPdp: (pdp: string) => void
+  setPdp: (pdp: string) => void;
 };
 
 const TodoService: React.FC<React.PropsWithChildren<ServiceProps>> = ({
   children,
   token,
   pdp,
-  setPdp
+  setPdp,
 }) => {
   return (
     <serviceContext.Provider value={{ token, pdp, setPdp }}>

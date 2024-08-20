@@ -1,7 +1,6 @@
 import clc from "cli-color";
 
 import { decisions } from "./decisions.json";
-import { json } from "stream/consumers";
 
 const AUTHZEN_PDP_URL =
   process.argv[2] || "https://authzen-proxy.demo.aserto.com";
@@ -100,32 +99,31 @@ function logResult(result: Result) {
   }
 }
 
-function arrayToTable (array) {
-  var cols = Object.keys(array[0])
-  var table = `<table>
+function arrayToTable(array) {
+  let table = `<table>
   <tr>
     <th>result</th>
     <th>request</th>
   </tr>
-`
+`;
   // Generate table body
   array.forEach(function (item) {
-    const bgColor = item.result ? 'green' : 'red'
+    const bgColor = item.result ? "green" : "red";
     table += `  <tr>
     <td bgColor="${bgColor}">${String(item.result)}</td>
     <td>
 
-`
-    table += "```js\r\n" + item.request + "\r\n```\r\n\r\n"
+`;
+    table += "```js\r\n" + item.request + "\r\n```\r\n\r\n";
     table += `  </td>
   </tr>
-`
-  })
+`;
+  });
 
-  table += "</table>"
+  table += "</table>";
 
   // Return table
-  return table
+  return table;
 }
 
 main();
