@@ -1,8 +1,8 @@
 {
-  "label": "API v1.0",
+  "label": "AuthZEN API",
   "position": 1,
   "link": {
     "type": "generated-index",
-    "description": "Authorization scenarios defined by the AuthZEN WG API v1.0."
+    "description": "Authorization scenarios defined by the AuthZEN WG"
   }
 }
