@@ -10,6 +10,10 @@ This document lists the request and response payloads for each of the API reques
 This is a copy of the payload document defined by the AuthZEN WG. The definitive document can be found [here](https://github.com/openid/authzen/blob/main/api/authorization-api-1_0.md).
 :::
 
+## Version history
+* 2024-08-13: added `id` keys to all `subject` and `resource` fields to make them compliant with AuthZEN 1.0.
+* 2024-02-15: initial draft.
+
 ## Overview of the scenario
 
 The Todo application manages a shared todo list between a set of users.
@@ -122,6 +126,8 @@ For simplicity, the policy always returns `true`.
 ```js
 {
   "subject": {
+    "type": "user",
+    "id": "<subject_from_jwt>",
     "identity": "<subject_from_jwt>"
   },
   "action": {
@@ -129,12 +135,17 @@ For simplicity, the policy always returns `true`.
   },
   "resource": {
     "type": "user",
+    "id": "<email_OR_subject>",
     "userID": "<email_OR_subject>"
   },
   "context": {
   }
 }
 ```
+
+> Notes:
+> 1. to make the payload structure interoperable with the original implementation, `subject.identity` is still specified in the payload, even though it is redundant with `subject.type` + `subject.id`.
+> 2. likewise, `resource.userID` is still specified, even though it is redundant with `resource.id`.
 
 #### Response payload
 
@@ -157,18 +168,25 @@ For simplicity, the policy always returns `true` for every user.
 ```js
 {
   "subject": {
+    "type": "user",
+    "id": "<subject_from_jwt>",
     "identity": "<subject_from_jwt>"
   },
   "action": {
     "name": "can_read_todos"
   },
   "resource": {
-    "type": "todo"
+    "type": "todo",
+    "id": "todo-1"
   },
   "context": {
   }
 }
 ```
+
+> Notes:
+> 1. to make the payload structure interoperable with the original implementation, `subject.identity` is still specified in the payload, even though it is redundant with `subject.type` + `subject.id`.
+> 2. `resource.type` continues to be `todo`, and `resource.id` is specified as a fixed / stable identifier.
 
 #### Response payload
 
@@ -191,18 +209,25 @@ The policy evaluates the subject's `roles` attribute to determine whether the us
 ```js
 {
   "subject": {
+    "type": "user",
+    "id": "<subject_from_jwt>",
     "identity": "<subject_from_jwt>"
   },
   "action": {
     "name": "can_create_todo"
   },
   "resource": {
-    "type": "todo"
+    "type": "todo",
+    "id": "todo-1"
   },
   "context": {
   }
 }
 ```
+
+> Notes:
+> 1. to make the payload structure interoperable with the original implementation, `subject.identity` is still specified in the payload, even though it is redundant with `subject.type` + `subject.id`.
+> 2. `resource.type` continues to be `todo`, and `resource.id` is specified as a fixed / stable identifier.
 
 #### Response payload
 
@@ -235,19 +260,26 @@ The `resource` contains an attribute called `ownerID` which contains the `id` of
 ```js
 {
   "subject": {
+    "type": "user",
+    "id": "<subject_from_jwt>",
     "identity": "<subject_from_jwt>"
   },
   "action": {
     "name": "can_update_todo"
   },
   "resource": {
-    "ownerID": "<email_of_owner>",
-    "type": "todo"
+    "type": "todo",
+    "id": "<uuid-of-the-todo>",
+    "ownerID": "<email_of_owner>"
   },
   "context": {
   }
 }
 ```
+
+> Notes:
+> 1. to make the payload structure interoperable with the original implementation, `subject.identity` is still specified in the payload, even though it is redundant with `subject.type` + `subject.id`.
+> 2. `resource.id` is a UUID representing the Todo, but since the PDPs are not assumed to be stateful, `ownerID` continues to be passed in as a way to designate a Todo's owner.
 
 #### Response payload
 
@@ -258,14 +290,17 @@ For the user Morty, the following request will return a `true` decision:
 ```js
 {
   "subject": {
+    "type": "user",
+    "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs",
     "identity": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
     "name": "can_update_todo"
   },
   "resource": {
-    "ownerID": "morty@the-citadel.com",
-    "type": "todo"
+    "type": "todo",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "ownerID": "morty@the-citadel.com"
   },
   "context": {
   }
@@ -299,19 +334,26 @@ The `resource` contains an attribute called `ownerID` which contains the `id` of
 ```js
 {
   "subject": {
+    "type": "user",
+    "id": "<subject_from_jwt>",
     "identity": "<subject_from_jwt>"
   },
   "action": {
     "name": "can_delete_todo"
   },
   "resource": {
-    "ownerID": "<email_of_owner>",
-    "type": "todo"
+    "type": "todo",
+    "id": "<uuid-of-the-todo>",
+    "ownerID": "<email_of_owner>"
   },
   "context": {
   }
 }
 ```
+
+> Notes:
+> 1. to make the payload structure interoperable with the original implementation, `subject.identity` is still specified in the payload, even though it is redundant with `subject.type` + `subject.id`.
+> 2. `resource.id` is a UUID representing the Todo, but since the PDPs are not assumed to be stateful, `ownerID` continues to be passed in as a way to designate a Todo's owner.
 
 #### Response payload
 
@@ -322,14 +364,17 @@ For the user Morty, the following request will return a `true` decision:
 ```js
 {
   "subject": {
+    "type": "user",
+    "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs",
     "identity": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
     "name": "can_delete_todo"
   },
   "resource": {
-    "ownerID": "morty@the-citadel.com",
-    "type": "todo"
+    "type": "todo",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "ownerID": "morty@the-citadel.com"
   },
   "context": {
   }
