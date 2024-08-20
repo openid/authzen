@@ -7,12 +7,13 @@ sidebar_position: 1
 This document lists the request and response payloads for each of the API requests in the Todo interop scenario.
 
 :::tip
-This is a copy of the payload document defined by the AuthZEN WG. The definitive document can be found [here](https://github.com/openid/authzen/blob/main/api/authorization-api-1_0.md).
+This is a copy of the payload document defined by the AuthZEN WG. The definitive document can be found [here](https://hackmd.io/gNZBRoTfRgWh_PNM0y2wDA?view).
 :::
 
 ## Version history
-* 2024-08-13: added `id` keys to all `subject` and `resource` fields to make them compliant with AuthZEN 1.0.
-* 2024-02-15: initial draft.
+
+- 2024-08-13: added `id` keys to all `subject` and `resource` fields to make them compliant with AuthZEN 1.0.
+- 2024-02-15: initial draft.
 
 ## Overview of the scenario
 
@@ -144,6 +145,7 @@ For simplicity, the policy always returns `true`.
 ```
 
 > Notes:
+>
 > 1. to make the payload structure interoperable with the original implementation, `subject.identity` is still specified in the payload, even though it is redundant with `subject.type` + `subject.id`.
 > 2. likewise, `resource.userID` is still specified, even though it is redundant with `resource.id`.
 
@@ -185,6 +187,7 @@ For simplicity, the policy always returns `true` for every user.
 ```
 
 > Notes:
+>
 > 1. to make the payload structure interoperable with the original implementation, `subject.identity` is still specified in the payload, even though it is redundant with `subject.type` + `subject.id`.
 > 2. `resource.type` continues to be `todo`, and `resource.id` is specified as a fixed / stable identifier.
 
@@ -226,6 +229,7 @@ The policy evaluates the subject's `roles` attribute to determine whether the us
 ```
 
 > Notes:
+>
 > 1. to make the payload structure interoperable with the original implementation, `subject.identity` is still specified in the payload, even though it is redundant with `subject.type` + `subject.id`.
 > 2. `resource.type` continues to be `todo`, and `resource.id` is specified as a fixed / stable identifier.
 
@@ -278,6 +282,7 @@ The `resource` contains an attribute called `ownerID` which contains the `id` of
 ```
 
 > Notes:
+>
 > 1. to make the payload structure interoperable with the original implementation, `subject.identity` is still specified in the payload, even though it is redundant with `subject.type` + `subject.id`.
 > 2. `resource.id` is a UUID representing the Todo, but since the PDPs are not assumed to be stateful, `ownerID` continues to be passed in as a way to designate a Todo's owner.
 
@@ -352,6 +357,7 @@ The `resource` contains an attribute called `ownerID` which contains the `id` of
 ```
 
 > Notes:
+>
 > 1. to make the payload structure interoperable with the original implementation, `subject.identity` is still specified in the payload, even though it is redundant with `subject.type` + `subject.id`.
 > 2. `resource.id` is a UUID representing the Todo, but since the PDPs are not assumed to be stateful, `ownerID` continues to be passed in as a way to designate a Todo's owner.
 

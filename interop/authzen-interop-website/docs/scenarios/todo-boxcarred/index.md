@@ -1,13 +1,13 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 ---
 
-# Todo Application
+# Todo Boxcar Application
 
 This document lists the request and response payloads for each of the API requests in the Todo interop scenario.
 
 :::tip
-This is a copy of the payload document defined by the AuthZEN WG. The definitive document can be found [here](https://github.com/openid/authzen/blob/main/api/authorization-api-1_1.md).
+This is a copy of the payload document defined by the AuthZEN WG. The definitive document can be found [here](https://hackmd.io/gNZBRoTfRgWh_PNM0y2wDA?view).
 :::
 
 ## Overview of the scenario
