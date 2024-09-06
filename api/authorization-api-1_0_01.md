@@ -577,13 +577,6 @@ This template uses extracts from templates written by
 {{{Pekka Savola}}}, {{{Elwyn Davies}}} and
 {{{Henrik Levkowetz}}}.
 
-# Document History
-
-[[ To be removed from the final specification ]]
-
-* 00 - Initial version.
-* 01 - Refactored the optional fields of Subject, Action, and Resource into a `properties` sub-object, making it easier to design meaningful JSON-schema and protobuf contracts for the API.
-
 # Notices {#Notices}
 Copyright (c) 2024 The OpenID Foundation.
 
@@ -600,3 +593,10 @@ not be available; neither does it represent that it has made any independent eff
 title, related to this specification, and the entire risk as to implementing this specification is assumed by the implementer. The OpenID Intellectual Property Rights policy requires
 contributors to offer a patent promise not to assert certain patent claims against other contributors and against implementers. The OpenID Foundation invites any interested party to bring
 to its attention any copyrights, patents, patent applications, or other proprietary rights that may cover technology that may be required to practice this specification.
+
+# Document History
+
+[[ To be removed from the final specification ]]
+
+* 00 - Initial version.
+* 01 - Refactored the optional fields of Subject, Action, and Resource into a `properties` sub-object, making it easier to design meaningful JSON-schema and protobuf contracts for the API.
