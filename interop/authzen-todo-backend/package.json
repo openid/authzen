@@ -19,7 +19,6 @@
   "author": "Omri Gazitt <ogazitt@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "array-to-table": "^1.0.1",
     "axios": "^1.7.4",
     "cli-color": "^2.0.4",
     "cors": "^2.8.5",
