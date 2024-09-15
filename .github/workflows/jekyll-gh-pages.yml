@@ -38,7 +38,7 @@ jobs:
       #     name: output
       #     path: |
       #       authorization-api-1_0_00.html
-      #       api/authorization-api-1_0.xml
+      #       api/authorization-api-1_0_00.xml
 
       - name: Convert Authz API 1.0 revision 01 to rfc xml
         run: kramdown-rfc2629 api/authorization-api-1_0_01.md > api/authorization-api-1_0_01.xml
@@ -51,7 +51,7 @@ jobs:
       - name: Upload Authz API 1.0 revision 01 artifact
         uses: actions/upload-artifact@v4
         with:
-          name: output
+          name: Authz API 1.0 revision 01
           path: |
             index.html
             authorization-api-1_0_01.html
@@ -66,7 +66,7 @@ jobs:
       - name: Upload Authz API 1.1 revision 01 artifact
         uses: actions/upload-artifact@v4
         with:
-          name: output
+          name: Authz API 1.1 revision 01
           path: |
             authorization-api-1_1_01.html
             api/authorization-api-1_1_01.xml      
@@ -94,7 +94,7 @@ jobs:
       - name: Upload Authz Design Patterns artifact
         uses: actions/upload-artifact@v4
         with:
-          name: output
+          name: Authz Design Patterns
           path: |
             patterns.html
             patterns/AuthorizationDesignPatterns.xml            
