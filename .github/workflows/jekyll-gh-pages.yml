@@ -113,6 +113,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: authorization-api-*
+          path: .
+          merge-multiple: true
       - name: Download artifact - pattern document
         uses: actions/download-artifact@v4
         with:
