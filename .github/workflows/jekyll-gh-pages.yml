@@ -51,7 +51,7 @@ jobs:
       - name: Upload Authz API 1.0 revision 01 artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Authz API 1.0 revision 01
+          name: authorization-api-1_0_01
           path: |
             index.html
             authorization-api-1_0_01.html
@@ -66,7 +66,7 @@ jobs:
       - name: Upload Authz API 1.1 revision 01 artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Authz API 1.1 revision 01
+          name: authorization-api-1_1_01
           path: |
             authorization-api-1_1_01.html
             api/authorization-api-1_1_01.xml      
@@ -94,7 +94,7 @@ jobs:
       - name: Upload Authz Design Patterns artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Authz Design Patterns
+          name: patterns-doc
           path: |
             patterns.html
             patterns/AuthorizationDesignPatterns.xml            
@@ -112,7 +112,11 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: output
+          pattern: authorization-api-*
+      - name: Download artifact - pattern document
+        uses: actions/download-artifact@v4
+        with:
+          name: patterns-doc
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
