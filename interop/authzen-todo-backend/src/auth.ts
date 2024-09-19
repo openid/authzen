@@ -5,92 +5,168 @@ import {
   GetVerificationKey,
   Request as JWTRequest,
 } from "express-jwt";
-import jwksRsa = require("jwks-rsa");
-import * as dotenv from "dotenv";
-import * as dotenvExpand from "dotenv-expand";
+import jwksRsa from "jwks-rsa";
+import dotenv from "dotenv";
+import dotenvExpand from "dotenv-expand";
 import log from "./log";
-import * as pdps from "./pdps.json";
+import config from "./pdps.json";
+import { Store } from "store";
+import { Todo } from "interfaces";
 
+// Configuration
 dotenvExpand.expand(dotenv.config());
 
-// default PDP
 const { AUTHZEN_PDP_URL, AUTHZEN_PDP_API_KEY } = process.env;
-const AUTHZEN_PDP_API_KEYS = AUTHZEN_PDP_API_KEY ? JSON.parse(AUTHZEN_PDP_API_KEY) : {}
+const AUTHZEN_PDP_API_KEYS = AUTHZEN_PDP_API_KEY
+  ? JSON.parse(AUTHZEN_PDP_API_KEY)
+  : {};
 
+// JWT Middleware
 export const checkJwt = jwt({
-  // Dynamically provide a signing key based on the kid in the header and the signing keys provided by the JWKS endpoint
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
     jwksUri: process.env.JWKS_URI,
   }) as GetVerificationKey,
-
-  // Validate the audience and the issuer
   audience: process.env.AUDIENCE,
   issuer: process.env.ISSUER,
   algorithms: ["RS256"],
 });
 
 // Resource mapper
-const resourceMapper = async (req: express.Request, permission: string, store) => {
-  switch (permission) {
-    case 'can_read_user':
-      return { type: 'user', id: req.params.userID, userID: req.params.userID };
-    case 'can_read_todos':
-      return { type: 'todo', id: 'todo-1' };
-    case 'can_create_todo':
-      return { type: 'todo', id: 'todo-1' };
-    case 'can_update_todo':
+const resourceMapper = async (
+  req: express.Request,
+  permission: string,
+  store: Store,
+  specVersion: string
+) => {
+  const mappers = {
+    can_read_user: () => ({
+      type: "user",
+      id: req.params.userID,
+      userID: specVersion === "1.0-preview" || specVersion === "1.1-preview" ? req.params.userID : undefined,
+    }),
+    can_read_todos: () => ({ type: "todo", id: "todo-1" }),
+    can_create_todo: () => ({ type: "todo", id: "todo-1" }),
+    can_update_todo: async () => {
       const todo = await store.get(req.params.id);
-      return { ownerID: todo.OwnerID, id: todo.OwnerID, type: 'todo' };
-    case 'can_delete_todo':
+      return {
+        type: "todo",
+        id: todo.OwnerID,
+        ownerID: specVersion === "1.0-preview" || specVersion === "1.1-preview" ? todo.OwnerID : undefined,
+        properties:
+          specVersion !== "1.0-preview" ? { ownerID: todo.OwnerID } : undefined,
+      };
+    },
+    can_delete_todo: async () => {
       const todoToDelete = await store.get(req.params.id);
-      return { ownerID: todoToDelete.OwnerID, id: todoToDelete.OwnerID, type: 'todo' };
-    default:
-      return {};
-  }
+      return {
+        type: "todo",
+        id: todoToDelete.OwnerID,
+        ownerID:
+          specVersion === "1.0-preview" || specVersion === "1.1-preview" ? todoToDelete.OwnerID : undefined,
+        properties:
+          specVersion !== "1.0-preview"
+            ? { ownerID: todoToDelete.OwnerID }
+            : undefined,
+      };
+    },
+  };
+
+  return (mappers[permission] && (await mappers[permission]())) || {};
 };
 
-// Authorizer middleware
-export const authzMiddleware = (store) => {
-  return (permission: string) => {
-    return async (
-      req: JWTRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const pdpHeader = req.headers["x_authzen_pdp"] as string;
-      const pdpBaseName = (pdpHeader && pdps[pdpHeader]) ?? AUTHZEN_PDP_URL;
-      const authorizerUrl = `${pdpBaseName}/access/v1/evaluation`
-      log(`Authorizer: ${authorizerUrl}`);
-      const pdpAuthHeader = (pdpHeader && AUTHZEN_PDP_API_KEYS[pdpHeader])
-      const headers: Record<string, string> = {
-        'content-type': 'application/json',
-      };
-      if (pdpAuthHeader) {
-        headers.authorization = pdpAuthHeader;
-      }
-      const data = {
-        subject: {
-          identity: req.auth?.sub,
-          type: 'user',
-          id: req.auth?.sub,
-        },
-        action: {
-          name: permission,
-        },
-        resource: await resourceMapper(req, permission, store),
-        context: {}
-      };
-      log(data);
-      const response = await axios.post(authorizerUrl, data, { headers });
-      log(response?.data)
-      if (response?.data?.decision) {
-        next();
-      } else {
-        res.status(403).send();
-      }
-    };
+// Authorization Helper Functions
+const getPdpInfo = (req: JWTRequest) => {
+  const pdpHeader = req.headers["x_authzen_pdp"] as string;
+  const specVersion =
+    (req.headers["x_authzen_spec_version"] as string) || "1.0-preview";
+  const pdps = config[specVersion];
+  const pdpBaseName = (pdpHeader && pdps[pdpHeader]) ?? AUTHZEN_PDP_URL;
+  const pdpAuthHeader = pdpHeader && AUTHZEN_PDP_API_KEYS[pdpHeader];
+  return { specVersion, pdpBaseName, pdpAuthHeader };
+};
+
+const getHeaders = (pdpAuthHeader: string) => {
+  const headers: Record<string, string> = {
+    "content-type": "application/json",
   };
+  if (pdpAuthHeader) headers.authorization = pdpAuthHeader;
+  return headers;
+};
+
+// Authorizer Middleware
+export const authzMiddleware = (store: Store) => (permission: string) => {
+  return async (
+    req: JWTRequest,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    const { specVersion, pdpBaseName, pdpAuthHeader } = getPdpInfo(req);
+    const authorizerUrl = `${pdpBaseName}/access/v1/evaluation`;
+    log(`Authorizer: ${authorizerUrl}`);
+
+    const data = {
+      subject: {
+        type: "user",
+        id: req.auth?.sub,
+        identity: specVersion === "1.0-preview" || specVersion === "1.1-preview" ? req.auth?.sub : undefined,
+      },
+      action: {
+        name: permission,
+      },
+      resource: await resourceMapper(req, permission, store, specVersion),
+      context: {},
+    };
+    log(data);
+
+    try {
+      const response = await axios.post(authorizerUrl, data, {
+        headers: getHeaders(pdpAuthHeader),
+      });
+      log(response?.data);
+      response?.data?.decision ? next() : res.status(403).send();
+    } catch (error) {
+      log(error);
+      res.status(500).send();
+    }
+  };
+};
+
+export const checkCanUpdateTodos = async (req: JWTRequest, todos: Todo[]) => {
+  const { pdpBaseName, pdpAuthHeader, specVersion } = getPdpInfo(req);
+  if (!specVersion.startsWith("1.1")) {
+    return todos;
+  }
+
+  const authorizerUrl = `${pdpBaseName}/access/v1/evaluations`;
+  log(`Authorizer: ${authorizerUrl}`);
+
+  const evaluations = {};
+  todos.map((todo: Todo) => {
+    evaluations[todo.ID] = {
+      resource: { id: todo.ID, ownerID: todo.OwnerID, type: "todo" },
+    };
+  });
+
+  const data = {
+    subject: { type: "user", identity: req.auth?.sub },
+    action: { name: "can_update_todo" },
+    evaluations,
+  };
+
+  try {
+    const response = await axios.post(authorizerUrl, data, {
+      headers: getHeaders(pdpAuthHeader),
+    });
+    if (response?.data?.evaluations) {
+      todos.map(
+        (t, i) => (t.CannotUpdate = !response?.data?.evaluations[t.ID].decision)
+      );
+    }
+  } catch (error) {
+    log(error);
+  }
+  return todos;
 };

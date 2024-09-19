@@ -11,7 +11,8 @@ export function LoginWrapper() {
   const { userData } = auth;
   const isAuthenticated = userData?.id_token ? true : false;
   const [loggedIn, setLoggedIn] = useState(false);
-  const [pdp, setPdp] = useState<string>(localStorage.getItem("pdp") ?? "");
+  const [specVersion, setSpecVersion] = useState<string>("");
+  const [pdp, setPdp] = useState<string>("");
 
   useEffect(() => {
     if (!auth.isLoading && !isAuthenticated) {
@@ -25,7 +26,13 @@ export function LoginWrapper() {
   if (loggedIn && userData?.profile.email) {
     return (
       <QueryClientProvider client={queryClient}>
-        <TodoService token={userData.id_token} pdp={pdp} setPdp={setPdp}>
+        <TodoService
+          token={userData.id_token}
+          pdp={pdp}
+          specVersion={specVersion}
+          setPdp={setPdp}
+          setSpecVersion={setSpecVersion}
+        >
           <App
             user={{
               email: userData.profile.email,
