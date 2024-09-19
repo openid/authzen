@@ -103,7 +103,7 @@ export const App: React.FC<AppProps> = (props) => {
     refreshTodos();
   };
 
-  const refreshTodos: () => void = useCallback(() => {
+  const refreshTodos: () => void = () => {
     const getTodos = async () => {
       try {
         const todos: Todo[] = await listTodos();
@@ -116,7 +116,7 @@ export const App: React.FC<AppProps> = (props) => {
     };
 
     getTodos();
-  }, [listTodos]);
+  };
 
   const enableShowCompleted: () => void = () => {
     setShowCompleted(true);
@@ -200,7 +200,8 @@ export const App: React.FC<AppProps> = (props) => {
     if (specVersion && pdp) {
       refreshTodos();
     }
-  }, [refreshTodos, specVersion, pdp])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [specVersion, pdp])
 
   return (
     <div className="App">
