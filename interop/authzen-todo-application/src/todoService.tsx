@@ -1,10 +1,14 @@
 import React, { useContext } from "react";
-import { Todo, TodoValues, ITodoService, User } from "./interfaces";
+import { Todo, TodoValues, ITodoService, User, Config } from "./interfaces";
 import { useQuery } from "react-query";
 
-const serviceContext = React.createContext(
-  { token: "", pdp: "", setPdp: (_: string) => {} }
-);
+const serviceContext = React.createContext({
+  token: "",
+  pdp: "",
+  specVersion: "",
+  setPdp: (_: string) => {},
+  setSpecVersion: (_: string) => {},
+});
 
 const urls = {
   pdps: `${process.env.REACT_APP_API_ORIGIN}/pdps`,
@@ -14,11 +18,14 @@ const urls = {
 };
 
 export const useTodoService: () => ITodoService = () => {
-  const { token, pdp, setPdp } = useContext(serviceContext);
+  const { token, pdp, specVersion, setPdp, setSpecVersion } = useContext(serviceContext);
   const headers: Headers = new Headers();
 
   headers.append("Authorization", `Bearer ${token}`);
   headers.append("Content-Type", "application/json");
+  if (specVersion) {
+    headers.append("X_AUTHZEN_SPEC_VERSION", specVersion);
+  }
   if (pdp) {
     headers.append("X_AUTHZEN_PDP", pdp);
   }
@@ -62,7 +69,7 @@ export const useTodoService: () => ITodoService = () => {
     return await jsonOrError(response);
   };
 
-  const listPdps: () => Promise<string[]> = async () => {
+  const getConfig: () => Promise<Config> = async () => {
     const response = await fetch(urls.pdps, { headers: headers });
     return await jsonOrError(response);
   };
@@ -73,14 +80,17 @@ export const useTodoService: () => ITodoService = () => {
     saveTodo,
     deleteTodo,
     getUser,
-    listPdps,
+    getConfig,
+    pdp,
+    specVersion,
     setPdp,
+    setSpecVersion,
   };
 };
 
 export const useUser: (userId: string) => User = (userId: string) => {
   const { getUser } = useTodoService();
-  const response = useQuery(['User', userId], () => {
+  const response = useQuery(["User", userId], () => {
     return getUser(userId);
   });
   return response.data as User;
@@ -97,17 +107,21 @@ const jsonOrError = async (response: Response): Promise<any> => {
 export type ServiceProps = {
   token: string;
   pdp: string;
-  setPdp: (pdp: string) => void
+  specVersion: string;
+  setPdp: (pdp: string) => void;
+  setSpecVersion: (specVersion: string) => void;
 };
 
 const TodoService: React.FC<React.PropsWithChildren<ServiceProps>> = ({
   children,
   token,
   pdp,
-  setPdp
+  specVersion,
+  setPdp,
+  setSpecVersion,
 }) => {
   return (
-    <serviceContext.Provider value={{ token, pdp, setPdp }}>
+    <serviceContext.Provider value={{ token, pdp, specVersion, setPdp, setSpecVersion }}>
       {children}
     </serviceContext.Provider>
   );

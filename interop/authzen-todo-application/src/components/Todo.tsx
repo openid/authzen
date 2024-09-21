@@ -10,6 +10,7 @@ export const Todo: React.FC<TodoProps> = (todoProps) => {
       <div className="view">
         <input
           className="toggle"
+          disabled={!!todoProps.todo.CannotUpdate}
           type="checkbox"
           onChange={() =>
             todoProps.handleCompletedChange(

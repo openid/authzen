@@ -1,15 +1,25 @@
 {
-  "Aserto": "https://authzen-proxy.demo.aserto.com",
-  "Axiomatics": "https://pdp.alfa.guide",
-  "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
-  "HexaOPA": "https://interop.authzen.hexaorchestration.org",
-  "Kogito": "https://authzen-proxy-demo.azerad.org",
-  "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
-  "Permit.io": "https://permit-authzen-interop.up.railway.app",
-  "PlainID": "https://authzeninteropt.se-plainid.com",
-  "Rock Solid Knowledge": "https://authzen.identityserver.com",
-  "SGNL": "https://authzen.sgnlapis.cloud",
-  "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app",
-  "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
-  "3Edges": "https://api-authzen-authz.3edges.io"
+  "1.0-preview": {
+    "Aserto": "https://authzen-proxy-preview.demo.aserto.com",
+    "Axiomatics": "https://pdp.alfa.guide",
+    "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
+    "HexaOPA": "https://interop.authzen.hexaorchestration.org",
+    "Kogito": "https://authzen-proxy-demo.azerad.org",
+    "Open Policy Agent": "https://authzen-opa-proxy-preview.demo.aserto.com",
+    "Permit.io": "https://permit-authzen-interop.up.railway.app",
+    "PlainID": "https://authzeninteropt.se-plainid.com",
+    "Rock Solid Knowledge": "https://authzen.identityserver.com",
+    "SGNL": "https://authzen.sgnlapis.cloud",
+    "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app",
+    "Topaz": "https://authzen-topaz-proxy-preview.demo.aserto.com",
+    "3Edges": "https://api-authzen-authz.3edges.io"
+  },
+  "1.0-implementers-draft": {
+    "Aserto": "https://authzen-proxy.demo.aserto.com",
+    "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
+    "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
+  },
+  "1.1-preview": {
+    "Cerbos": "https://authzen-proxy-demo.cerbos.dev"
+  }
 }
