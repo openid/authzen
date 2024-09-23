@@ -20,6 +20,7 @@
     "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
   },
   "1.1-preview": {
-    "Cerbos": "https://authzen-proxy-demo.cerbos.dev"
+    "Aserto": "http://authzen-proxy.demo.aserto.com",
+    "Topaz": "http://authzen-topaz-proxy.demo.aserto.com"
   }
 }

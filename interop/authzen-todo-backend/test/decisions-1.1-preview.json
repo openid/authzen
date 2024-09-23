@@ -714,8 +714,8 @@
         "action": {
           "name": "can_update_todo"
         },
-        "evaluations": {
-          "1": {
+        "evaluations": [
+          {
             "resource": {
               "type": "todo",
               "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
@@ -724,7 +724,7 @@
               }
             }
           },
-          "2": {
+          {
             "resource": {
               "type": "todo",
               "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
@@ -733,9 +733,9 @@
               }
             }
           }
-        }
+        ]
       },
-      "expected": { "1": { "decision": true }, "2": { "decision": true } }
+      "expected": [ { "decision": true }, { "decision": true } ]
     },
     {
       "request": {
@@ -747,8 +747,8 @@
         "action": {
           "name": "can_update_todo"
         },
-        "evaluations": {
-          "1": {
+        "evaluations": [
+          {
             "resource": {
               "type": "todo",
               "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
@@ -757,7 +757,7 @@
               }
             }
           },
-          "2": {
+          {
             "resource": {
               "type": "todo",
               "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
@@ -766,9 +766,9 @@
               }
             }
           }
-        }
+        ]
       },
-      "expected": { "1": { "decision": false }, "2": { "decision": true } }
+      "expected": [ { "decision": false }, { "decision": true } ]
     },
     {
       "request": {
@@ -780,8 +780,8 @@
         "action": {
           "name": "can_update_todo"
         },
-        "evaluations": {
-          "1": {
+        "evaluations": [
+          {
             "resource": {
               "type": "todo",
               "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
@@ -790,7 +790,7 @@
               }
             }
           },
-          "2": {
+          {
             "resource": {
               "type": "todo",
               "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
@@ -799,9 +799,9 @@
               }
             }
           }
-        }
+        ]
       },
-      "expected": { "1": { "decision": false }, "2": { "decision": false } }
+      "expected": [ { "decision": false }, { "decision": false } ]
     }
   ]
 }

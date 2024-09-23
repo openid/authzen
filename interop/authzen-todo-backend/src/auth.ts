@@ -45,7 +45,7 @@ const resourceMapper = async (
     can_read_user: () => ({
       type: "user",
       id: req.params.userID,
-      userID: specVersion === "1.0-preview" || specVersion === "1.1-preview" ? req.params.userID : undefined,
+      userID: specVersion === "1.0-preview" ? req.params.userID : undefined,
     }),
     can_read_todos: () => ({ type: "todo", id: "todo-1" }),
     can_create_todo: () => ({ type: "todo", id: "todo-1" }),
@@ -54,7 +54,7 @@ const resourceMapper = async (
       return {
         type: "todo",
         id: todo.OwnerID,
-        ownerID: specVersion === "1.0-preview" || specVersion === "1.1-preview" ? todo.OwnerID : undefined,
+        ownerID: specVersion === "1.0-preview" ? todo.OwnerID : undefined,
         properties:
           specVersion !== "1.0-preview" ? { ownerID: todo.OwnerID } : undefined,
       };
@@ -65,7 +65,7 @@ const resourceMapper = async (
         type: "todo",
         id: todoToDelete.OwnerID,
         ownerID:
-          specVersion === "1.0-preview" || specVersion === "1.1-preview" ? todoToDelete.OwnerID : undefined,
+          specVersion === "1.0-preview" ? todoToDelete.OwnerID : undefined,
         properties:
           specVersion !== "1.0-preview"
             ? { ownerID: todoToDelete.OwnerID }
@@ -111,7 +111,10 @@ export const authzMiddleware = (store: Store) => (permission: string) => {
       subject: {
         type: "user",
         id: req.auth?.sub,
-        identity: specVersion === "1.0-preview" || specVersion === "1.1-preview" ? req.auth?.sub : undefined,
+        identity:
+          specVersion === "1.0-preview" || specVersion === "1.1-preview"
+            ? req.auth?.sub
+            : undefined,
       },
       action: {
         name: permission,
@@ -139,19 +142,25 @@ export const checkCanUpdateTodos = async (req: JWTRequest, todos: Todo[]) => {
   if (!specVersion.startsWith("1.1")) {
     return todos;
   }
+  if (todos && !todos.length) {
+    return todos;
+  }
 
   const authorizerUrl = `${pdpBaseName}/access/v1/evaluations`;
   log(`Authorizer: ${authorizerUrl}`);
 
-  const evaluations = {};
-  todos.map((todo: Todo) => {
-    evaluations[todo.ID] = {
-      resource: { id: todo.ID, ownerID: todo.OwnerID, type: "todo" },
-    };
-  });
+  const evaluations = todos.map((todo: Todo) => ({
+    resource: {
+      id: todo.ID,
+      type: "todo",
+      properties: {
+        ownerID: todo.OwnerID,
+      },
+    },
+  }));
 
   const data = {
-    subject: { type: "user", identity: req.auth?.sub },
+    subject: { type: "user", id: req.auth?.sub },
     action: { name: "can_update_todo" },
     evaluations,
   };
@@ -162,7 +171,7 @@ export const checkCanUpdateTodos = async (req: JWTRequest, todos: Todo[]) => {
     });
     if (response?.data?.evaluations) {
       todos.map(
-        (t, i) => (t.CannotUpdate = !response?.data?.evaluations[t.ID].decision)
+        (t, i) => (t.CannotUpdate = !response?.data?.evaluations[i].decision)
       );
     }
   } catch (error) {
