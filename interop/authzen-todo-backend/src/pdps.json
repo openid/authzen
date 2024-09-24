@@ -21,6 +21,7 @@
   },
   "1.1-preview": {
     "Aserto": "http://authzen-proxy.demo.aserto.com",
+    "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
     "Topaz": "http://authzen-topaz-proxy.demo.aserto.com"
   }
 }
