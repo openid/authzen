@@ -3,6 +3,7 @@ export interface Todo {
   Title: string;
   Completed: boolean;
   OwnerID: string;
+  CannotUpdate?: boolean;
 }
 
 export interface User {

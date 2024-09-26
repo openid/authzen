@@ -6,6 +6,7 @@ export interface TodoValues {
 export interface Todo extends TodoValues {
   ID: string;
   OwnerID: string;
+  CannotUpdate?: boolean;
 }
 
 export interface User {
@@ -21,8 +22,11 @@ export interface ITodoService {
   saveTodo: (id: string, values: TodoValues) => Promise<Todo[]>;
   deleteTodo: (todo: Todo) => Promise<void | Response>;
   getUser: (sub: string) => Promise<User>;
-  listPdps: () => Promise<string[]>;
+  getConfig: () => Promise<Config>;
   setPdp: (pdp: string) => void;
+  setSpecVersion: (specVersion: string) => void;
+  pdp: string
+  specVersion: string
 }
 
 export interface TodoProps {
@@ -46,4 +50,8 @@ export interface AppProps {
 export interface AuthUser {
   email: string;
   sub: string;
+}
+
+export type Config = {
+  [specVersion: string]: string[]
 }

@@ -2,7 +2,7 @@ import { useAuth } from "oidc-react";
 import React, { useCallback, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { Todos } from "./components/Todos";
-import { AppProps, Todo, User } from "./interfaces";
+import { AppProps, Todo, User, Config } from "./interfaces";
 import { useTodoService, useUser } from "./todoService";
 import Select from "react-select";
 
@@ -32,18 +32,32 @@ type PDP = {
   name: string;
 };
 
+type SpecVersion = {
+  name: string;
+};
+
 export const App: React.FC<AppProps> = (props) => {
   const auth = useAuth();
-  const { createTodo, listTodos, listPdps, setPdp } = useTodoService();
+  const {
+    createTodo,
+    listTodos,
+    getConfig,
+    pdp,
+    specVersion,
+    setPdp,
+    setSpecVersion,
+  } = useTodoService();
   const userEmail = props.user.email;
   const [todos, setTodos] = useState<Todo[] | void>([]);
+  const [config, setConfig] = useState<Config>();
   const [pdps, setPdps] = useState<PDP[]>([]);
+  const [specVersions, setSpecVersions] = useState<SpecVersion[]>([]);
   const [todoTitle, setTodoTitle] = useState<string>("");
   const [showCompleted, setShowCompleted] = useState<boolean>(true);
   const [showActive, setShowActive] = useState<boolean>(true);
   const user: User = useUser(props.user.sub);
-  const storedPdpOption = localStorage.getItem("pdp");
-  const currentPdpOption = storedPdpOption ? { name: storedPdpOption } : (pdps && pdps[0]);
+  const [currentPdpOption, setCurrentPdpOption] = useState<PDP>({ name: pdp });
+  const [currentSpecVersion, setCurrentSpecVersion] = useState<SpecVersion>({ name: specVersion });
 
   const errorHandler = (errorText: string, close?: number | false) => {
     const autoClose = close === undefined ? 3000 : close;
@@ -89,7 +103,7 @@ export const App: React.FC<AppProps> = (props) => {
     refreshTodos();
   };
 
-  const refreshTodos: () => void = useCallback(() => {
+  const refreshTodos: () => void = () => {
     const getTodos = async () => {
       try {
         const todos: Todo[] = await listTodos();
@@ -102,7 +116,7 @@ export const App: React.FC<AppProps> = (props) => {
     };
 
     getTodos();
-  }, [listTodos]);
+  };
 
   const enableShowCompleted: () => void = () => {
     setShowCompleted(true);
@@ -114,15 +128,32 @@ export const App: React.FC<AppProps> = (props) => {
     setShowCompleted(false);
   };
 
-  const getPdps: () => void = useCallback(() => {
+  const getSpecVersionsAndPdps: () => void = useCallback(async () => {
     const list = async () => {
       try {
-        const pdps: string[] = await listPdps();
+        const config: Config = await getConfig();
+        setConfig(config);
+        const defaultSpecVersion = localStorage.getItem("specVersion") ?? Object.keys(config)[0];
+        setSpecVersions(
+          Object.keys(config).map((v) => {
+            return { name: v };
+          })
+        );
+        if (!specVersion) {
+          setSpecVersion(defaultSpecVersion);
+          setCurrentSpecVersion({ name: defaultSpecVersion });
+        }
+        const pdps = config[defaultSpecVersion];
+        const defaultPdp = localStorage.getItem("pdp") ?? pdps[0];
         setPdps(
           pdps.map((pdp) => {
             return { name: pdp };
           })
         );
+        if (!pdp) {
+          setPdp(defaultPdp);
+          setCurrentPdpOption({ name: defaultPdp });
+        }
       } catch (e) {
         if (e instanceof TypeError && e.message === "Failed to fetch") {
           errorHandler("", false);
@@ -131,18 +162,46 @@ export const App: React.FC<AppProps> = (props) => {
     };
 
     list();
-  }, [listPdps]);
+  }, [getConfig, pdp, specVersion, setPdp, setPdps, setSpecVersion, setSpecVersions]);
 
-  const storePdp: ((pdp: string) => void) = useCallback((pdp: string) => {
-    setPdp(pdp);
-    localStorage.setItem("pdp", pdp);
-  }, [setPdp])
+  const storePdp: (pdp: string) => void = useCallback(
+    (pdp: string) => {
+      setPdp(pdp);
+      setCurrentPdpOption({ name: pdp });
+      localStorage.setItem("pdp", pdp);
+    },
+    [setPdp]
+  );
+
+  const storeSpecVersion: (version: string) => void = useCallback(
+    (version: string) => {
+      setSpecVersion(version);
+      setCurrentSpecVersion({ name: version });
+      localStorage.setItem("specVersion", version);
+      const pdps = config && config[version];
+      if (pdps) {
+        setPdps(
+          pdps.map((pdp) => {
+            return { name: pdp };
+          })
+        );
+        storePdp(pdps[0]);
+      }
+    },
+    [config, setSpecVersion, setPdps, storePdp]
+  );
 
   useEffect(() => {
-    getPdps();
-    refreshTodos();
+    getSpecVersionsAndPdps();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (specVersion && pdp) {
+      refreshTodos();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [specVersion, pdp])
 
   return (
     <div className="App">
@@ -218,13 +277,27 @@ export const App: React.FC<AppProps> = (props) => {
         <div className="user-controls">
           <>
             <div className="pdp-info">
-              <span className="user-name">Authorize using: &nbsp;</span>
+              <span className="select-title">AuthZEN version: &nbsp;</span>
+              {pdps.length && (
+                <Select
+                  className="pdp-select"
+                  isSearchable={false}
+                  options={specVersions}
+                  value={currentSpecVersion}
+                  getOptionLabel={(version: SpecVersion) => version.name}
+                  getOptionValue={(version: SpecVersion) => version.name}
+                  onChange={(option) => storeSpecVersion(option!.name)}
+                />
+              )}
+            </div>
+            <div className="pdp-info">
+              <span className="select-title">Authorize using: &nbsp;</span>
               {pdps.length && (
                 <Select
                   className="pdp-select"
                   isSearchable={false}
                   options={pdps}
-                  defaultValue={currentPdpOption}
+                  value={currentPdpOption}
                   getOptionLabel={(pdp: PDP) => pdp.name}
                   getOptionValue={(pdp: PDP) => pdp.name}
                   onChange={(option) => storePdp(option!.name)}

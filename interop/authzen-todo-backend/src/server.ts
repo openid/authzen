@@ -4,6 +4,7 @@ import { Response } from "express";
 import { Todo } from "./interfaces";
 import { Store } from "./store";
 import { Directory } from "./directory";
+import { checkCanUpdateTodos } from "./auth";
 const pdps = require("./pdps.json");
 
 export class Server {
@@ -16,7 +17,12 @@ export class Server {
   }
 
   async listPdps(_: Request, res: Response) {
-    res.json(Object.keys(pdps));
+    const config = {};
+    const versions = Object.keys(pdps);
+    for (const v of versions) {
+      config[v] = Object.keys(pdps[v])
+    }
+    res.json(config);
   }
 
   async getUser(req: JWTRequest, res: Response) {
@@ -28,8 +34,9 @@ export class Server {
     }
   }
 
-  async list(_: Request, res: Response) {
-    const todos = await this.store.list();
+  async list(req: JWTRequest, res: Response) {
+    let todos = await this.store.list();
+    todos = await checkCanUpdateTodos(req, todos);
     res.json(todos);
   }
 
