@@ -1,19 +1,17 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 ---
 
-# Aserto
+# Cerbos
 
-Interop results for the [Aserto](https://www.aserto.com/) implementation hosted at https://authzen-proxy-preview.demo.aserto.com.
-
-For more information, please refer to the [code](https://github.com/aserto-dev/authzen-topaz-proxy) and [playground](https://authzen-proxy-preview.demo.aserto.com), demonstrating the scenario.
+Interop results for the [Cerbos](https://cerbos.dev) implementation hosted at `https://authzen-proxy-demo.cerbos.dev`.
 
 ## Test results
 
 ```bash
-yarn test https://authzen-proxy-preview.demo.aserto.com markdown
+yarn test https://authzen-proxy-demo.cerbos.dev markdown
 yarn run v1.22.19
-$ node build/test/runner.js https://authzen-proxy-preview.demo.aserto.com markdown
+$ node build/test/runner.js https://authzen-proxy-demo.cerbos.dev markdown
 ```
 <table>
   <tr>
