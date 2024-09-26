@@ -1,10 +1,12 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # Todo Application
 
 This document lists the request and response payloads for each of the API requests in the Todo interop scenario.
+
+> Note: These payloads and corresponding interop results are for the [AuthZEN 1.1 Preview 01](https://openid.github.io/authzen/authorization-api-1_1_01) version of the spec.
 
 :::tip
 This is a copy of the payload document defined by the AuthZEN WG. The definitive document can be found [here](https://hackmd.io/gNZBRoTfRgWh_PNM0y2wDA?view).
@@ -111,11 +113,47 @@ The PIP can, of course, express this in any way they desire. The policy for each
 
 ## Requests and payloads
 
+### `GET /users/{userID}`
+
+Get information (e.g. email, picture) associated with a user. This is used by the backend to render the picture of the user that owns each todo.
+
+For simplicity, the policy always returns `true`.
+
+#### Request payload
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "<subject_from_jwt>"
+  },
+  "action": {
+    "name": "can_read_user"
+  },
+  "resource": {
+    "type": "user",
+    "id": "<email_OR_subject>"
+  },
+  "context": {
+  }
+}
+```
+
+#### Response payload
+
+For every subject and resource combination:
+
+```js
+{
+  "decision": true
+}
+```
+
 ### `GET /todos`
 
 Get the list of todos.
 
-> Note: For the 1.0 Implementer's Draft version of the interop, this call utilizes only the `evaluation` API. The 1.1-preview version of the interop also utilizes the `evaluations` API. See more below.
+> Note: For the 1.0 Implementer's Draft version of the interop, this call utilizes only the `evaluation` API. The 1.1 version of the interop also utilizes the `evaluations` API. See more below.
 
 #### Evaluation API payload
 
@@ -123,7 +161,7 @@ For simplicity, the policy always returns `true` for every user.
 
 ##### Evaluation API Request payload
 
-```json=
+```js
 {
   "subject": {
     "type": "user",
@@ -141,22 +179,17 @@ For simplicity, the policy always returns `true` for every user.
 }
 ```
 
-> Notes:
->
-> 1. `subject.identity` has been removed.
-> 2. `resource.type` continues to be `todo`, and `resource.id` is specified as a fixed / stable identifier.
-
 ##### Evaluation API Response payload
 
 For every subject and resource combination:
 
-```json=
+```js
 {
   "decision": true
 }
 ```
 
-#### AuthZEN 1.1-preview semantics
+#### AuthZEN 1.1 semantics
 
 AuthZEN 1.1 provides an `evaluations` API which enables a PEP to "boxcar" a number of authorization requests in a single round-trip.
 
@@ -166,13 +199,13 @@ The Todo Application uses this facility to determine which Todos a user is able 
 
 > Note: this payload is intended for the `evaluations` (note plural) endpoint of a 1.1-compliant PDP.
 
-```http=
+```http
 POST /access/v1/evaluations HTTP/1.1
 Host: mypdp.com
 [Authorization: Bearer <token>]
 ```
 
-```json=
+```js
 {
   "subject": {
     "type": "user",
@@ -212,7 +245,7 @@ Host: mypdp.com
 
 The `evaluations` array contains the result of each evaluation request sent in the request payload. For example, for the user Morty, using the following request payload:
 
-```json=
+```js
 {
   "subject": {
     "type": "user",
@@ -250,7 +283,7 @@ The `evaluations` array contains the result of each evaluation request sent in t
 
 The response payload will be:
 
-```json=
+```js
 {
   "evaluations": [
     {
@@ -314,7 +347,7 @@ Edit (complete) a todo.
 
 The policy allows the operation if the subject's `roles` attribute contains the `evil_genius` role, OR if the subject's `roles` contains the `editor` role AND the subject is the owner of the todo.
 
-The `resource` contains an attribute called `ownerID` which contains the `id` of the owner (which is defined in the "Attributes" section above, and is the email address of the owner).
+The `resource.properties` contains an attribute called `ownerID` which contains the `id` of the owner (which is defined in the "Attributes" section above, and is the email address of the owner).
 
 #### Request payload
 
@@ -335,6 +368,10 @@ The `resource` contains an attribute called `ownerID` which contains the `id` of
   }
 }
 ```
+
+> Notes:
+>
+> 1. `resource.id` is a UUID representing the Todo, but since the PDPs are not assumed to be stateful, `resource.properties.ownerID` is passed in as a way to designate a Todo's owner.
 
 #### Response payload
 
@@ -380,11 +417,12 @@ Delete a todo.
 
 The policy allows the operation if the subject's `roles` attribute contains the `admin` role, OR if the subject's `roles` contains the `editor` role AND the subject is the owner of the todo.
 
-The `resource` contains an attribute called `ownerID` which contains the `id` of the owner (which is defined in the "Attributes" section above, and is the email address of the owner).
+The `resource.properties` contains an attribute called `ownerID` which contains the `id` of the owner (which is defined in the "Attributes" section above, and is the email address of the owner).
 
 #### Request payload
 
-```json
+```js
+{
   "subject": {
     "type": "user",
     "id": "<subject_from_jwt>"
@@ -406,9 +444,7 @@ The `resource` contains an attribute called `ownerID` which contains the `id` of
 
 > Notes:
 >
-> 1. `subject.identity` has been removed.
-> 2. `resource.id` is a UUID representing the Todo, but since the PDPs are not assumed to be stateful, `ownerID` continues to be passed in as a way to designate a Todo's owner.
-> 3. `resource.ownerID` has been moved to `resource.properties.ownerID`, to make it compliant with AuthZEN 1.0 Implementers Draft.
+> 1. `resource.id` is a UUID representing the Todo, but since the PDPs are not assumed to be stateful, `resource.properties.ownerID` is passed in as a way to designate a Todo's owner.
 
 #### Response payload
 
@@ -416,7 +452,7 @@ Only users with a `roles` attribute that contains `admin` (Rick), OR the owner o
 
 For the user Morty, the following request will return a `true` decision:
 
-```json
+```js
 {
   "subject": {
     "type": "user",
@@ -436,7 +472,7 @@ For the user Morty, the following request will return a `true` decision:
 }
 ```
 
-```json
+```js
 {
   "decision": true
 }
@@ -444,7 +480,7 @@ For the user Morty, the following request will return a `true` decision:
 
 For a different value of `ownerID`, the decision will be `false`:
 
-```json
+```js
 {
   "decision": false
 }

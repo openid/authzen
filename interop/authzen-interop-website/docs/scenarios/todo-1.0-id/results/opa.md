@@ -1,19 +1,17 @@
 ---
-sidebar_position: 1
+sidebar_position: 8
 ---
 
-# Aserto
+# Open Policy Agent
 
-Interop results for the [Aserto](https://www.aserto.com/) implementation hosted at https://authzen-proxy-preview.demo.aserto.com.
-
-For more information, please refer to the [code](https://github.com/aserto-dev/authzen-topaz-proxy) and [playground](https://authzen-proxy-preview.demo.aserto.com), demonstrating the scenario.
+Interop results for the [OPA](https://openpolicyagent.org/) implementation hosted at `https://authzen-opa-proxy.demo.aserto.com`.
 
 ## Test results
 
 ```bash
-yarn test https://authzen-proxy-preview.demo.aserto.com markdown
+yarn test https://authzen-opa-proxy.demo.aserto.com markdown
 yarn run v1.22.19
-$ node build/test/runner.js https://authzen-proxy-preview.demo.aserto.com markdown
+$ node build/test/runner.js https://authzen-opa-proxy.demo.aserto.com markdown
 ```
 <table>
   <tr>
