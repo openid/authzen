@@ -18,6 +18,7 @@
     "Aserto": "https://authzen-proxy.demo.aserto.com",
     "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
     "HexaOPA": "https://interop.authzen.hexaorchestration.org",
+    "Kogito": "https://authzen-proxy-demo.azerad.org",
     "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
     "PingID": "https://authzen.idpartners.au",
     "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
@@ -26,6 +27,7 @@
     "Aserto": "https://authzen-proxy.demo.aserto.com",
     "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
     "HexaOPA": "https://interop.authzen.hexaorchestration.org",
+    "Kogito": "https://authzen-proxy-demo.azerad.org",
     "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
     "PingID": "https://authzen.idpartners.au",
     "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
