@@ -1,0 +1,8 @@
+{
+  "label": "AuthZEN API",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "Authorization scenarios defined by the AuthZEN WG"
+  }
+}

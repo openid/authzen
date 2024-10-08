@@ -5,9 +5,9 @@ cat: std # Check
 submissiontype: IETF
 wg: OpenID AuthZEN
 
-docname: authorization-api-1_0
+docname: authorization-api-1_0_01
 
-title: Authorization API
+title: Authorization API 1.0 – draft 01
 abbrev: azapi
 lang: en
 kw:
@@ -66,6 +66,25 @@ normative:
       org: Entrust
     date: 2006
 
+informative:
+  ABAC: 
+    title: Attribute-Based Access Control
+    isbn: 9781630811341
+    date: 2018
+    target: https://us.artechhouse.com/Attribute-Based-Access-Control-P1911.aspx
+    author:
+      - name: Hu, V. 
+        org: NIST
+    author:
+      - name: Ferraiolo, D.
+        org: NIST 
+    author:
+      - name: Chandramouli, R
+        org: NIST 
+    author:
+      - name: Kuhn, R.
+        org: NIST 
+
 --- abstract
 
 The Authorization API enables Policy Decision Points (PDPs) and Policy Enforcement Points (PEPs) to communicate authorization requests and decisions to each other without requiring knowledge of each other's inner workings. The Authorization API is served by the PDP and is called by the PEP. The Authorization API includes an Evaluation endpoint, which provides specific access decisions. Other endpoints may be added in the future for other scenarios, including searching for subjects or resources.
@@ -73,7 +92,7 @@ The Authorization API enables Policy Decision Points (PDPs) and Policy Enforceme
 --- middle
 
 # Introduction
-Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML ({{XACML}}) and NIST's ABAC SP 800-162. Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
+Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML ({{XACML}}) and NIST's ABAC SP 800-162 ({{ABAC}}). Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
 
 # Model
 The Authorization API is a transport-agnostic API published by the PDP, to which the PEP acts as a client. Possible bindings of this specification, such as HTTPS or gRPC, are described in Transport ({{transport}}).
@@ -96,17 +115,18 @@ The information model for requests and responses include the following entities:
 ## Subject {#subject}
 A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.
 
-A Subject is a JSON ({{RFC8259}}) object that contains any number of key-value pair attributes. However, there are a minimal number of fields that are required in order to properly resolve a Subject.
+A Subject is a JSON ({{RFC8259}}) object that contains two REQUIRED keys, `type` and `id`, which have a value typed `string`, and an OPTIONAL key, `properties`, with a value of a JSON object.
 
 `type`:
 : REQUIRED. A `string` value that specifies the type of the Subject.
 
 `id`:
-: REQUIRED. The unique identifier of the Subject, scoped to the `type`.
+: REQUIRED. A `string` value containing the unique identifier of the Subject, scoped to the `type`.
 
-A Subject MAY contain zero or more additional key-value pairs.
+`properties`:
+: OPTIONAL. A JSON object containing any number of key-value pairs, which can be used to express additional properties of a Subject.
 
-The following is a non-normative example of a subject:
+The following is a non-normative example of a Subject:
 
 ~~~ json
 {
@@ -116,87 +136,39 @@ The following is a non-normative example of a subject:
 ~~~
 {: #subject-example title="Example Subject"}
 
-### Subject Identifier {#subject-identifier}
-The `id` field of a Subject MAY be any valid JSON value. It MAY be a string, or it MAY be a structured identifier. For example, it MAY follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
-
-The following is a non-normative example of a Subject Identifier as a simple string:
-
-~~~ json
-{
-  "type": "user",
-  "id": "alice@acmecorp.com"
-}
-~~~
-{: #subject-identifier-example-simple title="Example of Simple Subject Identifier"}
-
-The following is a non-normative example of a Subject Identifier in the {{RFC9493}} Email Identifier Format:
-
-~~~ json
-{
-  "type": "user",
-  "id": {
-    "format" : "email",
-    "email": "alice@acmecorp.com"
-  }
-}
-~~~
-{: #subject-identifier-example-rfc9493 title="Example Subject Identifier as RFC9493 Subject"}
-
-### Subject Type {#subject-type}
-Since {{RFC9493}} only concerns itself with the *format* of the identifier and not its *type*, every Subject MUST also include a string-valued `type` field, which identifies the type of Subject.
-
-The following is a non-normative example of a Subject of type `group` with a Subject Identifier as a simple string:
-
-~~~ json
-{
-  "type": "group",
-  "id": "engineering@acmecorp.com"
-}
-~~~
-{: #subject-type-group-example title="Example Group Subject Type"}
-
-The following is a non-normative example of a Subject of type `group` with a Subject Identifier in the {{RFC9493}} Email Identifier Format:
-
-~~~ json
-{
-  "type": "group",
-  "id": {
-    "format" : "email",
-    "email": "engineering@acmecorp.com"
-  }
-}
-~~~
-{: #subject-type-example-rfc-9493 title="Example Subject Type in RFC9493 Format"}
-
-### Subject Attributes {#subject-attributes}
-Many authorization systems are stateless, and expect the client (PEP) to pass in any attributes that are expected to be used in the evaluation of the authorization policy. To satisfy this requirement, Subjects MAY include zero or more additional attributes as key-value pairs.
+### Subject Properties {#subject-properties}
+Many authorization systems are stateless, and expect the client (PEP) to pass in any properties or attributes that are expected to be used in the evaluation of the authorization policy. To satisfy this requirement, Subjects MAY include zero or more additional attributes as key-value pairs, under the `properties` object.
 
 An attribute can be single-valued or multi-valued. It can be a primitive type (string, boolean, number) or a complex type such as a JSON object or JSON array.
 
-The following is a non-normative example of a Subject which adds a string-valued `department` attribute:
+The following is a non-normative example of a Subject which adds a string-valued `department` property:
 
 ~~~ json
 {
   "type": "user",
   "id": "alice@acmecorp.com",
-  "department": "Sales"
+  "properties": {
+    "department": "Sales"
+  }
 }
 ~~~
-{: #subject-department-example title="Example Subject with Additional Attribute"}
+{: #subject-department-example title="Example Subject with Additional Property"}
 
-To increase interoperability, a few common attributes are specified below:
+To increase interoperability, a few common properties are specified below:
 
 #### IP Address {#subject-ip-address}
 The IP Address of the Subject, identified by an `ip_address` field, whose value is a textual representation of an IP Address, as defined in `Textual Conventions for Internet Network Addresses` {{RFC4001}}.
 
-The following is a non-normative example of a subject which adds the `ip_address` attribute:
+The following is a non-normative example of a subject which adds the `ip_address` property:
 
 ~~~ json
 {
   "type": "user",
   "id": "alice@acmecorp.com",
-  "department": "Sales",
-  "ip_address": "172.217.22.14"
+  "properties": {
+    "department": "Sales",
+    "ip_address": "172.217.22.14"
+  }
 }
 ~~~
 {: #subject-ip-address-example title="Example Subject with IP Address"}
@@ -205,27 +177,32 @@ The following is a non-normative example of a subject which adds the `ip_address
 #### Device ID {#subject-device-id}
 The Device Identifier of the Subject, identified by a `device_id` field, whose value is a string representation of the device identifier.
 
-The following is a non-normative example of a subject which adds the `device_id` attribute:
+The following is a non-normative example of a subject which adds the `device_id` property:
 
 ~~~ json
 {
   "type": "user",
   "id": "alice@acmecorp.com",
-  "department": "Sales",
-  "ip_address": "172.217.22.14",
-  "device_id": "8:65:ee:17:7e:0b"
+  "properties": {
+    "department": "Sales",
+    "ip_address": "172.217.22.14",
+    "device_id": "8:65:ee:17:7e:0b"
+  }
 }
 ~~~
 {: #subject-device-id-example title="Example Subject with Device ID"}
 
 ## Resource {#resource}
-A Resource is the target of an access request. It is a JSON ({{RFC8259}}) object that is constructed similar to a Subject entity.
+A Resource is the target of an access request. It is a JSON ({{RFC8259}}) object that is constructed similar to a Subject entity. It has the follow keys:
 
 `type`:
 : REQUIRED. A `string` value that specifies the type of the Resource.
 
 `id`:
-: REQUIRED. The unique identifier of the Resource, scoped to the `type`. The value MAY be any valid JSON value, including a simple string. It also MAY follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
+: REQUIRED. A `string` value containing the unique identifier of the Resource, scoped to the `type`.
+
+`properties`:
+: OPTIONAL. A JSON object containing any number of key-value pairs, which can be used to express additional properties of a Resource.
 
 ### Examples (non-normative)
 
@@ -239,30 +216,32 @@ The following is a non-normative example of a Resource with a `type` and a simpl
 ~~~
 {: #resource-example title="Example Resource"}
 
-The following is a non-normative example of a Resource containing a Subject Identifier in the Opaque Identifier Format, with additional structured attributes:
+The following is a non-normative example of a Resource containing a `library_record` property, that is itself a JSON object:
 
 ~~~ json
 {
   "type": "book",
-  "id": {
-    "format": "opaque",
-    "value": "123"
-  },
-  "library_record":{
-    "title": "AuthZEN in Action",
-    "isbn": "978-0593383322"
+  "id": "123",
+  "properties": {
+    "library_record":{
+      "title": "AuthZEN in Action",
+      "isbn": "978-0593383322"
+    }
   }
 }
 ~~~
-{: #resource-example-structured title="Example Resource with Subject Identifier and Additional Attributes"}
+{: #resource-example-structured title="Example Resource with Additional Property"}
 
 ## Action {#action}
 An Action is the type of access that the requester intends to perform.
 
-Action is a JSON ({{RFC8259}}) object that contains at least a `name` field.
+Action is a JSON ({{RFC8259}}) object that contains a REQUIRED `name` key with a `string` value, and an OPTIONAL `properties` key with a JSON object value.
 
 `name`:
 : REQUIRED. The name of the Action.
+
+`properties`:
+: OPTIONAL. A JSON object containing any number of key-value pairs, which can be used to express additional properties of an Action.
 
 The following is a non-normative example of an action:
 
@@ -323,11 +302,7 @@ The Access Evaluation request is a 4-tuple constructed of the four previously de
 {
   "subject": {
     "type": "user",
-    "id": {
-      "format": "iss_sub",
-      "iss": "https://issuer.example.com/",
-      "sub": "145234573"
-    }
+    "id": "alice@acmecorp.com"
   },
   "resource": {
     "type": "account",
@@ -335,7 +310,9 @@ The Access Evaluation request is a 4-tuple constructed of the four previously de
   },
   "action": {
     "name": "can_read",
-    "method": "GET"
+    "properties": {
+      "method": "GET"
+    }
   },
   "context": {
     "time": "1985-10-26T01:22-07:00"
@@ -537,11 +514,38 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 # IANA Considerations {#IANA}
 
-TBS
+This specification does not introduce any new identifiers that would require registration with IANA.
 
 # Security Considerations {#Security}
 
-TBS
+## Communication Integrity and Confidentiality
+
+In the ABAC architecture, the PEP-PDP connection is the most sensitive one and needs to be secured to guarantee:
+
+ - Integrity
+ - Confidentiality
+
+As a result, the connection between the PEP and the PDP MUST be secured using the most adequate means given the choice of transport (e.g. TLS for HTTP REST).
+
+## Policy Confidentiality and Sender Authentication
+
+Additionally, the PDP SHOULD authenticate the calling PEP. There are several ways authentication can be established. These ways are out of scope of this specification. They MAY include:
+
+ - Mutual TLS
+ - OAuth-based authentication
+ - API key
+
+The choice and strength of either mechanism is not in scope.
+
+Authenticating the PEP allows the PDP to avoid common attacks (such as DoS - see below) and/or reveal its internal policies. A malicious actor could craft a large number of requests to try and understand what policies the PDP is configured with. Requesting a client (PEP) be authenticated mitigates that risk.
+
+## Trust
+
+In ABAC, there is occasionally conversations around the trust between PEP and PDP: how can the PDP trust the PEP to send the right values in? This is a misplaced concern. The PDP must trust the PEP as ultimately, the PEP is the one responsible for enforcing the decision the PDP produces.
+
+## Availability & Denial of Service
+
+The PDP SHOULD apply reasonable protections to avoid common attacks tied to request payload size, the number of requests, invalid JSON, nested JSON attacks, or memory consumption. Rate limiting is one such way to address such issues.
 
 --- back
 
@@ -568,12 +572,31 @@ PEP:
 : Policy Enforcement Point. The component or system that requests decisions from the PDP and enforces access to specific requests based on the decisions obtained from the PDP.
 
 # Acknowledgements {#Acknowledgements}
-{: numbered="false"}
 
 This template uses extracts from templates written by
 {{{Pekka Savola}}}, {{{Elwyn Davies}}} and
 {{{Henrik Levkowetz}}}.
 
+# Notices {#Notices}
+Copyright (c) 2024 The OpenID Foundation.
 
+The OpenID Foundation (OIDF) grants to any Contributor, developer, implementer, or other interested party a non-exclusive, royalty free, worldwide copyright license to reproduce, prepare
+derivative works from, distribute, perform and display, this Implementers Draft or Final Specification solely for the purposes of (i) developing specifications, and (ii) implementing
+Implementers Drafts and Final Specifications based on such documents, provided that attribution be made to the OIDF as the source of the material, but that such attribution does not
+indicate an endorsement by the OIDF.
 
+The technology described in this specification was made available from contributions from various sources, including members of the OpenID Foundation and others. Although the OpenID
+Foundation has taken steps to help ensure that the technology is available for distribution, it takes no position regarding the validity or scope of any intellectual property or other
+rights that might be claimed to pertain to the implementation or use of the technology described in this specification or the extent to which any license under such rights might or might
+not be available; neither does it represent that it has made any independent effort to identify any such rights. The OpenID Foundation and the contributors to this specification make no
+(and hereby expressly disclaim any) warranties (express, implied, or otherwise), including implied warranties of merchantability, non-infringement, fitness for a particular purpose, or
+title, related to this specification, and the entire risk as to implementing this specification is assumed by the implementer. The OpenID Intellectual Property Rights policy requires
+contributors to offer a patent promise not to assert certain patent claims against other contributors and against implementers. The OpenID Foundation invites any interested party to bring
+to its attention any copyrights, patents, patent applications, or other proprietary rights that may cover technology that may be required to practice this specification.
 
+# Document History
+
+[[ To be removed from the final specification ]]
+
+* 00 - Initial version.
+* 01 - Refactored the optional fields of Subject, Action, and Resource into a `properties` sub-object, making it easier to design meaningful JSON-schema and protobuf contracts for the API.

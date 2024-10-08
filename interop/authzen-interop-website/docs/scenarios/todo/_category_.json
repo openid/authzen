@@ -1,0 +1,8 @@
+{
+  "label": "Todo (1.0 Preview)",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Authorization scenarios defined by the AuthZEN WG."
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "authzen-todo-backend",
-  "version": "0.1.4",
+  "version": "0.1.16",
   "description": "AuthZEN todo backend interop sample",
   "main": "src/index.ts",
   "scripts": {
@@ -11,7 +11,7 @@
     "docker-build": "scripts/docker-build.sh",
     "docker-run": "scripts/docker-run.sh",
     "tsc": "tsc --noEmit --incremental",
-    "release": "npm version patch && git push --follow-tags",
+    "release": "./scripts/release.sh",
     "test": "node build/test/runner.js",
     "test-clean": "yarn build && yarn test"
   },
@@ -19,13 +19,12 @@
   "author": "Omri Gazitt <ogazitt@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "array-to-table": "^1.0.1",
-    "axios": "^1.6.7",
+    "axios": "^1.7.4",
     "cli-color": "^2.0.4",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "dotenv-expand": "^9.0.0",
-    "express": "^4.19.2",
+    "express": "^4.20.0",
     "express-jwt": "8.4.1",
     "jwks-rsa": "3.0.0",
     "lodash": "^4.17.21",
