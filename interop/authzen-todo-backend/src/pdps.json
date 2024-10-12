@@ -22,6 +22,7 @@
     "PingID": "https://authzen.idpartners.au",
     "PingAuthorize": "https://authzen.idpartners.au",
     "PlainID": "//authzeninteropt.se-plainid.com",
+    "SGNL": "https://authzen.sgnlapis.cloud",
     "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
   },
   "1.1-preview": {
@@ -34,6 +35,7 @@
     "PingID": "https://authzen.idpartners.au",
     "PingAuthorize": "https://authzen.idpartners.au",
     "PlainID": "//authzeninteropt.se-plainid.com",
+    "SGNL": "https://authzen.sgnlapis.cloud",
     "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
   }
 }

@@ -7,9 +7,9 @@ sidebar_position: 9
 Interop results for the [SGNL](https://sgnl.ai) implementation hosted at [authzen.sgnlapis.cloud](https://authzen.sgnlapis.cloud).
 
 ```bash
-yarn test https://authzen.sgnlapis.cloud 1.1-preview markdown
+yarn test https://authzen.sgnlapis.cloud 1.0-implementers-draft markdown
 yarn run v1.22.22
-$ node build/test/runner.js https://authzen.sgnlapis.cloud 1.1-preview markdown
+$ node build/test/runner.js https://authzen.sgnlapis.cloud 1.0-implementers-draft markdown
 ```
 <table>
   <tr>
@@ -951,120 +951,6 @@ $ node build/test/runner.js https://authzen.sgnlapis.cloud 1.1-preview markdown
       "ownerID": "jerry@the-smiths.com"
     }
   }
-}
-```
-
-  </td>
-  </tr>
-  <tr>
-    <td bgColor="green">PASS</td>
-    <td>
-
-```js
-{
-  "subject": {
-    "type": "user",
-    "id": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
-  },
-  "action": {
-    "name": "can_update_todo"
-  },
-  "evaluations": [
-    {
-      "resource": {
-        "type": "todo",
-        "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-        "properties": {
-          "ownerID": "rick@the-citadel.com"
-        }
-      }
-    },
-    {
-      "resource": {
-        "type": "todo",
-        "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-        "properties": {
-          "ownerID": "jerry@the-smiths.com"
-        }
-      }
-    }
-  ]
-}
-```
-
-  </td>
-  </tr>
-  <tr>
-    <td bgColor="green">PASS</td>
-    <td>
-
-```js
-{
-  "subject": {
-    "type": "user",
-    "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
-  },
-  "action": {
-    "name": "can_update_todo"
-  },
-  "evaluations": [
-    {
-      "resource": {
-        "type": "todo",
-        "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-        "properties": {
-          "ownerID": "rick@the-citadel.com"
-        }
-      }
-    },
-    {
-      "resource": {
-        "type": "todo",
-        "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-        "properties": {
-          "ownerID": "morty@the-citadel.com"
-        }
-      }
-    }
-  ]
-}
-```
-
-  </td>
-  </tr>
-  <tr>
-    <td bgColor="green">PASS</td>
-    <td>
-
-```js
-{
-  "subject": {
-    "type": "user",
-    "id": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
-  },
-  "action": {
-    "name": "can_update_todo"
-  },
-  "evaluations": [
-    {
-      "resource": {
-        "type": "todo",
-        "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-        "properties": {
-          "ownerID": "rick@the-citadel.com"
-        }
-      }
-    },
-    {
-      "resource": {
-        "type": "todo",
-        "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-        "properties": {
-          "ownerID": "jerry@the-smiths.com"
-        }
-      }
-    }
-  ]
 }
 ```
 
