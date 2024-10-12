@@ -20,7 +20,7 @@
     "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
     "PingID": "https://authzen.idpartners.au",
     "PingAuthorize": "https://authzen.idpartners.au",
-    "PlainID": "//authzeninteropt.se-plainid.com",
+    "PlainID": "https://authzeninteropt.se-plainid.com",
     "SGNL": "https://authzen.sgnlapis.cloud",
     "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
   },
@@ -33,7 +33,7 @@
     "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
     "PingID": "https://authzen.idpartners.au",
     "PingAuthorize": "https://authzen.idpartners.au",
-    "PlainID": "//authzeninteropt.se-plainid.com",
+    "PlainID": "https://authzeninteropt.se-plainid.com",
     "SGNL": "https://authzen.sgnlapis.cloud",
     "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
   }
