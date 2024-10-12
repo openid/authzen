@@ -19,7 +19,7 @@
     "Kogito": "https://authzen-proxy-demo.azerad.org",
     "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
     "PingAuthorize": "https://authzen.idpartners.au",
-    "PlainID": "//authzeninteropt.se-plainid.com",
+    "PlainID": "https://authzeninteropt.se-plainid.com",
     "SGNL": "https://authzen.sgnlapis.cloud",
     "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
   },
@@ -30,7 +30,7 @@
     "Kogito": "https://authzen-proxy-demo.azerad.org",
     "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
     "PingAuthorize": "https://authzen.idpartners.au",
-    "PlainID": "//authzeninteropt.se-plainid.com",
+    "PlainID": "https://authzeninteropt.se-plainid.com",
     "SGNL": "https://authzen.sgnlapis.cloud",
     "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
   }
