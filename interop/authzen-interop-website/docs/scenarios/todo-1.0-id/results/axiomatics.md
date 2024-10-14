@@ -13,7 +13,6 @@ yarn test https://pdp.alfa.guide 1.0-implementers-draft markdown
 yarn run v1.22.22
 $ node build/test/runner.js https://pdp.alfa.guide 1.0-implementers-draft markdown
 ```
-
 <table>
   <tr>
     <th>result</th>
@@ -960,4 +959,3 @@ $ node build/test/runner.js https://pdp.alfa.guide 1.0-implementers-draft markdo
   </td>
   </tr>
 </table>
-Done in 6.09s.
