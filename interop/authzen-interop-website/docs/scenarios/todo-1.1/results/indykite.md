@@ -1,5 +1,18 @@
+---
+sidebar_position: 10
+---
+
+# Indykite
+
+Interop results for the [Indykite](https://www.indykite.com/) implementation hosted at https://api-authzen-authz.3edges.io.
+
+## Test results
+
+```bash
+AUTHZEN_PDP_API_KEY="Basic <api-key-redacted>" yarn test https://api-authzen-authz.3edges.io markdown
 yarn run v1.22.22
 $ node build/test/runner.js https://api-authzen-authz.3edges.io 1.1-preview markdown
+```
 <table>
   <tr>
     <th>result</th>
@@ -1060,4 +1073,3 @@ $ node build/test/runner.js https://api-authzen-authz.3edges.io 1.1-preview mark
   </td>
   </tr>
 </table>
-Done in 9.54s.
