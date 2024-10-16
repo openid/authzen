@@ -26,6 +26,7 @@
   },
   "1.1-preview": {
     "Aserto": "https://authzen-proxy.demo.aserto.com",
+    "Axiomatics": "https://pdp.alfa.guide",
     "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
     "HexaOPA": "https://interop.authzen.hexaorchestration.org",
     "Indykite": "https://api-authzen-authz.3edges.io",

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 10
+sidebar_position: 11
 ---
 
 # Axiomatics
@@ -9,10 +9,10 @@ Interop results for the [Axiomatics](https://www.axiomatics.com/) implementation
 ## Test results
 
 ```bash
+yarn test https://pdp.alfa.guide 1.1-preview markdown
 yarn run v1.22.22
 $ node build/test/runner.js https://pdp.alfa.guide 1.1-preview markdown
 ```
-
 <table>
   <tr>
     <th>result</th>
@@ -1073,4 +1073,3 @@ $ node build/test/runner.js https://pdp.alfa.guide 1.1-preview markdown
   </td>
   </tr>
 </table>
-Done in 4.31s.
