@@ -212,7 +212,7 @@ Host: mypdp.com
     "id": "<subject_from_jwt>"
   },
   "action": {
-    "name": "can_update_todos"
+    "name": "can_update_todo"
   },
   "resource": {
   },
@@ -252,7 +252,7 @@ The `evaluations` array contains the result of each evaluation request sent in t
     "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
-    "name": "can_update_todos"
+    "name": "can_update_todo"
   },
   "resource": {
   },
