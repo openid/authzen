@@ -55,7 +55,21 @@ jobs:
             index.html
             authorization-api-1_0_01.html
             api/authorization-api-1_0_01.xml      
-      
+
+      - name: Convert Authz API 1.0 revision 02 to rfc xml
+        run: kramdown-rfc2629 api/authorization-api-1_0_02.md > api/authorization-api-1_0_02.xml
+      - name: Render Authz API 1.0 revision 02 HTML
+        run: xml2rfc api/authorization-api-1_0_02.xml --html -o authorization-api-1_0_02.html
+      - name: Render Authz API 1.0 revision 01 Text
+        run: xml2rfc api/authorization-api-1_0_02.xml --text
+      - name: Upload Authz API 1.0 revision 01 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: authorization-api-1_0_02
+          path: |
+            authorization-api-1_0_02.html
+            api/authorization-api-1_0_02.xml
+
       - name: Convert Authz API 1.1 revision 01 to rfc xml
         run: kramdown-rfc2629 api/authorization-api-1_1_01.md > api/authorization-api-1_1_01.xml
       - name: Render Authz API 1.1 revision 01 HTML
