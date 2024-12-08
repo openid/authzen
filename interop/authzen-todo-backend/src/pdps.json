@@ -20,11 +20,11 @@
     "Indykite": "https://api-authzen-authz.3edges.io",
     "Kogito": "https://authzen-proxy-demo.azerad.org",
     "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
+    "Permit.io": "https://permit-authzen-interop.up.railway.app",
     "PingAuthorize": "https://authzen.idpartners.au",
     "PlainID": "https://authzeninteropt.se-plainid.com",
     "SGNL": "https://authzen.sgnlapis.cloud",
-    "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
-    "Permit.io": "https://permit-authzen-interop.up.railway.app"
+    "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
   },
   "1.1-preview": {
     "Aserto": "https://authzen-proxy.demo.aserto.com",
@@ -35,10 +35,10 @@
     "Indykite": "https://api-authzen-authz.3edges.io",
     "Kogito": "https://authzen-proxy-demo.azerad.org",
     "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
+    "Permit.io": "https://permit-authzen-interop.up.railway.app",
     "PingAuthorize": "https://authzen.idpartners.au",
     "PlainID": "https://authzeninteropt.se-plainid.com",
     "SGNL": "https://authzen.sgnlapis.cloud",
-    "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
-    "Permit.io": "https://permit-authzen-interop.up.railway.app"
+    "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
   }
 }
