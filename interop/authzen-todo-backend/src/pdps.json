@@ -6,7 +6,7 @@
     "HexaOPA": "https://interop.authzen.hexaorchestration.org",
     "Kogito": "https://authzen-proxy-demo.azerad.org",
     "Open Policy Agent": "https://authzen-opa-proxy-preview.demo.aserto.com",
-    "Permit.io": "https://permit-authzen-interop.up.railway.app",
+    "Permit.io": "https://permit-authzen-interop-1-0-preview.up.railway.app",
     "Rock Solid Knowledge": "https://authzen.identityserver.com",
     "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app",
     "Topaz": "https://authzen-topaz-proxy-preview.demo.aserto.com"
@@ -23,7 +23,8 @@
     "PingAuthorize": "https://authzen.idpartners.au",
     "PlainID": "https://authzeninteropt.se-plainid.com",
     "SGNL": "https://authzen.sgnlapis.cloud",
-    "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
+    "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
+    "Permit.io": "https://permit-authzen-interop.up.railway.app"
   },
   "1.1-preview": {
     "Aserto": "https://authzen-proxy.demo.aserto.com",
@@ -37,6 +38,7 @@
     "PingAuthorize": "https://authzen.idpartners.au",
     "PlainID": "https://authzeninteropt.se-plainid.com",
     "SGNL": "https://authzen.sgnlapis.cloud",
-    "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
+    "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
+    "Permit.io": "https://permit-authzen-interop.up.railway.app"
   }
 }
