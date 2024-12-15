@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "authzen-evaluation-request",
+  "title": "Access Evaluation API Response",
+  "$comment": "https://openid.net/specs/authorization-api-1_0-01.html#name-the-access-evaluation-api-r",
+  "type": "object",
+  "required": [
+    "subject",
+    "resource",
+    "action"
+  ],
+  "properties": {
+    "subject": {
+      "description": "A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.",
+      "$comment": "https://openid.net/specs/authorization-api-1_0-01.html#name-subject",
+      "type": "object",
+      "required": [
+        "type",
+        "id"
+      ],
+      "properties": {
+        "type": {
+          "description": "A string value that specifies the type of the Subject.",
+          "type": "string"
+        },
+        "id": {
+          "description": "A string value containing the unique identifier of the Subject, scoped to the type.",
+          "type": "string"
+        },
+        "properties": {
+          "description": "A JSON object containing any number of key-value pairs, which can be used to express additional properties of a Subject.",
+          "type": "object",
+          "example": [
+            {
+              "department": "Sales"
+            },
+            {
+              "department": "Sales",
+              "ip_address": "172.217.22.14"
+            },
+            {
+              "department": "Sales",
+              "ip_address": "172.217.22.14",
+              "device_id": "8:65:ee:17:7e:0b"
+            }
+          ]
+        }
+      }
+    },
+    "resource": {
+      "description": "A Resource is the target of an access request.",
+      "$comment": "https://openid.net/specs/authorization-api-1_0-01.html#name-resource",
+      "type": "object",
+      "required": [
+        "type",
+        "id"
+      ],
+      "properties": {
+        "type": {
+          "description": "A string value that specifies the type of the Resource.",
+          "type": "string"
+        },
+        "id": {
+          "description": "A string value containing the unique identifier of the Resource, scoped to the type.",
+          "type": "string"
+        },
+        "properties": {
+          "description": "A JSON object containing any number of key-value pairs, which can be used to express additional properties of a Resource.",
+          "type": "object",
+          "example": [
+            {
+              "library_record": {
+                "title": "AuthZEN in Action",
+                "isbn": "978-0593383322"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "action": {
+      "description": "A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.",
+      "$comment": "https://openid.net/specs/authorization-api-1_0-01.html#name-action",
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "description": "The name of the Action.",
+          "type": "string"
+        },
+        "properties": {
+          "description": "A JSON object containing any number of key-value pairs, which can be used to express additional properties of an Action.",
+          "type": "object"
+        }
+      }
+    },
+    "context": {
+      "description": "The Context object is a set of attributes that represent environmental or contextual data about the request such as time of day. It is a JSON ([RFC8259]) object.",
+      "$comment": "https://openid.net/specs/authorization-api-1_0-01.html#name-context",
+      "type": "object",
+      "example": [
+        {
+          "time": "1985-10-26T01:22-07:00"
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "subject": {
+        "type": "user",
+        "id": "alice@acmecorp.com"
+      },
+      "resource": {
+        "type": "account",
+        "id": "123"
+      },
+      "action": {
+        "name": "can_read",
+        "properties": {
+          "method": "GET"
+        }
+      },
+      "context": {
+        "time": "1985-10-26T01:22-07:00"
+      }
+    }
+  ]
+}
