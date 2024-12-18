@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "authzen-evaluation-request",
+  "title": "Access Evaluation API Request",
+  "$comment": "https://openid.net/specs/authorization-api-1_0-01.html#name-the-access-evaluation-api-re",
+  "type": "object",
+  "required": [
+    "decision"
+  ],
+  "properties": {
+    "decision": {
+      "description": "A boolean value that specifies whether the Decision is to allow or deny the operation.",
+      "$comment": "https://openid.net/specs/authorization-api-1_0-01.html#name-access-evaluation-decision",
+      "type": "boolean"
+    },
+    "context": {
+      "$comment": "https://openid.net/specs/authorization-api-1_0-01.html#name-access-evaluation-decision",
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "description": "A string value that specifies the reason within the scope of a particular response.",
+          "type": "string"
+        },
+        "reason_admin": {
+          "description": "The reason, which MUST NOT be shared with the user, but useful for administrative purposes that indicates why the access was denied.",
+          "type": "object"
+        },
+        "reason_user": {
+          "description": "The reason, which MAY be shared with the user that indicates why the access was denied.",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
