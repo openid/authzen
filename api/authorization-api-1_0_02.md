@@ -233,19 +233,6 @@ The following is a non-normative example of an action:
 ~~~
 {: #action-example title="Example Action"}
 
-### Common Action Values
-Since many services follow a Create-Read-Update-Delete convention, a set of common Actions are defined. That said, an Action may be specific to the application being accessed or shared across applications but not listed in the common Actions below.
-
-The following common Actions are defined:
-
-- `can_access`: A generic Action that could mean any type of access. This is useful if the policy or application is not interested in different decisions for different types of Actions.
-- `can_create`: The Action to create a new entity, which MAY be defined by the `resource` field in the request.
-- `can_read`: The Action to read the content. Based on the Resource being accessed, this could mean a list functionality or reading an individual Resource's contents.
-- `can_update`: The Action to update the content of an existing Resource. This represents a partial update or an entire replacement of an entity that MAY be identified by the Resource in the request.
-- `can_delete`: The Action to delete a Resource. The specific entity MAY be identified by the Resource in the request.
-
-PDP Policies MAY incorporate common Action names to provide different decisions based on the Action.
-
 ## Context {#context}
 The Context object is a set of attributes that represent environmental or contextual data about the request such as time of day. It is a JSON ({{RFC8259}}) object.
 
@@ -406,7 +393,7 @@ The Access Evaluations API defines the message exchange pattern between a client
 
 The Access Evaluation API Request builds on the information model presented in {{information-model}} and the 4-tuple defined in the Access Evaluation Request ({{access-evaluation-request}}).
 
-To send multiple access evaluation requests in a single message, the caller MAY add an `evaluations` key to the request. The `evaluations` key is an array which contains a list JSON objects, each typed as a 4-tuple, and specifying a discrete request. 
+To send multiple access evaluation requests in a single message, the caller MAY add an `evaluations` key to the request. The `evaluations` key is an array which contains a list of JSON objects, each typed as a 4-tuple, and specifying a discrete request.
 
 If an `evaluations` array is NOT present, the Access Evaluations Request behaves in a backwards-compatible manner with the (single) Access Evaluation API Request ({{access-evaluation-request}}).
 
@@ -557,6 +544,206 @@ The following is a non-normative example for specifying three requests that refe
         "type": "document",
         "id": "resource-search.md"
       }
+    }
+  ]
+}
+~~~
+
+### Evaluations options
+
+The `evaluations` request payload includes an OPTIONAL `options` key, with a JSON value containing a set of key-value pairs.
+
+This provides a general-purpose mechanism for providing caller-supplied metadata on how the request is to be executed.
+
+One such option conrtols *evaluation semantics*, and is described in {{evaluations-semantics}}.
+
+A non-normative example of the `options` field is shown below:
+
+~~~json
+{
+  "evaluations": [...],
+  "options": {
+    "evaluation_semantics": "execute_all",
+    "another_option": "value"
+  }
+}
+~~~
+
+#### Evaluations semantics
+
+By default, every request in the `evaluations` array is executed and a response returned in the same array order. This is the most common use-case for boxcarring multiple evaluation requests in a single payload.
+
+With that said, three evaluation semantics are supported:
+
+1. *Execute all of the requests (potentially in parallel), return all of the results.* Any failure can be denoted by `decision: false` and MAY provide a reason code in the context.
+2. *Deny on first denial (or failure).* This semantic could be desired if a PEP wants to issue a few requests in a particular order, with any denial (error, or `decision: false`) "short-circuiting" the evaluations call and returning on the first denial. This essentially works like the `&&` operator in programming languages.
+3. *Permit on first permit.* This is the converse "short-circuiting" semantic, working like the `||` operator in programming languages.
+
+To select the desired evaluations semantic, a caller can pass in `options.evaluations_semantic` with exactly one of the following values:
+
+  * `execute_all`
+  * `deny_on_first_deny`
+  * `permit_on_first_permit`
+
+`execute_all` is the default semantic, so an `evaluations` request without the `options.evaluations_semantic` flag will execute using this semantic.
+
+##### Example: Evaluate `read` action for three documents using all three semantics
+
+Execute all requests:
+
+~~~json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "action": {
+    "name": "read"
+  },
+  "options": {
+    "evaluations_semantic": "execute_all"
+  },
+  "evaluations": [
+    {
+      "resource": {
+        "type": "document",
+        "id": "1"
+      }
+    },
+    {
+      "resource": {
+        "type": "document",
+        "id": "2"
+      }
+    },
+    {
+      "resource": {
+        "type": "document",
+        "id": "3"
+      }
+    }
+  ]
+}
+~~~
+
+Response:
+
+~~~json
+{
+  "evaluations": [
+    {
+      decision: true
+    },
+    {
+      decision: false
+    },
+    {
+      decision: true
+    }
+  ]
+}
+~~~
+
+Deny on first deny:
+
+~~~json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "action": {
+    "name": "read"
+  },
+  "options": {
+    "evaluations_semantic": "deny_on_first_deny"
+  },
+  "evaluations": [
+    {
+      "resource": {
+        "type": "document",
+        "id": "1"
+      }
+    },
+    {
+      "resource": {
+        "type": "document",
+        "id": "2"
+      }
+    },
+    {
+      "resource": {
+        "type": "document",
+        "id": "3"
+      }
+    }
+  ]
+}
+~~~
+
+Response:
+
+~~~json
+{
+  "evaluations": [
+    {
+      decision: true
+    },
+    {
+      decision: false,
+      context: {
+        "id": "200",
+        "reason": "deny_on_first_deny"
+      }
+    }
+  ]
+}
+~~~
+
+Permit on first permit:
+
+~~~json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "action": {
+    "name": "read"
+  },
+  "options": {
+    "evaluations_semantic": "permit_on_first_permit"
+  },
+  "evaluations": [
+    {
+      "resource": {
+        "type": "document",
+        "id": "1"
+      },
+    },
+    {
+      "resource": {
+        "type": "document",
+        "id": "2"
+      }
+    },
+    {
+      "resource": {
+        "type": "document",
+        "id": "3"
+      }
+    }
+  ]
+}
+~~~
+
+Response:
+
+~~~json
+{
+  "evaluations": [
+    {
+      decision: true
     }
   ]
 }
