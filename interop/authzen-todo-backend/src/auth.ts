@@ -63,7 +63,7 @@ const resourceMapper = async (
       const todoToDelete = await store.get(req.params.id);
       return {
         type: "todo",
-        id: todo.ID,
+        id: todoToDelete.ID,
         ownerID:
           specVersion === "1.0-preview" ? todoToDelete.OwnerID : undefined,
         properties:
