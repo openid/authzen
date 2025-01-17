@@ -1,0 +1,2925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>Authorization API</title>
+<meta content="Atul Tulshibagwale" name="author">
+<meta content="David Brossard" name="author">
+<meta content="Omri Gazitt" name="author">
+<meta content="
+       The Authorization API enables Policy Decision Points (PDPs) and Policy Enforcement Points (PEPs) to communicate authorization requests and decisions to each other without requiring knowledge of each other's inner workings. The Authorization API is served by the PDP and is called by the PEP. The Authorization API includes an Evaluations endpoint, which provides specific access decisions and a Search endpoint, which provides generalized access capabilities. 
+    " name="description">
+<meta content="xml2rfc 3.21.0" name="generator">
+<meta content="Authorization" name="keyword">
+<meta content="Access Management" name="keyword">
+<meta content="XACML" name="keyword">
+<meta content="OPA" name="keyword">
+<meta content="Cedar" name="keyword">
+<meta content="PDP" name="keyword">
+<meta content="PEP" name="keyword">
+<meta content="authorization-api-1_0" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.21.0
+    Python 3.9.6
+    ConfigArgParse 1.7
+    google-i18n-address 3.1.0
+    intervaltree 3.1.0
+    Jinja2 3.1.4
+    lxml 4.9.4
+    platformdirs 4.2.2
+    pycountry 24.6.1
+    PyYAML 6.0.1
+    requests 2.32.3
+    setuptools 58.0.4
+    six 1.15.0
+    wcwidth 0.2.13
+-->
+<link href="api/authorization-api-1_0-original.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">/*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necessary during the development of the v3
+  formatters.
+
+*/
+
+/* fonts */
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans'); /* Sans-serif */
+@import url('https://fonts.googleapis.com/css?family=Noto+Serif'); /* Serif (print) */
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono'); /* Monospace */
+
+:root {
+  --font-sans: 'Noto Sans', Arial, Helvetica, sans-serif;
+  --font-serif: 'Noto Serif', 'Times', 'Times New Roman', serif;
+  --font-mono: 'Roboto Mono', Courier, 'Courier New', monospace;
+}
+
+@viewport {
+  zoom: 1.0;
+}
+@-ms-viewport {
+  width: extend-to-zoom;
+  zoom: 1.0;
+}
+/* general and mobile first */
+html {
+}
+body {
+  max-width: 90%;
+  margin: 1.5em auto;
+  color: #222;
+  background-color: #fff;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  overflow-wrap: break-word;
+}
+.ears {
+  display: none;
+}
+
+/* headings */
+#title, h1, h2, h3, h4, h5, h6 {
+  margin: 1em 0 0.5em;
+  font-weight: bold;
+  line-height: 1.3;
+}
+#title {
+  clear: both;
+  border-bottom: 1px solid #ddd;
+  margin: 0 0 0.5em 0;
+  padding: 1em 0 0.5em;
+}
+.author {
+  padding-bottom: 4px;
+}
+h1 {
+  font-size: 26px;
+  margin: 1em 0;
+}
+h2 {
+  font-size: 22px;
+  margin-top: -20px;  /* provide offset for in-page anchors */
+  padding-top: 33px;
+}
+h3 {
+  font-size: 18px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h4 {
+  font-size: 16px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h5, h6 {
+  font-size: 14px;
+}
+#n-copyright-notice {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+}
+/* general structure */
+p {
+  padding: 0;
+  margin: 0 0 1em 0;
+  text-align: left;
+}
+div, span {
+  position: relative;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+svg[font-family~="serif" i], svg [font-family~="serif" i] {
+  font-family: var(--font-serif);
+}
+svg[font-family~="sans-serif" i], svg [font-family~="sans-serif" i] {
+  font-family: var(--font-sans);
+}
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  display: table;
+  border: none;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 1em 2em;
+}
+ol ol, ul ul, ol ul, ul ol {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+ul.ulBare, li.ulBare {
+  margin-left: 0em !important;
+}
+ul.compact, .ulCompact,
+ol.compact, .olCompact {
+  line-height: 100%;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+}
+dl > dt {
+  float: left;
+  margin-right: 1em;
+}
+/* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+dl > dd {
+  margin-bottom: .8em;
+  min-height: 1.3em;
+}
+dl.compact > dd, .dlCompact > dd {
+  margin-bottom: 0em;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0em;
+}
+
+/* links */
+a {
+  text-decoration: none;
+}
+a[href] {
+  color: #22e; /* Arlen: WCAG 2019 */
+}
+a[href]:hover {
+  background-color: #f2f2f2;
+}
+figcaption a[href],
+a[href].selfRef {
+  color: #222;
+}
+/* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+/* Figures */
+tt, code, pre {
+  background-color: #f9f9f9;
+  font-family: var(--font-mono);
+}
+pre {
+  border: 1px solid #eee;
+  margin: 0;
+  padding: 1em;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption {
+  font-style: italic;
+  margin: 0 0 1em 0;
+}
+@media screen {
+  pre {
+    overflow-x: auto;
+    max-width: 100%;
+    max-width: calc(100% - 22px);
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 1.2em 2em;
+}
+blockquote {
+  background-color: #f9f9f9;
+  color: #111; /* Arlen: WCAG 2019 */
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  margin: 1em 0;
+}
+blockquote > *:last-child {
+  margin-bottom: 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+.xref {
+  overflow-wrap: normal;
+}
+
+/* tables */
+table {
+  width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  border: 1px solid #eee;
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.5em 0.75em;
+}
+th {
+  text-align: left;
+  background-color: #e9e9e9;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f5f5f5;
+}
+table caption {
+  font-style: italic;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+table p {
+  /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  color: #666; /* Arlen: AHDJ 2019 */
+  text-decoration: none;
+  visibility: hidden;
+  user-select: none;
+  -ms-user-select: none;
+  -o-user-select:none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+@media screen {
+  aside:hover > a.pilcrow,
+  p:hover > a.pilcrow,
+  blockquote:hover > a.pilcrow,
+  div:hover > a.pilcrow,
+  li:hover > a.pilcrow,
+  pre:hover > a.pilcrow {
+    visibility: visible;
+  }
+  a.pilcrow:hover {
+    background-color: transparent;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+}
+.bcp14 {
+  font-variant: small-caps;
+}
+
+.role {
+  font-variant: all-small-caps;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: 0.9em;
+}
+#identifiers dt {
+  width: 3em;
+  clear: left;
+}
+#identifiers dd {
+  float: left;
+  margin-bottom: 0;
+}
+/* Fix PDF info block run off issue */
+@media print {
+  #identifiers dd {
+    float: none;
+  }
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #666; /* Arlen: WCAG 2019 */
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc  {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+nav.toc ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+nav.toc li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 7em;
+}
+.references dd {
+  margin-left: 8em;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.refSubseries {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+.index ul {
+  margin: 0 0 0 1em;
+  padding: 0;
+  list-style: none;
+}
+.index ul ul {
+  margin: 0;
+}
+.index li {
+  margin: 0;
+  text-indent: -2em;
+  padding-left: 2em;
+  padding-bottom: 5px;
+}
+.indexIndex {
+  margin: 0.5em 0 1em;
+}
+.index a {
+  font-weight: 700;
+}
+/* make the index two-column on all but the smallest screens */
+@media (min-width: 600px) {
+  .index ul {
+    -moz-column-count: 2;
+    -moz-column-gap: 20px;
+  }
+  .index ul ul {
+    -moz-column-count: 1;
+    -moz-column-gap: 0;
+  }
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  font-family: var(--font-sans);
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+
+/* temporary notes */
+.rfcEditorRemove::before {
+  position: absolute;
+  top: 0.2em;
+  right: 0.2em;
+  padding: 0.2em;
+  content: "The RFC Editor will remove this note";
+  color: #9e2a00; /* Arlen: WCAG 2019 */
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+}
+.rfcEditorRemove {
+  position: relative;
+  padding-top: 1.8em;
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  border-radius: 3px;
+}
+.cref {
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 1023px) {
+  body {
+    padding-top: 2em;
+  }
+  #title {
+    padding: 1em 0;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  h2 {
+    font-size: 20px;
+    margin-top: -18px;  /* provide offset for in-page anchors */
+    padding-top: 38px;
+  }
+  #identifiers dd {
+    max-width: 60%;
+  }
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    background-color: inherit;
+    border-bottom: 1px solid #ccc;
+  }
+  #toc h2 {
+    margin: -1px 0 0 0;
+    padding: 4px 0 4px 6px;
+    padding-right: 1em;
+    min-width: 190px;
+    font-size: 1.1em;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 6px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 1024px) {
+  body {
+    max-width: 724px;
+    margin: 42px auto;
+    padding-left: 1.5em;
+    padding-right: 29em;
+  }
+  #toc {
+    position: fixed;
+    top: 42px;
+    right: 42px;
+    width: 25%;
+    margin: 0;
+    padding: 0 1em;
+    z-index: 1;
+  }
+  #toc h2 {
+    border-top: none;
+    border-bottom: 1px solid #ddd;
+    font-size: 1em;
+    font-weight: normal;
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 0;
+    overflow: auto;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  .breakable pre {
+    break-inside: auto;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+/* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+/*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+  /* The following is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+  /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+}
+
+/* Changes introduced to fix issues found during implementation */
+/* Make sure links are clickable even if overlapped by following H* */
+a {
+  z-index: 2;
+}
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Leave room in document info to show Internet-Draft on one line */
+#identifiers dt {
+  width: 8em;
+}
+
+/* Don't waste quite as much whitespace between label and value in doc info */
+#identifiers dd {
+  margin-left: 1em;
+}
+
+/* Give floating toc a background color (needed when it's a div inside section */
+#toc {
+  background-color: white;
+}
+
+/* Make the collapsed ToC header render white on gray also when it's a link */
+@media screen and (max-width: 1023px) {
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+}
+
+/* Give the bottom of the ToC some whitespace */
+@media screen and (min-width: 1024px) {
+  #toc {
+    padding: 0 0 1em 1em;
+  }
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* prevent monospace from becoming overly large */
+tt, code, pre {
+  font-size: 95%;
+}
+
+/* Fix the height/width aspect for ascii art*/
+.sourcecode pre,
+.art-text pre {
+  line-height: 1.12;
+}
+
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin-right: 0.5em;
+}
+
+/* Fix the dl styling to match the RFC 7992 attributes */
+dl > dt,
+dl.dlParallel > dt {
+  float: left;
+  margin-right: 1em;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+
+/* Provide styling for table cell text alignment */
+table td.text-left,
+table th.text-left {
+  text-align: left;
+}
+table td.text-center,
+table th.text-center {
+  text-align: center;
+}
+table td.text-right,
+table th.text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 30em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+table.right {
+ margin-left: auto;
+ margin-right: 0;
+}
+table.center {
+ margin-left: auto;
+ margin-right: auto;
+}
+table.left {
+ margin-left: 0;
+ margin-right: auto;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+caption a[href] {
+  color: #222;
+}
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+/* Tweak the bcp14 keyword presentation */
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+/* Tweak the invisible space above H* in order not to overlay links in text above */
+ h2 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 31px;
+ }
+ h3 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+ h4 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+/* Float artwork pilcrow to the right */
+@media screen {
+  .artwork a.pilcrow {
+    display: block;
+    line-height: 0.7;
+    margin-top: 0.15em;
+  }
+}
+/* Make pilcrows on dd visible */
+@media screen {
+  dd:hover > a.pilcrow {
+    visibility: visible;
+  }
+}
+/* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+.alignLeft.art-text,
+.alignCenter.art-text,
+.alignRight.art-text {
+   margin-bottom: 0;
+}
+.alignLeft,
+.alignCenter,
+.alignRight {
+  margin: 1em 0 0 0;
+}
+/* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+/* Styling for the external metadata */
+div#external-metadata {
+  background-color: #eee;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+  display: none;
+}
+div#internal-metadata {
+  padding: 0.5em;                       /* to match the external-metadata padding */
+}
+/* Styling for title RFC Number */
+h1#rfcnum {
+  clear: both;
+  margin: 0 0 -1em;
+  padding: 1em 0 0 0;
+}
+/* Make .olPercent look the same as <ol><li> */
+dl.olPercent > dd {
+  margin-bottom: 0.25em;
+  min-height: initial;
+}
+/* Give aside some styling to set it apart */
+aside {
+  border-left: 1px solid #ddd;
+  margin: 1em 0 1em 2em;
+  padding: 0.2em 2em;
+}
+aside > dl,
+aside > ol,
+aside > ul,
+aside > table,
+aside > p {
+  margin-bottom: 0.5em;
+}
+/* Additional page break settings */
+@media print {
+  figcaption, table caption {
+    page-break-before: avoid;
+  }
+}
+/* Font size adjustments for print */
+@media print {
+  body  { font-size: 10pt;      line-height: normal; max-width: 96%; }
+  h1    { font-size: 1.72em;    padding-top: 1.5em; } /* 1*1.2*1.2*1.2 */
+  h2    { font-size: 1.44em;    padding-top: 1.5em; } /* 1*1.2*1.2 */
+  h3    { font-size: 1.2em;     padding-top: 1.5em; } /* 1*1.2 */
+  h4    { font-size: 1em;       padding-top: 1.5em; }
+  h5, h6 { font-size: 1em;      margin: initial; padding: 0.5em 0 0.3em; }
+}
+/* Sourcecode margin in print, when there's no pilcrow */
+@media print {
+  .artwork,
+  .artwork > pre,
+  .sourcecode {
+    margin-bottom: 1em;
+  }
+}
+/* Avoid narrow tables forcing too narrow table captions, which may render badly */
+table {
+  min-width: 20em;
+}
+/* ol type a */
+ol.type-a { list-style-type: lower-alpha; }
+ol.type-A { list-style-type: upper-alpha; }
+ol.type-i { list-style-type: lower-roman; }
+ol.type-I { list-style-type: lower-roman; }
+/* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background slightly */
+table {
+  border: 1px solid #ddd;
+}
+td {
+  border-top: 1px solid #ddd;
+}
+tr {
+  break-inside: avoid;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f8f8f8;
+}
+/* Use style rules to govern display of the TOC. */
+@media screen and (max-width: 1023px) {
+  #toc nav { display: none; }
+  #toc.active nav { display: block; }
+}
+/* Add support for keepWithNext */
+.keepWithNext {
+  break-after: avoid-page;
+  break-after: avoid-page;
+}
+/* Add support for keepWithPrevious */
+.keepWithPrevious {
+  break-before: avoid-page;
+}
+/* Change the approach to avoiding breaks inside artwork etc. */
+figure, pre, table, .artwork, .sourcecode  {
+  break-before: auto;
+  break-after: auto;
+}
+/* Avoid breaks between <dt> and <dd> */
+dl {
+  break-before: auto;
+  break-inside: auto;
+}
+dt {
+  break-before: auto;
+  break-after: avoid-page;
+}
+dd {
+  break-before: avoid-page;
+  break-after: auto;
+  orphans: 3;
+  widows: 3
+}
+span.break, dd.break {
+  margin-bottom: 0;
+  min-height: 0;
+  break-before: auto;
+  break-inside: auto;
+  break-after: auto;
+}
+/* Undo break-before ToC */
+@media print {
+  #toc {
+    break-before: auto;
+  }
+}
+/* Text in compact lists should not get extra bottom margin space,
+   since that would makes the list not compact */
+ul.compact p, .ulCompact p,
+ol.compact p, .olCompact p {
+ margin: 0;
+}
+/* But the list as a whole needs the extra space at the end */
+section ul.compact,
+section .ulCompact,
+section ol.compact,
+section .olCompact {
+  margin-bottom: 1em;                    /* same as p not within ul.compact etc. */
+}
+/* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+tt, code {
+  background-color: transparent;
+}
+p tt, p code, li tt, li code {
+  background-color: #f8f8f8;
+}
+/* Tweak the pre margin -- 0px doesn't come out well */
+pre {
+   margin-top: 0.5px;
+}
+/* Tweak the compact list text */
+ul.compact, .ulCompact,
+ol.compact, .olCompact,
+dl.compact, .dlCompact {
+  line-height: normal;
+}
+/* Don't add top margin for nested lists */
+li > ul, li > ol, li > dl,
+dd > ul, dd > ol, dd > dl,
+dl > dd > dl {
+  margin-top: initial;
+}
+/* Elements that should not be rendered on the same line as a <dt> */
+/* This should match the element list in writer.text.TextWriter.render_dl() */
+dd > div.artwork:first-child,
+dd > aside:first-child,
+dd > figure:first-child,
+dd > ol:first-child,
+dd > div.sourcecode:first-child,
+dd > table:first-child,
+dd > ul:first-child {
+  clear: left;
+}
+/* fix for weird browser behaviour when <dd/> is empty */
+dt+dd:empty::before{
+  content: "\00a0";
+}
+/* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+li > p {
+  margin-bottom: 0.5em
+}
+/* Don't let p margin spill out from inside list items */
+li > p:last-of-type:only-child {
+  margin-bottom: 0;
+}
+</style>
+<link href="rfc-local.css" rel="stylesheet" type="text/css">
+<script type="application/javascript">async function addMetadata(){try{const e=document.styleSheets[0].cssRules;for(let t=0;t<e.length;t++)if(/#identifiers/.exec(e[t].selectorText)){const a=e[t].cssText.replace("#identifiers","#external-updates");document.styleSheets[0].insertRule(a,document.styleSheets[0].cssRules.length)}}catch(e){console.log(e)}const e=document.getElementById("external-metadata");if(e)try{var t,a="",o=function(e){const t=document.getElementsByTagName("meta");for(let a=0;a<t.length;a++)if(t[a].getAttribute("name")===e)return t[a].getAttribute("content");return""}("rfc.number");if(o){t="https://www.rfc-editor.org/rfc/rfc"+o+".json";try{const e=await fetch(t);a=await e.json()}catch(e){t=document.URL.indexOf("html")>=0?document.URL.replace(/html$/,"json"):document.URL+".json";const o=await fetch(t);a=await o.json()}}if(!a)return;e.style.display="block";const s="",d="https://datatracker.ietf.org/doc",n="https://datatracker.ietf.org/ipr/search",c="https://www.rfc-editor.org/info",l=a.doc_id.toLowerCase(),i=a.doc_id.slice(0,3).toLowerCase(),f=a.doc_id.slice(3).replace(/^0+/,""),u={status:"Status",obsoletes:"Obsoletes",obsoleted_by:"Obsoleted By",updates:"Updates",updated_by:"Updated By",see_also:"See Also",errata_url:"Errata"};let h="<dl style='overflow:hidden' id='external-updates'>";["status","obsoletes","obsoleted_by","updates","updated_by","see_also","errata_url"].forEach(e=>{if("status"==e){a[e]=a[e].toLowerCase();var t=a[e].split(" "),o=t.length,w="",p=1;for(let e=0;e<o;e++)p<o?w=w+r(t[e])+" ":w+=r(t[e]),p++;a[e]=w}else if("obsoletes"==e||"obsoleted_by"==e||"updates"==e||"updated_by"==e){var g,m="",b=1;g=a[e].length;for(let t=0;t<g;t++)a[e][t]&&(a[e][t]=String(a[e][t]).toLowerCase(),m=b<g?m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>, ":m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>",b++);a[e]=m}else if("see_also"==e){var y,L="",C=1;y=a[e].length;for(let t=0;t<y;t++)if(a[e][t]){a[e][t]=String(a[e][t]);var _=a[e][t].slice(0,3),v=a[e][t].slice(3).replace(/^0+/,"");L=C<y?"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>, ":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>, ":"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>",C++}a[e]=L}else if("errata_url"==e){var R="";R=a[e]?R+"<a href='"+a[e]+"'>Errata exist</a> | <a href='"+d+"/"+l+"'>Datatracker</a>| <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>":"<a href='"+d+"/"+l+"'>Datatracker</a> | <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>",a[e]=R}""!=a[e]?"Errata"==u[e]?h+=`<dt>More info:</dt><dd>${a[e]}</dd>`:h+=`<dt>${u[e]}:</dt><dd>${a[e]}</dd>`:"Errata"==u[e]&&(h+=`<dt>More info:</dt><dd>${a[e]}</dd>`)}),h+="</dl>",e.innerHTML=h}catch(e){console.log(e)}else console.log("Could not locate metadata <div> element");function r(e){return e.charAt(0).toUpperCase()+e.slice(1)}}window.removeEventListener("load",addMetadata),window.addEventListener("load",addMetadata);</script>
+</head>
+<body class="xml2rfc">
+<script src="metadata.min.js"></script>
+<table class="ears">
+<thead><tr>
+<td class="left"></td>
+<td class="center">azapi</td>
+<td class="right">October 2023</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Tulshibagwale, et al.</td>
+<td class="center">Standards Track</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">OpenID TBD</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2023-12-18" class="published">18 October 2023</time>
+    </dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">A. Tulshibagwale, <span class="editor">Ed.</span>
+</div>
+<div class="org">SGNL</div>
+</div>
+<div class="author">
+      <div class="author-name">D. Brossard, <span class="editor">Ed.</span>
+</div>
+<div class="org">Axiomatics</div>
+</div>
+<div class="author">
+      <div class="author-name">O. Gazitt, <span class="editor">Ed.</span>
+</div>
+<div class="org">Aserto</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">Authorization API</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">The Authorization API enables Policy Decision Points (PDPs) and Policy Enforcement Points (PEPs) to communicate authorization requests and decisions to each other without requiring knowledge of each other's inner workings. The Authorization API is served by the PDP and is called by the PEP. The Authorization API includes an Evaluations endpoint, which provides specific access decisions and a Search endpoint, which provides generalized access capabilities.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-model" class="internal xref">Model</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
+                <p id="section-toc.1-1.1.2.2.1" class="keepWithNext"><a href="#section-1.2" class="auto internal xref">1.2</a>.  <a href="#name-features" class="internal xref">Features</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-api-specification" class="internal xref">API Specification</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-api-version" class="internal xref">API Version</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="auto internal xref">2.2</a>.  <a href="#name-information-model" class="internal xref">Information Model</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2.2.1">
+                    <p id="section-toc.1-1.2.2.2.2.1.1"><a href="#section-2.2.1" class="auto internal xref">2.2.1</a>.  <a href="#name-subjects" class="internal xref">Subjects</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2.2.2">
+                    <p id="section-toc.1-1.2.2.2.2.2.1"><a href="#section-2.2.2" class="auto internal xref">2.2.2</a>.  <a href="#name-resources" class="internal xref">Resources</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2.2.3">
+                    <p id="section-toc.1-1.2.2.2.2.3.1"><a href="#section-2.2.3" class="auto internal xref">2.2.3</a>.  <a href="#name-actions" class="internal xref">Actions</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2.2.4">
+                    <p id="section-toc.1-1.2.2.2.2.4.1"><a href="#section-2.2.4" class="auto internal xref">2.2.4</a>.  <a href="#name-context" class="internal xref">Context</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2.2.5">
+                    <p id="section-toc.1-1.2.2.2.2.5.1"><a href="#section-2.2.5" class="auto internal xref">2.2.5</a>.  <a href="#name-the-access-evaluation-api-r" class="internal xref">The Access Evaluation API Request</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2.2.6">
+                    <p id="section-toc.1-1.2.2.2.2.6.1"><a href="#section-2.2.6" class="auto internal xref">2.2.6</a>.  <a href="#name-the-access-evaluation-api-re" class="internal xref">The Access Evaluation API Response</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
+                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="auto internal xref">2.3</a>.  <a href="#name-resource-query" class="internal xref">Resource Query</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3.2.1">
+                    <p id="section-toc.1-1.2.2.3.2.1.1"><a href="#section-2.3.1" class="auto internal xref">2.3.1</a>.  <a href="#name-resource-query-decision" class="internal xref">Resource Query Decision</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.4">
+                <p id="section-toc.1-1.2.2.4.1"><a href="#section-2.4" class="auto internal xref">2.4</a>.  <a href="#name-collections" class="internal xref">Collections</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5">
+                <p id="section-toc.1-1.2.2.5.1"><a href="#section-2.5" class="auto internal xref">2.5</a>.  <a href="#name-error-responses" class="internal xref">Error Responses</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.6">
+                <p id="section-toc.1-1.2.2.6.1"><a href="#section-2.6" class="auto internal xref">2.6</a>.  <a href="#name-access-evaluations-api" class="internal xref">Access Evaluations API</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.6.2.1">
+                    <p id="section-toc.1-1.2.2.6.2.1.1"><a href="#section-2.6.1" class="auto internal xref">2.6.1</a>.  <a href="#name-access-evaluation-request" class="internal xref">Access Evaluation Request</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.6.2.2">
+                    <p id="section-toc.1-1.2.2.6.2.2.1"><a href="#section-2.6.2" class="auto internal xref">2.6.2</a>.  <a href="#name-access-evaluation-response" class="internal xref">Access Evaluation Response</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.6.2.3">
+                    <p id="section-toc.1-1.2.2.6.2.3.1"><a href="#section-2.6.3" class="auto internal xref">2.6.3</a>.  <a href="#name-access-evaluations-request" class="internal xref">Access Evaluations Request</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.6.2.4">
+                    <p id="section-toc.1-1.2.2.6.2.4.1"><a href="#section-2.6.4" class="auto internal xref">2.6.4</a>.  <a href="#name-access-evaluations-response" class="internal xref">Access Evaluations Response</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.7">
+                <p id="section-toc.1-1.2.2.7.1"><a href="#section-2.7" class="auto internal xref">2.7</a>.  <a href="#name-resource-search-api" class="internal xref">Resource Search API</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.7.2.1">
+                    <p id="section-toc.1-1.2.2.7.2.1.1"><a href="#section-2.7.1" class="auto internal xref">2.7.1</a>.  <a href="#name-resource-search-request" class="internal xref">Resource Search Request</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.7.2.2">
+                    <p id="section-toc.1-1.2.2.7.2.2.1"><a href="#section-2.7.2" class="auto internal xref">2.7.2</a>.  <a href="#name-resource-query-result" class="internal xref">Resource Query result</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.7.2.3">
+                    <p id="section-toc.1-1.2.2.7.2.3.1"><a href="#section-2.7.3" class="auto internal xref">2.7.3</a>.  <a href="#name-resource-search-response" class="internal xref">Resource Search Response</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.8">
+                <p id="section-toc.1-1.2.2.8.1"><a href="#section-2.8" class="auto internal xref">2.8</a>.  <a href="#name-subject-search-api" class="internal xref">Subject Search API</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.8.2.1">
+                    <p id="section-toc.1-1.2.2.8.2.1.1"><a href="#section-2.8.1" class="auto internal xref">2.8.1</a>.  <a href="#name-subject-search-request" class="internal xref">Subject Search Request</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.8.2.2">
+                    <p id="section-toc.1-1.2.2.8.2.2.1"><a href="#section-2.8.2" class="auto internal xref">2.8.2</a>.  <a href="#name-subject-search-response" class="internal xref">Subject Search Response</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-transport" class="internal xref">Transport</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-rest-binding" class="internal xref">REST Binding</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-request-identification" class="internal xref">Request Identification</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-request-identification-in-a" class="internal xref">Request Identification in a Response</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-contributors" class="internal xref">Contributors</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML (<span>[<a href="#XACML" class="cite xref">XACML</a>]</span>) and NIST's ABAC SP 800-162. Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<div id="model">
+<section id="section-1.1">
+        <h3 id="name-model">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-model" class="section-name selfRef">Model</a>
+        </h3>
+<p id="section-1.1-1">The Authorization API is a transport-agnostic API published by the PDP, to which the PEP acts as a client. The Transport section of this specification will detail possible bindings e.g. REST.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-2">Authorization for the Authorization API itself is out of scope for this document, since authorization for REST APIs is well-documented elsewhere. For example, the Authorization API MAY support authorization using an <code>Authorization</code> header, using a <code>basic</code> or <code>bearer</code> token. Support for OAuth 2.0 (<span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>) is RECOMMENDED.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="features">
+<section id="section-1.2">
+        <h3 id="name-features">
+<a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-features" class="section-name selfRef">Features</a>
+        </h3>
+<p id="section-1.2-1">The Authorization API has two main features:<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-1.2-2.1">
+            <p id="section-1.2-2.1.1">An Access Evaluation API, which enables a PEP to find out if a specific request can be permitted to access specific resources. The following are non-normative examples:<a href="#section-1.2-2.1.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-1.2-2.1.2.1">
+                <p id="section-1.2-2.1.2.1.1">Can Alice view document #123?<a href="#section-1.2-2.1.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-1.2-2.1.2.2">
+                <p id="section-1.2-2.1.2.2.1">Can a manager print?<a href="#section-1.2-2.1.2.2.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li class="normal" id="section-1.2-2.2">
+            <p id="section-1.2-2.2.1">A Search API, which enables a PEP to ask open-ended questions. This feature is sometimes referred to as partial evaluation, reverse querying, or contextual access queries by other frameworks. The following are non-normative examples:<a href="#section-1.2-2.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-1.2-2.2.2.1">
+                <p id="section-1.2-2.2.2.1.1">What can happen?<a href="#section-1.2-2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-1.2-2.2.2.2">
+                <p id="section-1.2-2.2.2.2.1">What can Alice do?<a href="#section-1.2-2.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-1.2-2.2.2.3">
+                <p id="section-1.2-2.2.2.3.1">Who can access record #123?<a href="#section-1.2-2.2.2.3.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-1.2-2.2.2.4">
+                <p id="section-1.2-2.2.2.4.1">Who can edit medical records between 8 am and 3 pm?<a href="#section-1.2-2.2.2.4.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-1.2-2.2.2.5">
+                <p id="section-1.2-2.2.2.5.1">Who can edit?<a href="#section-1.2-2.2.2.5.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-1.2-2.2.2.6">
+                <p id="section-1.2-2.2.2.6.1">What can happen at 3 pm from Glasgow?<a href="#section-1.2-2.2.2.6.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+        </ul>
+</section>
+</div>
+</section>
+</div>
+<div id="api-specification">
+<section id="section-2">
+      <h2 id="name-api-specification">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-api-specification" class="section-name selfRef">API Specification</a>
+      </h2>
+<p id="section-2-1">The Authorization API has two parts, Access Evaluation and Search. Each of these is defined below. The definition is transport-agnostic. Refer to the Transport section for example bindings.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<div id="api-version">
+<section id="section-2.1">
+        <h3 id="name-api-version">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-api-version" class="section-name selfRef">API Version</a>
+        </h3>
+<p id="section-2.1-1">This document describes the API version 1. Any updates to this API through subsequent revisions of this document or other documents MAY augment this API, but MUST NOT modify the API described here. Augmentation MAY include additional API methods or additional parameters to existing API methods, additional authorization mechanisms, or additional optional headers in API requests. All API methods for version 1 MUST be immediately preceded by the relative URL path <code>/v1/</code>.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="information-model">
+<section id="section-2.2">
+        <h3 id="name-information-model">
+<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-information-model" class="section-name selfRef">Information Model</a>
+        </h3>
+<div id="subjects">
+<section id="section-2.2.1">
+          <h4 id="name-subjects">
+<a href="#section-2.2.1" class="section-number selfRef">2.2.1. </a><a href="#name-subjects" class="section-name selfRef">Subjects</a>
+          </h4>
+<p id="section-2.2.1-1">A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked, or the Subject may be of interest in a Search API call.<a href="#section-2.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-2.2.1-2">A Subject is a JSON (<span>[<a href="#RFC8259" class="cite xref">RFC8259</a>]</span>) object that contains any number of key-value pair attributes e.g. 
+~~~ json
+"username" : "Alice",
+"department": "Sales"
+~~~<a href="#section-2.2.1-2" class="pilcrow">¶</a></p>
+<p id="section-2.2.1-3">An attribute can be single-valued or multi-valued. It can be a primitive type (string, boolean...) or a complex type such as a JSON object.<a href="#section-2.2.1-3" class="pilcrow">¶</a></p>
+<div id="sample-fields">
+<section id="section-2.2.1.1">
+            <h5 id="name-sample-fields">
+<a href="#section-2.2.1.1" class="section-number selfRef">2.2.1.1. </a><a href="#name-sample-fields" class="section-name selfRef">Sample Fields</a>
+            </h5>
+<p id="section-2.2.1.1-1">Here are sample fields:<a href="#section-2.2.1.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.2.1.1-2">
+              <dt id="section-2.2.1.1-2.1">id:</dt>
+              <dd style="margin-left: 1.5em" id="section-2.2.1.1-2.2">
+                <p id="section-2.2.1.1-2.2.1">OPTIONAL. A field, whose value is of type <code>string</code>, which uniquely identifies the user within the scope of a PEP. This identifier could be an email address, or it might be an internal identifier such as a UUID or employee ID.<a href="#section-2.2.1.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+              <dd class="break"></dd>
+<dt id="section-2.2.1.1-2.3">ipAddress:</dt>
+              <dd style="margin-left: 1.5em" id="section-2.2.1.1-2.4">
+                <p id="section-2.2.1.1-2.4.1">OPTIONAL. A field, whose value is of type <code>string</code>, which is a <span>[<a href="#RFC4001" class="cite xref">RFC4001</a>]</span> text representation of the IP Address<a href="#section-2.2.1.1-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+              <dd class="break"></dd>
+<dt id="section-2.2.1.1-2.5">deviceId:</dt>
+              <dd style="margin-left: 1.5em" id="section-2.2.1.1-2.6">
+                <p id="section-2.2.1.1-2.6.1">OPTIONAL. A field, whose value is of type <code>string</code>, which uniquely identifies the device of the Subject<a href="#section-2.2.1.1-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="example-non-normative">
+<section id="section-2.2.1.2">
+            <h5 id="name-example-non-normative">
+<a href="#section-2.2.1.2" class="section-number selfRef">2.2.1.2. </a><a href="#name-example-non-normative" class="section-name selfRef">Example (non-normative)</a>
+            </h5>
+<p id="section-2.2.1.2-1">The following non-normative example describes a Subject:<a href="#section-2.2.1.2-1" class="pilcrow">¶</a></p>
+<span id="name-example-subject-object"></span><div id="subjectexample">
+<figure id="figure-1">
+              <div class="lang-json sourcecode" id="section-2.2.1.2-2.1">
+<pre>
+{
+  "id": "atul@sgnl.ai",
+  "ipAddress": "172.217.22.14",
+  "deviceId": "8:65:ee:17:7e:0b"
+}
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-example-subject-object" class="selfRef">Example Subject Object</a>
+              </figcaption></figure>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="resources">
+<section id="section-2.2.2">
+          <h4 id="name-resources">
+<a href="#section-2.2.2" class="section-number selfRef">2.2.2. </a><a href="#name-resources" class="section-name selfRef">Resources</a>
+          </h4>
+<p id="section-2.2.2-1">A Resource is the target of an access request. It is a JSON (<span>[<a href="#RFC8259" class="cite xref">RFC8259</a>]</span>) object that is constructed just like a Subject object.<a href="#section-2.2.2-1" class="pilcrow">¶</a></p>
+<div id="sample-fields-1">
+<section id="section-2.2.2.1">
+            <h5 id="name-sample-fields-2">
+<a href="#section-2.2.2.1" class="section-number selfRef">2.2.2.1. </a><a href="#name-sample-fields-2" class="section-name selfRef">Sample Fields</a>
+            </h5>
+<span class="break"></span><dl class="dlParallel" id="section-2.2.2.1-1">
+              <dt id="section-2.2.2.1-1.1">id:</dt>
+              <dd style="margin-left: 1.5em" id="section-2.2.2.1-1.2">
+                <p id="section-2.2.2.1-1.2.1">OPTIONAL. The unique identifier of the resource within the scope of the PEP. Its value is a <code>string</code> specifying the identifier of the resource. This field MAY be omitted to indicate a class of resources<a href="#section-2.2.2.1-1.2.1" class="pilcrow">¶</a></p>
+</dd>
+              <dd class="break"></dd>
+<dt id="section-2.2.2.1-1.3">type:</dt>
+              <dd style="margin-left: 1.5em" id="section-2.2.2.1-1.4">
+                <p id="section-2.2.2.1-1.4.1">OPTIONAL. The type of the resource. Its value is a <code>string</code> that specifies the type of the resource<a href="#section-2.2.2.1-1.4.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="example-non-normative-1">
+<section id="section-2.2.2.2">
+            <h5 id="name-example-non-normative-2">
+<a href="#section-2.2.2.2" class="section-number selfRef">2.2.2.2. </a><a href="#name-example-non-normative-2" class="section-name selfRef">Example (non-normative)</a>
+            </h5>
+<p id="section-2.2.2.2-1">The following is a non-normative example of a Resource:<a href="#section-2.2.2.2-1" class="pilcrow">¶</a></p>
+<span id="name-example-resource"></span><div id="resourceexample">
+<figure id="figure-2">
+              <div class="lang-json sourcecode" id="section-2.2.2.2-2.1">
+<pre>
+{
+  "id": "123",
+  "type": "book",
+  "libraryRecord":{
+    "title": "ABAC's new hit",
+    "isbn": "978-0593383322"
+  }
+}
+</pre>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-example-resource" class="selfRef">Example Resource</a>
+              </figcaption></figure>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="actions">
+<section id="section-2.2.3">
+          <h4 id="name-actions">
+<a href="#section-2.2.3" class="section-number selfRef">2.2.3. </a><a href="#name-actions" class="section-name selfRef">Actions</a>
+          </h4>
+<p id="section-2.2.3-1">An action is the type of access that the requester intends to perform. There are common actions defined herein, or the action may be custom, which could be specific to the application being accessed or shared across applications but not listed in the common actions below. Action is a JSON (<span>[<a href="#RFC8259" class="cite xref">RFC8259</a>]</span>) object that is constructed just like a Subject or Resource object.<a href="#section-2.2.3-1" class="pilcrow">¶</a></p>
+<div id="common-action-values-non-normative">
+<section id="section-2.2.3.1">
+            <h5 id="name-common-action-values-non-no">
+<a href="#section-2.2.3.1" class="section-number selfRef">2.2.3.1. </a><a href="#name-common-action-values-non-no" class="section-name selfRef">Common Action Values (non-normative)</a>
+            </h5>
+<p id="section-2.2.3.1-1">The following common actions are defined herein:
+*  <strong>access</strong>: A generic action that could mean any type of access. This is useful if the policy or application is not interested in different decisions for different types of actions
+* <strong>create</strong>: The action to create a new entity, which MAY be defined by the <code>resource</code> field in the request
+* <strong>read</strong>: The action to read the content. Based on the resource being accessed, this could mean a list functionality or reading an individual resource's contents
+* <strong>update</strong>: The action to update the content of an existing entity. This MAY represent a partial update or an entire replacement of the entity. The entity MAY be identified by the resource in the request
+* <strong>delete</strong>: The action to delete an entity. The entity MAY be identified by the resource in the request<a href="#section-2.2.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-2.2.3.1-2">Policies MAY incorporate common action names to provide different decisions based on the action<a href="#section-2.2.3.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="custom-actions">
+<section id="section-2.2.3.2">
+            <h5 id="name-custom-actions">
+<a href="#section-2.2.3.2" class="section-number selfRef">2.2.3.2. </a><a href="#name-custom-actions" class="section-name selfRef">Custom Actions</a>
+            </h5>
+<p id="section-2.2.3.2-1">Any action that is not one of the above is custom. Policies MAY incorporate custom action names if decisions need to be taken differently for different custom actions<a href="#section-2.2.3.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="context">
+<section id="section-2.2.4">
+          <h4 id="name-context">
+<a href="#section-2.2.4" class="section-number selfRef">2.2.4. </a><a href="#name-context" class="section-name selfRef">Context</a>
+          </h4>
+<p id="section-2.2.4-1">The Context object is a set of attributes that represent environmental or contextual data about the request such as time of day. It is a JSON (<span>[<a href="#RFC8259" class="cite xref">RFC8259</a>]</span>) object that is constructed just like a Subject, Resource, or Action object.<a href="#section-2.2.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="the-access-evaluation-api-request">
+<section id="section-2.2.5">
+          <h4 id="name-the-access-evaluation-api-r">
+<a href="#section-2.2.5" class="section-number selfRef">2.2.5. </a><a href="#name-the-access-evaluation-api-r" class="section-name selfRef">The Access Evaluation API Request</a>
+          </h4>
+<p id="section-2.2.5-1">The request follows a format similar to that used in XACML-JSON (TBD add normative reference) or AWS Cedar i.e. a collection of <em>attributes</em> grouped together in categories that reflect the grammatical purpose or function of said attribute. This specification defines 4 such categories as aforementioned:<a href="#section-2.2.5-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2.2.5-2.1">
+              <p id="section-2.2.5-2.1.1">The subject (or principal) of type Subject<a href="#section-2.2.5-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-2.2.5-2.2">
+              <p id="section-2.2.5-2.2.1">The action (or verb) of type Action<a href="#section-2.2.5-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-2.2.5-2.3">
+              <p id="section-2.2.5-2.3.1">The resource of type Resource<a href="#section-2.2.5-2.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-2.2.5-2.4">
+              <p id="section-2.2.5-2.4.1">The context (or environment) of type Context<a href="#section-2.2.5-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<div id="example-non-normative-2">
+<section id="section-2.2.5.1">
+            <h5 id="name-example-non-normative-3">
+<a href="#section-2.2.5.1" class="section-number selfRef">2.2.5.1. </a><a href="#name-example-non-normative-3" class="section-name selfRef">Example (non-normative)</a>
+            </h5>
+<div class="lang-json sourcecode" id="section-2.2.5.1-1">
+<pre>
+{
+  "subject":{
+    "id": {
+      "username": "Art",
+      "jwt": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MiIsIm5hbWUiOiJBcnQgVmFuZGVsYXkiLCJpYXQiOjE1MTYyMzkwMjJ9.QR3kS983lnaRVM1ZVJ_TM7XxJDPppELnCSCV_upUHQIGs28mB4JE_VqC9WBlcCYIYZn_E3r1RXarnFBe5UAy9g"
+    }
+  },
+  "resource":{
+    "path": "/api/account/123"
+  },
+  "action":{
+    "method": "GET"
+  },
+  "context":{
+    "time": "1985-10-26T01:22-07:00"
+  }
+}
+</pre><a href="#section-2.2.5.1-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="the-access-evaluation-api-response">
+<section id="section-2.2.6">
+          <h4 id="name-the-access-evaluation-api-re">
+<a href="#section-2.2.6" class="section-number selfRef">2.2.6. </a><a href="#name-the-access-evaluation-api-re" class="section-name selfRef">The Access Evaluation API Response</a>
+          </h4>
+<p id="section-2.2.6-1">The simplest form of a response is simply a boolean representing a decision, indicated by a <code>"decision"</code> field. In this specification, assuming the evaluation was successful, there are only 2 possible responses:<a href="#section-2.2.6-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2.2.6-2.1">
+              <p id="section-2.2.6-2.1.1"><code>true</code>: The access request is permitted to go forward<a href="#section-2.2.6-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-2.2.6-2.2">
+              <p id="section-2.2.6-2.2.1"><code>false</code>: The access request is denied and MUST NOT be permitted to go forward<a href="#section-2.2.6-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<div id="query-decision">
+<section id="section-2.2.6.1">
+            <h5 id="name-query-decision">
+<a href="#section-2.2.6.1" class="section-number selfRef">2.2.6.1. </a><a href="#name-query-decision" class="section-name selfRef">Query Decision</a>
+            </h5>
+<p id="section-2.2.6.1-1">The following is a non-normative example of a simple query decision:<a href="#section-2.2.6.1-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-2.2.6.1-2">
+<pre>
+{
+  "decision": true
+}
+</pre><a href="#section-2.2.6.1-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="additional-context-in-a-response">
+<section id="section-2.2.6.2">
+            <h5 id="name-additional-context-in-a-res">
+<a href="#section-2.2.6.2" class="section-number selfRef">2.2.6.2. </a><a href="#name-additional-context-in-a-res" class="section-name selfRef">Additional context in a response</a>
+            </h5>
+<p id="section-2.2.6.2-1">In addition to a <code>"decision"</code>, a response may contain a <code>"context"</code> field which can be any JSON object.  This context can convey additional information that can be used by the PEP as part of the decision evaluation process. Examples include:<a href="#section-2.2.6.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2.2.6.2-2.1">
+                <p id="section-2.2.6.2-2.1.1">XACML's notion of "advice" and "obligations"<a href="#section-2.2.6.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-2.2.6.2-2.2">
+                <p id="section-2.2.6.2-2.2.1">Hints for rendering UI state<a href="#section-2.2.6.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-2.2.6.2-2.3">
+                <p id="section-2.2.6.2-2.3.1">Instructions for step-up authentication<a href="#section-2.2.6.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</section>
+</div>
+<div id="example-context">
+<section id="section-2.2.6.3">
+            <h5 id="name-example-context">
+<a href="#section-2.2.6.3" class="section-number selfRef">2.2.6.3. </a><a href="#name-example-context" class="section-name selfRef">Example context</a>
+            </h5>
+<p id="section-2.2.6.3-1">An implementation MAY follow a structured approach to <code>"context"</code>, in which it presents the reasons that an authorization request failed.<a href="#section-2.2.6.3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2.2.6.3-2.1">
+                <p id="section-2.2.6.3-2.1.1">A list of identifiers representing the items (policies, graph nodes, tuples) that were used in the decision-making process<a href="#section-2.2.6.3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-2.2.6.3-2.2">
+                <p id="section-2.2.6.3-2.2.1">A list of reasons as to why access is permitted or denied.<a href="#section-2.2.6.3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+<div id="reasons">
+<section id="section-2.2.6.3.1">
+              <h6 id="name-reasons">
+<a href="#section-2.2.6.3.1" class="section-number selfRef">2.2.6.3.1. </a><a href="#name-reasons" class="section-name selfRef">Reasons</a>
+              </h6>
+<p id="section-2.2.6.3.1-1">Reasons MAY be provided by the PDP.<a href="#section-2.2.6.3.1-1" class="pilcrow">¶</a></p>
+<div id="reason-field">
+<section id="section-2.2.6.3.1.1">
+                <h6 id="name-reason-field">
+<a href="#section-2.2.6.3.1.1" class="section-number selfRef">2.2.6.3.1.1. </a><a href="#name-reason-field" class="section-name selfRef">Reason Field</a>
+                </h6>
+<p id="section-2.2.6.3.1.1-1">A Reason Field is a JSON object that has keys and values of type <code>string</code>. The following are non-normative examples of Reason Field objects:<a href="#section-2.2.6.3.1.1-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-2.2.6.3.1.1-2">
+<pre>
+{
+  "en": "location restriction violation"
+}
+</pre><a href="#section-2.2.6.3.1.1-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="reason-object">
+<section id="section-2.2.6.3.1.2">
+                <h6 id="name-reason-object">
+<a href="#section-2.2.6.3.1.2" class="section-number selfRef">2.2.6.3.1.2. </a><a href="#name-reason-object" class="section-name selfRef">Reason Object</a>
+                </h6>
+<p id="section-2.2.6.3.1.2-1">A Reason Object specifies a particular reason. It is a JSON object that has the following fields:<a href="#section-2.2.6.3.1.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.2.6.3.1.2-2">
+                  <dt id="section-2.2.6.3.1.2-2.1">id:</dt>
+                  <dd style="margin-left: 1.5em" id="section-2.2.6.3.1.2-2.2">
+                    <p id="section-2.2.6.3.1.2-2.2.1">REQUIRED. A numeric value of that specifies the reason within the scope of a particular response<a href="#section-2.2.6.3.1.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+                  <dd class="break"></dd>
+<dt id="section-2.2.6.3.1.2-2.3">reason_admin:</dt>
+                  <dd style="margin-left: 1.5em" id="section-2.2.6.3.1.2-2.4">
+                    <p id="section-2.2.6.3.1.2-2.4.1">OPTIONAL. The reason, which MUST NOT be shared with the user, but useful for administrative purposes that indicates why the access was denied. The value of this field is a Reason Field object (<a href="#reason-field" class="auto internal xref">Section 2.2.6.3.1.1</a>).<a href="#section-2.2.6.3.1.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+                  <dd class="break"></dd>
+<dt id="section-2.2.6.3.1.2-2.5">reason_user:</dt>
+                  <dd style="margin-left: 1.5em" id="section-2.2.6.3.1.2-2.6">
+                    <p id="section-2.2.6.3.1.2-2.6.1">OPTIONAL. The reason, which MAY be shared with the user that indicates why the access was denied. The value of this field is a Reason Field object (<a href="#reason-field" class="auto internal xref">Section 2.2.6.3.1.1</a>)<a href="#section-2.2.6.3.1.2-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+                <dd class="break"></dd>
+</dl>
+<p id="section-2.2.6.3.1.2-3">The following is a non-normative example of a Reason Object:<a href="#section-2.2.6.3.1.2-3" class="pilcrow">¶</a></p>
+<span id="name-example-of-a-reason-object"></span><div id="example-reason-object">
+<figure id="figure-3">
+                  <div class="lang-json sourcecode" id="section-2.2.6.3.1.2-4.1">
+<pre>
+{
+  "id": 0,
+  "reason_admin": {
+    "en": "Request failed policy C076E82F"
+  },
+  "reason_user": {
+    "en-403": "Insufficient privileges. Contact your administrator",
+    "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
+  }
+}
+</pre>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-example-of-a-reason-object" class="selfRef">Example of a Reason Object</a>
+                  </figcaption></figure>
+</div>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="sample-response-with-additional-context-non-normative">
+<section id="section-2.2.6.4">
+            <h5 id="name-sample-response-with-additi">
+<a href="#section-2.2.6.4" class="section-number selfRef">2.2.6.4. </a><a href="#name-sample-response-with-additi" class="section-name selfRef">Sample Response with additional context (non-normative)</a>
+            </h5>
+<div class="lang-json sourcecode" id="section-2.2.6.4-1">
+<pre>
+{
+  "decision": true,
+  "context": {
+    "id": 0,
+    "reason_admin": {
+      "en": "Request failed policy C076E82F"
+    },
+    "reason_user": {
+      "en-403": "Insufficient privileges. Contact your administrator",
+      "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
+    }
+  }
+}
+</pre><a href="#section-2.2.6.4-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="resource-query">
+<section id="section-2.3">
+        <h3 id="name-resource-query">
+<a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-resource-query" class="section-name selfRef">Resource Query</a>
+        </h3>
+<p id="section-2.3-1">An Resource Query is a question about whether a subject can access a specific resource. It is a JSON object with the following fields:<a href="#section-2.3-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.3-2">
+          <dt id="section-2.3-2.1">action:</dt>
+          <dd style="margin-left: 1.5em" id="section-2.3-2.2">
+            <p id="section-2.3-2.2.1">REQUIRED. The type of access that is to be performed. Its value is a <code>string</code> that describes the action. This value of this field is as described in the Actions section (<a href="#actions" class="auto internal xref">Section 2.2.3</a>).<a href="#section-2.3-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-2.3-2.3">resource:</dt>
+          <dd style="margin-left: 1.5em" id="section-2.3-2.4">
+            <p id="section-2.3-2.4.1">REQUIRED. The resource to which this query relates. Its format is as described in the Resources section (<a href="#resources" class="auto internal xref">Section 2.2.2</a>)<a href="#section-2.3-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-2.3-3">The following is a non-normative example of an Resource Query:<a href="#section-2.3-3" class="pilcrow">¶</a></p>
+<span id="name-example-resource-query"></span><div id="example-resource-query">
+<figure id="figure-4">
+          <div class="lang-json sourcecode" id="section-2.3-4.1">
+<pre>
+{
+  "action": "stream",
+  "resource": {
+    "id": "1234",
+    "type": "webcam",
+    "attributeNames": [
+      "lowRes",
+      "motionOnly"
+    ]
+  }
+}
+</pre>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-example-resource-query" class="selfRef">Example Resource Query</a>
+          </figcaption></figure>
+</div>
+<div id="resource-query-decision">
+<section id="section-2.3.1">
+          <h4 id="name-resource-query-decision">
+<a href="#section-2.3.1" class="section-number selfRef">2.3.1. </a><a href="#name-resource-query-decision" class="section-name selfRef">Resource Query Decision</a>
+          </h4>
+<p id="section-2.3.1-1">An Resource Query Decision is a tuple of an resource, action and a decision, represented as a JSON object. It has the following fields:<a href="#section-2.3.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.3.1-2">
+            <dt id="section-2.3.1-2.1">action:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.3.1-2.2">
+              <p id="section-2.3.1-2.2.1">OPTIONAL. The action for which the decision is provided. The format is as described in the Actions section (<a href="#actions" class="auto internal xref">Section 2.2.3</a>)<a href="#section-2.3.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.3.1-2.3">resource:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.3.1-2.4">
+              <p id="section-2.3.1-2.4.1">OPTIONAL. The resource for which the decision is provided. The format is as described in the Resources section (<a href="#resources" class="auto internal xref">Section 2.2.2</a>). This resource MAY be greater in scope than described in the Resource Query (<a href="#resource-query" class="auto internal xref">Section 2.3</a>), i.e. It MAY describe an resource more generally than specified in the Resource Query. However, it MUST NOT be more specific than the resource described in the Resource Query.<a href="#section-2.3.1-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.3.1-2.5">decision:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.3.1-2.6">
+              <p id="section-2.3.1-2.6.1">REQUIRED. The decision for the above <code>resource</code> and <code>action</code>. The format is as described in the Query Decision section (<a href="#query-decision" class="auto internal xref">Section 2.2.6.1</a>)<a href="#section-2.3.1-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.3.1-2.7">reason_ids:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.3.1-2.8">
+              <p id="section-2.3.1-2.8.1">OPTIONAL. An array of reason identifiers that indicate specific resons why the resource query was denied<a href="#section-2.3.1-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-2.3.1-3">The following is a non-normative example of an Resource Query Decision:<a href="#section-2.3.1-3" class="pilcrow">¶</a></p>
+<span id="name-example-resource-query-deci"></span><div id="example-resource-query-decision">
+<figure id="figure-5">
+            <div class="lang-json sourcecode" id="section-2.3.1-4.1">
+<pre>
+{
+  "action": "stream",
+  "resource": {
+    "id": "1234"
+  },
+  "decision": "deny",
+  "reason_ids": [0,2,3]
+}
+</pre>
+</div>
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<a href="#name-example-resource-query-deci" class="selfRef">Example Resource Query Decision</a>
+            </figcaption></figure>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="collections">
+<section id="section-2.4">
+        <h3 id="name-collections">
+<a href="#section-2.4" class="section-number selfRef">2.4. </a><a href="#name-collections" class="section-name selfRef">Collections</a>
+        </h3>
+<p id="section-2.4-1">An API request or response MAY contain a collection of items, such as an array of strings representing various attribute names, or an array of Resource Query Decision objects (<a href="#resource-query-decision" class="auto internal xref">Section 2.3.1</a>). The objects in a collection MAY overlap in scope. For example:<a href="#section-2.4-1" class="pilcrow">¶</a></p>
+<span id="name-example-overlapping-collect"></span><div id="collection-example">
+<figure id="figure-6">
+          <div class="lang-json sourcecode" id="section-2.4-2.1">
+<pre>
+[
+  {
+    "resource": {
+      "id": "1234",
+      "attributeNames": [
+        "homeAddress",
+        "title"
+      ]
+    },
+    "decision": "deny",
+    "reason_ids": [1]
+  },
+  {
+    "resource": {
+      "id": "1234"
+    },
+    "decision": "allow"
+  }
+]
+</pre>
+</div>
+<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
+<a href="#name-example-overlapping-collect" class="selfRef">Example Overlapping Collection</a>
+          </figcaption></figure>
+</div>
+<p id="section-2.4-3">The receiver of a collection MUST interpret the collection in a way that results in the least-privilege access. In the above example, this means that the subject has access to the resource identified by "1234", but not to the "homeAddress" and "title" attributes of that resource.<a href="#section-2.4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="error-responses">
+<section id="section-2.5">
+        <h3 id="name-error-responses">
+<a href="#section-2.5" class="section-number selfRef">2.5. </a><a href="#name-error-responses" class="section-name selfRef">Error Responses</a>
+        </h3>
+<p id="section-2.5-1">The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTP status code (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-15" class="relref">Section 15</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>) that indicates error.<a href="#section-2.5-1" class="pilcrow">¶</a></p>
+<p id="section-2.5-2">The following errors are indicated by the status codes defined below:<a href="#section-2.5-2" class="pilcrow">¶</a></p>
+<span id="name-error-status-codes"></span><div id="_table-error-status-codes">
+<table class="center" id="table-1">
+          <caption>
+<a href="#table-1" class="selfRef">Table 1</a>:
+<a href="#name-error-status-codes" class="selfRef">Error status codes</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Code</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">HTTP Body Content</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">400</td>
+              <td class="text-left" rowspan="1" colspan="1">Bad Request</td>
+              <td class="text-left" rowspan="1" colspan="1">An error message string</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">401</td>
+              <td class="text-left" rowspan="1" colspan="1">Unauthorized</td>
+              <td class="text-left" rowspan="1" colspan="1">An error message string</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">403</td>
+              <td class="text-left" rowspan="1" colspan="1">Forbidden</td>
+              <td class="text-left" rowspan="1" colspan="1">An error message string</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">500</td>
+              <td class="text-left" rowspan="1" colspan="1">Internal error</td>
+              <td class="text-left" rowspan="1" colspan="1">An error message string</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+</section>
+</div>
+<div id="access-evaluations-api">
+<section id="section-2.6">
+        <h3 id="name-access-evaluations-api">
+<a href="#section-2.6" class="section-number selfRef">2.6. </a><a href="#name-access-evaluations-api" class="section-name selfRef">Access Evaluations API</a>
+        </h3>
+<p id="section-2.6-1">The Access Evaluations API is a means for a PEP to request decisions for a number of resources for a single request context.<a href="#section-2.6-1" class="pilcrow">¶</a></p>
+<p id="section-2.6-2">The Access Evaluations API is available at the relative URL <code>/evaluations/</code> via the <code>POST</code> HTTP method.<a href="#section-2.6-2" class="pilcrow">¶</a></p>
+<div id="access-evaluation-request">
+<section id="section-2.6.1">
+          <h4 id="name-access-evaluation-request">
+<a href="#section-2.6.1" class="section-number selfRef">2.6.1. </a><a href="#name-access-evaluation-request" class="section-name selfRef">Access Evaluation Request</a>
+          </h4>
+<span class="break"></span><dl class="dlParallel" id="section-2.6.1-1">
+            <dt id="section-2.6.1-1.1">subject:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.1-1.2">
+              <p id="section-2.6.1-1.2.1">REQUIRED. A subject as described in the Subjects section (<a href="#subjects" class="auto internal xref">Section 2.2.1</a>)<a href="#section-2.6.1-1.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.6.1-1.3">action:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.1-1.4">
+              <p id="section-2.6.1-1.4.1">REQUIRED. An action as described in the Actions section (<a href="#actions" class="auto internal xref">Section 2.2.3</a>)<a href="#section-2.6.1-1.4.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.6.1-1.5">resource:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.1-1.6">
+              <p id="section-2.6.1-1.6.1">OPTIONAL. A resource as described in the Resources section (<a href="#resources" class="auto internal xref">Section 2.2.2</a>)<a href="#section-2.6.1-1.6.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.6.1-1.7">context:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.1-1.8">
+              <p id="section-2.6.1-1.8.1">OPTIONAL. The environment/context attributes, as described in the Context section (<a href="#context" class="auto internal xref">Section 2.2.4</a>)<a href="#section-2.6.1-1.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-2.6.1-2">The following is a non-normative example of an Access Evaluation Request:<a href="#section-2.6.1-2" class="pilcrow">¶</a></p>
+<span id="name-example-of-an-access-evalua"></span><div id="example-access-evaluation-request">
+<figure id="figure-7">
+            <div class="lang-http sourcecode" id="section-2.6.1-3.1">
+<pre>
+POST /access/v1/evaluation HTTP/1.1
+Host: pdp.mycompany.com
+Authorization: &lt;myoauthtoken&gt;
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "subject": {
+    "id": "omri@aserto.com",
+  },
+  "action": {
+    "action": "can_read"
+  },
+  "resource": {
+    "type": "todo",
+    "id": "1"
+  },
+  "context": {
+  }
+}
+</pre>
+</div>
+<figcaption><a href="#figure-7" class="selfRef">Figure 7</a>:
+<a href="#name-example-of-an-access-evalua" class="selfRef">Example of an Access Evaluation Request</a>
+            </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="access-evaluation-response">
+<section id="section-2.6.2">
+          <h4 id="name-access-evaluation-response">
+<a href="#section-2.6.2" class="section-number selfRef">2.6.2. </a><a href="#name-access-evaluation-response" class="section-name selfRef">Access Evaluation Response</a>
+          </h4>
+<p id="section-2.6.2-1">The success response to an Access Evaluation Request is an Access Evaluation Response. It is a HTTP response of type <code>application/json</code>. Its body is a JSON object that contains the following fields:<a href="#section-2.6.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.6.2-2">
+            <dt id="section-2.6.2-2.1">decision:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.2-2.2">
+              <p id="section-2.6.2-2.2.1">REQUIRED. A boolean value (<code>true</code> or <code>false</code>) as described in the Resource Query Decision section (<a href="#resource-query-decision" class="auto internal xref">Section 2.3.1</a>).<a href="#section-2.6.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.6.2-2.3">iat:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.2-2.4">
+              <p id="section-2.6.2-2.4.1">OPTIONAL. The issued at time in <code>integer</code> format, expressed as epoch milliseconds<a href="#section-2.6.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.6.2-2.5">exp:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.2-2.6">
+              <p id="section-2.6.2-2.6.1">OPTIONAL. The time in <code>integer</code> format, expressed at epoch milliseconds, after which the response SHOULD NOT be used<a href="#section-2.6.2-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.6.2-2.7">context:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.2-2.8">
+              <p id="section-2.6.2-2.8.1">OPTIONAL. A JSON object that provides additional evaluation context.<a href="#section-2.6.2-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.6.2-2.9">evaluationDuration:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.2-2.10">
+              <p id="section-2.6.2-2.10.1">OPTIONAL. The time in milliseconds, in <code>integer</code> format, that it took to respond to the Access Evaluation Request.<a href="#section-2.6.2-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-2.6.2-3">Following is a non-normative example of an Access Evaluation Response:<a href="#section-2.6.2-3" class="pilcrow">¶</a></p>
+<span id="name-example-of-an-access-evaluat"></span><div id="example-access-evaluation-response">
+<figure id="figure-8">
+            <div class="lang-http sourcecode" id="section-2.6.2-4.1">
+<pre>
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "decision": true
+}
+</pre>
+</div>
+<figcaption><a href="#figure-8" class="selfRef">Figure 8</a>:
+<a href="#name-example-of-an-access-evaluat" class="selfRef">Example of an Access Evaluation Response</a>
+            </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="access-evaluations-request">
+<section id="section-2.6.3">
+          <h4 id="name-access-evaluations-request">
+<a href="#section-2.6.3" class="section-number selfRef">2.6.3. </a><a href="#name-access-evaluations-request" class="section-name selfRef">Access Evaluations Request</a>
+          </h4>
+<p id="section-2.6.3-1">This API is used for boxcarring more than one request to a PDP.<a href="#section-2.6.3-1" class="pilcrow">¶</a></p>
+<p id="section-2.6.3-2">The content of the request body is a JSON Object with the following fields:<a href="#section-2.6.3-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.6.3-3">
+            <dt id="section-2.6.3-3.1">subject:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.3-3.2">
+              <p id="section-2.6.3-3.2.1">REQUIRED. A subject as described in the Subjects section (<a href="#subjects" class="auto internal xref">Section 2.2.1</a>)<a href="#section-2.6.3-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.6.3-3.3">queries:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.3-3.4">
+              <p id="section-2.6.3-3.4.1">REQUIRED. An array of queries defined in Resource Query section (<a href="#resource-query" class="auto internal xref">Section 2.3</a>) about access to specific resources<a href="#section-2.6.3-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-2.6.3-4">The following is a non-normative example of an Access Evaluations Request:<a href="#section-2.6.3-4" class="pilcrow">¶</a></p>
+<span id="name-example-of-an-access-evaluati"></span><div id="example-access-evaluations-request">
+<figure id="figure-9">
+            <div class="lang-http sourcecode" id="section-2.6.3-5.1">
+<pre>
+POST /access/v1/evaluations HTTP/1.1
+Host: pdp.mycompany.com
+Authorization: &lt;myoauthtoken&gt;
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "subject": {
+    "id": "atul@sgnl.ai",
+  },
+  "queries": [
+    {
+      "action": "read",
+      "resource": {
+        "type": "customer"
+      }
+    },
+    {
+      "action": "read",
+      "resource": {
+        "id": "efgh",
+        "type": "customer",
+        "attributeNames": [
+          "homeAddress"
+        ]
+      }
+    }
+  ]
+}
+</pre>
+</div>
+<figcaption><a href="#figure-9" class="selfRef">Figure 9</a>:
+<a href="#name-example-of-an-access-evaluati" class="selfRef">Example of an Access Evaluations Request</a>
+            </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="access-evaluations-response">
+<section id="section-2.6.4">
+          <h4 id="name-access-evaluations-response">
+<a href="#section-2.6.4" class="section-number selfRef">2.6.4. </a><a href="#name-access-evaluations-response" class="section-name selfRef">Access Evaluations Response</a>
+          </h4>
+<p id="section-2.6.4-1">The success response to an Access Evaluations Request is an Access Evaluations Response. It is a HTTP response of type <code>application/json</code>. Its body is a JSON object that contains the following fields:<a href="#section-2.6.4-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.6.4-2">
+            <dt id="section-2.6.4-2.1">iat:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.4-2.2">
+              <p id="section-2.6.4-2.2.1">OPTIONAL. The issued at time in <code>integer</code> format, expressed as epoch milliseconds<a href="#section-2.6.4-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.6.4-2.3">exp:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.4-2.4">
+              <p id="section-2.6.4-2.4.1">OPTIONAL. The time in <code>integer</code> format, expressed at epoch milliseconds, after which the response SHOULD NOT be used<a href="#section-2.6.4-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.6.4-2.5">subject:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.4-2.6">
+              <p id="section-2.6.4-2.6.1">OPTIONAL. The subject for which the response is being issued. The format of this field is as described in the Subjects section (<a href="#subjects" class="auto internal xref">Section 2.2.1</a>)<a href="#section-2.6.4-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.6.4-2.7">decisions:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.4-2.8">
+              <p id="section-2.6.4-2.8.1">REQUIRED. An array of Resource Query Decisions as described in the Resource Query Decision section (<a href="#resource-query-decision" class="auto internal xref">Section 2.3.1</a>).<a href="#section-2.6.4-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.6.4-2.9">reasons:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.4-2.10">
+              <p id="section-2.6.4-2.10.1">OPTIONAL. An array of Reason Objects (<a href="#reason-object" class="auto internal xref">Section 2.2.6.3.1.2</a>) which provide details of every reason identifier specified in the <code>decisions</code> field.  This field is REQUIRED if there is at least one decision in the <code>decisions</code> field that specifies a <code>reason_ids</code> field. The content of the <code>reasons</code> field MUST provide details of every identifier in the <code>reason_ids</code> fields in the <code>decisions</code> array.<a href="#section-2.6.4-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.6.4-2.11">evaluationDuration:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.6.4-2.12">
+              <p id="section-2.6.4-2.12.1">OPTIONAL. The time in milliseconds, in <code>integer</code> format, that it took to respond to the Access Evaluation Request.<a href="#section-2.6.4-2.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-2.6.4-3">Following is a non-normative example of an Access Evaluations Response:<a href="#section-2.6.4-3" class="pilcrow">¶</a></p>
+<span id="name-example-of-an-access-evaluatio"></span><div id="example-access-evaluations-response">
+<figure id="figure-10">
+            <div class="breakable lang-http sourcecode" id="section-2.6.4-4.1">
+<pre>
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "iat": 1234567890,
+  "exp": 1234568890,
+  "subject": {
+    "id": "atul@sgnl.ai"
+  }
+  "decisions": [
+    {
+      "action": "read",
+      "resource": {
+        "type": "customer"
+      },
+      "decision": "deny",
+      "reasons": [1]
+    },
+    {
+      "action": "read",
+      "resource": {
+        "id": "efgh",
+        "type": "customer",
+      },
+      "decision": "allow"
+    }
+  ],
+  "reasons": [
+    {
+      "id": 0,
+      "reason_admin": {
+        "en": "Request failed policy C076E82F"
+      },
+      "reason_user": {
+        "en-403": "Insufficient privileges. Contact your administrator",
+        "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
+      }
+    },
+    {
+      "id": 1,
+      "reason_admin": {
+        "en-410": "Access attempt from multiple regions"
+      },
+      "reason_user": {
+        "en": "Insufficient privileges. Contact your administrator"
+      }
+    }
+  ],
+  "evaluationDuration": 30
+}
+</pre>
+</div>
+<figcaption><a href="#figure-10" class="selfRef">Figure 10</a>:
+<a href="#name-example-of-an-access-evaluatio" class="selfRef">Example of an Access Evaluation Response</a>
+            </figcaption></figure>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="resource-search-api">
+<section id="section-2.7">
+        <h3 id="name-resource-search-api">
+<a href="#section-2.7" class="section-number selfRef">2.7. </a><a href="#name-resource-search-api" class="section-name selfRef">Resource Search API</a>
+        </h3>
+<p id="section-2.7-1">The Resource Access Search API enables a PEP to find out all resources a subject has access to.<a href="#section-2.7-1" class="pilcrow">¶</a></p>
+<p id="section-2.7-2">The Resource Access Search API is available at the relative URL <code>/resourcesearch/</code> via the <code>POST</code> HTTP method<a href="#section-2.7-2" class="pilcrow">¶</a></p>
+<div id="resource-search-request">
+<section id="section-2.7.1">
+          <h4 id="name-resource-search-request">
+<a href="#section-2.7.1" class="section-number selfRef">2.7.1. </a><a href="#name-resource-search-request" class="section-name selfRef">Resource Search Request</a>
+          </h4>
+<p id="section-2.7.1-1">A Resource Search Request has request parameters and a request body. The request parameters are:<a href="#section-2.7.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.7.1-2">
+            <dt id="section-2.7.1-2.1">pageToken:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.7.1-2.2">
+              <p id="section-2.7.1-2.2.1">OPTIONAL. A string value that is returned in a previous Search Response (<a href="#search-response" class="auto internal xref">Section 2.7.3</a>), which indicates that the request is a continuation of a previous request<a href="#section-2.7.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.7.1-2.3">pageSize:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.7.1-2.4">
+              <p id="section-2.7.1-2.4.1">OPTIONAL. The maximum number of <code>decision</code> items in a Search Response (<a href="#search-response" class="auto internal xref">Section 2.7.3</a>). The API MAY return a smaller number of items but SHOULD NOT return a number of items that is greater than this value<a href="#section-2.7.1-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-2.7.1-3">The content of a Search Request body is a JSON object with the following fields:<a href="#section-2.7.1-3" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.7.1-4">
+            <dt id="section-2.7.1-4.1">subject:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.7.1-4.2">
+              <p id="section-2.7.1-4.2.1">REQUIRED. A subject as described in the Subjects section (<a href="#subjects" class="auto internal xref">Section 2.2.1</a>)<a href="#section-2.7.1-4.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.7.1-4.3">queries:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.7.1-4.4">
+              <p id="section-2.7.1-4.4.1">REQUIRED. An array of <code>string</code> values as described in the Actions section (<a href="#actions" class="auto internal xref">Section 2.2.3</a>).<a href="#section-2.7.1-4.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-2.7.1-5">The following is a non-normative example of a Search Request:<a href="#section-2.7.1-5" class="pilcrow">¶</a></p>
+<span id="name-example-access-request"></span><div id="example-search-request">
+<figure id="figure-11">
+            <div class="lang-http sourcecode" id="section-2.7.1-6.1">
+<pre>
+POST /resourcesearch HTTP/1.1
+Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM2Q4"&amp;pageSize=2
+Authorization: &lt;myoauthtoken&gt;
+
+{
+  "subject": {
+    "id": "atul@sgnl.ai"
+    "ipAddress": "172.217.22.14",
+  }
+  "queries": ["delete", "read"],
+}
+</pre>
+</div>
+<figcaption><a href="#figure-11" class="selfRef">Figure 11</a>:
+<a href="#name-example-access-request" class="selfRef">Example Access Request</a>
+            </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="resource-query-result">
+<section id="section-2.7.2">
+          <h4 id="name-resource-query-result">
+<a href="#section-2.7.2" class="section-number selfRef">2.7.2. </a><a href="#name-resource-query-result" class="section-name selfRef">Resource Query result</a>
+          </h4>
+<p id="section-2.7.2-1">A Resource Query Result is a JSON object representing a single result for a Resource Search Request. The Resource Query result always convey a positive ("Allow") decision.
+Its body is a JSON object with teh following fields:<a href="#section-2.7.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.7.2-2">
+            <dt id="section-2.7.2-2.1">action:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.7.2-2.2">
+              <p id="section-2.7.2-2.2.1">REQUIRED. The action that the subject is granted on this resource.<a href="#section-2.7.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.7.2-2.3">resource:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.7.2-2.4">
+              <p id="section-2.7.2-2.4.1">REQUIRED. An object representing the resource.<a href="#section-2.7.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-2.7.2-3">The following is a non-normative example of a Resource Query Result:<a href="#section-2.7.2-3" class="pilcrow">¶</a></p>
+<span id="name-example-resource-query-resu"></span><div id="example-resource-query-result">
+<figure id="figure-12">
+            <div class="lang-json sourcecode" id="section-2.7.2-4.1">
+<pre>
+{
+  "action": "stream",
+  "resource": {
+    "id": "1234"
+  }
+}
+</pre>
+</div>
+<figcaption><a href="#figure-12" class="selfRef">Figure 12</a>:
+<a href="#name-example-resource-query-resu" class="selfRef">Example Resource Query Result</a>
+            </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="search-response">
+<section id="section-2.7.3">
+          <h4 id="name-resource-search-response">
+<a href="#section-2.7.3" class="section-number selfRef">2.7.3. </a><a href="#name-resource-search-response" class="section-name selfRef">Resource Search Response</a>
+          </h4>
+<p id="section-2.7.3-1">The success response to a Resource Search Request is a Resource Search Response. It is a HTTP response of type <code>application/json</code>. The Resource Search Response contains only positive results: only those Resources that the given Subject has access to. Any Resources not returned are therefore not accessible by the subject.
+Its body is a JSON object that contains the following fields:<a href="#section-2.7.3-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.7.3-2">
+            <dt id="section-2.7.3-2.1">iat:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.7.3-2.2">
+              <p id="section-2.7.3-2.2.1">REQUIRED. The issued at time in <code>integer</code> format, expressed as epoch milliseconds<a href="#section-2.7.3-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.7.3-2.3">exp:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.7.3-2.4">
+              <p id="section-2.7.3-2.4.1">REQUIRED. The time in <code>integer</code> format, expressed at epoch milliseconds, after which the response SHOULD NOT be used<a href="#section-2.7.3-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.7.3-2.5">subject:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.7.3-2.6">
+              <p id="section-2.7.3-2.6.1">REQUIRED. The subject for which the response is being issued. The format of this field is as described in the Subjects section (<a href="#subjects" class="auto internal xref">Section 2.2.1</a>)<a href="#section-2.7.3-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.7.3-2.7">decisions:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.7.3-2.8">
+              <p id="section-2.7.3-2.8.1">REQUIRED. An array of Resource Query Results as described in the Resource Query Result section (<a href="#resource-query-result" class="auto internal xref">Section 2.7.2</a>).<a href="#section-2.7.3-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.7.3-2.9">nextPageToken:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.7.3-2.10">
+              <p id="section-2.7.3-2.10.1">OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.<a href="#section-2.7.3-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-2.7.3-3">Following is a non-normative example of a Resource Search Response:<a href="#section-2.7.3-3" class="pilcrow">¶</a></p>
+<span id="name-example-of-a-resource-searc"></span><div id="example-resource-search-response">
+<figure id="figure-13">
+            <div class="lang-http sourcecode" id="section-2.7.3-4.1">
+<pre>
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
+
+{
+  "iat": 1234567890,
+  "exp": 1234568890,
+  "subject": {
+    "id": "atul@sgnl.ai"
+    "ipAddress": "172.217.22.14",
+  }
+  "decisions": [
+    {
+      "action": "read",
+      "resource": {
+        "id": "efgh",
+        "type": "customer",
+      }
+    },
+    {
+      "action": "delete",
+      "resource": {
+        "id": "report.docx",
+        "type": "Document",
+      }
+    }
+  ],
+  "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
+}
+</pre>
+</div>
+<figcaption><a href="#figure-13" class="selfRef">Figure 13</a>:
+<a href="#name-example-of-a-resource-searc" class="selfRef">Example of a Resource Search Response</a>
+            </figcaption></figure>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="subject-search-api">
+<section id="section-2.8">
+        <h3 id="name-subject-search-api">
+<a href="#section-2.8" class="section-number selfRef">2.8. </a><a href="#name-subject-search-api" class="section-name selfRef">Subject Search API</a>
+        </h3>
+<p id="section-2.8-1">The Access Subject Search API does the reverse of the Search API: it enables a PEP or client to find out all the subjects that can access a given resource.<a href="#section-2.8-1" class="pilcrow">¶</a></p>
+<p id="section-2.8-2">The Access Subject Search API is available at the relative URL <code>/subjectsearch/</code> via the <code>POST</code> HTTP method<a href="#section-2.8-2" class="pilcrow">¶</a></p>
+<div id="subject-search-request">
+<section id="section-2.8.1">
+          <h4 id="name-subject-search-request">
+<a href="#section-2.8.1" class="section-number selfRef">2.8.1. </a><a href="#name-subject-search-request" class="section-name selfRef">Subject Search Request</a>
+          </h4>
+<p id="section-2.8.1-1">A Subject Search Request has request parameters and a request body. The request parameters are:<a href="#section-2.8.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.8.1-2">
+            <dt id="section-2.8.1-2.1">pageToken:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.8.1-2.2">
+              <p id="section-2.8.1-2.2.1">OPTIONAL. A string value that is returned in a previous Subject Search Response (<a href="#subject-search-response" class="auto internal xref">Section 2.8.2</a>), which indicates that the request is a continuation of a previous request<a href="#section-2.8.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.8.1-2.3">pageSize:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.8.1-2.4">
+              <p id="section-2.8.1-2.4.1">OPTIONAL. The maximum number of <code>decision</code> items in a Subject Search Response (<a href="#subject-search-response" class="auto internal xref">Section 2.8.2</a>). The API MAY return a smaller number of items but SHOULD NOT return a number of items that is greater than this value<a href="#section-2.8.1-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-2.8.1-3">The content of a Subject Search Request body is a JSON object with the following fields:<a href="#section-2.8.1-3" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.8.1-4">
+            <dt id="section-2.8.1-4.1">resource:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.8.1-4.2">
+              <p id="section-2.8.1-4.2.1">REQUIRED. A resource as described in the Resources section (<a href="#resources" class="auto internal xref">Section 2.2.2</a>)<a href="#section-2.8.1-4.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.8.1-4.3">queries:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.8.1-4.4">
+              <p id="section-2.8.1-4.4.1">REQUIRED. An array of <code>string</code> values as described in the Actions section (<a href="#actions" class="auto internal xref">Section 2.2.3</a>).<a href="#section-2.8.1-4.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<p id="section-2.8.1-5">The following is a non-normative example of a Subject Search Request:<a href="#section-2.8.1-5" class="pilcrow">¶</a></p>
+<span id="name-example-subject-search-requ"></span><div id="example-subject-search-request">
+<figure id="figure-14">
+            <div class="lang-http sourcecode" id="section-2.8.1-6.1">
+<pre>
+POST /subjectsearch HTTP/1.1
+Host: pdp.mycompany.com?pageToken="NWU0OGFiZTItNjI1My00NTQ5LWEzYTctNWQ1YmE1MmVmM2Q4"&amp;pageSize=2
+Authorization: &lt;myoauthtoken&gt;
+
+{
+  "resource": {
+    "id": "somevalue",
+    "type": "document",
+    "attributeNames": [
+      "author",
+      "createDate",
+      "lastUpdated"
+    ]
+   },
+  "queries": ["delete", "read", "write"]
+}
+</pre>
+</div>
+<figcaption><a href="#figure-14" class="selfRef">Figure 14</a>:
+<a href="#name-example-subject-search-requ" class="selfRef">Example Subject Search Request</a>
+            </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="subject-search-response">
+<section id="section-2.8.2">
+          <h4 id="name-subject-search-response">
+<a href="#section-2.8.2" class="section-number selfRef">2.8.2. </a><a href="#name-subject-search-response" class="section-name selfRef">Subject Search Response</a>
+          </h4>
+<p id="section-2.8.2-1">The success response to a Subject Search Request is a Subject Search Response. It is a HTTP response of type <code>application/json</code>. Its body is a JSON object that contains the following fields:<a href="#section-2.8.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.8.2-2">
+            <dt id="section-2.8.2-2.1">iat:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.8.2-2.2">
+              <p id="section-2.8.2-2.2.1">REQUIRED. The issued at time in <code>integer</code> format, expressed as epoch milliseconds<a href="#section-2.8.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.8.2-2.3">subject:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.8.2-2.4">
+              <p id="section-2.8.2-2.4.1">REQUIRED. The subject for which the response is being issued. The format of this field is as described in the Subjects section (<a href="#subjects" class="auto internal xref">Section 2.2.1</a>)<a href="#section-2.8.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.8.2-2.5">decisions:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.8.2-2.6">
+              <p id="section-2.8.2-2.6.1">REQUIRED. An array of Subject Query results as described below (<a href="#subject-query-result" class="auto internal xref">Section 2.8.2.1</a>).<a href="#section-2.8.2-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+<dt id="section-2.8.2-2.7">nextPageToken:</dt>
+            <dd style="margin-left: 1.5em" id="section-2.8.2-2.8">
+              <p id="section-2.8.2-2.8.1">OPTIONAL. A string that MAY be used in a Search Request to fetch the next set of responses.<a href="#section-2.8.2-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+</dl>
+<div id="subject-query-result">
+<section id="section-2.8.2.1">
+            <h5 id="name-subject-query-result">
+<a href="#section-2.8.2.1" class="section-number selfRef">2.8.2.1. </a><a href="#name-subject-query-result" class="section-name selfRef">Subject Query Result</a>
+            </h5>
+<p id="section-2.8.2.1-1">A Subject Query Result is array of Subject Query Decisions (<a href="#example-subject-query-decision" class="auto internal xref">Figure 15</a>). It is JSON object combining a subject, a list of resource attribute names and an action. Given that a Subject Query result is expected to be the response to a Subject Search, only positive matches should be returned; i.e., only those subjects that match the search criteria (those subjects that are allowed to access the provided Resource Attributes). Any Subjects absent from the results do not have any access to the Resource. 
+A Subject Query Result has the following fields:<a href="#section-2.8.2.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.8.2.1-2">
+              <dt id="section-2.8.2.1-2.1">actions:</dt>
+              <dd style="margin-left: 1.5em" id="section-2.8.2.1-2.2">
+                <p id="section-2.8.2.1-2.2.1">OPTIONAL. An Array of the action for which the decision is provided. The format is as described in the Actions section (<a href="#actions" class="auto internal xref">Section 2.2.3</a>). The values in this list should match the values provided as queries in the Subject Search request.<a href="#section-2.8.2.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+              <dd class="break"></dd>
+<dt id="section-2.8.2.1-2.3">attributeNames:</dt>
+              <dd style="margin-left: 1.5em" id="section-2.8.2.1-2.4">
+                <p id="section-2.8.2.1-2.4.1">OPTIONAL. An Array of attribute names of the resource for which the response applies. The attribute is provided only if attributes were part of the Subject search request. In that case, the attribute names must match those that are part of the request.<a href="#section-2.8.2.1-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+              <dd class="break"></dd>
+<dt id="section-2.8.2.1-2.5">subject:</dt>
+              <dd style="margin-left: 1.5em" id="section-2.8.2.1-2.6">
+                <p id="section-2.8.2.1-2.6.1">REQUIRED. The subject for which the decision is provided. The format is as described in the Subjects section (<a href="#subjects" class="auto internal xref">Section 2.2.1</a>).<a href="#section-2.8.2.1-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+            <dd class="break"></dd>
+</dl>
+<p id="section-2.8.2.1-3">The following is a non-normative example of a Subject Query Decision:<a href="#section-2.8.2.1-3" class="pilcrow">¶</a></p>
+<span id="name-example-subject-query-decis"></span><div id="example-subject-query-decision">
+<figure id="figure-15">
+              <div class="lang-json sourcecode" id="section-2.8.2.1-4.1">
+<pre>
+{
+  "actions": ["delete", "read", "write"],
+  "attributeNames": [
+    "author",
+    "createDate",
+    "lastUpdated"
+  ],
+  "subject": {
+    "id": "alex@3edges.com"
+  }
+}
+</pre>
+</div>
+<figcaption><a href="#figure-15" class="selfRef">Figure 15</a>:
+<a href="#name-example-subject-query-decis" class="selfRef">Example Subject Query Decision</a>
+              </figcaption></figure>
+</div>
+<p id="section-2.8.2.1-5">Following is a non-normative example of a Subject Search Response:<a href="#section-2.8.2.1-5" class="pilcrow">¶</a></p>
+<span id="name-example-of-a-subject-search"></span><div id="example-subject-search-response">
+<figure id="figure-16">
+              <div class="breakable lang-http sourcecode" id="section-2.8.2.1-6.1">
+<pre>
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305720
+
+{
+  "iat": 1234567890,
+  "resource": {
+    "id": "somevalue",
+    "type": "document",
+    "attributeNames": [
+      "author",
+      "createDate",
+      "lastUpdated"
+    ]
+  },
+  "queries": [
+    "write",
+    "read"
+  ],
+  "decisions": [
+    {
+      "action": "write",
+      "attributeNames": [
+        "author"
+      ],
+      "subject": {
+        "id": "alex@3edges.com"
+      }
+    },
+    {
+      "action": "read",
+      "attributeNames": [
+        "author",
+        "createDate",
+        "lastUpdated"
+      ],
+      "subject": {
+        "id": "alex@3edges.com"
+      }
+    },
+    {
+      "action": "read",
+      "attributeNames": [
+        "author",
+        "createDate",
+        "lastUpdated"
+      ],
+      "subject": {
+        "id": "Janet@3edges.com"
+      }
+    }
+  ],
+  "nextPageToken": "1DlR0Em5panAPy5llasLPfNUpDztEKgTDKF2I5gPwymnc"
+}
+</pre>
+</div>
+<figcaption><a href="#figure-16" class="selfRef">Figure 16</a>:
+<a href="#name-example-of-a-subject-search" class="selfRef">Example of a Subject Search Response</a>
+              </figcaption></figure>
+</div>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="transport">
+<section id="section-3">
+      <h2 id="name-transport">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-transport" class="section-name selfRef">Transport</a>
+      </h2>
+<div id="rest-binding">
+<section id="section-3.1">
+        <h3 id="name-rest-binding">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-rest-binding" class="section-name selfRef">REST Binding</a>
+      </h3>
+</section>
+</div>
+<div id="request-identification">
+<section id="section-3.2">
+        <h3 id="name-request-identification">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-request-identification" class="section-name selfRef">Request Identification</a>
+        </h3>
+<p id="section-3.2-1">All requests to the API MAY have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. If present, the request identifier SHALL be provided using the HTTP Header <code>X-Request-ID</code>. The value of this header is an arbitrary string. The following non-normative example describes this header:<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<span id="name-request-id-example"></span><div id="requestidexample">
+<figure id="figure-17">
+          <div class="lang-http sourcecode" id="section-3.2-2.1">
+<pre>
+POST /access/v1/evaluations HTTP/1.1
+Authorization: Bearer mF_9.B5f-4.1JqM
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+</pre>
+</div>
+<figcaption><a href="#figure-17" class="selfRef">Figure 17</a>:
+<a href="#name-request-id-example" class="selfRef">Request Id Example</a>
+          </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="request-identification-in-a-response">
+<section id="section-3.3">
+        <h3 id="name-request-identification-in-a">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-request-identification-in-a" class="section-name selfRef">Request Identification in a Response</a>
+        </h3>
+<p id="section-3.3-1">A PDP responding to an Authorization API request MUST include a request identifier in the response. The request identifier is specified in the HTTP Response header: <code>X-Request-ID</code>. If the PEP specified a request identifier in the request, the PDP MUST include the same identifier in the response to that request. If the PEP has not specified a request identifier in the request, the PDP MUST generate a new request identifier in its response to the PEP. The following is an non-normative example of an HTTP Response with this header:<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<span id="name-example-http-response-with-"></span><div id="example-response-request-id">
+<figure id="figure-18">
+          <div class="lang-http sourcecode" id="section-3.3-2.1">
+<pre>
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+</pre>
+</div>
+<figcaption><a href="#figure-18" class="selfRef">Figure 18</a>:
+<a href="#name-example-http-response-with-" class="selfRef">Example HTTP response with a Request Id</a>
+          </figcaption></figure>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="IANA">
+<section id="section-4">
+      <h2 id="name-iana-considerations">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-4-1">TBS<a href="#section-4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="Security">
+<section id="section-5">
+      <h2 id="name-security-considerations">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-5-1">TBS<a href="#section-5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-normative-references">
+<section id="section-6">
+      <h2 id="name-normative-references">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+      </h2>
+<dl class="references">
+<dt id="RFC4001">[RFC4001]</dt>
+      <dd>
+<span class="refAuthor">Daniele, M.</span>, <span class="refAuthor">Haberman, B.</span>, <span class="refAuthor">Routhier, S.</span>, and <span class="refAuthor">J. Schoenwaelder</span>, <span class="refTitle">"Textual Conventions for Internet Network Addresses"</span>, <span class="seriesInfo">RFC 4001</span>, <span class="seriesInfo">DOI 10.17487/RFC4001</span>, <time datetime="2005-02" class="refDate">February 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4001">https://www.rfc-editor.org/rfc/rfc4001</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5234">[RFC5234]</dt>
+      <dd>
+<span class="refAuthor">Crocker, D., Ed.</span> and <span class="refAuthor">P. Overell</span>, <span class="refTitle">"Augmented BNF for Syntax Specifications: ABNF"</span>, <span class="seriesInfo">STD 68</span>, <span class="seriesInfo">RFC 5234</span>, <span class="seriesInfo">DOI 10.17487/RFC5234</span>, <time datetime="2008-01" class="refDate">January 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5234">https://www.rfc-editor.org/rfc/rfc5234</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6749">[RFC6749]</dt>
+      <dd>
+<span class="refAuthor">Hardt, D., Ed.</span>, <span class="refTitle">"The OAuth 2.0 Authorization Framework"</span>, <span class="seriesInfo">RFC 6749</span>, <span class="seriesInfo">DOI 10.17487/RFC6749</span>, <time datetime="2012-10" class="refDate">October 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6749">https://www.rfc-editor.org/rfc/rfc6749</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6750">[RFC6750]</dt>
+      <dd>
+<span class="refAuthor">Jones, M.</span> and <span class="refAuthor">D. Hardt</span>, <span class="refTitle">"The OAuth 2.0 Authorization Framework: Bearer Token Usage"</span>, <span class="seriesInfo">RFC 6750</span>, <span class="seriesInfo">DOI 10.17487/RFC6750</span>, <time datetime="2012-10" class="refDate">October 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6750">https://www.rfc-editor.org/rfc/rfc6750</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8259">[RFC8259]</dt>
+      <dd>
+<span class="refAuthor">Bray, T., Ed.</span>, <span class="refTitle">"The JavaScript Object Notation (JSON) Data Interchange Format"</span>, <span class="seriesInfo">STD 90</span>, <span class="seriesInfo">RFC 8259</span>, <span class="seriesInfo">DOI 10.17487/RFC8259</span>, <time datetime="2017-12" class="refDate">December 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8259">https://www.rfc-editor.org/rfc/rfc8259</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9110">[RFC9110]</dt>
+      <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <span class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI 10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="XACML">[XACML]</dt>
+    <dd>
+<span class="refAuthor">Godik, S., Ed.</span> and <span class="refAuthor">T. M. (Ed.), Ed.</span>, <span class="refTitle">"eXtensible Access Control Markup Language (XACML) Version 1.1"</span>, <time datetime="2006" class="refDate">2006</time>, <span>&lt;<a href="https://www.oasis-open.org/committees/xacml/repository/cs-xacml-specification-1.1.pdf">https://www.oasis-open.org/committees/xacml/repository/cs-xacml-specification-1.1.pdf</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="terminology">
+<section id="appendix-A">
+      <h2 id="name-terminology">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+      </h2>
+<span class="break"></span><dl class="dlParallel" id="appendix-A-1">
+        <dt id="appendix-A-1.1">Subject:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-A-1.2">
+          <p id="appendix-A-1.2.1">The user or robotic principal about whom the Authorization API call is being made<a href="#appendix-A-1.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-A-1.3">Resource:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-A-1.4">
+          <p id="appendix-A-1.4.1">The target of the request; the resource about which the Authorization API is being made<a href="#appendix-A-1.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-A-1.5">Action:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-A-1.6">
+          <p id="appendix-A-1.6.1">The operation the Subject has attempted on the Resource in an Authorization API call<a href="#appendix-A-1.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-A-1.7">PDP:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-A-1.8">
+          <p id="appendix-A-1.8.1">Policy Decision Point. The component or system that provides authorization decisions over the network interface defined here as the Authorization API<a href="#appendix-A-1.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-A-1.9">PEP:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-A-1.10">
+          <p id="appendix-A-1.10.1">Policy Enforcement Point. The component or system that requests decisions from the PDP and enforces access to specific requests based on the decisions obtained from the PDP<a href="#appendix-A-1.10.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="Acknowledgements">
+<section id="appendix-B">
+      <h2 id="name-acknowledgements">
+<a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
+      </h2>
+<p id="appendix-B-1">This template uses extracts from templates written by
+<span class="contact-name">Pekka Savola</span>, <span class="contact-name">Elwyn Davies</span> and
+<span class="contact-name">Henrik Levkowetz</span>.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="contributors">
+<section id="appendix-C">
+      <h2 id="name-contributors">
+<a href="#name-contributors" class="section-name selfRef">Contributors</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Marc Jordan</span></div>
+<div dir="auto" class="left"><span class="org">SGNL</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:marc@sgnl.ai" class="email">marc@sgnl.ai</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Erik Gustavson</span></div>
+<div dir="auto" class="left"><span class="org">SGNL</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:erik@sgnl.ai" class="email">erik@sgnl.ai</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Alex Babeanu</span></div>
+<div dir="auto" class="left"><span class="org">3Edges</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:alex@3edges.com" class="email">alex@3edges.com</a>
+</div>
+</address>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-D">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Atul Tulshibagwale (<span class="role">editor</span>)</span></div>
+<div dir="auto" class="left"><span class="org">SGNL</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:atul@sgnl.ai" class="email">atul@sgnl.ai</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">David Brossard (<span class="role">editor</span>)</span></div>
+<div dir="auto" class="left"><span class="org">Axiomatics</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:david.brossard@axiomatics.com" class="email">david.brossard@axiomatics.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Omri Gazitt (<span class="role">editor</span>)</span></div>
+<div dir="auto" class="left"><span class="org">Aserto</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:omri@aserto.com" class="email">omri@aserto.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>

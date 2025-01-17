@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Ruby
-        uses: ruby/setup-ruby@ec02537da5712d66d4d50a0f33b7eb52773b5ed1
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
       - uses: actions/setup-python@v5
@@ -25,79 +25,23 @@ jobs:
       - name: Install xml2rfc
         run: pip install xml2rfc
 
-      - name: Convert Authz API 1.0 revision 00 to rfc xml
-        run: kramdown-rfc2629 api/authorization-api-1_0_00.md > api/authorization-api-1_0_00.xml
-      - name: Render Authz API 1.0 revision 00 HTML
-        run: xml2rfc api/authorization-api-1_0_00.xml --html -o authorization-api-1_0_00.html
-      - name: Render Authz API 1.0 revision 00 Text
-        run: xml2rfc api/authorization-api-1_0_00.xml --text
-      - name: Upload Authz API 1.0 revision 00 artifact
+      - name: Convert working version of Authz API 1.0 to rfc xml
+        run: kramdown-rfc2629 api/authorization-api-1_0.md > api/authorization-api-1_0.xml
+      - name: Render Authz API 1.0 HTML
+        run: xml2rfc api/authorization-api-1_0.xml --html -o authorization-api-1_0.html
+      - name: Render Index HTML (this is the current working draft of the spec)
+        run: xml2rfc api/authorization-api-1_0.xml --html -o index.html
+      - name: Render Authz API 1.0 Text
+        run: xml2rfc api/authorization-api-1_0.xml --text
+      - name: Upload Authz API 1.0 artifact
         uses: actions/upload-artifact@v4
         with:
-          name: authorization-api-1_0_00
-          path: |
-            authorization-api-1_0_00.html
-            api/authorization-api-1_0_00.xml
-
-      - name: Convert Authz API 1.0 revision 01 to rfc xml
-        run: kramdown-rfc2629 api/authorization-api-1_0_01.md > api/authorization-api-1_0_01.xml
-      - name: Render Authz API 1.0 revision 01 HTML
-        run: xml2rfc api/authorization-api-1_0_01.xml --html -o authorization-api-1_0_01.html
-      - name: Render Index HTML (this is the current stable version of the spec)
-        run: xml2rfc api/authorization-api-1_0_01.xml --html -o index.html
-      - name: Render Authz API 1.0 revision 01 Text
-        run: xml2rfc api/authorization-api-1_0_01.xml --text
-      - name: Upload Authz API 1.0 revision 01 artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: authorization-api-1_0_01
+          name: authorization-api-1_0
           path: |
             index.html
-            authorization-api-1_0_01.html
-            api/authorization-api-1_0_01.xml      
-
-      - name: Convert Authz API 1.0 revision 02 to rfc xml
-        run: kramdown-rfc2629 api/authorization-api-1_0_02.md > api/authorization-api-1_0_02.xml
-      - name: Render Authz API 1.0 revision 02 HTML
-        run: xml2rfc api/authorization-api-1_0_02.xml --html -o authorization-api-1_0_02.html
-      - name: Render Authz API 1.0 revision 01 Text
-        run: xml2rfc api/authorization-api-1_0_02.xml --text
-      - name: Upload Authz API 1.0 revision 01 artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: authorization-api-1_0_02
-          path: |
-            authorization-api-1_0_02.html
-            api/authorization-api-1_0_02.xml
-
-      - name: Convert Authz API 1.1 revision 01 to rfc xml
-        run: kramdown-rfc2629 api/authorization-api-1_1_01.md > api/authorization-api-1_1_01.xml
-      - name: Render Authz API 1.1 revision 01 HTML
-        run: xml2rfc api/authorization-api-1_1_01.xml --html -o authorization-api-1_1_01.html
-      - name: Render Authz API 1.1 revision 01 Text
-        run: xml2rfc api/authorization-api-1_1_01.xml --text
-      - name: Upload Authz API 1.1 revision 01 artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: authorization-api-1_1_01
-          path: |
-            authorization-api-1_1_01.html
-            api/authorization-api-1_1_01.xml      
+            authorization-api-1_0.html
+            api/authorization-api-1_0.xml
       
-      - name: Convert Authz API Original to rfc xml
-        run: kramdown-rfc2629 api/authorization-api-1_0-original.md > api/authorization-api-1_0-original.xml
-      - name: Render Authz API Original HTML
-        run: xml2rfc api/authorization-api-1_0-original.xml --html -o authorization-api-1_0-original.html
-      - name: Render Authz API Original Text
-        run: xml2rfc api/authorization-api-1_0-original.xml --text
-      - name: Upload Authz API Original artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: authorization-api-1_0-original
-          path: |
-            authorization-api-1_0-original.html
-            api/authorization-api-1_0-original.xml
-
       - name: Convert Authz Design Patterns to rfc xml
         run: kramdown-rfc2629 patterns/AuthorizationDesignPatterns.md > patterns/AuthorizationDesignPatterns.xml
       - name: Render Authz Design Patterns HTML
@@ -110,7 +54,15 @@ jobs:
           name: patterns-doc
           path: |
             patterns.html
-            patterns/AuthorizationDesignPatterns.xml            
+            patterns/AuthorizationDesignPatterns.xml
+
+      - name: Upload Authz API 1.0 original submission artifact (version 0_0)
+        uses: actions/upload-artifact@v4
+        with:
+          name: authorization-api-0_0
+          path: |
+            archive/authorization-api-0_0.html
+
   publish-to-pages:
     if: github.ref == 'refs/heads/main'
     needs: [build-rfc]
