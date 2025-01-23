@@ -29,3 +29,5 @@ yarn-error.log*
 .pnp
 .pnp.js
 todo.db
+
+.vscode/
