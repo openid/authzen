@@ -5,13 +5,13 @@ import { LoginWrapper } from "./LoginWrapper";
 import { AuthProvider } from "oidc-react";
 
 const configuration = {
-  authority: `https://${process.env.REACT_APP_OIDC_DOMAIN}/dex`,
-  clientId: process.env.REACT_APP_OIDC_CLIENT_ID,
+  authority: `https://${import.meta.env.VITE_OIDC_DOMAIN}/dex`,
+  clientId: import.meta.env.VITE_OIDC_CLIENT_ID,
   autoSignIn: true,
   responseType: "id_token",
   scope: "openid profile email",
   redirectUri: window.location.origin,
-  audience: process.env.REACT_APP_OIDC_AUDIENCE,
+  audience: import.meta.env.VITE_OIDC_AUDIENCE,
   onSignIn: () => {
     window.location.replace(window.location.origin);
   },

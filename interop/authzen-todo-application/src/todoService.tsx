@@ -11,14 +11,15 @@ const serviceContext = React.createContext({
 });
 
 const urls = {
-  pdps: `${process.env.REACT_APP_API_ORIGIN}/pdps`,
-  todos: `${process.env.REACT_APP_API_ORIGIN}/todos`,
-  todo: (id: string) => `${process.env.REACT_APP_API_ORIGIN}/todos/${id}`,
-  user: (id: string) => `${process.env.REACT_APP_API_ORIGIN}/users/${id}`,
+  pdps: `${import.meta.env.VITE_API_ORIGIN}/pdps`,
+  todos: `${import.meta.env.VITE_API_ORIGIN}/todos`,
+  todo: (id: string) => `${import.meta.env.VITE_API_ORIGIN}/todos/${id}`,
+  user: (id: string) => `${import.meta.env.VITE_API_ORIGIN}/users/${id}`,
 };
 
 export const useTodoService: () => ITodoService = () => {
-  const { token, pdp, specVersion, setPdp, setSpecVersion } = useContext(serviceContext);
+  const { token, pdp, specVersion, setPdp, setSpecVersion } =
+    useContext(serviceContext);
   const headers: Headers = new Headers();
 
   headers.append("Authorization", `Bearer ${token}`);
@@ -121,7 +122,9 @@ const TodoService: React.FC<React.PropsWithChildren<ServiceProps>> = ({
   setSpecVersion,
 }) => {
   return (
-    <serviceContext.Provider value={{ token, pdp, specVersion, setPdp, setSpecVersion }}>
+    <serviceContext.Provider
+      value={{ token, pdp, specVersion, setPdp, setSpecVersion }}
+    >
       {children}
     </serviceContext.Provider>
   );
