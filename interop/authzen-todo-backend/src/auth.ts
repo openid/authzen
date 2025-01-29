@@ -53,7 +53,7 @@ const resourceMapper = async (
       const todo = await store.get(req.params.id);
       return {
         type: "todo",
-        id: todo.OwnerID,
+        id: todo.ID,
         ownerID: specVersion === "1.0-preview" ? todo.OwnerID : undefined,
         properties:
           specVersion !== "1.0-preview" ? { ownerID: todo.OwnerID } : undefined,
@@ -63,7 +63,7 @@ const resourceMapper = async (
       const todoToDelete = await store.get(req.params.id);
       return {
         type: "todo",
-        id: todoToDelete.OwnerID,
+        id: todoToDelete.ID,
         ownerID:
           specVersion === "1.0-preview" ? todoToDelete.OwnerID : undefined,
         properties:
