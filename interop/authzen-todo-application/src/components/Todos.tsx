@@ -1,9 +1,8 @@
-import * as React from "react";
 import { Todo as TodoItem } from "./Todo";
-import { TodosProps, Todo } from "../interfaces";
+import { TodosProps } from "../interfaces";
 import { useTodos } from "../hooks/useTodos";
 
-export const Todos: React.FC<TodosProps> = (props) => {
+export const Todos = (props: TodosProps) => {
   const { todos, updateTodo, deleteTodo } = useTodos();
 
   return (

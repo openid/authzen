@@ -1,11 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { createTodoApi } from "../api/todoApi";
 import { Todo, TodoValues } from "../interfaces";
 
 import { useConfig } from "../context/ConfigContext";
 import { errorHandler } from "../utils/errorHandler";
 import { queryClient } from "../utils/queryClient";
-import { useState } from "react";
 
 export const useTodos = () => {
   const { headers } = useConfig();

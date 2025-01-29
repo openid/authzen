@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import "react-toastify/dist/ReactToastify.css";
 import "todomvc-app-css/index.css";

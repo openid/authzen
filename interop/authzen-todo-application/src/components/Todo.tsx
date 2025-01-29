@@ -1,8 +1,7 @@
-import React from "react";
 import { TodoProps } from "../interfaces";
 import { useUser } from "../hooks/useUser";
 
-export const Todo: React.FC<TodoProps> = (todoProps) => {
+export const Todo = (todoProps: TodoProps) => {
   const { user } = useUser(todoProps.todo.OwnerID);
 
   return (
