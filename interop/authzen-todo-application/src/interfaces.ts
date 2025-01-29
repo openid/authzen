@@ -35,7 +35,7 @@ export interface TodoProps {
   handleDeleteChange: (Todo: Todo) => void;
 }
 
-export interface TodosPropsn {
+export interface TodosProps {
   // todos: Todo[] | void;
   showCompleted: boolean;
   showActive: boolean;
