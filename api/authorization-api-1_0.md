@@ -7,7 +7,7 @@ wg: OpenID AuthZEN
 
 docname: authorization-api-1_0
 
-title: Authorization API 1.0 – draft 02
+title: Authorization API 1.0 – draft 03
 abbrev: azapi
 lang: en
 kw:
@@ -53,7 +53,6 @@ normative:
   RFC6749: # OAuth
   RFC8259: # JSON
   RFC9110: # HTTP Semantics
-  RFC9493: # Subject Identifiers for Security Event Tokens
   XACML:
     title: eXtensible Access Control Markup Language (XACML) Version 1.1
     target: https://www.oasis-open.org/committees/xacml/repository/cs-xacml-specification-1.1.pdf
@@ -816,6 +815,226 @@ The following is a non-normative example of a response to an Access Evaluations 
 }
 ~~~
 
+# Subject Search API {#subject-search-api}
+
+The Subject Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the subjects that match the search criteria.
+
+The Subject Search API is based on the Access Evaluation information model, but omits the Subject ID.
+
+## The Subject Search API Request {#subject-search-request}
+
+The Subject Search request is a 3-tuple constructed of three previously defined entities:
+
+`subject`:
+: REQUIRED. The subject (or principal) of type Subject.  NOTE that the Subject type is REQUIRED but the Subject ID can be omitted, and if present, is IGNORED.
+
+`action`:
+: REQUIRED. The action (or verb) of type Action.
+
+`resource`:
+: REQUIRED. The resource of type Resource.
+
+`page`:
+: OPTIONAL. A page token for paged requests.
+
+### Example (non-normative)
+
+The following payload defines a request for the subjects of type `user` that can perform the `can_read` action on the resource of type `account` and ID `123`.
+
+~~~ json
+{
+  "subject": {
+    "type": "user"
+  },
+  "action": {
+    "name": "can_read",
+  },
+  "resource": {
+    "type": "account",
+    "id": "123"
+  }
+}
+~~~
+{: #subject-search-request-example title="Example Request"}
+
+## The Subject Search API Response {#subject-search-response}
+
+The response is a paged array of Subjects.
+
+~~~ json
+{
+  "results": [
+    {
+      "type": "user",
+      "id": "alice@acmecorp.com"
+    },
+    {
+      "type": "user",
+      "id": "bob@acmecorp.com"
+    }
+  ],
+  "page": {
+    "next_token": ""
+  }
+}
+~~~
+
+### Paged requests
+
+A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
+
+#### Example
+
+~~~ json
+{
+  "results": [
+    {
+      "type": "user",
+      "id": "alice@acmecorp.com"
+    },
+    {
+      "type": "user",
+      "id": "bob@acmecorp.com"
+    }
+  ],
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+
+To retrieve the next page, provide `page.next_token` in the next request:
+
+~~~ json
+{
+  "subject": {
+    "type": "user"
+  },
+  "action": {
+    "name": "can_read",
+  },
+  "resource": {
+    "type": "account",
+    "id": "123"
+  },
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+
+Note: page size is implementation-dependent.
+
+# Resource Search API {#resource-search-api}
+
+The Resource Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the resources that match the search criteria.
+
+The Resource Search API is based on the Access Evaluation information model, but omits the Resource ID.
+
+## The Resource Search API Request {#resource-search-request}
+
+The Resource Search request is a 3-tuple constructed of three previously defined entities:
+
+`subject`:
+: REQUIRED. The subject (or principal) of type Subject.
+
+`action`:
+: REQUIRED. The action (or verb) of type Action.
+
+`resource`:
+: REQUIRED. The resource of type Resource. NOTE that the Resource type is REQUIRED but the Resource ID is omitted, and if present, is IGNORED.
+
+`page`:
+: OPTIONAL. A page token for paged requests.
+
+### Example (non-normative)
+
+The following payload defines a request for the resources of type `account` on which the subject of type `user` and ID `alice@acmecorp.com` can perform the `can_read` action.
+
+~~~ json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@acmecorp.com"
+  },
+  "action": {
+    "name": "can_read",
+  },
+  "resource": {
+    "type": "account"
+  }
+}
+~~~
+{: #resource-search-request-example title="Example Request"}
+
+## The Resource Search API Response {#resource-search-response}
+
+The response is a paged array of Resources.
+
+~~~ json
+{
+  "results": [
+    {
+      "type": "account",
+      "id": "123"
+    },
+    {
+      "type": "account",
+      "id": "456"
+    }
+  ],
+  "page": {
+    "next_token": ""
+  }
+}
+~~~
+
+### Paged requests
+
+A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
+
+#### Example
+
+~~~ json
+{
+  "results": [
+    {
+      "type": "account",
+      "id": "123"
+    },
+    {
+      "type": "account",
+      "id": "456"
+    }
+  ],
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+
+To retrieve the next page, provide `page.next_token` in the next request:
+
+~~~ json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@acmecorp.com"
+  },
+  "action": {
+    "name": "can_read",
+  },
+  "resource": {
+    "type": "account"
+  },
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+
+Note: page size is implementation-dependent.
+
 # Transport
 
 This specification defines an HTTPS binding which MUST be implemented by a compliant PDP.
@@ -854,7 +1073,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-access-evaluation-request title="Example of an HTTPS Access Evaluation Request"}
 
-### Access Evaluation HTTPS Response
+### HTTPS Access Evaluation Response
 The success response to an Access Evaluation Request is an Access Evaluation Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluation Response, as defined in {{access-evaluation-response}}.
 
 Following is a non-normative example of an HTTPS Access Evaluation Response:
@@ -870,7 +1089,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-access-evaluation-response title="Example of an HTTP Access Evaluation Response"}
 
-### Access Evaluations HTTPS Request
+### HTTPS Access Evaluations Request
 The Access Evaluations Request is an HTTPS request with `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluations Request, as defined in {{access-evaluations-request}}.
 
 The following is a non-normative example of a the HTTPS binding of the Access Evaluations Request:
@@ -922,7 +1141,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ### HTTPS Access Evaluations Response
 The success response to an Access Evaluations Request is an Access Evaluations Response. It is a HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluations Response, as defined in {{access-evaluations-response}}.
 
-Following is a non-normative example of an HTTPS Access Evaluations Response:
+The following is a non-normative example of an HTTPS Access Evaluations Response:
 
 ~~~ http
 HTTP/1.1 OK
@@ -953,6 +1172,114 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 }
 ~~~
 {: #example-access-evaluations-response title="Example of an HTTPS Access Evaluations Response"}
+
+### HTTPS Subject Search Request
+The Subject Search Request is an HTTPS request with `content-type` of `application/json`. Its body is a JSON object that contains the Subject Search Request, as defined in {{subject-search-request}}.
+
+The following is a non-normative example of the HTTPS binding of the Subject Search Request:
+
+~~~ http
+POST /access/v1/subjectsearch HTTP/1.1
+Host: pdp.mycompany.com
+Authorization: Bearer <myoauthtoken>
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "subject": {
+    "type": "user"
+  },
+  "action": {
+    "name": "can_read"
+  },
+  "resource": {
+    "type": "account",
+    "id": "123",
+  }
+}
+~~~
+{: #example-subject-search-request title="Example of an HTTPS Subject Search Request"}
+
+### HTTPS Subject Search Response
+The success response to a Subject Search Request is a Subject Search Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Subject Search Response, as defined in {{subject-search-response}}.
+
+The following is a non-normative example of an HTTPS Subject Search Response:
+
+~~~ http
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "results": [
+    {
+      "type": "user",
+      "id": "alice@acmecorp.com"
+    },
+    {
+      "type": "user",
+      "id": "bob@acmecorp.com"
+    }
+  ],
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+{: #example-subject-search-response title="Example of an HTTPS Subject Search Response"}
+
+### HTTPS Resource Search Request
+The Resource Search Request is an HTTPS request with `content-type` of `application/json`. Its body is a JSON object that contains the Resource Search Request, as defined in {{resource-search-request}}.
+
+The following is a non-normative example of the HTTPS binding of the Resource Search Request:
+
+~~~ http
+POST /access/v1/resourcesearch HTTP/1.1
+Host: pdp.mycompany.com
+Authorization: Bearer <myoauthtoken>
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@acmecorp.com"
+  },
+  "action": {
+    "name": "can_read"
+  },
+  "resource": {
+    "type": "account"
+  }
+}
+~~~
+{: #example-resource-search-request title="Example of an HTTPS Resource Search Request"}
+
+### HTTPS Resource Search Response
+The success response to a Resource Search Request is a Resource Search Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Resource Search Response, as defined in {{resource-search-response}}.
+
+The following is a non-normative example of an HTTPS Resource Search Response:
+
+~~~ http
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "results": [
+    {
+      "type": "account",
+      "id": "123"
+    },
+    {
+      "type": "account",
+      "id": "456"
+    }
+  ],
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+{: #example-resource-search-response title="Example of an HTTPS Resource Search Response"}
 
 ### Error Responses
 The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTPS status code ({{Section 15 of RFC9110}}) that indicates error.
