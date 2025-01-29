@@ -1,8 +1,10 @@
 import {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { useAuth } from "./AuthContext";
@@ -27,58 +29,75 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
   const { headers } = useAuth();
   const { getPDPs } = createConfigApi(headers);
 
-  const [pdp, setPdp] = useState<string | undefined>(undefined);
-  const [avaliablePDPs, setAvaliablePDPs] = useState<string[]>([]);
-  const [specVersion, setSpecVersion] = useState<string | undefined>(undefined);
-  const [specVersions, setSpecVersions] = useState<string[]>([]);
+  const [pdp, setPdp] = useState<string | undefined>(
+    () => localStorage.getItem("pdp") || undefined
+  );
+  const [specVersion, setSpecVersion] = useState<string | undefined>(
+    () => localStorage.getItem("specVersion") || undefined
+  );
 
-  const { data, isLoading } = useQuery({
+  const { data: config, isLoading } = useQuery({
     queryKey: ["pdps"],
     queryFn: async () => getPDPs() as unknown as Config,
+    select: (data: Config) => {
+      const versions = Object.keys(data);
+      const currentSpec = specVersion || versions[0];
+      const pdps = data[currentSpec];
+
+      return {
+        versions,
+        currentSpec,
+        pdps,
+        defaultPdp: pdp || pdps[0],
+      };
+    },
   });
 
   useEffect(() => {
-    if (data) {
-      const versions = Object.keys(data);
-      setSpecVersions(versions);
-
-      const spec = localStorage.getItem("specVersion") ?? versions[0];
-      setSpecVersion(spec);
-      setAvaliablePDPs(data[spec]);
-
-      setPdp(localStorage.getItem("pdp") ?? data[spec][0]);
+    if (config) {
+      if (!specVersion || !Object.keys(config).includes(specVersion)) {
+        setSpecVersion(config.currentSpec);
+      }
+      if (!pdp || !config.pdps.includes(pdp)) {
+        setPdp(config.defaultPdp);
+      }
     }
-  }, [data]);
+  }, [config, specVersion, pdp]);
 
-  useEffect(() => {
+  const updateHeaders = useCallback(() => {
+    const newHeaders = new Headers(headers);
     if (specVersion) {
-      headers.set("X_AUTHZEN_SPEC_VERSION", specVersion);
+      newHeaders.set("X_AUTHZEN_SPEC_VERSION", specVersion);
     }
     if (pdp) {
-      headers.set("X_AUTHZEN_PDP", pdp);
+      newHeaders.set("X_AUTHZEN_PDP", pdp);
     }
-  }, [specVersion, pdp]);
+    return newHeaders;
+  }, [headers, specVersion, pdp]);
 
-  const value = {
-    headers,
-    isLoading: isLoading || !avaliablePDPs || !pdp || !specVersion,
-    avaliablePDPs,
-    pdp,
-    setPdp: (pdp: string) => {
-      localStorage.setItem("pdp", pdp);
-      setPdp(pdp);
-    },
-    specVersion,
-    setSpecVersion: (specVersion: string) => {
-      localStorage.setItem("specVersion", specVersion);
-      setSpecVersion(specVersion);
-      setAvaliablePDPs(avaliablePDPs);
-      setPdp(avaliablePDPs[0]);
-    },
-    specVersions,
-  };
-
-  console.log(value);
+  const value = useMemo(
+    () => ({
+      headers: updateHeaders(),
+      isLoading: isLoading || !config?.pdps || !pdp || !specVersion,
+      avaliablePDPs: config?.pdps ?? [],
+      pdp,
+      setPdp: (newPdp: string) => {
+        localStorage.setItem("pdp", newPdp);
+        setPdp(newPdp);
+      },
+      specVersion,
+      setSpecVersion: (newSpecVersion: string) => {
+        localStorage.setItem("specVersion", newSpecVersion);
+        setSpecVersion(newSpecVersion);
+        if (config) {
+          const pdps = config.pdps;
+          setPdp(pdps[0]);
+        }
+      },
+      specVersions: config?.versions ?? [],
+    }),
+    [config, isLoading, pdp, specVersion, updateHeaders]
+  );
 
   if (value.isLoading) {
     return <div>Loading config...</div>;
