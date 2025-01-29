@@ -25,8 +25,8 @@ export interface ITodoService {
   getConfig: () => Promise<Config>;
   setPdp: (pdp: string) => void;
   setSpecVersion: (specVersion: string) => void;
-  pdp: string
-  specVersion: string
+  pdp: string;
+  specVersion: string;
 }
 
 export interface TodoProps {
@@ -36,11 +36,11 @@ export interface TodoProps {
 }
 
 export interface TodosPropsn {
-  todos: Todo[] | void;
+  // todos: Todo[] | void;
   showCompleted: boolean;
   showActive: boolean;
-  refreshTodos: () => void;
-  errorHandler(errorText: string, autoClose?: number | boolean): void;
+  // refreshTodos: () => void;
+  // errorHandler(errorText: string, autoClose?: number | boolean): void;
 }
 
 export interface AppProps {
@@ -53,5 +53,5 @@ export interface AuthUser {
 }
 
 export type Config = {
-  [specVersion: string]: string[]
-}
+  [specVersion: string]: string[];
+};
