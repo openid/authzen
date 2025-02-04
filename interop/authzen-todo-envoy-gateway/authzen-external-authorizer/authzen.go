@@ -47,10 +47,7 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 		return false, err
 	}
 
-	resource, err := MatchRoute(request)
-	if err != nil {
-		return false, err
-	}
+	route, err := MatchRoute(request)
 
 	authZENPayload := &AuthZENRequest{
 		Subject: AuthZENSubject{
@@ -60,8 +57,19 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 		Action: AuthZENAction{
 			Name: request.Attributes.Request.Http.Method,
 		},
-		Resource: *resource,
-		Context:  map[string]any{},
+		Resource: AuthZENResource{
+			Type: "route",
+			ID:   route.route,
+			Properties: map[string]any{
+				"uri":      fmt.Sprint(request.Attributes.Request.Http.Scheme, "://", request.Attributes.Request.Http.Host, request.Attributes.Request.Http.Path),
+				"schema":   request.Attributes.Request.Http.Scheme,
+				"hostname": request.Attributes.Request.Http.Host,
+				"path":     request.Attributes.Request.Http.Path,
+				"params":   route.params,
+				"ip":       request.Attributes.Request.Http.Headers["x-forwarded-for"],
+			},
+		},
+		Context: map[string]any{},
 	}
 
 	log.Println("Sending request to PDP")

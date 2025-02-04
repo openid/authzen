@@ -15,7 +15,12 @@ var patterns = map[*regexp.Regexp]string{
 	regexp.MustCompile(`/todos/([a-zA-Z0-9_-]+)$`):   "/todos/{id}",
 }
 
-func MatchRoute(request *auth_pb.CheckRequest) (*AuthZENResource, error) {
+type MatchedRoute struct {
+	route  string
+	params map[string]string
+}
+
+func MatchRoute(request *auth_pb.CheckRequest) (*MatchedRoute, error) {
 	var route string
 	var matches map[string]string
 	for pattern, replacement := range patterns {
@@ -38,16 +43,9 @@ func MatchRoute(request *auth_pb.CheckRequest) (*AuthZENResource, error) {
 		log.Printf("%s route not found\n", request.Attributes.Request.Http.Path)
 		return nil, fmt.Errorf("route not found")
 	}
-	return &AuthZENResource{
-		Type: "route",
-		ID:   route,
-		Properties: map[string]any{
-			"uri":      fmt.Sprint(request.Attributes.Request.Http.Scheme, "://", request.Attributes.Request.Http.Host, request.Attributes.Request.Http.Path),
-			"schema":   request.Attributes.Request.Http.Scheme,
-			"hostname": request.Attributes.Request.Http.Host,
-			"path":     request.Attributes.Request.Http.Path,
-			"params":   matches,
-			"ip":       request.Attributes.Request.Http.Headers["x-forwarded-for"],
-		},
+
+	return &MatchedRoute{
+		route:  route,
+		params: matches,
 	}, nil
 }
