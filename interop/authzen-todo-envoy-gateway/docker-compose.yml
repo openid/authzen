@@ -18,6 +18,7 @@ services:
       context: ./authzen-external-authorizer
     environment:
       - PDP_URL=https://authzen-proxy-demo.cerbos.dev
+      # - PDP_AUTHN=<some authn token>
       - PORT=3001
     develop:
       watch:

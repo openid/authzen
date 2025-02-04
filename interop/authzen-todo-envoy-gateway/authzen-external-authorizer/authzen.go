@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 
 	auth_pb "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
@@ -47,6 +48,27 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 		return false, err
 	}
 
+	// This is emulating the path matching a Gateway would do
+	patterns := map[*regexp.Regexp]string{
+		regexp.MustCompile(`/users$`):                  "/users",
+		regexp.MustCompile(`/users/[a-zA-Z0-9_@.-]+$`): "/users/{id}",
+		regexp.MustCompile(`/todos$`):                  "/todos",
+		regexp.MustCompile(`/todos/[a-zA-Z0-9_-]+$`):   "/todos/{id}",
+	}
+
+	var route string
+	for pattern, replacement := range patterns {
+		if pattern.MatchString(request.Attributes.Request.Http.Path) {
+			route = replacement
+			break
+		}
+	}
+
+	if route == "" {
+		log.Printf("%s route not found\n", request.Attributes.Request.Http.Path)
+		return false, fmt.Errorf("route not found")
+	}
+
 	authZENPayload := &AuthZENRequest{
 		Subject: AuthZENSubject{
 			Type: "user",
@@ -56,9 +78,14 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 			Name: request.Attributes.Request.Http.Method,
 		},
 		Resource: AuthZENResource{
-			Type:       "route",
-			ID:         request.Attributes.Request.Http.Path,
-			Properties: map[string]any{},
+			Type: "route",
+			ID:   route,
+			Properties: map[string]any{
+				"uri":      fmt.Sprint(request.Attributes.Request.Http.Scheme, "://", request.Attributes.Request.Http.Host, request.Attributes.Request.Http.Path),
+				"schema":   request.Attributes.Request.Http.Scheme,
+				"hostname": request.Attributes.Request.Http.Host,
+				"path":     request.Attributes.Request.Http.Path,
+			},
 		},
 		Context: map[string]any{},
 	}
@@ -69,6 +96,12 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 	payloadBuf := new(bytes.Buffer)
 	json.NewEncoder(payloadBuf).Encode(authZENPayload)
 	req, _ := http.NewRequestWithContext(ctx, "POST", fmt.Sprint(server.pdpURL, "/access/v1/evaluation"), payloadBuf)
+
+	req.Header.Set("Content-Type", "application/json")
+
+	if server.pdpAuthN != "" {
+		req.Header.Set("Authorization", server.pdpAuthN)
+	}
 
 	res, e := server.httpClient.Do(req)
 	if e != nil {

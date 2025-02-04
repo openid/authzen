@@ -2,7 +2,7 @@
 
 A basic [External Authorization](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter) filter for Envoy.
 
-To configure, set your PDP URL and port in `docker-compose.yml` as the environment variables `AUTHZEN_PROXY` and `AUTHZEN_PROXY_PORT` respectively, then run:
+To configure, set your PDP URL and port in `docker-compose.yml` as the environment variables `PDP_URL` and `PDP_PORT` respectively (and `PDP_AUTHN` if required), then run:
 
 ```
 docker compose up
@@ -14,6 +14,4 @@ Make sure configure the frontend app to use this endpoint rather than `authzen-t
 
 ## TODO
 
-- [ ] URL Glob mathching if required
-- [ ] Support PDP AuthN
 - [ ] Add other parts of the todo app into docker-compose so anyone can launch it locally

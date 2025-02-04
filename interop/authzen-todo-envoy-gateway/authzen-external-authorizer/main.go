@@ -16,6 +16,7 @@ import (
 type AuthServer struct {
 	httpClient *http.Client
 	pdpURL     string
+	pdpAuthN   string
 }
 
 func (server *AuthServer) Check(ctx context.Context, request *auth_pb.CheckRequest) (*auth_pb.CheckResponse, error) {
@@ -73,7 +74,8 @@ func main() {
 		httpClient: &http.Client{
 			Timeout: time.Second,
 		},
-		pdpURL: pdpURL,
+		pdpURL:   pdpURL,
+		pdpAuthN: os.Getenv("PDP_AUTHN"),
 	}
 	auth_pb.RegisterAuthorizationServer(s, server)
 
