@@ -50,16 +50,26 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 
 	// This is emulating the path matching a Gateway would do
 	patterns := map[*regexp.Regexp]string{
-		regexp.MustCompile(`/users$`):                  "/users",
-		regexp.MustCompile(`/users/[a-zA-Z0-9_@.-]+$`): "/users/{id}",
-		regexp.MustCompile(`/todos$`):                  "/todos",
-		regexp.MustCompile(`/todos/[a-zA-Z0-9_-]+$`):   "/todos/{id}",
+		regexp.MustCompile(`/users$`):                    "/users",
+		regexp.MustCompile(`/users/([a-zA-Z0-9_@.-]+)$`): "/users/{id}",
+		regexp.MustCompile(`/todos$`):                    "/todos",
+		regexp.MustCompile(`/todos/([a-zA-Z0-9_-]+)$`):   "/todos/{id}",
 	}
 
 	var route string
+	var matches map[string]string
 	for pattern, replacement := range patterns {
 		if pattern.MatchString(request.Attributes.Request.Http.Path) {
 			route = replacement
+			matches = make(map[string]string)
+			groups := pattern.FindStringSubmatch(request.Attributes.Request.Http.Path)
+			if len(groups) > 1 {
+				// Extract the placeholder names from the replacement string
+				placeholders := regexp.MustCompile(`\{([^}]+)\}`).FindAllStringSubmatch(replacement, -1)
+				for i, placeholder := range placeholders {
+					matches[placeholder[1]] = groups[i+1]
+				}
+			}
 			break
 		}
 	}
@@ -85,6 +95,8 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 				"schema":   request.Attributes.Request.Http.Scheme,
 				"hostname": request.Attributes.Request.Http.Host,
 				"path":     request.Attributes.Request.Http.Path,
+				"params":   matches,
+				"ip":       request.Attributes.Request.Http.Headers["x-forwarded-for"],
 			},
 		},
 		Context: map[string]any{},
