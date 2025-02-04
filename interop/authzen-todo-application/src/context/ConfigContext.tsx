@@ -11,6 +11,7 @@ import { useAuth } from "./AuthContext";
 import { createConfigApi } from "../api/configApi";
 import { useQuery } from "@tanstack/react-query";
 import { Config } from "../interfaces";
+import { queryClient } from "../utils/queryClient";
 
 interface ConfigContextType {
   headers: Headers;
@@ -57,9 +58,11 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     if (config) {
       if (!specVersion || !Object.keys(config).includes(specVersion)) {
         setSpecVersion(config.currentSpec);
+        queryClient.refetchQueries({ queryKey: ["todos"] });
       }
       if (!pdp || !config.pdps.includes(pdp)) {
         setPdp(config.defaultPdp);
+        queryClient.refetchQueries({ queryKey: ["todos"] });
       }
     }
   }, [config, specVersion, pdp]);
