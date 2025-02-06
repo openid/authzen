@@ -7,8 +7,9 @@ import { errorHandler } from "../utils/errorHandler";
 import { queryClient } from "../utils/queryClient";
 
 export const useTodos = () => {
-  const { headers } = useConfig();
-  const api = createTodoApi(headers);
+  const { headers, gateways, gateway } = useConfig();
+  const url = gateways[gateway ?? Object.keys(gateways)[0]];
+  const api = createTodoApi(url, headers);
 
   const { data: todos = [], isFetching } = useQuery({
     queryKey: ["todos"],

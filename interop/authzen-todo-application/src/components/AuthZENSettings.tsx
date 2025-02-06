@@ -3,7 +3,7 @@ import Select from "react-select";
 
 export function AuthZENSettings() {
   const {
-    avaliablePDPs,
+    availablePDPs: avaliablePDPs,
     gateway,
     gatewayPdp,
     gatewayPdps,
@@ -48,11 +48,11 @@ export function AuthZENSettings() {
         <Select
           className="pdp-select"
           isSearchable={false}
-          options={gateways.map((gateway) => {
-            return { label: gateway, value: gateway };
+          options={Object.keys(gateways).map((gateway) => {
+            return { label: gateway, value: gateways[gateway] };
           })}
-          value={{ label: gateway, value: gateway }}
-          onChange={(option) => option?.value && setGateway(option.value)}
+          value={{ label: gateway, value: gateways[gateway ?? Object.keys(gateways)[0]] }}
+          onChange={(option) => option?.label && setGateway(option.label)}
         />
       </div>
       <div className="pdp-info">

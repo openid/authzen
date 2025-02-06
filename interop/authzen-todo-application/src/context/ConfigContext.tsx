@@ -16,11 +16,13 @@ import { queryClient } from "../utils/queryClient";
 interface ConfigContextType {
   headers: Headers;
   isLoading: boolean;
-  avaliablePDPs: string[];
+  availablePDPs: string[];
   gateway: string | undefined;
   gatewayPdp: string | undefined;
   gatewayPdps: string[];
-  gateways: string[];
+  gateways: {
+    [name: string]: string;
+  };
   pdp: string | undefined;
   setGateway: (gateway: string) => void;
   setGatewayPdp: (gatewayPdp: string) => void;
@@ -56,7 +58,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
       const versions = Object.keys(data.pdps);
       const currentSpec = specVersion || versions[0];
       const pdps = data.pdps[currentSpec];
-      const gateways = Object.keys(data.gateways);
+      const gateways = data.gateways;
       const gatewayPdps = data.gatewayPdps;
 
       return {
@@ -65,7 +67,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
         pdps,
         defaultPdp: pdp || pdps[0],
         gateways,
-        defaultGateway: gateway || gateways[0],
+        defaultGateway: gateway || Object.keys(gateways)[0],
         gatewayPdps,
         defaultGatewayPdp: gatewayPdp || gatewayPdps[0],
       };
@@ -82,7 +84,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
         setPdp(config.defaultPdp);
         queryClient.refetchQueries({ queryKey: ["todos"] });
       }
-      if (!gateway || !config.gateways.includes(gateway)) {
+      if (!gateway || !Object.keys(config.gateways).includes(gateway)) {
         setGateway(config.defaultGateway);
         queryClient.refetchQueries({ queryKey: ["todos"] });
       }
@@ -102,27 +104,27 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
       newHeaders.set("X_AUTHZEN_PDP", pdp);
     }
     if (gatewayPdp) {
-      newHeaders.set("X_AUTHZEN_PDP", gatewayPdp);
+      newHeaders.set("X_AUTHZEN_GATEWAY_PDP", gatewayPdp);
     }
     return newHeaders;
-  }, [headers, specVersion, pdp]);
+  }, [headers, specVersion, pdp, gatewayPdp]);
 
   const value = useMemo(
     () => ({
       headers: updateHeaders(),
-      isLoading: isLoading || !config?.pdps || !pdp || !specVersion,
-      avaliablePDPs: config?.pdps ?? [],
+      isLoading: isLoading || !config?.pdps || !pdp || !specVersion || !gateway || !gatewayPdp,
+      availablePDPs: config?.pdps ?? [],
       gateway,
       gatewayPdps: config?.gatewayPdps ?? [],
-      gateways: config?.gateways ?? [],
+      gateways: config?.gateways ?? {},
       setGateway: (newGateway: string) => {
         localStorage.setItem("gateway", newGateway);
-        setPdp(newGateway);
+        setGateway(newGateway);
       },
       gatewayPdp,
       setGatewayPdp: (newGatewayPdp: string) => {
         localStorage.setItem("gatewayPdp", newGatewayPdp);
-        setPdp(newGatewayPdp);
+        setGatewayPdp(newGatewayPdp);
       },
       pdp,
       setPdp: (newPdp: string) => {

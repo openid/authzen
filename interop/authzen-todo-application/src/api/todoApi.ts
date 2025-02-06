@@ -2,14 +2,14 @@ import { Todo, TodoValues, User, Config } from "../interfaces";
 
 const BASE_URL = import.meta.env.VITE_API_ORIGIN;
 
-export const createTodoApi = (headers: Headers) => ({
+export const createTodoApi = (url: string, headers: Headers) => ({
   listTodos: async (): Promise<Todo[]> => {
-    const response = await fetch(`${BASE_URL}/todos`, { headers });
+    const response = await fetch(`${url ?? BASE_URL}/todos`, { headers });
     return await jsonOrError(response);
   },
 
   createTodo: async (todo: TodoValues): Promise<Todo> => {
-    const response = await fetch(`${BASE_URL}/todos`, {
+    const response = await fetch(`${url ?? BASE_URL}/todos`, {
       method: "POST",
       headers,
       body: JSON.stringify(todo),
@@ -18,7 +18,7 @@ export const createTodoApi = (headers: Headers) => ({
   },
 
   updateTodo: async (id: string, values: TodoValues): Promise<Todo[]> => {
-    const response = await fetch(`${BASE_URL}/todos/${id}`, {
+    const response = await fetch(`${url ?? BASE_URL}/todos/${id}`, {
       method: "PUT",
       headers,
       body: JSON.stringify(values),
@@ -27,7 +27,7 @@ export const createTodoApi = (headers: Headers) => ({
   },
 
   deleteTodo: async (todo: Todo): Promise<void> => {
-    const response = await fetch(`${BASE_URL}/todos/${todo.ID}`, {
+    const response = await fetch(`${url ?? BASE_URL}/todos/${todo.ID}`, {
       method: "DELETE",
       body: JSON.stringify(todo),
       headers,
@@ -38,7 +38,7 @@ export const createTodoApi = (headers: Headers) => ({
   },
 
   getUser: async (userId: string): Promise<User> => {
-    const response = await fetch(`${BASE_URL}/users/${userId}`, { headers });
+    const response = await fetch(`${url ?? BASE_URL}/users/${userId}`, { headers });
     return await jsonOrError(response);
   },
 

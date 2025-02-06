@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { createUserApi } from "../api/userApi";
-import { useAuth } from "../context/AuthContext";
+import { useConfig } from "../context/ConfigContext";
 import { User } from "../interfaces";
 
 export const useUser = (userId?: string) => {
-  const { headers } = useAuth();
-  const { getUser } = createUserApi(headers);
+  const { headers, gateways, gateway } = useConfig();
+  const url = gateways[gateway ?? Object.keys(gateways)[0]];
+  const { getUser } = createUserApi(url, headers);
 
   const { data: user, isLoading } = useQuery({
     queryKey: ["user", userId],
