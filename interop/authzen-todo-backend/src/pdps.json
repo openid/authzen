@@ -1,44 +1,53 @@
 {
-  "1.0-preview": {
-    "Aserto": "https://authzen-proxy-preview.demo.aserto.com",
-    "Axiomatics": "https://pdp.alfa.guide",
-    "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
-    "HexaOPA": "https://interop.authzen.hexaorchestration.org",
-    "Kogito": "https://authzen-proxy-demo.azerad.org",
-    "Open Policy Agent": "https://authzen-opa-proxy-preview.demo.aserto.com",
-    "Permit.io": "https://permit-authzen-interop-1-0-preview.up.railway.app",
-    "Rock Solid Knowledge": "https://authzen.identityserver.com",
-    "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app",
-    "Topaz": "https://authzen-topaz-proxy-preview.demo.aserto.com"
+  "pdps": {
+    "authorization-api-1_0-00": {
+      "Aserto": "https://authzen-proxy-preview.demo.aserto.com",
+      "Axiomatics": "https://pdp.alfa.guide",
+      "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
+      "HexaOPA": "https://interop.authzen.hexaorchestration.org",
+      "Kogito": "https://authzen-proxy-demo.azerad.org",
+      "Open Policy Agent": "https://authzen-opa-proxy-preview.demo.aserto.com",
+      "Permit.io": "https://permit-authzen-interop-1-0-preview.up.railway.app",
+      "Rock Solid Knowledge": "https://authzen.identityserver.com",
+      "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app",
+      "Topaz": "https://authzen-topaz-proxy-preview.demo.aserto.com"
+    },
+    "authorization-api-1_0-01": {
+      "Aserto": "https://authzen-proxy.demo.aserto.com",
+      "Axiomatics": "https://pdp.alfa.guide",
+      "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
+      "EmpowerID": "https://authzen-demo.eidlabs.net",
+      "HexaOPA": "https://interop.authzen.hexaorchestration.org",
+      "Indykite": "https://api-authzen-authz.3edges.io",
+      "Kogito": "https://authzen-proxy-demo.azerad.org",
+      "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
+      "Permit.io": "https://permit-authzen-interop.up.railway.app",
+      "PingAuthorize": "https://authzen.idpartners.au",
+      "PlainID": "https://authzeninteropt.se-plainid.com",
+      "SGNL": "https://authzen.sgnlapis.cloud",
+      "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
+    },
+    "authorization-api-1_0-02": {
+      "Aserto": "https://authzen-proxy.demo.aserto.com",
+      "Axiomatics": "https://pdp.alfa.guide",
+      "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
+      "EmpowerID": "https://authzen-demo.eidlabs.net",
+      "HexaOPA": "https://interop.authzen.hexaorchestration.org",
+      "Indykite": "https://api-authzen-authz.3edges.io",
+      "Kogito": "https://authzen-proxy-demo.azerad.org",
+      "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
+      "Permit.io": "https://permit-authzen-interop.up.railway.app",
+      "PingAuthorize": "https://authzen.idpartners.au",
+      "PlainID": "https://authzeninteropt.se-plainid.com",
+      "SGNL": "https://authzen.sgnlapis.cloud",
+      "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
+    }
   },
-  "1.0-implementers-draft": {
-    "Aserto": "https://authzen-proxy.demo.aserto.com",
-    "Axiomatics": "https://pdp.alfa.guide",
-    "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
-    "EmpowerID": "https://authzen-demo.eidlabs.net",
-    "HexaOPA": "https://interop.authzen.hexaorchestration.org",
-    "Indykite": "https://api-authzen-authz.3edges.io",
-    "Kogito": "https://authzen-proxy-demo.azerad.org",
-    "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
-    "Permit.io": "https://permit-authzen-interop.up.railway.app",
-    "PingAuthorize": "https://authzen.idpartners.au",
-    "PlainID": "https://authzeninteropt.se-plainid.com",
-    "SGNL": "https://authzen.sgnlapis.cloud",
-    "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
+  "gateways": {
+    "--Pass Through--": "http://localhost:8080",
+    "AWS API Gateway": "https://aws-gateway.authzen-interop.net"
   },
-  "1.1-preview": {
-    "Aserto": "https://authzen-proxy.demo.aserto.com",
-    "Axiomatics": "https://pdp.alfa.guide",
-    "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
-    "EmpowerID": "https://authzen-demo.eidlabs.net",
-    "HexaOPA": "https://interop.authzen.hexaorchestration.org",
-    "Indykite": "https://api-authzen-authz.3edges.io",
-    "Kogito": "https://authzen-proxy-demo.azerad.org",
-    "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
-    "Permit.io": "https://permit-authzen-interop.up.railway.app",
-    "PingAuthorize": "https://authzen.idpartners.au",
-    "PlainID": "https://authzeninteropt.se-plainid.com",
-    "SGNL": "https://authzen.sgnlapis.cloud",
-    "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
+  "gatewayPdps": {
+    "Aserto": "http://authzen-gateway-proxy.demo.aserto.com"
   }
 }

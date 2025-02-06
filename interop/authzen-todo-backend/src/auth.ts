@@ -21,6 +21,13 @@ const AUTHZEN_PDP_API_KEYS = AUTHZEN_PDP_API_KEY
   ? JSON.parse(AUTHZEN_PDP_API_KEY)
   : {};
 
+const enum SPEC_VERSIONS {
+  VERSION_00 = "authorization-api-1_0-00",
+  VERSION_01 = "authorization-api-1_0-01",
+  VERSION_02 = "authorization-api-1_0-02",
+}
+const DEFAULT_SPEC_VERSION = SPEC_VERSIONS.VERSION_02;
+
 // JWT Middleware
 export const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
@@ -45,29 +52,45 @@ const resourceMapper = async (
     can_read_user: () => ({
       type: "user",
       id: req.params.userID,
-      userID: specVersion === "1.0-preview" ? req.params.userID : undefined,
+      userID:
+        specVersion === SPEC_VERSIONS.VERSION_00
+          ? req.params.userID
+          : undefined,
     }),
     can_read_todos: () => ({ type: "todo", id: "todo-1" }),
     can_create_todo: () => ({ type: "todo", id: "todo-1" }),
     can_update_todo: async () => {
       const todo = await store.get(req.params.id);
+      if (!todo) {
+        log(`todo ${req.params.id} not found in SQLite db`);
+        return {};
+      }
       return {
         type: "todo",
         id: todo.ID,
-        ownerID: specVersion === "1.0-preview" ? todo.OwnerID : undefined,
+        ownerID:
+          specVersion === SPEC_VERSIONS.VERSION_00 ? todo.OwnerID : undefined,
         properties:
-          specVersion !== "1.0-preview" ? { ownerID: todo.OwnerID } : undefined,
+          specVersion !== SPEC_VERSIONS.VERSION_00
+            ? { ownerID: todo.OwnerID }
+            : undefined,
       };
     },
     can_delete_todo: async () => {
       const todoToDelete = await store.get(req.params.id);
+      if (!todoToDelete) {
+        log(`todo ${req.params.id} not found in SQLite db`);
+        return {};
+      }
       return {
         type: "todo",
         id: todoToDelete.ID,
         ownerID:
-          specVersion === "1.0-preview" ? todoToDelete.OwnerID : undefined,
+          specVersion === SPEC_VERSIONS.VERSION_00
+            ? todoToDelete.OwnerID
+            : undefined,
         properties:
-          specVersion !== "1.0-preview"
+          specVersion !== SPEC_VERSIONS.VERSION_00
             ? { ownerID: todoToDelete.OwnerID }
             : undefined,
       };
@@ -80,9 +103,12 @@ const resourceMapper = async (
 // Authorization Helper Functions
 const getPdpInfo = (req: JWTRequest) => {
   const pdpHeader = req.headers["x_authzen_pdp"] as string;
-  const specVersion =
-    (req.headers["x_authzen_spec_version"] as string) || "1.0-preview";
-  const pdps = config[specVersion];
+  const specVersionHeader =
+    (req.headers["x_authzen_spec_version"] as string) || DEFAULT_SPEC_VERSION;
+  const specVersion = Object.keys(config.pdps).includes(specVersionHeader)
+    ? specVersionHeader
+    : DEFAULT_SPEC_VERSION;
+  const pdps = config.pdps[specVersion];
   const pdpBaseName = (pdpHeader && pdps[pdpHeader]) ?? AUTHZEN_PDP_URL;
   const pdpAuthHeader = pdpHeader && AUTHZEN_PDP_API_KEYS[pdpHeader];
   return { specVersion, pdpBaseName, pdpAuthHeader };
@@ -112,9 +138,7 @@ export const authzMiddleware = (store: Store) => (permission: string) => {
         type: "user",
         id: req.auth?.sub,
         identity:
-          specVersion === "1.0-preview" || specVersion === "1.1-preview"
-            ? req.auth?.sub
-            : undefined,
+          specVersion === SPEC_VERSIONS.VERSION_00 ? req.auth?.sub : undefined,
       },
       action: {
         name: permission,
@@ -139,7 +163,10 @@ export const authzMiddleware = (store: Store) => (permission: string) => {
 
 export const checkCanUpdateTodos = async (req: JWTRequest, todos: Todo[]) => {
   const { pdpBaseName, pdpAuthHeader, specVersion } = getPdpInfo(req);
-  if (!specVersion.startsWith("1.1")) {
+  if (
+    specVersion === SPEC_VERSIONS.VERSION_00 ||
+    specVersion === SPEC_VERSIONS.VERSION_01
+  ) {
     return todos;
   }
   if (todos && !todos.length) {

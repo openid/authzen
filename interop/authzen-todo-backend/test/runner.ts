@@ -1,5 +1,5 @@
 import clc from "cli-color";
-import { evaluation } from "./decisions-1.0-implementers-draft.json";
+import { evaluation } from "./decisions-authorization-api-1_0-01.json";
 
 const AUTHZEN_PDP_URL =
   process.argv[2] || "https://authzen-proxy.demo.aserto.com";
@@ -29,11 +29,11 @@ async function main() {
     console.log(`Usage: yarn test <authorizer-url> [<spec-version>] [<format>]
 
     <spec-version> should be one of:
-      1.0-preview
-      1.0-implementers-draft
-      1.1-preview
+      authorization-api-1_0-00
+      authorization-api-1_0-01
+      authorization-api-1_0-02
 
-      and defaults to 1.0-implementers-draft
+      and defaults to authorization-api-1_0-01
 
     <format> should be one of:
       console
@@ -47,7 +47,7 @@ async function main() {
   const decisionFile =
     process.argv.length >= 4
       ? `./decisions-${process.argv[3]}.json`
-      : "./decisions-1.0-implementers-draft.json";
+      : "./decisions-authorization-api-1_0-01.json";
   const { evaluation, evaluations } = require(decisionFile);
 
   const results: Result[] = [];

@@ -6,7 +6,7 @@ sidebar_position: 3
 
 This document lists the request and response payloads for each of the API requests in the Todo interop scenario.
 
-> Note: These payloads and corresponding interop results are for the [AuthZEN 1.0 Draft 02](https://openid.github.io/authzen) version of the spec.
+> Note: These payloads and corresponding interop results are for the [AuthZEN 1.0 Draft 02](https://openid.net/specs/authorization-api-1_0-02.html) version of the spec.
 
 :::tip
 This is a copy of the payload document defined by the AuthZEN WG. The definitive document can be found [here](https://hackmd.io/gNZBRoTfRgWh_PNM0y2wDA?view).

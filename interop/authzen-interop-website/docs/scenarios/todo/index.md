@@ -6,7 +6,7 @@ sidebar_position: 1
 
 This document lists the request and response payloads for each of the API requests in the Todo interop scenario.
 
-:::danger These payloads and corresponding interop results are for the [AuthZEN 1.0 Preview 00](https://openid.net/specs/authorization-api-1_0-00.html) version of the spec. These results are superseded by the [Implementers Draft](../todo-1.0-id/index.md) results. Once all of the implementations in this section switch over to the Implementers Draft, this section will be deleted.
+:::danger These payloads and corresponding interop results are for the [AuthZEN 1.0 Draft 00](https://openid.net/specs/authorization-api-1_0-00.html) version of the spec. These results are superseded by the [AuthZEN 1.0 Draft 01 (First Implementers Draft)](../todo-1.0-id/index.md) results. Once all of the implementations in this section switch over to the Implementers Draft, this section will be deleted.
 :::
 
 :::tip

@@ -9,9 +9,9 @@ Interop results for the [Kogito](https://kogito.kie.org/) implementation hosted 
 ## Test results
 
 ```bash
-yarn test https://authzen-proxy-demo.azerad.org 1.1-preview markdown
+yarn test https://authzen-proxy-demo.azerad.org authorization-api-1_0-02 markdown
 yarn run v1.22.22
-$ node build/test/runner.js https://authzen-proxy-demo.azerad.org 1.1-preview markdown
+$ node build/test/runner.js https://authzen-proxy-demo.azerad.org authorization-api-1_0-02 markdown
 ```
 <table>
   <tr>

@@ -9,9 +9,9 @@ Interop results for the [Axiomatics](https://www.axiomatics.com/) implementation
 ## Test results
 
 ```bash
-yarn test https://pdp.alfa.guide 1.0-implementers-draft markdown
+yarn test https://pdp.alfa.guide authorization-api-1_0-01 markdown
 yarn run v1.22.22
-$ node build/test/runner.js https://pdp.alfa.guide 1.0-implementers-draft markdown
+$ node build/test/runner.js https://pdp.alfa.guide authorization-api-1_0-01 markdown
 ```
 <table>
   <tr>
