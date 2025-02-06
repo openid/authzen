@@ -48,6 +48,7 @@
     "AWS API Gateway": "https://aws-gateway.authzen-interop.net"
   },
   "gatewayPdps": {
-    "Aserto": "http://authzen-gateway-proxy.demo.aserto.com"
+    "Aserto": "http://authzen-gateway-proxy.demo.aserto.com",
+    "Cerbos": "https://authzen-proxy-demo.cerbos.dev"
   }
 }
