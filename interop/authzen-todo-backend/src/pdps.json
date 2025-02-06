@@ -45,10 +45,9 @@
   },
   "gateways": {
     "Pass Through": "https://authzen-todo-backend.demo.aserto.com",
-    "AWS API Gateway": "https://aws-gateway.authzen-interop.net/authzen",
-    "AWS Aserto": "https://aws-gateway.aserto.com"
+    "AWS API Gateway": "https://aws-gateway.authzen-interop.net"
   },
   "gatewayPdps": {
-    "Aserto": "http://localhost:8080"
+    "Aserto": "http://authzen-gateway-proxy.demo.aserto.com"
   }
 }
