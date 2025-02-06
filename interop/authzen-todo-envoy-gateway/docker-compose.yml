@@ -1,26 +1,8 @@
 services:
   envoy:
     build:
-      context: ./envoy
+      context: .
     ports:
       - "9000:9000"
     environment:
-      - AUTHZEN_PROXY=authzen-proxy
-      - AUTHZEN_PROXY_PORT=3001
-      - TODO_BACKEND=authzen-todo-backend.demo.aserto.com
-      - TODO_BACKEND_PORT=443
       - PORT=9000
-    depends_on:
-      - authzen-proxy
-
-  authzen-proxy:
-    build:
-      context: ./authzen-external-authorizer
-    environment:
-      - PDP_URL=https://authzen-proxy-demo.cerbos.dev
-      # - PDP_AUTHN=<some authn token>
-      - PORT=3001
-    develop:
-      watch:
-        - action: rebuild
-          path: main.go

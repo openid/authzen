@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -10,13 +11,13 @@ import (
 	"time"
 
 	auth_pb "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+	"github.com/getkin/kin-openapi/openapi3"
 	"google.golang.org/grpc"
 )
 
 type AuthServer struct {
-	httpClient *http.Client
-	pdpURL     string
-	pdpAuthN   string
+	httpClient  *http.Client
+	openApiSpec openapi3.T
 }
 
 func (server *AuthServer) Check(ctx context.Context, request *auth_pb.CheckRequest) (*auth_pb.CheckResponse, error) {
@@ -43,18 +44,19 @@ func (server *AuthServer) Check(ctx context.Context, request *auth_pb.CheckReque
 
 func main() {
 
-	pdpURL := os.Getenv("PDP_URL")
-	if pdpURL == "" {
-		log.Fatalf("PDP_URL is required")
+	// Load OpenAPI specification from file
+	fileData, err := os.ReadFile("openapi.json")
+	if err != nil {
+		log.Fatalf("failed to read OpenAPI spec file: %v", err)
 	}
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		log.Fatalf("PORT is required")
+	// Parse OpenAPI specification
+	var openApiSpec openapi3.T
+	if err := json.Unmarshal(fileData, &openApiSpec); err != nil {
+		log.Fatalf("failed to parse OpenAPI JSON: %v", err)
 	}
 
-	addr := fmt.Sprintf("0.0.0.0:%s", port)
-	lis, err := net.Listen("tcp", addr)
+	lis, err := net.Listen("tcp", "0.0.0.0:3001")
 
 	if err != nil {
 		log.Fatalf("failed to listen: %v\n", err)
@@ -65,7 +67,7 @@ func main() {
 			log.Fatalf("unexpected error: %v", err)
 		}
 	}(lis)
-	log.Printf("listening at %s\n", addr)
+	log.Printf("listening at %s\n", "0.0.0.0:3001")
 
 	var opts []grpc.ServerOption
 	s := grpc.NewServer(opts...)
@@ -74,8 +76,7 @@ func main() {
 		httpClient: &http.Client{
 			Timeout: time.Second,
 		},
-		pdpURL:   pdpURL,
-		pdpAuthN: os.Getenv("PDP_AUTHN"),
+		openApiSpec: openApiSpec,
 	}
 	auth_pb.RegisterAuthorizationServer(s, server)
 

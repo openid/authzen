@@ -13,6 +13,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+var pdps = map[string]string{
+	"Aserto": "http://authzen-gateway-proxy.demo.aserto.com",
+	"Cerbos": "https://authzen-proxy-demo.cerbos.dev",
+}
+
 type AuthZENSubject struct {
 	Type string `json:"type"`
 	ID   string `json:"id"`
@@ -41,13 +46,20 @@ type AuthZENResponse struct {
 
 func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb.CheckRequest) (bool, error) {
 
+	pdpUrl := pdps[request.Attributes.Request.Http.Headers["X_AUTHZEN_GATEWAY_PDP"]]
+
 	userId, err := extractSubFromBearer(request.Attributes.Request.Http.Headers["authorization"])
 	if err != nil {
 		log.Printf("Failed to extract user ID: %v\n", err)
 		return false, err
 	}
 
-	route, err := MatchRoute(request)
+	url := fmt.Sprint(request.Attributes.Request.Http.Scheme, "://", request.Attributes.Request.Http.Host, request.Attributes.Request.Http.Path)
+
+	route, params, err := MatchURLToPath(server.openApiSpec, url)
+	if err != nil {
+		log.Printf("Failed to match URL to path: %v\n", err)
+	}
 
 	authZENPayload := &AuthZENRequest{
 		Subject: AuthZENSubject{
@@ -59,13 +71,13 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 		},
 		Resource: AuthZENResource{
 			Type: "route",
-			ID:   route.route,
+			ID:   route,
 			Properties: map[string]any{
 				"uri":      fmt.Sprint(request.Attributes.Request.Http.Scheme, "://", request.Attributes.Request.Http.Host, request.Attributes.Request.Http.Path),
 				"schema":   request.Attributes.Request.Http.Scheme,
 				"hostname": request.Attributes.Request.Http.Host,
 				"path":     request.Attributes.Request.Http.Path,
-				"params":   route.params,
+				"params":   params,
 				"ip":       request.Attributes.Request.Http.Headers["x-forwarded-for"],
 			},
 		},
@@ -77,13 +89,9 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 
 	payloadBuf := new(bytes.Buffer)
 	json.NewEncoder(payloadBuf).Encode(authZENPayload)
-	req, _ := http.NewRequestWithContext(ctx, "POST", fmt.Sprint(server.pdpURL, "/access/v1/evaluation"), payloadBuf)
+	req, _ := http.NewRequestWithContext(ctx, "POST", fmt.Sprint(pdpUrl, "/access/v1/evaluation"), payloadBuf)
 
 	req.Header.Set("Content-Type", "application/json")
-
-	if server.pdpAuthN != "" {
-		req.Header.Set("Authorization", server.pdpAuthN)
-	}
 
 	res, e := server.httpClient.Do(req)
 	if e != nil {

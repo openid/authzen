@@ -45,9 +45,11 @@
   },
   "gateways": {
     "--Pass Through--": "https://authzen-todo-backend.demo.aserto.com",
-    "AWS API Gateway": "https://aws-gateway.authzen-interop.net"
+    "AWS API Gateway": "https://aws-gateway.authzen-interop.net",
+    "Envoy": "https://authzen-envoy-proxy-demo.cerbos.dev"
   },
   "gatewayPdps": {
-    "Aserto": "http://authzen-gateway-proxy.demo.aserto.com"
+    "Aserto": "http://authzen-gateway-proxy.demo.aserto.com",
+    "Cerbos": "https://authzen-proxy-demo.cerbos.dev"
   }
 }
