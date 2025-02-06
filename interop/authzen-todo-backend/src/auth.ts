@@ -51,6 +51,10 @@ const resourceMapper = async (
     can_create_todo: () => ({ type: "todo", id: "todo-1" }),
     can_update_todo: async () => {
       const todo = await store.get(req.params.id);
+      if (!todo) {
+        log(`todo ${req.params.id} not found in SQLite db`);
+        return {}
+      }
       return {
         type: "todo",
         id: todo.ID,
@@ -61,6 +65,10 @@ const resourceMapper = async (
     },
     can_delete_todo: async () => {
       const todoToDelete = await store.get(req.params.id);
+      if (!todoToDelete) {
+        log(`todo ${req.params.id} not found in SQLite db`);
+        return {}
+      }
       return {
         type: "todo",
         id: todoToDelete.ID,
@@ -82,7 +90,7 @@ const getPdpInfo = (req: JWTRequest) => {
   const pdpHeader = req.headers["x_authzen_pdp"] as string;
   const specVersion =
     (req.headers["x_authzen_spec_version"] as string) || "1.0-preview";
-  const pdps = config[specVersion];
+  const pdps = config.pdps[specVersion];
   const pdpBaseName = (pdpHeader && pdps[pdpHeader]) ?? AUTHZEN_PDP_URL;
   const pdpAuthHeader = pdpHeader && AUTHZEN_PDP_API_KEYS[pdpHeader];
   return { specVersion, pdpBaseName, pdpAuthHeader };
