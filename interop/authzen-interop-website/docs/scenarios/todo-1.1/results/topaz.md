@@ -11,9 +11,9 @@ For more information, please refer to the [code](https://github.com/aserto-dev/a
 ## Test results
 
 ```bash
-yarn test https://authzen-topaz-proxy.demo.aserto.com  1.1-preview markdown
+yarn test https://authzen-topaz-proxy.demo.aserto.com  authorization-api-1_0-02 markdown
 yarn run v1.22.19
-$ node build/test/runner.js https://authzen-topaz-proxy.demo.aserto.com 1.1-preview markdown
+$ node build/test/runner.js https://authzen-topaz-proxy.demo.aserto.com authorization-api-1_0-02 markdown
 ```
 
 <table>

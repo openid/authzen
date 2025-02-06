@@ -4,14 +4,14 @@ sidebar_position: 12
 
 # Permit.io
 
-Interop results for the [Permit.io](https://www.permit.io/) implementation hosted at [https://permit-authzen-interop.up.railway.app/](https://permit-authzen-interop.up.railway.app/).
-For more details, refer to the [interop code and documentation](https://github.com/permitio/permit-authzen-interop)
+Interop results for the [Permit.io](https://www.permit.io/) implementation hosted at [https://permit-authzen-interop-1-0-preview.up.railway.app](https://permit-authzen-interop-1-0-preview.up.railway.app).
+For more details, refer to the [interop code and documentation](https://github.com/permitio/permit-authzen-interop/tree/authorization-api-1_0-00)
 
 ## Test Results
 ```bash
-yarn test https://permit-authzen-interop.up.railway.app markdown
-yarn run v1.22.19
-$ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdown
+yarn test https://permit-authzen-interop-1-0-preview.up.railway.app authorization-api-1_0-00 markdown
+yarn run v1.22.22
+$ node build/test/runner.js https://permit-authzen-interop-1-0-preview.up.railway.app authorization-api-1_0-00 markdown -
 ```
 <table>
   <tr>
@@ -128,7 +128,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
     "ownerID": "rick@the-citadel.com"
   }
 }
@@ -152,7 +152,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b91",
     "ownerID": "morty@the-citadel.com"
   }
 }
@@ -176,7 +176,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
     "ownerID": "rick@the-citadel.com"
   }
 }
@@ -200,7 +200,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b91",
     "ownerID": "morty@the-citadel.com"
   }
 }
@@ -318,7 +318,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
     "ownerID": "rick@the-citadel.com"
   }
 }
@@ -342,7 +342,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b91",
     "ownerID": "morty@the-citadel.com"
   }
 }
@@ -366,7 +366,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
     "ownerID": "rick@the-citadel.com"
   }
 }
@@ -390,7 +390,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b91",
     "ownerID": "morty@the-citadel.com"
   }
 }
@@ -508,7 +508,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
     "ownerID": "rick@the-citadel.com"
   }
 }
@@ -532,7 +532,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b93",
     "ownerID": "summer@the-smiths.com"
   }
 }
@@ -556,7 +556,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
     "ownerID": "rick@the-citadel.com"
   }
 }
@@ -580,7 +580,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b93",
     "ownerID": "summer@the-smiths.com"
   }
 }
@@ -698,7 +698,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
     "ownerID": "rick@the-citadel.com"
   }
 }
@@ -722,7 +722,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b94",
     "ownerID": "beth@the-smiths.com"
   }
 }
@@ -746,7 +746,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
     "ownerID": "rick@the-citadel.com"
   }
 }
@@ -770,7 +770,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b94",
     "ownerID": "beth@the-smiths.com"
   }
 }
@@ -888,7 +888,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
     "ownerID": "rick@the-citadel.com"
   }
 }
@@ -912,7 +912,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b95",
     "ownerID": "jerry@the-smiths.com"
   }
 }
@@ -936,7 +936,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
     "ownerID": "rick@the-citadel.com"
   }
 }
@@ -960,7 +960,7 @@ $ node build/test/runner.js https://permit-authzen-interop.up.railway.app markdo
   },
   "resource": {
     "type": "todo",
-    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b95",
     "ownerID": "jerry@the-smiths.com"
   }
 }

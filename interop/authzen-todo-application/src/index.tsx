@@ -1,27 +1,42 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
+import { QueryClientProvider } from "@tanstack/react-query";
+import {
+  AuthProviderProps,
+  AuthProvider as OidcAuthProvider,
+} from "oidc-react";
+import { AuthProvider } from "./context/AuthContext";
 import "./index.css";
-import { LoginWrapper } from "./LoginWrapper";
-import { AuthProvider } from "oidc-react";
+import { ConfigProvider } from "./context/ConfigContext";
+import { App } from "./App";
+import { queryClient } from "./utils/queryClient";
+import { AuthenticatedApp } from "./components/AuthenticatedApp";
 
-const configuration = {
-  authority: `https://${process.env.REACT_APP_OIDC_DOMAIN}/dex`,
-  clientId: process.env.REACT_APP_OIDC_CLIENT_ID,
+const oidcConfig: AuthProviderProps = {
+  authority: `https://${import.meta.env.VITE_OIDC_DOMAIN}/dex`,
+  clientId: import.meta.env.VITE_OIDC_CLIENT_ID,
   autoSignIn: true,
   responseType: "id_token",
   scope: "openid profile email",
   redirectUri: window.location.origin,
-  audience: process.env.REACT_APP_OIDC_AUDIENCE,
   onSignIn: () => {
     window.location.replace(window.location.origin);
   },
 };
 
-ReactDOM.render(
-  <React.StrictMode>
-    <AuthProvider {...configuration}>
-      <LoginWrapper />
-    </AuthProvider>
-  </React.StrictMode>,
-  document.getElementById("root")
+const root = createRoot(document.getElementById("root")!);
+root.render(
+  <OidcAuthProvider {...oidcConfig}>
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ConfigProvider>
+            <AuthenticatedApp>
+              <App />
+            </AuthenticatedApp>
+          </ConfigProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
+  </OidcAuthProvider>
 );

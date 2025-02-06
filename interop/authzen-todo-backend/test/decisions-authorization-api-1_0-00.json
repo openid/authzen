@@ -4,14 +4,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "rick@the-citadel.com",
+          "identity": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_user"
         },
         "resource": {
           "type": "user",
-          "id": "beth@the-smiths.com"
+          "id": "beth@the-smiths.com",
+          "userID": "beth@the-smiths.com"
         }
       },
       "expected": true
@@ -20,14 +22,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "rick@the-citadel.com",
+          "identity": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_user"
         },
         "resource": {
           "type": "user",
-          "id": "rick@the-citadel.com"
+          "id": "rick@the-citadel.com",
+          "userID": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         }
       },
       "expected": true
@@ -36,7 +40,8 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "rick@the-citadel.com",
+          "identity": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_todos"
@@ -52,7 +57,8 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "rick@the-citadel.com",
+          "identity": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_create_todo"
@@ -68,17 +74,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "rick@the-citadel.com",
+          "identity": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_update_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "rick@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
+          "ownerID": "rick@the-citadel.com"
         }
       },
       "expected": true
@@ -87,17 +92,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "rick@the-citadel.com",
+          "identity": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_update_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "morty@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b91",
+          "ownerID": "morty@the-citadel.com"
         }
       },
       "expected": true
@@ -106,17 +110,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "rick@the-citadel.com",
+          "identity": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_delete_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "rick@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
+          "ownerID": "rick@the-citadel.com"
         }
       },
       "expected": true
@@ -125,17 +128,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "rick@the-citadel.com",
+          "identity": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_delete_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "morty@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b91",
+          "ownerID": "morty@the-citadel.com"
         }
       },
       "expected": true
@@ -145,14 +147,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "morty@the-citadel.com",
+          "identity": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_user"
         },
         "resource": {
           "type": "user",
-          "id": "beth@the-smiths.com"
+          "id": "beth@the-smiths.com",
+          "userID": "beth@the-smiths.com"
         }
       },
       "expected": true
@@ -161,14 +165,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "morty@the-citadel.com",
+          "identity": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_user"
         },
         "resource": {
           "type": "user",
-          "id": "morty@the-citadel.com"
+          "id": "morty@the-citadel.com",
+          "userID": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         }
       },
       "expected": true
@@ -177,7 +183,8 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "morty@the-citadel.com",
+          "identity": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_todos"
@@ -193,7 +200,8 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "morty@the-citadel.com",
+          "identity": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_create_todo"
@@ -209,17 +217,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "morty@the-citadel.com",
+          "identity": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_update_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "rick@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
+          "ownerID": "rick@the-citadel.com"
         }
       },
       "expected": false
@@ -228,17 +235,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "morty@the-citadel.com",
+          "identity": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_update_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "morty@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b91",
+          "ownerID": "morty@the-citadel.com"
         }
       },
       "expected": true
@@ -247,17 +253,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "morty@the-citadel.com",
+          "identity": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_delete_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "rick@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
+          "ownerID": "rick@the-citadel.com"
         }
       },
       "expected": false
@@ -266,17 +271,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "morty@the-citadel.com",
+          "identity": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_delete_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "morty@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b91",
+          "ownerID": "morty@the-citadel.com"
         }
       },
       "expected": true
@@ -286,14 +290,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "summer@the-smiths.com",
+          "identity": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_user"
         },
         "resource": {
           "type": "user",
-          "id": "beth@the-smiths.com"
+          "id": "beth@the-smiths.com",
+          "userID": "beth@the-smiths.com"
         }
       },
       "expected": true
@@ -302,14 +308,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "summer@the-smiths.com",
+          "identity": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_user"
         },
         "resource": {
           "type": "user",
-          "id": "summer@the-smiths.com"
+          "id": "summer@the-smiths.com",
+          "userID": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         }
       },
       "expected": true
@@ -318,7 +326,8 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "summer@the-smiths.com",
+          "identity": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_todos"
@@ -334,7 +343,8 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "summer@the-smiths.com",
+          "identity": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_create_todo"
@@ -350,17 +360,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "summer@the-smiths.com",
+          "identity": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_update_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "rick@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
+          "ownerID": "rick@the-citadel.com"
         }
       },
       "expected": false
@@ -369,17 +378,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "summer@the-smiths.com",
+          "identity": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_update_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "summer@the-smiths.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b93",
+          "ownerID": "summer@the-smiths.com"
         }
       },
       "expected": true
@@ -388,17 +396,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "summer@the-smiths.com",
+          "identity": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_delete_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "rick@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
+          "ownerID": "rick@the-citadel.com"
         }
       },
       "expected": false
@@ -407,17 +414,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "summer@the-smiths.com",
+          "identity": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_delete_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "summer@the-smiths.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b93",
+          "ownerID": "summer@the-smiths.com"
         }
       },
       "expected": true
@@ -426,14 +432,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "beth@the-smiths.com",
+          "identity": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_user"
         },
         "resource": {
           "type": "user",
-          "id": "beth@the-smiths.com"
+          "id": "beth@the-smiths.com",
+          "userID": "beth@the-smiths.com"
         }
       },
       "expected": true
@@ -442,14 +450,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "beth@the-smiths.com",
+          "identity": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_user"
         },
         "resource": {
           "type": "user",
-          "id": "beth@the-smiths.com"
+          "id": "beth@the-smiths.com",
+          "userID": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         }
       },
       "expected": true
@@ -458,7 +468,8 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "beth@the-smiths.com",
+          "identity": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_todos"
@@ -474,7 +485,8 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "beth@the-smiths.com",
+          "identity": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_create_todo"
@@ -490,17 +502,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "beth@the-smiths.com",
+          "identity": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_update_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "rick@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
+          "ownerID": "rick@the-citadel.com"
         }
       },
       "expected": false
@@ -509,17 +520,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "beth@the-smiths.com",
+          "identity": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_update_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "beth@the-smiths.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b94",
+          "ownerID": "beth@the-smiths.com"
         }
       },
       "expected": false
@@ -528,17 +538,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "beth@the-smiths.com",
+          "identity": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_delete_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "rick@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
+          "ownerID": "rick@the-citadel.com"
         }
       },
       "expected": false
@@ -547,17 +556,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "beth@the-smiths.com",
+          "identity": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_delete_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "beth@the-smiths.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b94",
+          "ownerID": "beth@the-smiths.com"
         }
       },
       "expected": false
@@ -566,14 +574,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "jerry@the-smiths.com",
+          "identity": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_user"
         },
         "resource": {
           "type": "user",
-          "id": "beth@the-smiths.com"
+          "id": "beth@the-smiths.com",
+          "userID": "beth@the-smiths.com"
         }
       },
       "expected": true
@@ -582,14 +592,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "jerry@the-smiths.com",
+          "identity": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_user"
         },
         "resource": {
           "type": "user",
-          "id": "jerry@the-smiths.com"
+          "id": "jerry@the-smiths.com",
+          "userID": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         }
       },
       "expected": true
@@ -598,7 +610,8 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "jerry@the-smiths.com",
+          "identity": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_read_todos"
@@ -614,7 +627,8 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "jerry@the-smiths.com",
+          "identity": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_create_todo"
@@ -630,17 +644,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "jerry@the-smiths.com",
+          "identity": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_update_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "rick@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
+          "ownerID": "rick@the-citadel.com"
         }
       },
       "expected": false
@@ -649,17 +662,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "jerry@the-smiths.com",
+          "identity": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_update_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "jerry@the-smiths.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b95",
+          "ownerID": "jerry@the-smiths.com"
         }
       },
       "expected": false
@@ -668,17 +680,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "jerry@the-smiths.com",
+          "identity": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_delete_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "rick@the-citadel.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b92",
+          "ownerID": "rick@the-citadel.com"
         }
       },
       "expected": false
@@ -687,17 +698,16 @@
       "request": {
         "subject": {
           "type": "user",
-          "id":"CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+          "id": "jerry@the-smiths.com",
+          "identity": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
         },
         "action": {
           "name": "can_delete_todo"
         },
         "resource": {
           "type": "todo",
-          "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
-          "properties": {
-            "ownerID": "jerry@the-smiths.com"
-          }
+          "id": "7240d0db-8ff0-41ec-98b2-34a096273b95",
+          "ownerID": "jerry@the-smiths.com"
         }
       },
       "expected": false

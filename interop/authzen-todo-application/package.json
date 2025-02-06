@@ -3,35 +3,27 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@types/node": "^16.7.13",
-    "@types/react": "^17.0.20",
-    "@types/react-dom": "^17.0.9",
+    "@tanstack/react-query": "^5.65.1",
+    "@tanstack/react-query-devtools": "^5.65.1",
     "base-64": "^1.0.0",
     "buffer": "^6.0.3",
-    "eslint-config-prettier": "^8.5.0",
     "js-base64": "^3.7.2",
     "oidc-react": "^1.5.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-query": "^3.39.3",
-    "react-scripts": "5.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-select": "^5.8.0",
-    "react-toastify": "^8.2.0",
+    "react-toastify": "^11.0.0",
     "todomvc-app-css": "^2.4.2",
     "typescript": "^4.4.2",
-    "uuidv4": "^6.2.12"
+    "uuidv4": "^6.2.12",
+    "vite": "^6.0.11",
+    "vite-plugin-svgr": "^4.3.0",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "start": "vite --port 3000",
+    "build": "tsc && vite build",
+    "serve": "vite preview --port 3000"
   },
   "browserslist": {
     "production": [
@@ -45,5 +37,11 @@
       "last 1 safari version"
     ]
   },
-  "packageManager": "yarn@1.22.19"
+  "packageManager": "yarn@1.22.19",
+  "devDependencies": {
+    "@types/node": "^22.12.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react-swc": "^3.7.2"
+  }
 }

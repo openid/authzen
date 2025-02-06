@@ -5,9 +5,9 @@ cat: std # Check
 submissiontype: IETF
 wg: OpenID AuthZEN
 
-docname: authorization-api-1_1
+docname: authorization-api-1_0
 
-title: Authorization API
+title: Authorization API 1.0 – draft 03
 abbrev: azapi
 lang: en
 kw:
@@ -53,7 +53,6 @@ normative:
   RFC6749: # OAuth
   RFC8259: # JSON
   RFC9110: # HTTP Semantics
-  RFC9493: # Subject Identifiers for Security Event Tokens
   XACML:
     title: eXtensible Access Control Markup Language (XACML) Version 1.1
     target: https://www.oasis-open.org/committees/xacml/repository/cs-xacml-specification-1.1.pdf
@@ -88,7 +87,7 @@ The core feature of the Authorization API is the Access Evaluation API, which en
 - Can a manager print?
 
 # API Version
-This document describes the API version 1.1. Any updates to this API through subsequent revisions of this document or other documents MAY augment this API, but MUST NOT modify the API described here. Augmentation MAY include additional API methods or additional parameters to existing API methods, additional authorization mechanisms, or additional optional headers in API requests. All API methods for version 1.1 MUST be immediately preceded by the relative URL path `/v1/`.
+This document describes the API version 1.0. Any updates to this API through subsequent revisions of this document or other documents MAY augment this API, but MUST NOT modify the API described here. Augmentation MAY include additional API methods or additional parameters to existing API methods, additional authorization mechanisms, or additional optional headers in API requests. All API methods for version 1.0 MUST be immediately preceded by the relative URL path `/v1/`.
 
 # Information Model
 The information model for requests and responses include the following entities: Subject, Action, Resource, Context, and Decision. These are all defined below.
@@ -96,17 +95,18 @@ The information model for requests and responses include the following entities:
 ## Subject {#subject}
 A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.
 
-A Subject is a JSON ({{RFC8259}}) object that contains any number of key-value pair attributes. However, there are a minimal number of fields that are required in order to properly resolve a Subject.
+A Subject is a JSON ({{RFC8259}}) object that contains two REQUIRED keys, `type` and `id`, which have a value typed `string`, and an OPTIONAL key, `properties`, with a value of a JSON object.
 
 `type`:
 : REQUIRED. A `string` value that specifies the type of the Subject.
 
 `id`:
-: REQUIRED. The unique identifier of the Subject, scoped to the `type`.
+: REQUIRED. A `string` value containing the unique identifier of the Subject, scoped to the `type`.
 
-A Subject MAY contain zero or more additional key-value pairs.
+`properties`:
+: OPTIONAL. A JSON object containing any number of key-value pairs, which can be used to express additional properties of a Subject.
 
-The following is a non-normative example of a subject:
+The following is a non-normative example of a Subject:
 
 ~~~ json
 {
@@ -116,87 +116,39 @@ The following is a non-normative example of a subject:
 ~~~
 {: #subject-example title="Example Subject"}
 
-### Subject Identifier {#subject-identifier}
-The `id` field of a Subject MAY be any valid JSON value. It MAY be a string, or it MAY be a structured identifier. For example, it MAY follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
-
-The following is a non-normative example of a Subject Identifier as a simple string:
-
-~~~ json
-{
-  "type": "user",
-  "id": "alice@acmecorp.com"
-}
-~~~
-{: #subject-identifier-example-simple title="Example of Simple Subject Identifier"}
-
-The following is a non-normative example of a Subject Identifier in the {{RFC9493}} Email Identifier Format:
-
-~~~ json
-{
-  "type": "user",
-  "id": {
-    "format" : "email",
-    "email": "alice@acmecorp.com"
-  }
-}
-~~~
-{: #subject-identifier-example-rfc9493 title="Example Subject Identifier as RFC9493 Subject"}
-
-### Subject Type {#subject-type}
-Since {{RFC9493}} only concerns itself with the *format* of the identifier and not its *type*, every Subject MUST also include a string-valued `type` field, which identifies the type of Subject.
-
-The following is a non-normative example of a Subject of type `group` with a Subject Identifier as a simple string:
-
-~~~ json
-{
-  "type": "group",
-  "id": "engineering@acmecorp.com"
-}
-~~~
-{: #subject-type-group-example title="Example Group Subject Type"}
-
-The following is a non-normative example of a Subject of type `group` with a Subject Identifier in the {{RFC9493}} Email Identifier Format:
-
-~~~ json
-{
-  "type": "group",
-  "id": {
-    "format" : "email",
-    "email": "engineering@acmecorp.com"
-  }
-}
-~~~
-{: #subject-type-example-rfc-9493 title="Example Subject Type in RFC9493 Format"}
-
-### Subject Attributes {#subject-attributes}
-Many authorization systems are stateless, and expect the client (PEP) to pass in any attributes that are expected to be used in the evaluation of the authorization policy. To satisfy this requirement, Subjects MAY include zero or more additional attributes as key-value pairs.
+### Subject Properties {#subject-properties}
+Many authorization systems are stateless, and expect the client (PEP) to pass in any properties or attributes that are expected to be used in the evaluation of the authorization policy. To satisfy this requirement, Subjects MAY include zero or more additional attributes as key-value pairs, under the `properties` object.
 
 An attribute can be single-valued or multi-valued. It can be a primitive type (string, boolean, number) or a complex type such as a JSON object or JSON array.
 
-The following is a non-normative example of a Subject which adds a string-valued `department` attribute:
+The following is a non-normative example of a Subject which adds a string-valued `department` property:
 
 ~~~ json
 {
   "type": "user",
   "id": "alice@acmecorp.com",
-  "department": "Sales"
+  "properties": {
+    "department": "Sales"
+  }
 }
 ~~~
-{: #subject-department-example title="Example Subject with Additional Attribute"}
+{: #subject-department-example title="Example Subject with Additional Property"}
 
-To increase interoperability, a few common attributes are specified below:
+To increase interoperability, a few common properties are specified below:
 
 #### IP Address {#subject-ip-address}
 The IP Address of the Subject, identified by an `ip_address` field, whose value is a textual representation of an IP Address, as defined in `Textual Conventions for Internet Network Addresses` {{RFC4001}}.
 
-The following is a non-normative example of a subject which adds the `ip_address` attribute:
+The following is a non-normative example of a subject which adds the `ip_address` property:
 
 ~~~ json
 {
   "type": "user",
   "id": "alice@acmecorp.com",
-  "department": "Sales",
-  "ip_address": "172.217.22.14"
+  "properties": {
+    "department": "Sales",
+    "ip_address": "172.217.22.14"
+  }
 }
 ~~~
 {: #subject-ip-address-example title="Example Subject with IP Address"}
@@ -205,27 +157,32 @@ The following is a non-normative example of a subject which adds the `ip_address
 #### Device ID {#subject-device-id}
 The Device Identifier of the Subject, identified by a `device_id` field, whose value is a string representation of the device identifier.
 
-The following is a non-normative example of a subject which adds the `device_id` attribute:
+The following is a non-normative example of a subject which adds the `device_id` property:
 
 ~~~ json
 {
   "type": "user",
   "id": "alice@acmecorp.com",
-  "department": "Sales",
-  "ip_address": "172.217.22.14",
-  "device_id": "8:65:ee:17:7e:0b"
+  "properties": {
+    "department": "Sales",
+    "ip_address": "172.217.22.14",
+    "device_id": "8:65:ee:17:7e:0b"
+  }
 }
 ~~~
 {: #subject-device-id-example title="Example Subject with Device ID"}
 
 ## Resource {#resource}
-A Resource is the target of an access request. It is a JSON ({{RFC8259}}) object that is constructed similar to a Subject entity.
+A Resource is the target of an access request. It is a JSON ({{RFC8259}}) object that is constructed similar to a Subject entity. It has the follow keys:
 
 `type`:
 : REQUIRED. A `string` value that specifies the type of the Resource.
 
 `id`:
-: REQUIRED. The unique identifier of the Resource, scoped to the `type`. The value MAY be any valid JSON value, including a simple string. It also MAY follow the format specified by the `Subject Identifiers for Security Event Tokens` specification {{RFC9493}}.
+: REQUIRED. A `string` value containing the unique identifier of the Resource, scoped to the `type`.
+
+`properties`:
+: OPTIONAL. A JSON object containing any number of key-value pairs, which can be used to express additional properties of a Resource.
 
 ### Examples (non-normative)
 
@@ -239,30 +196,32 @@ The following is a non-normative example of a Resource with a `type` and a simpl
 ~~~
 {: #resource-example title="Example Resource"}
 
-The following is a non-normative example of a Resource containing a Subject Identifier in the Opaque Identifier Format, with additional structured attributes:
+The following is a non-normative example of a Resource containing a `library_record` property, that is itself a JSON object:
 
 ~~~ json
 {
   "type": "book",
-  "id": {
-    "format": "opaque",
-    "value": "123"
-  },
-  "library_record":{
-    "title": "AuthZEN in Action",
-    "isbn": "978-0593383322"
+  "id": "123",
+  "properties": {
+    "library_record":{
+      "title": "AuthZEN in Action",
+      "isbn": "978-0593383322"
+    }
   }
 }
 ~~~
-{: #resource-example-structured title="Example Resource with Subject Identifier and Additional Attributes"}
+{: #resource-example-structured title="Example Resource with Additional Property"}
 
 ## Action {#action}
 An Action is the type of access that the requester intends to perform.
 
-Action is a JSON ({{RFC8259}}) object that contains at least a `name` field.
+Action is a JSON ({{RFC8259}}) object that contains a REQUIRED `name` key with a `string` value, and an OPTIONAL `properties` key with a JSON object value.
 
 `name`:
 : REQUIRED. The name of the Action.
+
+`properties`:
+: OPTIONAL. A JSON object containing any number of key-value pairs, which can be used to express additional properties of an Action.
 
 The following is a non-normative example of an action:
 
@@ -272,19 +231,6 @@ The following is a non-normative example of an action:
 }
 ~~~
 {: #action-example title="Example Action"}
-
-### Common Action Values
-Since many services follow a Create-Read-Update-Delete convention, a set of common Actions are defined. That said, an Action may be specific to the application being accessed or shared across applications but not listed in the common Actions below.
-
-The following common Actions are defined:
-
-- `can_access`: A generic Action that could mean any type of access. This is useful if the policy or application is not interested in different decisions for different types of Actions.
-- `can_create`: The Action to create a new entity, which MAY be defined by the `resource` field in the request.
-- `can_read`: The Action to read the content. Based on the Resource being accessed, this could mean a list functionality or reading an individual Resource's contents.
-- `can_update`: The Action to update the content of an existing Resource. This represents a partial update or an entire replacement of an entity that MAY be identified by the Resource in the request.
-- `can_delete`: The Action to delete a Resource. The specific entity MAY be identified by the Resource in the request.
-
-PDP Policies MAY incorporate common Action names to provide different decisions based on the Action.
 
 ## Context {#context}
 The Context object is a set of attributes that represent environmental or contextual data about the request such as time of day. It is a JSON ({{RFC8259}}) object.
@@ -301,8 +247,6 @@ The following is a non-normative example of a Context:
 # Access Evaluation API {#access-evaluation-api}
 
 The Access Evaluation API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for executing a single access evaluation.
-
-Evaluating multiple access evaluations within the scope of a single message exchange (also known as "boxcarring" requests) is covered in Access Evaluations API ({{access-evaluations-api}}).
 
 ## The Access Evaluation API Request {#access-evaluation-request}
 The Access Evaluation request is a 4-tuple constructed of the four previously defined entities:
@@ -325,11 +269,7 @@ The Access Evaluation request is a 4-tuple constructed of the four previously de
 {
   "subject": {
     "type": "user",
-    "id": {
-      "format": "iss_sub",
-      "iss": "https://issuer.example.com/",
-      "sub": "145234573"
-    }
+    "id": "alice@acmecorp.com"
   },
   "resource": {
     "type": "account",
@@ -337,7 +277,9 @@ The Access Evaluation request is a 4-tuple constructed of the four previously de
   },
   "action": {
     "name": "can_read",
-    "method": "GET"
+    "properties": {
+      "method": "GET"
+    }
   },
   "context": {
     "time": "1985-10-26T01:22-07:00"
@@ -450,20 +392,20 @@ The Access Evaluations API defines the message exchange pattern between a client
 
 The Access Evaluation API Request builds on the information model presented in {{information-model}} and the 4-tuple defined in the Access Evaluation Request ({{access-evaluation-request}}).
 
-To send multiple access evaluation requests in a single message, the caller MAY add an `evaluations` key to the request. The `evaluations` key is an object-typed value, which contains a keyed list JSON objects, each typed as a 4-tuple, and specifying a discrete request. 
+To send multiple access evaluation requests in a single message, the caller MAY add an `evaluations` key to the request. The `evaluations` key is an array which contains a list of JSON objects, each typed as a 4-tuple, and specifying a discrete request.
 
-If an `evaluations` key/value is NOT present, the Access Evaluations Request behaves in a backwards-compatible manner with the (single) Access Evaluation API Request ({{access-evaluation-request}}).
+If an `evaluations` array is NOT present, the Access Evaluations Request behaves in a backwards-compatible manner with the (single) Access Evaluation API Request ({{access-evaluation-request}}).
 
-If an `evaluations` key/value IS present and contains one or more objects, these form distinct requests that the PDP will evaluate. These requests are independent from each other, and may be executed sequentially or in parallel, left to the discretion of each implementation.
+If an `evaluations` array IS present and contains one or more objects, these form distinct requests that the PDP will evaluate. These requests are independent from each other, and may be executed sequentially or in parallel, left to the discretion of each implementation.
 
-If the `evaluations` key IS present and contains one or more objects, the top-level `subject`, `action`, `resource`, and `context` keys (4-tuple) in the request object MAY be omitted. However, if one or more of these values is present, they provide default values for their respective fields in the evaluation requests. This behavior is described in {{default-values}}.
+If the `evaluations` array IS present and contains one or more objects, the top-level `subject`, `action`, `resource`, and `context` keys (4-tuple) in the request object MAY be omitted. However, if one or more of these values is present, they provide default values for their respective fields in the evaluation requests. This behavior is described in {{default-values}}.
 
-The following is a non-normative example for specifying three requests (keyed `eval-1`, `eval-2`, and `eval-3`), with no default values:
+The following is a non-normative example for specifying three requests, with no default values:
 
 ~~~json
 {
-  "evaluations": {
-    "eval-1": {
+  "evaluations": [
+    {
       "subject": {
         "type": "user",
         "id": "alice@acmecorp.com"
@@ -479,7 +421,7 @@ The following is a non-normative example for specifying three requests (keyed `e
         "time": "2024-05-31T15:22-07:00"
       }
     },
-    "eval-2": {
+    {
       "subject": {
         "type": "user",
         "id": "alice@acmecorp.com"
@@ -495,7 +437,7 @@ The following is a non-normative example for specifying three requests (keyed `e
         "time": "2024-05-31T15:22-07:00"
       }
     },
-    "eval-3": {
+    {
       "subject": {
         "type": "user",
         "id": "alice@acmecorp.com"
@@ -511,7 +453,7 @@ The following is a non-normative example for specifying three requests (keyed `e
         "time": "2024-05-31T15:22-07:00"
       }
     }
-  }
+  ]
 }
 ~~~
 
@@ -534,8 +476,8 @@ The following is a non-normative example for specifying three requests that refe
   "context":{
     "time": "2024-05-31T15:22-07:00"
   },
-  "evaluations": {
-    "eval-1": {
+  "evaluations": [
+    {
       "action": {
         "name": "can_read"
       },
@@ -544,7 +486,7 @@ The following is a non-normative example for specifying three requests that refe
         "id": "boxcarring.md"
       }
     },
-    "eval-2": {
+    {
       "action": {
         "name": "can_read"
       },
@@ -553,7 +495,7 @@ The following is a non-normative example for specifying three requests that refe
         "id": "subject-search.md"
       }
     },
-    "eval-3": {
+    {
       "action": {
         "name": "can_read"
       },
@@ -562,7 +504,7 @@ The following is a non-normative example for specifying three requests that refe
         "id": "resource-search.md"
       }
     }
-  }
+  ]
 }
 ~~~
 
@@ -580,20 +522,20 @@ The following is a non-normative example for specifying three requests that refe
   "action": {
     "name": "can_read"
   },
-  "evaluations": {
-    "eval-1": {
+  "evaluations": [
+    {
       "resource": {
         "type": "document",
         "id": "boxcarring.md"
       }
     },
-    "eval-2": {
+    {
       "resource": {
         "type": "document",
         "id": "subject-search.md"
       }
     },
-    "eval-3": {
+    {
       "action": {
         "name": "can_edit"
       },
@@ -606,27 +548,227 @@ The following is a non-normative example for specifying three requests that refe
 }
 ~~~
 
+### Evaluations options
+
+The `evaluations` request payload includes an OPTIONAL `options` key, with a JSON value containing a set of key-value pairs.
+
+This provides a general-purpose mechanism for providing caller-supplied metadata on how the request is to be executed.
+
+One such option conrtols *evaluation semantics*, and is described in {{evaluations-semantics}}.
+
+A non-normative example of the `options` field is shown below:
+
+~~~json
+{
+  "evaluations": [...],
+  "options": {
+    "evaluation_semantics": "execute_all",
+    "another_option": "value"
+  }
+}
+~~~
+
+#### Evaluations semantics
+
+By default, every request in the `evaluations` array is executed and a response returned in the same array order. This is the most common use-case for boxcarring multiple evaluation requests in a single payload.
+
+With that said, three evaluation semantics are supported:
+
+1. *Execute all of the requests (potentially in parallel), return all of the results.* Any failure can be denoted by `decision: false` and MAY provide a reason code in the context.
+2. *Deny on first denial (or failure).* This semantic could be desired if a PEP wants to issue a few requests in a particular order, with any denial (error, or `decision: false`) "short-circuiting" the evaluations call and returning on the first denial. This essentially works like the `&&` operator in programming languages.
+3. *Permit on first permit.* This is the converse "short-circuiting" semantic, working like the `||` operator in programming languages.
+
+To select the desired evaluations semantic, a caller can pass in `options.evaluations_semantic` with exactly one of the following values:
+
+  * `execute_all`
+  * `deny_on_first_deny`
+  * `permit_on_first_permit`
+
+`execute_all` is the default semantic, so an `evaluations` request without the `options.evaluations_semantic` flag will execute using this semantic.
+
+##### Example: Evaluate `read` action for three documents using all three semantics
+
+Execute all requests:
+
+~~~json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "action": {
+    "name": "read"
+  },
+  "options": {
+    "evaluations_semantic": "execute_all"
+  },
+  "evaluations": [
+    {
+      "resource": {
+        "type": "document",
+        "id": "1"
+      }
+    },
+    {
+      "resource": {
+        "type": "document",
+        "id": "2"
+      }
+    },
+    {
+      "resource": {
+        "type": "document",
+        "id": "3"
+      }
+    }
+  ]
+}
+~~~
+
+Response:
+
+~~~json
+{
+  "evaluations": [
+    {
+      decision: true
+    },
+    {
+      decision: false
+    },
+    {
+      decision: true
+    }
+  ]
+}
+~~~
+
+Deny on first deny:
+
+~~~json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "action": {
+    "name": "read"
+  },
+  "options": {
+    "evaluations_semantic": "deny_on_first_deny"
+  },
+  "evaluations": [
+    {
+      "resource": {
+        "type": "document",
+        "id": "1"
+      }
+    },
+    {
+      "resource": {
+        "type": "document",
+        "id": "2"
+      }
+    },
+    {
+      "resource": {
+        "type": "document",
+        "id": "3"
+      }
+    }
+  ]
+}
+~~~
+
+Response:
+
+~~~json
+{
+  "evaluations": [
+    {
+      decision: true
+    },
+    {
+      decision: false,
+      context: {
+        "id": "200",
+        "reason": "deny_on_first_deny"
+      }
+    }
+  ]
+}
+~~~
+
+Permit on first permit:
+
+~~~json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "action": {
+    "name": "read"
+  },
+  "options": {
+    "evaluations_semantic": "permit_on_first_permit"
+  },
+  "evaluations": [
+    {
+      "resource": {
+        "type": "document",
+        "id": "1"
+      },
+    },
+    {
+      "resource": {
+        "type": "document",
+        "id": "2"
+      }
+    },
+    {
+      "resource": {
+        "type": "document",
+        "id": "3"
+      }
+    }
+  ]
+}
+~~~
+
+Response:
+
+~~~json
+{
+  "evaluations": [
+    {
+      decision: true
+    }
+  ]
+}
+~~~
+
 ## Access Evaluations API Response {#access-evaluations-response}
 
-Like the request format, the Access Evaluations Response format for an Access Evaluations Request adds an `evaluations` key that is object-typed, keyed by the request IDs in the `evaluations` object in the request. Each value of the evaluations object is typed as an Access Evaluation Response ({{access-evaluation-response}}).
+Like the request format, the Access Evaluations Response format for an Access Evaluations Request adds an `evaluations` array that lists the decisions in the same order they were provided in the `evaluations` array in the request. Each value of the evaluations array is typed as an Access Evaluation Response ({{access-evaluation-response}}).
 
-In case the `evaluations` key is present, it is RECOMMENDED that the `decision` key of the response will be omitted. If present, it can be ignored by the caller.
+In case the `evaluations` array is present, it is RECOMMENDED that the `decision` key of the response will be omitted. If present, it can be ignored by the caller.
 
 The following is a non-normative example of a Access Evaluations Response to an Access Evaluations Request containing three evaluation objects:
 
 ~~~json
 {
-  "evaluations": {
-    "eval-1": {
+  "evaluations": [
+    {
       "decision": true
     },
-    "eval-2": {
+    {
       "decision": false,
       "context": {
         "reason": "resource not found"
       }
     },
-    "eval-3": {
+    {
       "decision": false,
       "context": {
         "reason": "Subject is a viewer of the resource"
@@ -650,11 +792,11 @@ The following is a non-normative example of a response to an Access Evaluations 
 
 ~~~json
 {
-  "evaluations": {
-    "eval-1": {
+  "evaluations": [
+    {
       "decision": true
     },
-    "eval-2": {
+    {
       "decision": false,
       "context": {
         "error": {
@@ -663,7 +805,7 @@ The following is a non-normative example of a response to an Access Evaluations 
         }
       }
     },
-    "eval-3": {
+    {
       "decision": false,
       "context": {
         "reason": "Subject is a viewer of the resource"
@@ -672,6 +814,226 @@ The following is a non-normative example of a response to an Access Evaluations 
   ]
 }
 ~~~
+
+# Subject Search API {#subject-search-api}
+
+The Subject Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the subjects that match the search criteria.
+
+The Subject Search API is based on the Access Evaluation information model, but omits the Subject ID.
+
+## The Subject Search API Request {#subject-search-request}
+
+The Subject Search request is a 3-tuple constructed of three previously defined entities:
+
+`subject`:
+: REQUIRED. The subject (or principal) of type Subject.  NOTE that the Subject type is REQUIRED but the Subject ID can be omitted, and if present, is IGNORED.
+
+`action`:
+: REQUIRED. The action (or verb) of type Action.
+
+`resource`:
+: REQUIRED. The resource of type Resource.
+
+`page`:
+: OPTIONAL. A page token for paged requests.
+
+### Example (non-normative)
+
+The following payload defines a request for the subjects of type `user` that can perform the `can_read` action on the resource of type `account` and ID `123`.
+
+~~~ json
+{
+  "subject": {
+    "type": "user"
+  },
+  "action": {
+    "name": "can_read",
+  },
+  "resource": {
+    "type": "account",
+    "id": "123"
+  }
+}
+~~~
+{: #subject-search-request-example title="Example Request"}
+
+## The Subject Search API Response {#subject-search-response}
+
+The response is a paged array of Subjects.
+
+~~~ json
+{
+  "results": [
+    {
+      "type": "user",
+      "id": "alice@acmecorp.com"
+    },
+    {
+      "type": "user",
+      "id": "bob@acmecorp.com"
+    }
+  ],
+  "page": {
+    "next_token": ""
+  }
+}
+~~~
+
+### Paged requests
+
+A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
+
+#### Example
+
+~~~ json
+{
+  "results": [
+    {
+      "type": "user",
+      "id": "alice@acmecorp.com"
+    },
+    {
+      "type": "user",
+      "id": "bob@acmecorp.com"
+    }
+  ],
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+
+To retrieve the next page, provide `page.next_token` in the next request:
+
+~~~ json
+{
+  "subject": {
+    "type": "user"
+  },
+  "action": {
+    "name": "can_read",
+  },
+  "resource": {
+    "type": "account",
+    "id": "123"
+  },
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+
+Note: page size is implementation-dependent.
+
+# Resource Search API {#resource-search-api}
+
+The Resource Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the resources that match the search criteria.
+
+The Resource Search API is based on the Access Evaluation information model, but omits the Resource ID.
+
+## The Resource Search API Request {#resource-search-request}
+
+The Resource Search request is a 3-tuple constructed of three previously defined entities:
+
+`subject`:
+: REQUIRED. The subject (or principal) of type Subject.
+
+`action`:
+: REQUIRED. The action (or verb) of type Action.
+
+`resource`:
+: REQUIRED. The resource of type Resource. NOTE that the Resource type is REQUIRED but the Resource ID is omitted, and if present, is IGNORED.
+
+`page`:
+: OPTIONAL. A page token for paged requests.
+
+### Example (non-normative)
+
+The following payload defines a request for the resources of type `account` on which the subject of type `user` and ID `alice@acmecorp.com` can perform the `can_read` action.
+
+~~~ json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@acmecorp.com"
+  },
+  "action": {
+    "name": "can_read",
+  },
+  "resource": {
+    "type": "account"
+  }
+}
+~~~
+{: #resource-search-request-example title="Example Request"}
+
+## The Resource Search API Response {#resource-search-response}
+
+The response is a paged array of Resources.
+
+~~~ json
+{
+  "results": [
+    {
+      "type": "account",
+      "id": "123"
+    },
+    {
+      "type": "account",
+      "id": "456"
+    }
+  ],
+  "page": {
+    "next_token": ""
+  }
+}
+~~~
+
+### Paged requests
+
+A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
+
+#### Example
+
+~~~ json
+{
+  "results": [
+    {
+      "type": "account",
+      "id": "123"
+    },
+    {
+      "type": "account",
+      "id": "456"
+    }
+  ],
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+
+To retrieve the next page, provide `page.next_token` in the next request:
+
+~~~ json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@acmecorp.com"
+  },
+  "action": {
+    "name": "can_read",
+  },
+  "resource": {
+    "type": "account"
+  },
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+
+Note: page size is implementation-dependent.
 
 # Transport
 
@@ -711,7 +1073,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-access-evaluation-request title="Example of an HTTPS Access Evaluation Request"}
 
-### Access Evaluation HTTPS Response
+### HTTPS Access Evaluation Response
 The success response to an Access Evaluation Request is an Access Evaluation Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluation Response, as defined in {{access-evaluation-response}}.
 
 Following is a non-normative example of an HTTPS Access Evaluation Response:
@@ -727,7 +1089,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-access-evaluation-response title="Example of an HTTP Access Evaluation Response"}
 
-### Access Evaluations HTTPS Request
+### HTTPS Access Evaluations Request
 The Access Evaluations Request is an HTTPS request with `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluations Request, as defined in {{access-evaluations-request}}.
 
 The following is a non-normative example of a the HTTPS binding of the Access Evaluations Request:
@@ -749,20 +1111,20 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
   "action": {
     "name": "can_read"
   },
-  "evaluations": {
-    "eval-1": {
+  "evaluations": [
+    {
       "resource": {
         "type": "document",
         "id": "boxcarring.md"
       }
     },
-    "eval-2": {
+    {
       "resource": {
         "type": "document",
         "id": "subject-search.md"
       }
     },
-    "eval-3": {
+    {
       "action": {
         "name": "can_edit"
       },
@@ -779,7 +1141,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ### HTTPS Access Evaluations Response
 The success response to an Access Evaluations Request is an Access Evaluations Response. It is a HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluations Response, as defined in {{access-evaluations-response}}.
 
-Following is a non-normative example of an HTTPS Access Evaluations Response:
+The following is a non-normative example of an HTTPS Access Evaluations Response:
 
 ~~~ http
 HTTP/1.1 OK
@@ -787,10 +1149,137 @@ Content-type: application/json
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
-  "decision": true
+  "evaluations": [
+    {
+      "decision": true
+    },
+    {
+      "decision": false,
+      "context": {
+        "error": {
+          "status": 404,
+          "message": "Resource not found"
+        }
+      }
+    },
+    {
+      "decision": false,
+      "context": {
+        "reason": "Subject is a viewer of the resource"
+      }
+    }
+  ]
 }
 ~~~
 {: #example-access-evaluations-response title="Example of an HTTPS Access Evaluations Response"}
+
+### HTTPS Subject Search Request
+The Subject Search Request is an HTTPS request with `content-type` of `application/json`. Its body is a JSON object that contains the Subject Search Request, as defined in {{subject-search-request}}.
+
+The following is a non-normative example of the HTTPS binding of the Subject Search Request:
+
+~~~ http
+POST /access/v1/subjectsearch HTTP/1.1
+Host: pdp.mycompany.com
+Authorization: Bearer <myoauthtoken>
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "subject": {
+    "type": "user"
+  },
+  "action": {
+    "name": "can_read"
+  },
+  "resource": {
+    "type": "account",
+    "id": "123",
+  }
+}
+~~~
+{: #example-subject-search-request title="Example of an HTTPS Subject Search Request"}
+
+### HTTPS Subject Search Response
+The success response to a Subject Search Request is a Subject Search Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Subject Search Response, as defined in {{subject-search-response}}.
+
+The following is a non-normative example of an HTTPS Subject Search Response:
+
+~~~ http
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "results": [
+    {
+      "type": "user",
+      "id": "alice@acmecorp.com"
+    },
+    {
+      "type": "user",
+      "id": "bob@acmecorp.com"
+    }
+  ],
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+{: #example-subject-search-response title="Example of an HTTPS Subject Search Response"}
+
+### HTTPS Resource Search Request
+The Resource Search Request is an HTTPS request with `content-type` of `application/json`. Its body is a JSON object that contains the Resource Search Request, as defined in {{resource-search-request}}.
+
+The following is a non-normative example of the HTTPS binding of the Resource Search Request:
+
+~~~ http
+POST /access/v1/resourcesearch HTTP/1.1
+Host: pdp.mycompany.com
+Authorization: Bearer <myoauthtoken>
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@acmecorp.com"
+  },
+  "action": {
+    "name": "can_read"
+  },
+  "resource": {
+    "type": "account"
+  }
+}
+~~~
+{: #example-resource-search-request title="Example of an HTTPS Resource Search Request"}
+
+### HTTPS Resource Search Response
+The success response to a Resource Search Request is a Resource Search Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Resource Search Response, as defined in {{resource-search-response}}.
+
+The following is a non-normative example of an HTTPS Resource Search Response:
+
+~~~ http
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "results": [
+    {
+      "type": "account",
+      "id": "123"
+    },
+    {
+      "type": "account",
+      "id": "456"
+    }
+  ],
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+{: #example-resource-search-response title="Example of an HTTPS Resource Search Response"}
 
 ### Error Responses
 The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTPS status code ({{Section 15 of RFC9110}}) that indicates error.
@@ -808,8 +1297,9 @@ The following errors are indicated by the status codes defined below:
 Note: HTTPS errors are returned by the PDP to indicate an error condition relating to the request or its processing, and are unrelated to the outcome of an authorization decision, which is always returned with a `200` status code and a response payload.
 
 To make this concrete:
-* a `401` HTTPS status code indicates that the caller (policy enforcement point) did not properly authenticate to the PDP - for example, by omitting a required `Authorization` header, or using an invalid access token.
-* the PDP indicates to the caller that the authorization request is denied by sending a response with a `200` HTTPS status code, along with a payload of `{ "decision": false }`.
+
+- a `401` HTTPS status code indicates that the caller (policy enforcement point) did not properly authenticate to the PDP - for example, by omitting a required `Authorization` header, or using an invalid access token.
+- the PDP indicates to the caller that the authorization request is denied by sending a response with a `200` HTTPS status code, along with a payload of `{ "decision": false }`.
 
 ### Request Identification
 All requests to the API MAY have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. If present, the request identifier SHALL be provided using the HTTPS Header `X-Request-ID`. The value of this header is an arbitrary string. The following non-normative example describes this header:
@@ -898,19 +1388,42 @@ This template uses extracts from templates written by
 {{{Pekka Savola}}}, {{{Elwyn Davies}}} and
 {{{Henrik Levkowetz}}}.
 
-# Notices {#Notices}
-Copyright (c) 2024 The OpenID Foundation.
+# Document History
 
-The OpenID Foundation (OIDF) grants to any Contributor, developer, implementer, or other interested party a non-exclusive, royalty free, worldwide copyright license to reproduce, prepare
-derivative works from, distribute, perform and display, this Implementers Draft or Final Specification solely for the purposes of (i) developing specifications, and (ii) implementing
-Implementers Drafts and Final Specifications based on such documents, provided that attribution be made to the OIDF as the source of the material, but that such attribution does not
+[[ To be removed from the final specification ]]
+
+* 00 - Initial version.
+* 01 - Refactored the optional fields of Subject, Action, and Resource into a `properties` sub-object, making it easier to design meaningful JSON-schema and protobuf contracts for the API. Also changed the `evaluations` field from an object to an array, to preserve ordering semantics.
+* 02 - Added the evaluations API.
+
+# Notices {#Notices}
+Copyright (c) 2025 The OpenID Foundation.
+
+The OpenID Foundation (OIDF) grants to any Contributor, developer, implementer,
+or other interested party a non-exclusive, royalty free, worldwide copyright license to
+reproduce, prepare derivative works from, distribute, perform and display, this
+Implementers Draft, Final Specification, or Final Specification Incorporating Errata
+Corrections solely for the purposes of (i) developing specifications, and (ii)
+implementing Implementers Drafts, Final Specifications, and Final Specification
+Incorporating Errata Corrections based on such documents, provided that attribution
+be made to the OIDF as the source of the material, but that such attribution does not
 indicate an endorsement by the OIDF.
 
-The technology described in this specification was made available from contributions from various sources, including members of the OpenID Foundation and others. Although the OpenID
-Foundation has taken steps to help ensure that the technology is available for distribution, it takes no position regarding the validity or scope of any intellectual property or other
-rights that might be claimed to pertain to the implementation or use of the technology described in this specification or the extent to which any license under such rights might or might
-not be available; neither does it represent that it has made any independent effort to identify any such rights. The OpenID Foundation and the contributors to this specification make no
-(and hereby expressly disclaim any) warranties (express, implied, or otherwise), including implied warranties of merchantability, non-infringement, fitness for a particular purpose, or
-title, related to this specification, and the entire risk as to implementing this specification is assumed by the implementer. The OpenID Intellectual Property Rights policy requires
-contributors to offer a patent promise not to assert certain patent claims against other contributors and against implementers. The OpenID Foundation invites any interested party to bring
-to its attention any copyrights, patents, patent applications, or other proprietary rights that may cover technology that may be required to practice this specification.
+The technology described in this specification was made available from contributions
+from various sources, including members of the OpenID Foundation and others.
+Although the OpenID Foundation has taken steps to help ensure that the technology
+is available for distribution, it takes no position regarding the validity or scope of any
+intellectual property or other rights that might be claimed to pertain to the
+implementation or use of the technology described in this specification or the extent
+to which any license under such rights might or might not be available; neither does it
+represent that it has made any independent effort to identify any such rights. The
+OpenID Foundation and the contributors to this specification make no (and hereby
+expressly disclaim any) warranties (express, implied, or otherwise), including implied
+warranties of merchantability, non-infringement, fitness for a particular purpose, or
+title, related to this specification, and the entire risk as to implementing this
+specification is assumed by the implementer. The OpenID Intellectual Property
+Rights policy (found at openid.net) requires contributors to offer a patent promise not
+to assert certain patent claims against other contributors and against implementers.
+OpenID invites any interested party to bring to its attention any copyrights, patents,
+patent applications, or other proprietary rights that may cover technology that may be
+required to practice this specification.
