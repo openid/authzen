@@ -5,13 +5,13 @@ sidebar_position: 12
 # Permit.io
 
 Interop results for the [Permit.io](https://www.permit.io/) implementation hosted at [https://permit-authzen-interop-1-0-preview.up.railway.app](https://permit-authzen-interop-1-0-preview.up.railway.app).
-For more details, refer to the [interop code and documentation](https://github.com/permitio/permit-authzen-interop/tree/1.0-preview)
+For more details, refer to the [interop code and documentation](https://github.com/permitio/permit-authzen-interop/tree/authorization-api-1_0-00)
 
 ## Test Results
 ```bash
-yarn test https://permit-authzen-interop-1-0-preview.up.railway.app 1.0-preview markdown
+yarn test https://permit-authzen-interop-1-0-preview.up.railway.app authorization-api-1_0-00 markdown
 yarn run v1.22.22
-$ node build/test/runner.js https://permit-authzen-interop-1-0-preview.up.railway.app 1.0-preview markdown -
+$ node build/test/runner.js https://permit-authzen-interop-1-0-preview.up.railway.app authorization-api-1_0-00 markdown -
 ```
 <table>
   <tr>

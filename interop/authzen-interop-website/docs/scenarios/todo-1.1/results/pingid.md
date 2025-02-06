@@ -9,9 +9,9 @@ Interop results for the [ID Partners adapter for PingAuthorize](https://www.ping
 ## Test results
 
 ```bash
-yarn test https://authzen.idpartners.au 1.1-preview markdown
+yarn test https://authzen.idpartners.au authorization-api-1_0-02 markdown
 yarn run v1.22.22
-$ node build/test/runner.js https://authzen.idpartners.au 1.1-preview markdown
+$ node build/test/runner.js https://authzen.idpartners.au authorization-api-1_0-02 markdown
 ```
 <table>
   <tr>

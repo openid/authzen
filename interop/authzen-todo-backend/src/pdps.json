@@ -1,6 +1,6 @@
 {
   "pdps": {
-    "1.0-preview": {
+    "authorization-api-1_0-00": {
       "Aserto": "https://authzen-proxy-preview.demo.aserto.com",
       "Axiomatics": "https://pdp.alfa.guide",
       "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
@@ -12,7 +12,7 @@
       "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app",
       "Topaz": "https://authzen-topaz-proxy-preview.demo.aserto.com"
     },
-    "1.0-implementers-draft": {
+    "authorization-api-1_0-01": {
       "Aserto": "https://authzen-proxy.demo.aserto.com",
       "Axiomatics": "https://pdp.alfa.guide",
       "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
@@ -27,7 +27,7 @@
       "SGNL": "https://authzen.sgnlapis.cloud",
       "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
     },
-    "1.1-preview": {
+    "authorization-api-1_0-02": {
       "Aserto": "https://authzen-proxy.demo.aserto.com",
       "Axiomatics": "https://pdp.alfa.guide",
       "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
@@ -44,7 +44,7 @@
     }
   },
   "gateways": {
-    "Pass Through": "https://authzen-todo-backend.demo.aserto.com",
+    "--Pass Through--": "http://localhost:8080",
     "AWS API Gateway": "https://aws-gateway.authzen-interop.net"
   },
   "gatewayPdps": {

@@ -12,7 +12,7 @@ yarn
 
 ### Set up the `.env` file
 
-Rename the `.env.example` file to `.env` and update the `AUTHZEN_PDP_URL` variable. The authorization middleware will send AuthZEN requests to `${AUTHZEN_PDP_URL}/access/v1/evaluation` (for the `1.0-preview` and `1.0-implementers-draft` spec variations), and to a both `${AUTHZEN_PDP_URL}/access/v1/evaluation` and `${AUTHZEN_PDP_URL}/access/v1/evaluations` (for the `1.1-preview` spec variation).
+Rename the `.env.example` file to `.env` and update the `AUTHZEN_PDP_URL` variable. The authorization middleware will send AuthZEN requests to `${AUTHZEN_PDP_URL}/access/v1/evaluation` (for the `authorization-api-1_0-00` and `authorization-api-1_0-01` spec variations), and to a both `${AUTHZEN_PDP_URL}/access/v1/evaluation` and `${AUTHZEN_PDP_URL}/access/v1/evaluations` (for the `authorization-api-1_0-02` spec variation).
 
 Optionally, set the `AUTHZEN_PDP_API_KEY` variable if your authorizer needs an API key. This variable expects a JSON object with the key being the same keys as you use for your PDP in `src/pdps.json`, and the value being your API key, prefixed with `Basic` or `Bearer` as appropriate. If set, the authorization middleware will add the `Authorization` header with your API key to every authorization request.
 
@@ -52,11 +52,11 @@ yarn test
 Usage: yarn test <authorizer-url> [<spec-version>] [<format>]
 
     <spec-version> should be one of:
-      1.0-preview
-      1.0-implementers-draft
-      1.1-preview
+      authorization-api-1_0-00
+      authorization-api-1_0-01
+      authorization-api-1_0-02
 
-      and defaults to 1.0-implementers-draft
+      and defaults to authorization-api-1_0-01
 
     <format> should be one of:
       console
@@ -67,14 +67,14 @@ Usage: yarn test <authorizer-url> [<spec-version>] [<format>]
 
 ### Examples
 
-Run the `1.0-implementers-draft` test suite, output to console:
+Run the `authorization-api-1_0-01` test suite, output to console:
 
 ```shell
-yarn test https://authorizer.domain.com 1.0-implementers-draft console
+yarn test https://authorizer.domain.com authorization-api-1_0-01 console
 ```
 
-Run the `1.1-preview` test suite, output as markdown:
+Run the `authorization-api-1_0-02` test suite, output as markdown:
 
 ```shell
-yarn test https://authorizer.domain.com 1.1-preview markdown
+yarn test https://authorizer.domain.com authorization-api-1_0-02 markdown
 ```

@@ -56,8 +56,11 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     queryFn: async () => getConfig() as unknown as Config,
     select: (data: Config) => {
       const versions = Object.keys(data.pdps);
-      const currentSpec = specVersion || versions[0];
-      const pdps = data.pdps[currentSpec];
+      const currentSpec = (specVersion && versions.includes(specVersion)) ? specVersion : versions[0];
+      if (!data.pdps[currentSpec]) {
+        setSpecVersion(versions[0]);
+      }
+      const pdps = data.pdps[currentSpec] ?? data.pdps[0];
       const gateways = data.gateways;
       const gatewayPdps = data.gatewayPdps;
 

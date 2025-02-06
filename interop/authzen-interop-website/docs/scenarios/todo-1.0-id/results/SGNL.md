@@ -7,9 +7,9 @@ sidebar_position: 9
 Interop results for the [SGNL](https://sgnl.ai) implementation hosted at [authzen.sgnlapis.cloud](https://authzen.sgnlapis.cloud).
 
 ```bash
-yarn test https://authzen.sgnlapis.cloud 1.0-implementers-draft markdown
+yarn test https://authzen.sgnlapis.cloud authorization-api-1_0-01 markdown
 yarn run v1.22.22
-$ node build/test/runner.js https://authzen.sgnlapis.cloud 1.0-implementers-draft markdown
+$ node build/test/runner.js https://authzen.sgnlapis.cloud authorization-api-1_0-01 markdown
 ```
 <table>
   <tr>
