@@ -11,7 +11,7 @@ function log(message) {
 const { AUTHZEN_PDP_API_KEYS } = process.env;
 
 function getPdpInfo(req) {
-  const pdpName = req.headers["x-authzen-gateway-pdp"];
+  const pdpName = req.headers["x_authzen_gateway_pdp"];
   const pdpBaseUrl = pdpName && pdps[pdpName];
   const pdpAuthHeader = pdpName && AUTHZEN_PDP_API_KEYS[pdpName];
   return { pdpName, pdpBaseUrl, pdpAuthHeader };
