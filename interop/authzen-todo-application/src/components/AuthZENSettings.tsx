@@ -4,7 +4,13 @@ import Select from "react-select";
 export function AuthZENSettings() {
   const {
     avaliablePDPs,
+    gateway,
+    gatewayPdp,
+    gatewayPdps,
+    gateways,
     pdp,
+    setGateway,
+    setGatewayPdp,
     setPdp,
     setSpecVersion,
     specVersion,
@@ -35,6 +41,30 @@ export function AuthZENSettings() {
           })}
           value={{ label: pdp, value: pdp }}
           onChange={(option) => option?.value && setPdp(option.value)}
+        />
+      </div>
+      <div className="pdp-info">
+        <span className="select-title">API Gateway:</span>
+        <Select
+          className="pdp-select"
+          isSearchable={false}
+          options={gateways.map((gateway) => {
+            return { label: gateway, value: gateway };
+          })}
+          value={{ label: gateway, value: gateway }}
+          onChange={(option) => option?.value && setGateway(option.value)}
+        />
+      </div>
+      <div className="pdp-info">
+        <span className="select-title">Gateway PDP:</span>
+        <Select
+          className="pdp-select"
+          isSearchable={false}
+          options={gatewayPdps.map((gatewayPdp) => {
+            return { label: gatewayPdp, value: gatewayPdp };
+          })}
+          value={{ label: gatewayPdp, value: gatewayPdp }}
+          onChange={(option) => option?.value && setGatewayPdp(option.value)}
         />
       </div>
     </>

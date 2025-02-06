@@ -25,8 +25,14 @@ export interface ITodoService {
   getConfig: () => Promise<Config>;
   setPdp: (pdp: string) => void;
   setSpecVersion: (specVersion: string) => void;
-  pdp: string;
-  specVersion: string;
+  setGateway: (gateway: string) => void;
+  setGatewayUrl: (url: string) => void;
+  setGatewayPdp: (gatewayPdp: string) => void;
+  pdp: string
+  specVersion: string
+  gateway: string
+  gatewayUrl: string
+  gatewayPdp: string
 }
 
 export interface TodoProps {
@@ -53,5 +59,11 @@ export interface AuthUser {
 }
 
 export type Config = {
-  [specVersion: string]: string[];
-};
+  pdps: {
+    [specVersion: string]: string[]
+  }
+  gateways: {
+    [name: string]: string
+  }
+  gatewayPdps: string[]
+}

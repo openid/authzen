@@ -17,7 +17,13 @@ interface ConfigContextType {
   headers: Headers;
   isLoading: boolean;
   avaliablePDPs: string[];
+  gateway: string | undefined;
+  gatewayPdp: string | undefined;
+  gatewayPdps: string[];
+  gateways: string[];
   pdp: string | undefined;
+  setGateway: (gateway: string) => void;
+  setGatewayPdp: (gatewayPdp: string) => void;
   setPdp: (pdp: string) => void;
   specVersion: string | undefined;
   setSpecVersion: (specVersion: string) => void;
@@ -28,8 +34,14 @@ const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 
 export function ConfigProvider({ children }: { children: ReactNode }) {
   const { headers } = useAuth();
-  const { getPDPs } = createConfigApi(headers);
+  const { getConfig } = createConfigApi(headers);
 
+  const [gateway, setGateway] = useState<string | undefined>(
+    () => localStorage.getItem("gateway") || undefined
+  );
+  const [gatewayPdp, setGatewayPdp] = useState<string | undefined>(
+    () => localStorage.getItem("gatewayPdp") || undefined
+  );
   const [pdp, setPdp] = useState<string | undefined>(
     () => localStorage.getItem("pdp") || undefined
   );
@@ -39,17 +51,23 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 
   const { data: config, isLoading } = useQuery({
     queryKey: ["pdps"],
-    queryFn: async () => getPDPs() as unknown as Config,
+    queryFn: async () => getConfig() as unknown as Config,
     select: (data: Config) => {
-      const versions = Object.keys(data);
+      const versions = Object.keys(data.pdps);
       const currentSpec = specVersion || versions[0];
-      const pdps = data[currentSpec];
+      const pdps = data.pdps[currentSpec];
+      const gateways = Object.keys(data.gateways);
+      const gatewayPdps = data.gatewayPdps;
 
       return {
         versions,
         currentSpec,
         pdps,
         defaultPdp: pdp || pdps[0],
+        gateways,
+        defaultGateway: gateway || gateways[0],
+        gatewayPdps,
+        defaultGatewayPdp: gatewayPdp || gatewayPdps[0],
       };
     },
   });
@@ -64,8 +82,16 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
         setPdp(config.defaultPdp);
         queryClient.refetchQueries({ queryKey: ["todos"] });
       }
+      if (!gateway || !config.gateways.includes(gateway)) {
+        setGateway(config.defaultGateway);
+        queryClient.refetchQueries({ queryKey: ["todos"] });
+      }
+      if (!gatewayPdp || !config.gatewayPdps.includes(gatewayPdp)) {
+        setGatewayPdp(config.defaultGatewayPdp);
+        queryClient.refetchQueries({ queryKey: ["todos"] });
+      }
     }
-  }, [config, specVersion, pdp]);
+  }, [config, specVersion, pdp, gateway, gatewayPdp]);
 
   const updateHeaders = useCallback(() => {
     const newHeaders = new Headers(headers);
@@ -75,6 +101,9 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     if (pdp) {
       newHeaders.set("X_AUTHZEN_PDP", pdp);
     }
+    if (gatewayPdp) {
+      newHeaders.set("X_AUTHZEN_PDP", gatewayPdp);
+    }
     return newHeaders;
   }, [headers, specVersion, pdp]);
 
@@ -83,6 +112,18 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
       headers: updateHeaders(),
       isLoading: isLoading || !config?.pdps || !pdp || !specVersion,
       avaliablePDPs: config?.pdps ?? [],
+      gateway,
+      gatewayPdps: config?.gatewayPdps ?? [],
+      gateways: config?.gateways ?? [],
+      setGateway: (newGateway: string) => {
+        localStorage.setItem("gateway", newGateway);
+        setPdp(newGateway);
+      },
+      gatewayPdp,
+      setGatewayPdp: (newGatewayPdp: string) => {
+        localStorage.setItem("gatewayPdp", newGatewayPdp);
+        setPdp(newGatewayPdp);
+      },
       pdp,
       setPdp: (newPdp: string) => {
         localStorage.setItem("pdp", newPdp);
@@ -99,7 +140,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
       },
       specVersions: config?.versions ?? [],
     }),
-    [config, isLoading, pdp, specVersion, updateHeaders]
+    [config, gateway, gatewayPdp, isLoading, pdp, specVersion, updateHeaders]
   );
 
   if (value.isLoading) {
