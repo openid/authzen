@@ -1,9 +1,8 @@
-import React from "react";
-import { TodoProps, User } from "../interfaces";
-import { useUser } from "../todoService";
+import { TodoProps } from "../interfaces";
+import { useUser } from "../hooks/useUser";
 
-export const Todo: React.FC<TodoProps> = (todoProps) => {
-  const user: User = useUser(todoProps.todo.OwnerID);
+export const Todo = (todoProps: TodoProps) => {
+  const { user } = useUser(todoProps.todo.OwnerID);
 
   return (
     <li className={todoProps.todo.Completed ? "completed" : ""}>
