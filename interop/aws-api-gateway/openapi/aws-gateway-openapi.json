@@ -1,0 +1,155 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "AuthZEN Todo",
+    "description" : "AuthZEN Todo API",
+    "version" : "1.0.0"
+  },
+  "servers" : [ {
+    "url" : "https://m7bmfnl8ze.execute-api.us-east-2.amazonaws.com/{basePath}",
+    "variables" : {
+      "basePath" : {
+        "default" : ""
+      }
+    }
+  } ],
+  "tags" : [ {
+    "name" : "Standard Todo List Endpoints"
+  } ],
+  "paths" : {
+    "/todos/{todoId}" : {
+      "put" : {
+        "operationId" : "f3334d8b-37f9-489b-87c5-08a8beb5657c",
+        "responses" : {
+          "default" : {
+            "description" : "Default response for PUT /todos/{todoId}"
+          }
+        },
+        "security" : [ {
+          "authzen-authorizer" : [ ]
+        } ],
+        "x-amazon-apigateway-integration" : {
+          "payloadFormatVersion" : "1.0",
+          "type" : "http_proxy",
+          "httpMethod" : "ANY",
+          "uri" : "https://authzen-todo-backend.demo.aserto.com/{todoId}",
+          "connectionType" : "INTERNET"
+        }
+      },
+      "delete" : {
+        "operationId" : "1647d06c-2a96-41ab-a2f7-ebb55d5bcd76",
+        "responses" : {
+          "default" : {
+            "description" : "Default response for DELETE /todos/{todoId}"
+          }
+        },
+        "security" : [ {
+          "authzen-authorizer" : [ ]
+        } ],
+        "x-amazon-apigateway-integration" : {
+          "payloadFormatVersion" : "1.0",
+          "type" : "http_proxy",
+          "httpMethod" : "ANY",
+          "uri" : "https://authzen-todo-backend.demo.aserto.com/{todoId}",
+          "connectionType" : "INTERNET"
+        }
+      },
+      "parameters" : [ {
+        "name" : "todoId",
+        "in" : "path",
+        "description" : "Generated path parameter for todoId",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    },
+    "/todos" : {
+      "get" : {
+        "operationId" : "b61c0cd1-b380-4440-a430-840ea85f3e9c",
+        "responses" : {
+          "default" : {
+            "description" : "Default response for GET /todos"
+          }
+        },
+        "security" : [ {
+          "authzen-authorizer" : [ ]
+        } ],
+        "x-amazon-apigateway-integration" : {
+          "payloadFormatVersion" : "1.0",
+          "type" : "http_proxy",
+          "httpMethod" : "ANY",
+          "uri" : "https://authzen-todo-backend.demo.aserto.com/todos",
+          "connectionType" : "INTERNET",
+          "timeoutInMillis" : 30000
+        }
+      },
+      "post" : {
+        "operationId" : "f9e30d74-56ca-4f1e-bcb3-75fe305ea5e4",
+        "responses" : {
+          "default" : {
+            "description" : "Default response for POST /todos"
+          }
+        },
+        "security" : [ {
+          "authzen-authorizer" : [ ]
+        } ],
+        "x-amazon-apigateway-integration" : {
+          "payloadFormatVersion" : "1.0",
+          "type" : "http_proxy",
+          "httpMethod" : "ANY",
+          "uri" : "https://authzen-todo-backend.demo.aserto.com/todos",
+          "connectionType" : "INTERNET",
+          "timeoutInMillis" : 30000
+        }
+      }
+    },
+    "/users/{userId}" : {
+      "get" : {
+        "operationId" : "b61c0cd1-b380-4440-a430-840ea85f3e9f",
+        "responses" : {
+          "default" : {
+            "description" : "Default response for GET /users/{userId}"
+          }
+        },
+        "security" : [ {
+          "authzen-authorizer" : [ ]
+        } ],
+        "x-amazon-apigateway-integration" : {
+          "payloadFormatVersion" : "1.0",
+          "type" : "http_proxy",
+          "httpMethod" : "ANY",
+          "uri" : "https://authzen-todo-backend.demo.aserto.com/users",
+          "connectionType" : "INTERNET"
+        }
+      },
+      "parameters" : [ {
+        "name" : "userId",
+        "in" : "path",
+        "description" : "Generated path parameter for userId",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    }
+  },
+  "components" : {
+    "securitySchemes" : {
+      "authzen-authorizer" : {
+        "type" : "apiKey",
+        "name" : "Authorization",
+        "in" : "header",
+        "x-amazon-apigateway-authorizer" : {
+          "identitySource" : "$request.header.Authorization",
+          "authorizerUri" : "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:533267076018:function:authzen-authorizer/invocations",
+          "authorizerPayloadFormatVersion" : "2.0",
+          "authorizerResultTtlInSeconds" : 0,
+          "type" : "request",
+          "enableSimpleResponses" : true
+        }
+      }
+    }
+  },
+  "x-amazon-apigateway-importexport-version" : "1.0"
+}
