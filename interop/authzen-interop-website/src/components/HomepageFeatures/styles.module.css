@@ -9,3 +9,39 @@
   height: 200px;
   width: 200px;
 }
+
+@media screen and (min-width: 1024px) {
+  .lg {
+    display: block;
+  }
+}
+
+@media screen and (max-width: 1023px) {
+  .lg {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .md {
+    display: block;
+  }
+}
+
+@media screen and (min-width: 1024px), (max-width: 767px) {
+  .md {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .sm {
+    display: block;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .sm {
+    display: none;
+  }
+}
