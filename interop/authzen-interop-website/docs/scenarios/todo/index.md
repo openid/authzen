@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Todo Application
+# Payload Spec
 
 This document lists the request and response payloads for each of the API requests in the Todo interop scenario.
 

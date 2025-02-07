@@ -3,6 +3,6 @@
   "position": 2,
   "link": {
     "type": "generated-index",
-    "description": "Authorization scenarios defined by the AuthZEN WG."
+    "description": "Payload spec and results from the AuthZEN 1.0 Draft 00 interop at Identiverse 2024."
   }
 }
