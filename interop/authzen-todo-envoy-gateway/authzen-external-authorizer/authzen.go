@@ -46,7 +46,11 @@ type AuthZENResponse struct {
 
 func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb.CheckRequest) (bool, error) {
 
-	pdpUrl := pdps[request.Attributes.Request.Http.Headers["X_AUTHZEN_GATEWAY_PDP"]]
+	pdpUrl := pdps[request.Attributes.Request.Http.Headers["x_authzen_gateway_pdp"]]
+	if pdpUrl == "" {
+		return false, fmt.Errorf("PDP not found: %s", request.Attributes.Request.Http.Headers["x_authzen_gateway_pdp"])
+	}
+	log.Printf("PDP URL: %s\n", pdpUrl)
 
 	userId, err := extractSubFromBearer(request.Attributes.Request.Http.Headers["authorization"])
 	if err != nil {
@@ -60,6 +64,9 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 	if err != nil {
 		log.Printf("Failed to match URL to path: %v\n", err)
 	}
+
+	log.Printf("Route: %s\n", route)
+	log.Printf("Params: %v\n", params)
 
 	authZENPayload := &AuthZENRequest{
 		Subject: AuthZENSubject{
@@ -84,7 +91,7 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 		Context: map[string]any{},
 	}
 
-	log.Println("Sending request to PDP")
+	log.Printf("Sending request to %s", pdpUrl)
 	log.Printf("%+v\n", authZENPayload)
 
 	payloadBuf := new(bytes.Buffer)

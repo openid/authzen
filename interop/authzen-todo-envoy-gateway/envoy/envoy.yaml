@@ -21,6 +21,16 @@ static_resources:
                   virtual_hosts:
                     - name: backend_service
                       domains: ["*"]
+                      typed_per_filter_config:
+                        envoy.filters.http.cors:
+                          "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.CorsPolicy
+                          allow_origin_string_match:
+                            - safe_regex:
+                                regex: \*
+                          allow_methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+                          allow_headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Access-Control-Allow-Origin,x_authzen_gateway_pdp,x_authzen_pdp,x_authzen_spec_version"
+                          allow_credentials: true
+                          max_age: "1728000"
                       routes:
                         - match:
                             prefix: "/"
