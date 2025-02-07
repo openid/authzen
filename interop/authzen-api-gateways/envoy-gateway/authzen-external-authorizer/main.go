@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -11,8 +10,12 @@ import (
 	"time"
 
 	auth_pb "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+	envoy_type "github.com/envoyproxy/go-control-plane/envoy/type/v3"
+
 	"github.com/getkin/kin-openapi/openapi3"
+	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 )
 
 type AuthServer struct {
@@ -20,26 +23,51 @@ type AuthServer struct {
 	openApiSpec openapi3.T
 }
 
-func (server *AuthServer) Check(ctx context.Context, request *auth_pb.CheckRequest) (*auth_pb.CheckResponse, error) {
-	// Skip /pdps and OPTIONS requests
-	if request.Attributes.Request.Http.Path == "/pdps" || request.Attributes.Request.Http.Method == "OPTIONS" {
-		return &auth_pb.CheckResponse{
-			HttpResponse: &auth_pb.CheckResponse_OkResponse{
-				OkResponse: &auth_pb.OkHttpResponse{},
+func denied(code int32, body string) *auth_pb.CheckResponse {
+	return &auth_pb.CheckResponse{
+		Status: &status.Status{Code: code},
+		HttpResponse: &auth_pb.CheckResponse_DeniedResponse{
+			DeniedResponse: &auth_pb.DeniedHttpResponse{
+				Status: &envoy_type.HttpStatus{
+					Code: envoy_type.StatusCode(code),
+				},
+				Body: body,
 			},
-		}, nil
+		},
 	}
+}
+
+func allowed() *auth_pb.CheckResponse {
+	return &auth_pb.CheckResponse{
+		Status: &status.Status{Code: int32(codes.OK)},
+		HttpResponse: &auth_pb.CheckResponse_OkResponse{
+			OkResponse: &auth_pb.OkHttpResponse{},
+		},
+	}
+}
+
+func (server *AuthServer) Check(ctx context.Context, request *auth_pb.CheckRequest) (*auth_pb.CheckResponse, error) {
+
+	// Skip authorization for /pdps and OPTIONS
+	if request.Attributes.Request.Http.Path == "/pdps" || request.Attributes.Request.Http.Method == "OPTIONS" {
+		return allowed(), nil
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
 
 	response, err := server.AuthorizeRequest(ctx, request)
 	if err != nil {
-		return nil, err
+		log.Printf("Authorization error: %v\n", err)
+		return denied(http.StatusUnauthorized, "unauthorized"), nil
+	}
+	log.Printf("Response: %v\n", response)
+
+	if !response {
+		return denied(http.StatusUnauthorized, "unauthorized"), nil
 	}
 
-	if response {
-		return &auth_pb.CheckResponse{}, nil
-	} else {
-		return nil, fmt.Errorf("Not allowed")
-	}
+	return allowed(), nil
 }
 
 func main() {
@@ -74,7 +102,7 @@ func main() {
 
 	server := &AuthServer{
 		httpClient: &http.Client{
-			Timeout: time.Second,
+			Timeout: time.Second * 10,
 		},
 		openApiSpec: openApiSpec,
 	}
