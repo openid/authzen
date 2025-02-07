@@ -1,0 +1,94 @@
+static_resources:
+  listeners:
+    - name: listener_0
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: ${PORT}
+      filter_chains:
+        - filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                access_log:
+                  - name: envoy.access_loggers.stdout
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
+                codec_type: auto
+                stat_prefix: ingress_http
+                route_config:
+                  name: local_route
+                  virtual_hosts:
+                    - name: backend_service
+                      domains: ["*"]
+                      typed_per_filter_config:
+                        envoy.filters.http.cors:
+                          "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.CorsPolicy
+                          allow_origin_string_match:
+                            - prefix: "*"
+                          allow_methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+                          allow_headers: "*"
+                          allow_credentials: true
+                          max_age: "1728000"
+                      routes:
+                        - match:
+                            prefix: "/"
+                          route:
+                            cluster: backend_cluster
+                            timeout: 10s
+                            host_rewrite_literal: authzen-todo-backend.demo.aserto.com
+                http_filters:
+                  - name: envoy.filters.http.ext_authz
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+                      transport_api_version: v3
+                      grpc_service:
+                        envoy_grpc:
+                          cluster_name: go_grpc_cluster
+                        timeout: 10s
+                      failure_mode_allow: false
+                      with_request_body:
+                        max_request_bytes: 8192
+                        allow_partial_message: true
+                        pack_as_bytes: true
+                      status_on_error:
+                        code: 503
+                      include_peer_certificate: true
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+  clusters:
+    - name: go_grpc_cluster
+      connect_timeout: 5s
+      type: LOGICAL_DNS
+      typed_extension_protocol_options:
+        envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+          "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+          explicit_http_config:
+            http2_protocol_options: {}
+      load_assignment:
+        cluster_name: go_grpc_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: 127.0.0.1
+                      port_value: 3001
+    - name: backend_cluster
+      type: LOGICAL_DNS
+      connect_timeout: 5s
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: backend_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: authzen-todo-backend.demo.aserto.com
+                      port_value: 443
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext

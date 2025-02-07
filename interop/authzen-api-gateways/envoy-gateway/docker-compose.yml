@@ -1,0 +1,8 @@
+services:
+  envoy:
+    build:
+      context: .
+    ports:
+      - "9000:9000"
+    environment:
+      - PORT=9000
