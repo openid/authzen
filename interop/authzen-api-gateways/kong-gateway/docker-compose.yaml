@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  kong:
+   build:
+    context: .
+   environment:
+    KONG_PLUGINS: "authzen,bundled"
+    KONG_DATABASE: off
+    KONG_DECLARATIVE_CONFIG: "/plugins/conf.yaml"
+    KONG_LUA_PACKAGE_PATH: "/plugins/?.lua"
+   ports:
+     - "8000:8000/tcp"
