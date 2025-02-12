@@ -1,0 +1,47 @@
+_transform: false
+_format_version: '3.0'
+services:
+- host: authzen-todo-backend.demo.aserto.com
+  port: 443
+  name: AuthZEN_Interop
+  retries: 5
+  protocol: https
+  enabled: true
+  connect_timeout: 60000
+  write_timeout: 60000
+  id: 2e9926ca-053f-4a4d-aeea-e45ac77d4775
+  read_timeout: 60000
+routes:
+- regex_priority: 0
+  path_handling: v0
+  preserve_host: false
+  name: Interop
+  methods: ~
+  service: 2e9926ca-053f-4a4d-aeea-e45ac77d4775
+  paths:
+    - "/"
+  https_redirect_status_code: 426
+  strip_path: true
+  request_buffering: true
+  response_buffering: true
+  protocols:
+  - http
+  - https
+  id: 51799165-1a03-495c-b390-4ac7e7047061
+plugins:
+- tags: ~
+  instance_name: authzen-profile
+  name: authzen
+  ordering: ~
+  consumer: ~
+  id: 96cb9f8d-edd3-4254-b950-2fba72c8289b
+  route: 51799165-1a03-495c-b390-4ac7e7047061
+  config:
+    server:
+      pdp_url: '{     "Aserto":"https://authzen-gateway-proxy.demo.aserto.com",     "Cerbos":"https://authzen-proxy-demo.cerbos.dev",     "PlainID":"https://authzeninteropt.se-plainid.com" }'
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  enabled: true
