@@ -1,12 +1,13 @@
 # PlainID
 
-Interop results for the [PlainID](https://plainid.com) implementation hosted at `https://authzeninteropt.se-plainid.com `.
+Interop results for the [PlainID](https://www.plainid.com/) implementation hosted at https://authzeninteropt.se-plainid.com.
 
 ## Test results
+
 ```bash
-yarn test https://authzen-proxy-demo.cerbos.dev markdown
-yarn run v1.22.19
-$ node build/runner.js https://authzen-proxy-demo.cerbos.dev markdown
+yarn test https://authzeninteropt.se-plainid.com markdown
+yarn run v1.22.22
+$ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```
 <table>
   <tr>
