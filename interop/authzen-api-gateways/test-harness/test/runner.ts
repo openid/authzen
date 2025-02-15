@@ -178,7 +178,7 @@ function arrayToTable(startTime, endTime, array) {
 function wrapHTML(body) {
   return `<!DOCTYPE html>` + 
          `<html lang="en">` + 
-         `<head><style>*{font-family: Helvetica, Arial, sans-serif;}th{background-color: #555555; color: #eeeeee;} .success{background: green; color: white;} .fail{background: red; color: white;} .odd{background-color: #eeeeee;} td, th{padding: 5px;} tr{border: solid 1px black;} pre{font-family: monospace; font-size: small;}table{border-collapse: collapse;}</style></head><body><h1>Test Results</h1>` + 
+         `<head><meta charset="UTF-8"><style>*{font-family: Helvetica, Arial, sans-serif;}th{background-color: #555555; color: #eeeeee;} .success{background: green; color: white;} .fail{background: red; color: white;} .odd{background-color: #eeeeee;} td, th{padding: 5px;} tr{border: solid 1px black;} pre{font-family: monospace; font-size: small;}table{border-collapse: collapse;}</style><title>AuthZEN Test Results</title></head><body><h1>Test Results</h1>` + 
          body + 
          `</body></html>`;
 
