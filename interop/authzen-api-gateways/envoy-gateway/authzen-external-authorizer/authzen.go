@@ -16,8 +16,10 @@ import (
 
 // PDP URLs
 var pdps = map[string]string{
-	"Aserto": "https://authzen-gateway-proxy.demo.aserto.com",
-	"Cerbos": "https://authzen-proxy-demo.cerbos.dev",
+	"Aserto":     "https://authzen-gateway-proxy.demo.aserto.com",
+	"Axiomatics": "https://pdp.alfa.guide",
+	"Cerbos":     "https://authzen-proxy-demo.cerbos.dev",
+	"PlainID":    "https://authzeninteropt.se-plainid.com",
 }
 
 // AuthZENSubject represents the subject in the authorization request
