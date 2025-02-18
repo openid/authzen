@@ -25,7 +25,7 @@ routes:
     - /todos
     - /pdps
   https_redirect_status_code: 426
-  strip_path: true
+  strip_path: false
   request_buffering: true
   response_buffering: true
   protocols:
