@@ -11,6 +11,13 @@ paths:
         '200':
           description: ''
       summary: Returns a list of TODOs
+    post:
+      operationId: todospost
+      responses:
+        '200':
+          description: ''
+      summary: Create a TODO
+    }
   /todos/{todoId}:
     delete:
       parameters:
