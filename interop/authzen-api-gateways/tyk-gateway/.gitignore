@@ -1,0 +1,27 @@
+**/tyk-release-*/
+
+# Binaries and build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Coverage output
+*.out
+
+# Dependency directories
+vendor/
+
+# IDE-specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# But do NOT ignore these files
+!go.mod
+!go.sum
