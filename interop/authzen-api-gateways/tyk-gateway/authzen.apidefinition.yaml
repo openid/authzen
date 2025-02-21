@@ -44,7 +44,7 @@ paths:
         '200':
           description: ''
 servers:
-  - url: http://gateway.ahmet:8080/
+  - url: https://tyk-authzen-interop.do.poc.tyk.technology/
 x-tyk-api-gateway:
   info:
     dbId: 67b757aa6877c269f999170a
