@@ -30,21 +30,35 @@ The latest scenario defines a defense-in-depth architecture, consisting of API g
 
 ## Results summary
 
-| Implementation       | [Todo PEP 00](/docs/scenarios/todo/)                          | [Todo PEP 01](/docs/scenarios/todo-1.0-id)                           | [Todo PEP 02](/docs/scenarios/todo-1.1/)                          | [AWS Gateway PEP](/docs/scenarios/api-gateway/)             | [Envoy PEP](/docs/scenarios/api-gateway/)                   |
-| -------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------- |
-| Aserto               | ✅ [Results](/docs/scenarios/todo/results/aserto)             | ✅ [Results](/docs/scenarios/todo-1.0-id/results/aserto)             | ✅ [Results](/docs/scenarios/todo-1.1/results/aserto)             | ✅ [Results](/docs/scenarios/api-gateway/results/aserto)     | ✅ [Results](/docs/scenarios/api-gateway/results/aserto)     |
-| Axiomatics           | ✅ [Results](/docs/scenarios/todo/results/axiomatics)         | ✅ [Results](/docs/scenarios/todo-1.0-id/results/axiomatics)         | ✅ [Results](/docs/scenarios/todo-1.1/results/axiomatics)         | ✅ [Results](/docs/scenarios/api-gateway/results/axiomatics) | ✅ [Results](/docs/scenarios/api-gateway/results/axiomatics) |
-| Cerbos               | ✅ [Results](/docs/scenarios/todo/results/cerbos)             | ✅ [Results](/docs/scenarios/todo-1.0-id/results/cerbos)             | ✅ [Results](/docs/scenarios/todo-1.1/results/cerbos)             | ✅ [Results](/docs/scenarios/api-gateway/results/cerbos)     | ✅ [Results](/docs/scenarios/api-gateway/results/cerbos)     |
-| EmpowerID            | Did not participate                                           | ✅ [Results](/docs/scenarios/todo-1.0-id/results/empowerid)          | ✅ [Results](/docs/scenarios/todo-1.1/results/empowerid)          |    |  |
-| Hexa                 | ✅ [Results](/docs/scenarios/todo/results/hexa)               | ✅ [Results](/docs/scenarios/todo-1.0-id/results/hexa)               | ✅ [Results](/docs/scenarios/todo-1.1/results/hexa)               |    |  |
-| Indykite             | Did not participate                                           | ✅ [Results](/docs/scenarios/todo-1.0-id/results/indykite)           | ✅ [Results](/docs/scenarios/todo-1.1/results/indykite)           |    |  |
-| Kogito               | ✅ [Results](/docs/scenarios/todo/results/kogito)             | ✅ [Results](/docs/scenarios/todo-1.0-id/results/kogito)             | ✅ [Results](/docs/scenarios/todo-1.1/results/kogito)             |    |  |
-| Open Policy Agent    | ✅ [Results](/docs/scenarios/todo/results/opa)                | ✅ [Results](/docs/scenarios/todo-1.0-id/results/opa)                | ✅ [Results](/docs/scenarios/todo-1.1/results/opa)                |    |  |
-| Permit               | ✅ [Results](/docs/scenarios/todo/results/permit)             | ✅ [Results](/docs/scenarios/todo-1.0-id/results/permit)             | ✅ [Results](/docs/scenarios/todo-1.1/results/permit)             |    |  |
-| Ping Authorize       | Did not participate                                           | ✅ [Results](/docs/scenarios/todo-1.0-id/results/pingid)             | ✅ [Results](/docs/scenarios/todo-1.1/results/pingid)             |    |  |
-| PlainID              | ✅ [Results](/docs/scenarios/todo/results/plainid)            | ✅ [Results](/docs/scenarios/todo-1.0-id/results/plainid)            | ✅ [Results](/docs/scenarios/todo-1.1/results/plainid)            | ✅ [Results](/docs/scenarios/api-gateway/results/plainid) | ✅ [Results](/docs/scenarios/api-gateway/results/plainid) |
-| Real Solid Knowledge | ✅ [Results](/docs/scenarios/todo/results/RockSolidKnowledge) | Did not participate                                                  | Did not participate                                               |    |  |
+### Policy Decision Points
+
+| Implementation       | [Todo PEP 00](/docs/scenarios/todo/)                          | [Todo PEP 01](/docs/scenarios/todo-1.0-id)                           | [Todo PEP 02](/docs/scenarios/todo-1.1/)                          | [Gateway PEP 02](/docs/scenarios/api-gateway/)              |
+| -------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------- |
+| Aserto               | ✅ [Results](/docs/scenarios/todo/results/aserto)             | ✅ [Results](/docs/scenarios/todo-1.0-id/results/aserto)             | ✅ [Results](/docs/scenarios/todo-1.1/results/aserto)             | ✅ [Results](/docs/scenarios/api-gateway/results/aserto)     |
+| Axiomatics           | ✅ [Results](/docs/scenarios/todo/results/axiomatics)         | ✅ [Results](/docs/scenarios/todo-1.0-id/results/axiomatics)         | ✅ [Results](/docs/scenarios/todo-1.1/results/axiomatics)         | ✅ [Results](/docs/scenarios/api-gateway/results/axiomatics) |
+| Cerbos               | ✅ [Results](/docs/scenarios/todo/results/cerbos)             | ✅ [Results](/docs/scenarios/todo-1.0-id/results/cerbos)             | ✅ [Results](/docs/scenarios/todo-1.1/results/cerbos)             | ✅ [Results](/docs/scenarios/api-gateway/results/cerbos)     |
+| EmpowerID            | Did not participate                                           | ✅ [Results](/docs/scenarios/todo-1.0-id/results/empowerid)          | ✅ [Results](/docs/scenarios/todo-1.1/results/empowerid)          |    |
+| Hexa                 | ✅ [Results](/docs/scenarios/todo/results/hexa)               | ✅ [Results](/docs/scenarios/todo-1.0-id/results/hexa)               | ✅ [Results](/docs/scenarios/todo-1.1/results/hexa)               |    |
+| Indykite             | Did not participate                                           | ✅ [Results](/docs/scenarios/todo-1.0-id/results/indykite)           | ✅ [Results](/docs/scenarios/todo-1.1/results/indykite)           |    |
+| Kogito               | ✅ [Results](/docs/scenarios/todo/results/kogito)             | ✅ [Results](/docs/scenarios/todo-1.0-id/results/kogito)             | ✅ [Results](/docs/scenarios/todo-1.1/results/kogito)             |    |
+| Open Policy Agent    | ✅ [Results](/docs/scenarios/todo/results/opa)                | ✅ [Results](/docs/scenarios/todo-1.0-id/results/opa)                | ✅ [Results](/docs/scenarios/todo-1.1/results/opa)                |    |
+| Permit               | ✅ [Results](/docs/scenarios/todo/results/permit)             | ✅ [Results](/docs/scenarios/todo-1.0-id/results/permit)             | ✅ [Results](/docs/scenarios/todo-1.1/results/permit)             |    |
+| Ping Authorize       | Did not participate                                           | ✅ [Results](/docs/scenarios/todo-1.0-id/results/pingid)             | ✅ [Results](/docs/scenarios/todo-1.1/results/pingid)             |    |
+| PlainID              | ✅ [Results](/docs/scenarios/todo/results/plainid)            | ✅ [Results](/docs/scenarios/todo-1.0-id/results/plainid)            | ✅ [Results](/docs/scenarios/todo-1.1/results/plainid)            | ✅ [Results](/docs/scenarios/api-gateway/results/plainid)     |
+| Real Solid Knowledge | ✅ [Results](/docs/scenarios/todo/results/RockSolidKnowledge) | ✅ [Results](/docs/scenarios/todo-1.0-id/results/RockSolidKnowledge) | Did not participate                                               | ✅ [Results](/docs/scenarios/api-gateway/results/RockSolidKnowledge)   |
 | SGNL                 | ✅ [Results](/docs/scenarios/todo/results/sgnl)               | ✅ [Results](/docs/scenarios/todo-1.0-id/results/SGNL)               | ✅ [Results](/docs/scenarios/todo-1.1/results/SGNL)               |    |  |
 | Thales               | ✅ [Results](/docs/scenarios/todo/results/authzforce)         | Did not participate                                                  | Did not participate                                               |    |  |
 | Topaz                | ✅ [Results](/docs/scenarios/todo/results/topaz)              | ✅ [Results](/docs/scenarios/todo-1.0-id/results/topaz)              | ✅ [Results](/docs/scenarios/todo-1.1/results/topaz)              |    |  |
 | 3Edges               | ✅ [Results](/docs/scenarios/todo/results/3edges)             | Replaced by Indykite                                                 | Replaced by Indykite                                              |    |  |
+
+### API Gateways
+
+API Gateways that support the [Gateway scenario](/docs/scenarios/api-gateway/).
+
+| Implementation       | Hosted at                                                     |
+| -------------------- | ------------------------------------------------------------- |
+| AWS API Gateway      | https://aws-gateway.authzen-interop.net                       |
+| Envoy                | https://authzen-envoy-proxy-demo.cerbos.dev                   |
+| Kong                 | https://plainid-kong-gw.se-plainid.com                        |
+| Tyk                  | https://tyk-authzen-interop.do.poc.tyk.technology             |
+| Zuplo                | https://authzen-todo-main-4df5ceb.d2.zuplo.dev                |
