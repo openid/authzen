@@ -45,10 +45,10 @@
   },
   "gateways": {
     "--Pass Through--": "https://authzen-todo-backend.demo.aserto.com",
-    "Tyk": "https://tyk-authzen-interop.do.poc.tyk.technology",
     "AWS API Gateway": "https://aws-gateway.authzen-interop.net",
     "Envoy": "https://authzen-envoy-proxy-demo.cerbos.dev",
     "Kong": "https://plainid-kong-gw.se-plainid.com",
+    "Tyk": "https://tyk-authzen-interop.do.poc.tyk.technology",
     "Zuplo": "https://authzen-todo-main-4df5ceb.d2.zuplo.dev"
   },
   "gatewayPdps": {

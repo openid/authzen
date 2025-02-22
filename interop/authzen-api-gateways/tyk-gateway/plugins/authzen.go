@@ -4,25 +4,27 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httputil"
+	"strings"
+	"time"
+
 	"github.com/TykTechnologies/tyk/apidef/oas"
 	"github.com/TykTechnologies/tyk/ctx"
 	"github.com/TykTechnologies/tyk/log"
 	"github.com/TykTechnologies/tyk/regexp"
 	"github.com/dgrijalva/jwt-go"
 	kin "github.com/getkin/kin-openapi/openapi3"
-	"net/http"
-	"net/http/httputil"
-	"strings"
-	"time"
 )
 
 var (
 	logger = log.Get()
 	pdps   = map[string]string{
-		"Aserto":     "https://authzen-gateway-proxy.demo.aserto.com",
-		"Axiomatics": "https://pdp.alfa.guide",
-		"Cerbos":     "https://authzen-proxy-demo.cerbos.dev",
-		"PlainID":    "https://authzeninteropt.se-plainid.com",
+		"Aserto":               "https://authzen-gateway-proxy.demo.aserto.com",
+		"Axiomatics":           "https://pdp.alfa.guide",
+		"Cerbos":               "https://authzen-proxy-demo.cerbos.dev",
+		"PlainID":              "https://authzeninteropt.se-plainid.com",
+		"Rock Solid Knowledge": "https://authzen.identityserver.com",
 	}
 )
 
