@@ -31,6 +31,10 @@ export class Server {
     res.json(config);
   }
 
+  async listGatewayPdps(_: Request, res: Response) {
+    res.json(pdps.gatewayPdps);
+  }
+
   async getUser(req: JWTRequest, res: Response) {
     const { userID } = req.params;
     if(req.auth.sub === userID) {
