@@ -12,6 +12,10 @@ This document lists the request and response payloads for each of the API reques
 This is a copy of the payload document defined by the AuthZEN WG. The definitive document can be found [here](https://hackmd.io/ecYxP6uxSCm5X0RexkAM2g?view).
 :::
 
+## Changelog
+- Created: Jan 23 2025
+- Updated: Feb 22 2025 (`subject.type`: `"user"` -> `"identity"`)
+
 ## Context
 
 The API Gateway scenario layers on top of the existing Todo scenario.
@@ -92,7 +96,7 @@ This will be extracted from the `sub` claim in the JWT passed in as a bearer tok
 These are noted below in JSON format, with the key being the PID string from the table above, and the value being a set of attributes associated with the user. 
 
 
-```json=
+```js
 {
   "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs": {
     "id": "rick@the-citadel.com",
@@ -138,7 +142,7 @@ The PIP can, of course, express this in any way they desire. The policy for each
 
 Unless otherwise noted, these are payloads for the `evaluation` API, and are meant to be sent using the following HTTP(S) request:
 
-```http=
+```http
 POST /access/v1/evaluation HTTP/1.1
 Host: mypdp.com
 [Authorization: Bearer <token>]
@@ -152,10 +156,10 @@ For simplicity, the policy always returns `true`.
 
 #### Request payload
 
-```json=
+```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "<subject_from_jwt>"
   },
   "action": {
@@ -173,12 +177,14 @@ For simplicity, the policy always returns `true`.
 > Note:
 > Each of the `subject`, `action`, `resource` fields MAY contain additional key/value pairs in the `properties` field - for example, additional information about the subject or resource. In addition, the `context` field MAY contain additional key/value pairs - for example, HTTP headers for the request. 
 > HTTP Gateways that map these into standard locations as per the [AuthZEN REST API Gateway Profile proposal](https://hackmd.io/MTJPf_vzSmubctNtHis99g) are compliant with these payloads. The PDPs, however, will ignore those extra fields for the purpose of this interop showcase.
+> Feb 22 2025: changed `subject.type` from "user" to "identity"
+
 
 #### Response payload
 
 For every subject and resource combination:
 
-```json=
+```js
 {
   "decision": true
 }
@@ -194,10 +200,10 @@ For simplicity, the policy always returns `true` for every user.
 
 ##### Evaluation API Request payload
 
-```json=
+```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "<subject_from_jwt>"
   },
   "action": {
@@ -215,12 +221,13 @@ For simplicity, the policy always returns `true` for every user.
 > Note:
 > Each of the `subject`, `action`, `resource` fields MAY contain additional key/value pairs in the `properties` field - for example, additional information about the subject or resource. In addition, the `context` field MAY contain additional key/value pairs - for example, HTTP headers for the request. 
 > HTTP Gateways that map these into standard locations as per the [AuthZEN REST API Gateway Profile proposal](https://hackmd.io/MTJPf_vzSmubctNtHis99g) are compliant with these payloads. The PDPs, however, will ignore those extra fields for the purpose of this interop showcase.
+> Feb 22 2025: changed `subject.type` from "user" to "identity"
 
 ##### Evaluation API Response payload
 
 For every subject and resource combination:
 
-```json=
+```js
 {
   "decision": true
 }
@@ -234,10 +241,10 @@ The policy evaluates the subject's `roles` attribute to determine whether the us
 
 #### Request payload
 
-```json=
+```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "<subject_from_jwt>"
   },
   "action": {
@@ -255,12 +262,13 @@ The policy evaluates the subject's `roles` attribute to determine whether the us
 > Note:
 > Each of the `subject`, `action`, `resource` fields MAY contain additional key/value pairs in the `properties` field - for example, additional information about the subject or resource. In addition, the `context` field MAY contain additional key/value pairs - for example, HTTP headers for the request. 
 > HTTP Gateways that map these into standard locations as per the [AuthZEN REST API Gateway Profile proposal](https://hackmd.io/MTJPf_vzSmubctNtHis99g) are compliant with these payloads. The PDPs, however, will ignore those extra fields for the purpose of this interop showcase.
+> Feb 22 2025: changed `subject.type` from "user" to "identity"
 
 #### Response payload
 
 Only users with a `roles` attribute that contains `admin` or `editor` return a `true` decision. In the user set above, this includes Rick, Morty, and Summer.
 
-```json=
+```js
 {
   "decision": true
 }
@@ -268,7 +276,7 @@ Only users with a `roles` attribute that contains `admin` or `editor` return a `
 
 For the other two users, Beth and Jerry, the decision is `false`.
 
-```json=
+```js
 {
   "decision": false
 }
@@ -286,10 +294,10 @@ However, given the fact that the incoming HTTP request DOES NOT include informat
 
 #### Request payload
 
-```json=
+```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "<subject_from_jwt>"
   },
   "action": {
@@ -307,6 +315,7 @@ However, given the fact that the incoming HTTP request DOES NOT include informat
 > Note:
 > Each of the `subject`, `action`, `resource` fields MAY contain additional key/value pairs in the `properties` field - for example, additional information about the subject or resource. In addition, the `context` field MAY contain additional key/value pairs - for example, HTTP headers for the request. 
 > HTTP Gateways that map these into standard locations as per the [AuthZEN REST API Gateway Profile proposal](https://hackmd.io/MTJPf_vzSmubctNtHis99g) are compliant with these payloads. The PDPs, however, will ignore those extra fields for the purpose of this interop showcase.
+> Feb 22 2025: changed `subject.type` from "user" to "identity"
 
 #### Response payload
 
@@ -314,10 +323,10 @@ Only users with a `roles` attribute that contains `evil_genius` (Rick), OR `edit
 
 For the user Morty, the following request will return a `true` decision:
 
-```json=
+```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -332,7 +341,7 @@ For the user Morty, the following request will return a `true` decision:
 }
 ```
 
-```json=
+```js
 {
   "decision": true
 }
@@ -340,12 +349,11 @@ For the user Morty, the following request will return a `true` decision:
 
 For Jerry (who is a `viewer`), the decision will be `false`:
 
-```json=
+```js
 {
   "decision": false
 }
 ```
-
 
 ### `DELETE /todos/{todoId}`
 
@@ -359,10 +367,10 @@ However, given the fact that the incoming HTTP request DOES NOT include informat
 
 #### Request payload
 
-```json=
+```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "<subject_from_jwt>"
   },
   "action": {
@@ -380,6 +388,7 @@ However, given the fact that the incoming HTTP request DOES NOT include informat
 > Note:
 > Each of the `subject`, `action`, `resource` fields MAY contain additional key/value pairs in the `properties` field - for example, additional information about the subject or resource. In addition, the `context` field MAY contain additional key/value pairs - for example, HTTP headers for the request. 
 > HTTP Gateways that map these into standard locations as per the [AuthZEN REST API Gateway Profile proposal](https://hackmd.io/MTJPf_vzSmubctNtHis99g) are compliant with these payloads. The PDPs, however, will ignore those extra fields for the purpose of this interop showcase.
+> Feb 22 2025: changed `subject.type` from "user" to "identity"
 
 #### Response payload
 
@@ -387,10 +396,10 @@ Only users with a `roles` attribute that contains `admin` (Rick), OR `editor` (M
 
 For the user Morty, the following request will return a `true` decision:
 
-```json=
+```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -405,7 +414,7 @@ For the user Morty, the following request will return a `true` decision:
 }
 ```
 
-```json=
+```js
 {
   "decision": true
 }
@@ -413,7 +422,7 @@ For the user Morty, the following request will return a `true` decision:
 
 For Jerry (who is a `viewer`), the decision will be `false`:
 
-```json=
+```js
 {
   "decision": false
 }

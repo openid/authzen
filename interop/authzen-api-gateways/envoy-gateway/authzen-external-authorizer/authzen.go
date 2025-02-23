@@ -87,7 +87,7 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 	// Create authorization request payload
 	authZENPayload := &AuthZENRequest{
 		Subject: AuthZENSubject{
-			Type: "user",
+			Type: "identity",
 			ID:   userId,
 		},
 		Action: AuthZENAction{

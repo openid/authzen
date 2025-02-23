@@ -27,7 +27,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -49,7 +49,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -71,7 +71,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -93,7 +93,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -115,7 +115,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -137,7 +137,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -159,7 +159,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -181,7 +181,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -203,7 +203,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -225,7 +225,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -247,7 +247,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -269,7 +269,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -291,7 +291,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -313,7 +313,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -335,7 +335,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -357,7 +357,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -379,7 +379,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -401,7 +401,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -423,7 +423,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -445,7 +445,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -467,7 +467,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -489,7 +489,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -511,7 +511,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -533,7 +533,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
@@ -555,7 +555,7 @@ $ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
 ```js
 {
   "subject": {
-    "type": "user",
+    "type": "identity",
     "id": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
   },
   "action": {
