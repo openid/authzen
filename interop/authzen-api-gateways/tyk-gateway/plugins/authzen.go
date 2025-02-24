@@ -4,17 +4,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"net/http/httputil"
-	"strings"
-	"time"
-
 	"github.com/TykTechnologies/tyk/apidef/oas"
 	"github.com/TykTechnologies/tyk/ctx"
 	"github.com/TykTechnologies/tyk/log"
 	"github.com/TykTechnologies/tyk/regexp"
 	"github.com/dgrijalva/jwt-go"
 	kin "github.com/getkin/kin-openapi/openapi3"
+	"net/http"
+	"net/http/httputil"
+	"strings"
+	"time"
 )
 
 var (
@@ -113,11 +112,6 @@ func AuthZENMiddleware(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
-
-	//rawReq, _ := httputil.DumpRequestOut(req, true)
-	//println("----------------")
-	//println(string(rawReq))
-	//println("----------------")
 
 	client := &http.Client{Timeout: 10 * time.Second}
 	res, err := client.Do(req)
