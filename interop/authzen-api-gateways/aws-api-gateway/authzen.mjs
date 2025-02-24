@@ -45,7 +45,7 @@ export async function authorize(req) {
 
   const payload = {
     "subject": {
-      "type": "user",
+      "type": "identity",
       "id": subjectId
     },
     "action": {

@@ -100,7 +100,7 @@ function _M.execute(conf)
     local id = decoded_token.claims.sub
     local authzen_request = {
         subject = {
-            type = "user",
+            type = "identity",
             id = id
         },
         resource = {

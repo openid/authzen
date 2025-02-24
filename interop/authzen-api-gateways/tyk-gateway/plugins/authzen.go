@@ -87,7 +87,7 @@ func AuthZENMiddleware(w http.ResponseWriter, r *http.Request) {
 
 	authZENPayload := &AuthZENRequest{
 		Subject: AuthZENSubject{
-			Type: "user",
+			Type: "identity",
 			ID:   userId,
 		},
 		Action: AuthZENAction{
