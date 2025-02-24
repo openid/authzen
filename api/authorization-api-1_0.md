@@ -47,6 +47,9 @@ contributor: # Same structure as author list, but goes into contributors
 - name: Alex Babeanu
   org: 3Edges
   email: alex@3edges.com
+- name: David Hyland
+  org: ID Partners
+  email: dave@idpartners.com.au
 
 normative:
   RFC4001: # text representation of IP addresses
@@ -67,7 +70,7 @@ normative:
 
 --- abstract
 
-The Authorization API enables Policy Decision Points (PDPs) and Policy Enforcement Points (PEPs) to communicate authorization requests and decisions to each other without requiring knowledge of each other's inner workings. The Authorization API is served by the PDP and is called by the PEP. The Authorization API includes an Evaluation endpoint, which provides specific access decisions. Other endpoints may be added in the future for other scenarios, including searching for subjects or resources.
+The Authorization API enables Policy Decision Points (PDPs) and Policy Enforcement Points (PEPs) to communicate authorization requests and decisions to each other without requiring knowledge of each other's inner workings. The Authorization API is served by the PDP and is called by the PEP. The Authorization API includes an Evaluation endpoint, which provides specific access decisions. Other endpoints may be added in the future for other scenarios, including searching for subjects, resources or actions.
 
 --- middle
 
@@ -1035,6 +1038,105 @@ To retrieve the next page, provide `page.next_token` in the next request:
 
 Note: page size is implementation-dependent.
 
+# Action Search API {#action-search-api}
+
+The Action Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the actions that match the search criteria.
+
+The Action Search API is based on the Access Evaluation information model.
+
+## The Action Search API Request {#action-search-request}
+The Action Search request is a 3-tuple constructed of three previously defined entities:
+
+`subject`: REQUIRED. The subject (or principal) of type Subject.
+
+`resource`: REQUIRED. The resource of type Resource.
+
+`context`: OPTIONAL. Contextual data about the request.
+
+`page`: OPTIONAL. A page token for paged requests.
+
+### Example (non-normative)
+The following payload defines a request for the actions that the subject of type user and ID may perform on the resource of type account and ID 123 at 01:22 AM.
+```json
+{
+  "subject": {
+    "type": "user",
+    "id": "123"
+  },
+  "resource": {
+    "type": "account",
+    "id": "123"
+  },
+  "context": {
+    "time": "2024-10-26T01:22-07:00"
+  }
+}
+```
+{: #action-search-request-example title="Example Request"}
+
+## The Action Search API Response {#action-search-response}
+The response is a paged array of Actions.
+```json
+{
+  "results": [
+    {
+      "name": "can_read"
+    },
+    {
+      "name": "can_write"
+    }
+  ],
+  "page": {
+    "next_token": ""
+  }
+}
+```
+{: #action-search-response-example title="Example Response"}
+
+### Paged requests
+
+A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
+#### Example
+```json
+{
+  "results": [
+    {
+      "name": "can_read"
+    },
+    {
+      "name": "can_write"
+    }
+  ],
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+```
+{: #action-search-response-paged-example title="Example Paged Response"}
+
+To retrieve the next page, provide `page.next_token` in the next request:
+```json
+{
+  "subject": {
+    "type": "user",
+    "id": "123"
+  },
+  "resource": {
+    "type": "account",
+    "id": "123"
+  },
+  "context": {
+    "time": "2024-10-26T01:22-07:00"
+  },
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+```
+{: #action-search-request-paged-example title="Example Paged Request"}
+
+Note: page size is implementation-dependent.
+
 # Transport
 
 This specification defines an HTTPS binding which MUST be implemented by a compliant PDP.
@@ -1280,6 +1382,59 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 }
 ~~~
 {: #example-resource-search-response title="Example of an HTTPS Resource Search Response"}
+
+### HTTPS Action Search Request
+The Action Search Request is an HTTPS request with `content-type` of `application/json`. Its body is a JSON object that contains the Action Search Request, as defined in {{action-search-request}}.
+
+The following is a non-normative example of the HTTPS binding of the Action Search Request:
+
+~~~ http
+POST /access/v1/actionsearch HTTP/1.1
+Host: pdp.mycompany.com
+Authorization: Bearer <myoauthtoken>
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@acmecorp.com"
+  },
+  "resource": {
+    "type": "account",
+    "id": "123"
+  },
+  "context": {
+    "time": "2024-10-26T01:22-07:00"
+  },
+}
+~~~
+{: #example-action-search-request title="Example of an HTTPS Action Search Request"}
+
+### HTTPS Action Search Response
+The success response to an Action Search Request is an Action Search Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Action Search Response, as defined in {{action-search-response}}.
+
+The following is a non-normative example of an HTTPS Action Search Response:
+
+~~~ http
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+
+{
+  "results": [
+    {
+      "name": "can_read"
+    },
+    {
+      "name": "can_write"
+    }
+  ],
+  "page": {
+    "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+{: #example-action-search-response title="Example of an HTTPS Action Search Response"}
 
 ### Error Responses
 The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTPS status code ({{Section 15 of RFC9110}}) that indicates error.
