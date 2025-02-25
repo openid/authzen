@@ -19,6 +19,7 @@ Store.open().then((store) => {
   const checkAuthz = authzMiddleware(store);
 
   app.get("/pdps", server.listPdps.bind(server));
+  app.get("/gatewaypdps", server.listGatewayPdps.bind(server));
   app.get(
     "/users/:userID",
     checkJwt,

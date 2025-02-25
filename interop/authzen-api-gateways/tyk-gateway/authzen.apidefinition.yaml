@@ -1,0 +1,98 @@
+components: {}
+info:
+  title: todos
+  version: 1.0.0
+openapi: 3.0.3
+paths:
+  /todos:
+    get:
+      operationId: todosget
+      responses:
+        '200':
+          description: ''
+      summary: Returns a list of TODOs
+    post:
+      operationId: todospost
+      responses:
+        '200':
+          description: ''
+      summary: Create a TODO
+    }
+  /todos/{todoId}:
+    delete:
+      parameters:
+        - in: path
+          name: todoId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+    put:
+      parameters:
+        - in: path
+          name: todoId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+  /users/{userId}:
+    get:
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+servers:
+  - url: https://tyk-authzen-interop.do.poc.tyk.technology/
+x-tyk-api-gateway:
+  info:
+    dbId: 67b757aa6877c269f999170a
+    id: 24cc30025c1e404364517af3477e06dc
+    name: todos
+    orgId: 679109cfa375e124cc776a8d
+    state:
+      active: true
+  middleware:
+    global:
+      contextVariables:
+        enabled: true
+      cors:
+        allowCredentials: true
+        allowedHeaders:
+          - '*'
+        allowedMethods:
+          - GET
+          - HEAD
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        allowedOrigins:
+          - http://localhost:3000
+          - https://todo.authzen-interop.net
+        debug: true
+        enabled: true
+        maxAge: 24
+      pluginConfig:
+        driver: goplugin
+      postPlugins:
+        - enabled: true
+          functionName: AuthZENMiddleware
+          path: ./../plugins/authzen.so
+      trafficLogs:
+        enabled: true
+  server:
+    listenPath:
+      strip: true
+      value: /
+  upstream:
+    url: https://authzen-todo-backend.demo.aserto.com

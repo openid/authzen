@@ -8,7 +8,6 @@
       "Kogito": "https://authzen-proxy-demo.azerad.org",
       "Open Policy Agent": "https://authzen-opa-proxy-preview.demo.aserto.com",
       "Permit.io": "https://permit-authzen-interop-1-0-preview.up.railway.app",
-      "Rock Solid Knowledge": "https://authzen.identityserver.com",
       "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app",
       "Topaz": "https://authzen-topaz-proxy-preview.demo.aserto.com"
     },
@@ -24,6 +23,7 @@
       "Permit.io": "https://permit-authzen-interop.up.railway.app",
       "PingAuthorize": "https://authzen.idpartners.au",
       "PlainID": "https://authzeninteropt.se-plainid.com",
+      "Rock Solid Knowledge": "https://authzen.identityserver.com",
       "SGNL": "https://authzen.sgnlapis.cloud",
       "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
     },
@@ -48,12 +48,15 @@
     "AWS API Gateway": "https://aws-gateway.authzen-interop.net",
     "Envoy": "https://authzen-envoy-proxy-demo.cerbos.dev",
     "Kong": "https://plainid-kong-gw.se-plainid.com",
+    "Tyk": "https://tyk-authzen-interop.do.poc.tyk.technology",
     "Zuplo": "https://authzen-todo-main-4df5ceb.d2.zuplo.dev"
   },
   "gatewayPdps": {
     "Aserto": "http://authzen-gateway-proxy.demo.aserto.com",
     "Axiomatics": "https://pdp.alfa.guide",
     "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
-    "PlainID": "https://authzeninteropt.se-plainid.com"
+    "PlainID": "https://authzeninteropt.se-plainid.com",
+    "Rock Solid Knowledge": "https://authzen.identityserver.com",
+    "Topaz": "https://authzen-topaz.demo.aserto.com"
   }
 }

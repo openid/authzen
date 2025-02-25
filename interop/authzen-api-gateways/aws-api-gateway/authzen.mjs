@@ -9,11 +9,12 @@ function log(message) {
 }
 
 const { AUTHZEN_PDP_API_KEYS } = process.env;
+const apiKeys = (AUTHZEN_PDP_API_KEYS && JSON.parse(AUTHZEN_PDP_API_KEYS)) ?? {};
 
 function getPdpInfo(req) {
   const pdpName = req.headers["x_authzen_gateway_pdp"];
   const pdpBaseUrl = pdpName && pdps[pdpName];
-  const pdpAuthHeader = pdpName && AUTHZEN_PDP_API_KEYS[pdpName];
+  const pdpAuthHeader = pdpName && apiKeys[pdpName];
   return { pdpName, pdpBaseUrl, pdpAuthHeader };
 };
 
@@ -45,7 +46,7 @@ export async function authorize(req) {
 
   const payload = {
     "subject": {
-      "type": "user",
+      "type": "identity",
       "id": subjectId
     },
     "action": {
