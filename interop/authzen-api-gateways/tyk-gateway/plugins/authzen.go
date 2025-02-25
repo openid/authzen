@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/TykTechnologies/tyk/apidef/oas"
@@ -12,9 +13,12 @@ import (
 	kin "github.com/getkin/kin-openapi/openapi3"
 	"net/http"
 	"net/http/httputil"
+	"os"
 	"strings"
 	"time"
 )
+
+type PDPCredentials map[string]string
 
 var (
 	logger = log.Get()
@@ -26,10 +30,34 @@ var (
 		"Rock Solid Knowledge": "https://authzen.identityserver.com",
 		"Topaz":                "https://authzen-topaz.demo.aserto.com",
 	}
+	creds PDPCredentials
 )
 
 func init() {
 	logger.Info("--- Go AuthZEN plugin init success! ---- ")
+	creds = loadPDPAPIKeys()
+}
+
+func loadPDPAPIKeys() map[string]string {
+	apiKeys := make(map[string]string)
+	encodedKeys := os.Getenv("AUTHZEN_PDP_API_KEYS")
+	if encodedKeys == "" {
+		logger.Warn("AUTHZEN_PDP_API_KEYS environment variable not set")
+		return apiKeys
+	}
+
+	decodedKeys, err := base64.StdEncoding.DecodeString(encodedKeys)
+	if err != nil {
+		logger.Error("Failed to decode AUTHZEN_PDP_API_KEYS:", err)
+		return apiKeys
+	}
+
+	var pdpCreds PDPCredentials
+	if err := json.Unmarshal(decodedKeys, &pdpCreds); err != nil {
+		logger.Error("Failed to decode JSON from AUTHZEN_PDP_API_KEYS:", err)
+		return apiKeys
+	}
+	return pdpCreds
 }
 
 // AuthZENSubject represents the subject in the authorization request
@@ -63,12 +91,14 @@ type AuthZENResponse struct {
 }
 
 func AuthZENMiddleware(w http.ResponseWriter, r *http.Request) {
-	pdpURL := pdps[r.Header.Get("x_authzen_gateway_pdp")]
+	pdpName := r.Header.Get("x_authzen_gateway_pdp")
+	pdpURL := pdps[pdpName]
 	if pdpURL == "" {
 		logger.Error("PDP URL not found in request headers")
 		http.Error(w, "PDP not found", http.StatusForbidden)
 		return
 	}
+	credential := creds[pdpName]
 
 	userId, err := extractSubFromBearer(r.Header.Get("Authorization"))
 	if err != nil {
@@ -113,6 +143,9 @@ func AuthZENMiddleware(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
+	if credential != "" {
+		req.Header.Set("Authorization", credential)
+	}
 
 	client := &http.Client{Timeout: 10 * time.Second}
 	res, err := client.Do(req)
