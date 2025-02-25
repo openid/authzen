@@ -1,0 +1,557 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "AuthZEN Todo",
+    "description": "AuthZEN Todo API",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "Standard Todo List Endpoints",
+      "description": "Standard endpoints for managing todos list items."
+    }
+  ],
+  "components": {
+    "schemas": {
+      "TodoObject": {
+        "type": "object",
+        "required": [
+          "ID",
+          "OwnerID",
+          "Title",
+          "Completed"
+        ],
+        "properties": {
+          "ID": {
+            "type": "integer"
+          },
+          "OwnerID": {
+            "type": "integer"
+          },
+          "Title": {
+            "type": "string"
+          },
+          "Completed": {
+            "type": "boolean"
+          }
+        },
+        "examples": [
+          {
+            "OwnerID": 1,
+            "ID": 1,
+            "Title": "Take out the trash",
+            "Completed": false
+          }
+        ]
+      },
+      "AnonymousTodoObject": {
+        "type": "object",
+        "required": [
+          "ID",
+          "Title",
+          "Completed"
+        ],
+        "properties": {
+          "ID": {
+            "type": "integer"
+          },
+          "Title": {
+            "type": "string"
+          },
+          "Completed": {
+            "type": "boolean"
+          }
+        },
+        "examples": [
+          {
+            "ID": 1,
+            "Title": "Take out the trash",
+            "Completed": false
+          }
+        ]
+      },
+      "TodoListObject": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/TodoObject"
+        },
+        "examples": [
+          [
+            {
+              "OwnerID": 1,
+              "ID": 1,
+              "Title": "Take out the trash",
+              "Completed": false
+            },
+            {
+              "OwnerID": 2,
+              "ID": 2,
+              "Title": "Clean the dishes",
+              "Completed": false
+            }
+          ]
+        ]
+      },
+      "InsertTodoObject": {
+        "type": "object",
+        "title": "Todo Insert Schema",
+        "required": [
+          "OwnerID",
+          "Title",
+          "Completed"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "OwnerID": {
+            "type": "integer",
+            "description": "The userId that created the todo list item.",
+            "examples": [
+              1
+            ]
+          },
+          "Title": {
+            "type": "string",
+            "description": "The title of the todo list item.",
+            "examples": [
+              "Wash the dishes"
+            ]
+          },
+          "Completed": {
+            "type": "boolean",
+            "description": "Whether or not the todo list item is completed.",
+            "examples": [
+              false
+            ]
+          }
+        },
+        "examples": [
+          {
+            "OwnerID": 1,
+            "Title": "Wash the dishes",
+            "Completed": false
+          }
+        ]
+      },
+      "UpdateTodoObject": {
+        "type": "object",
+        "title": "Update Todo Object",
+        "additionalProperties": false,
+        "required": [
+          "OwnerID",
+          "Completed",
+          "Title"
+        ],
+        "properties": {
+          "OwnerID": {
+            "type": "integer",
+            "description": "The OwnerID that created the todo list item.",
+            "examples": [
+              1
+            ]
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the todo list item.",
+            "examples": [
+              "Make dinner"
+            ]
+          },
+          "Completed": {
+            "type": "boolean",
+            "description": "Whether or not the todo list item is completed.",
+            "examples": [
+              false
+            ]
+          }
+        },
+        "examples": [
+          {
+            "OwnerID": 1,
+            "Title": "New Title",
+            "Completed": false
+          }
+        ]
+      },
+      "SchemaValidationError": {
+        "type": "object",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "instance"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "trace": {
+            "type": "object"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          }
+        },
+        "examples": [
+          {
+            "type": "https://httpproblems.com/http-status/400",
+            "title": "Bad Request",
+            "status": 400,
+            "detail": "Incoming body did not pass schema validation",
+            "instance": "/v1/todos",
+            "trace": {
+              "timestamp": "2023-02-27T18:53:05.997Z",
+              "requestId": "b1e1c2a9-da7b-436c-aa89-2f78918047b2",
+              "buildId": "83e3d0f1-89a8-46ea-b040-e0a2432f2ea5",
+              "rayId": "7a031f102747944d-SJC"
+            },
+            "errors": [
+              "Body must have required property 'OwnerID'"
+            ]
+          }
+        ]
+      },
+      "UserObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "picture": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "examples": [
+          {
+            "id": "morty@the-citadel.com",
+            "name": "Morty Smith",
+            "email": "morty@the-citadel.com",
+            "picture": "https://www.topaz.sh/assets/templates/citadel/img/Morty%20Smith.jpg",
+            "roles": [
+              "editor"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "paths": {
+    "/users/{userId}": {
+      "get": {
+        "summary": "Get user",
+        "description": "Gets information about a user.",
+        "operationId": "b61c0cd1-b380-4440-a430-840ea85f3e9f",
+        "responses": {
+          "200": {
+            "description": "Properties of a user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserObject"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Standard Todo List Endpoints"
+        ],
+        "x-zuplo-route": {
+          "corsPolicy": "anything-goes",
+          "handler": {
+            "export": "urlForwardHandler",
+            "module": "$import(@zuplo/runtime)",
+            "options": {
+              "baseUrl": "https://authzen-todo-backend.demo.aserto.com"
+            }
+          },
+          "policies": {
+            "inbound": [
+              "open-id-jwt-auth-inbound",
+              "custom-code-inbound"
+            ]
+          }
+        }
+      }
+    },
+    "/todos": {
+      "get": {
+        "summary": "Get all todos",
+        "description": "Gets all the todos in the todo list.",
+        "operationId": "b61c0cd1-b380-4440-a430-840ea85f3e9c",
+        "responses": {
+          "200": {
+            "description": "A list of todos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoListObject"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Standard Todo List Endpoints"
+        ],
+        "x-zuplo-route": {
+          "corsPolicy": "anything-goes",
+          "handler": {
+            "export": "urlForwardHandler",
+            "module": "$import(@zuplo/runtime)",
+            "options": {
+              "baseUrl": "https://authzen-todo-backend.demo.aserto.com"
+            }
+          },
+          "policies": {
+            "inbound": [
+              "open-id-jwt-auth-inbound",
+              "custom-code-inbound"
+            ]
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Todo",
+        "description": "Creates a todo list item.",
+        "tags": [
+          "Standard Todo List Endpoints"
+        ],
+        "operationId": "f9e30d74-56ca-4f1e-bcb3-75fe305ea5e4",
+        "requestBody": {
+          "description": "Payload required to create a todo list item.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsertTodoObject"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": true,
+            "description": "Content type of the request body. Use application/json",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The created todo list item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoObject"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Schema validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchemaValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-zuplo-route": {
+          "corsPolicy": "anything-goes",
+          "handler": {
+            "export": "urlForwardHandler",
+            "module": "$import(@zuplo/runtime)",
+            "options": {
+              "baseUrl": "https://authzen-todo-backend.demo.aserto.com"
+            }
+          },
+          "policies": {
+            "inbound": [
+              "open-id-jwt-auth-inbound",
+              "custom-code-inbound"
+            ]
+          }
+        }
+      }
+    },
+    "/todos/{todoId}": {
+      "delete": {
+        "summary": "Delete Todo",
+        "description": "Deletes a todo list item. Will return an error if the todo list item does not exist.",
+        "operationId": "1647d06c-2a96-41ab-a2f7-ebb55d5bcd76",
+        "tags": [
+          "Standard Todo List Endpoints"
+        ],
+        "parameters": [
+          {
+            "name": "todoId",
+            "in": "path",
+            "description": "ID of the todo list item to be deleted.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1",
+              "pattern": "^-?\\d+$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Empty response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "examples": [
+                    {}
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Schema validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchemaValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-zuplo-route": {
+          "corsPolicy": "anything-goes",
+          "handler": {
+            "export": "urlForwardHandler",
+            "module": "$import(@zuplo/runtime)",
+            "options": {
+              "baseUrl": "https://authzen-todo-backend.demo.aserto.com"
+            }
+          },
+          "policies": {
+            "inbound": [
+              "open-id-jwt-auth-inbound",
+              "open-id-jwt-auth-inbound"
+            ]
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Todo",
+        "description": "Updates a todo list item with a matching `todoId`. Will return an error if a matching todo item is not found.",
+        "operationId": "f3334d8b-37f9-489b-87c5-08a8beb5657c",
+        "tags": [
+          "Standard Todo List Endpoints"
+        ],
+        "parameters": [
+          {
+            "name": "todoId",
+            "in": "path",
+            "description": "ID of the todo list item to be modified.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "1",
+              "pattern": "^-?\\d+$"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "description": "Content type of the request body. Use application/json",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The new todo object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoObject"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Schema validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchemaValidationError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "description": "Request body to update a todo list object.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTodoObject"
+              }
+            }
+          }
+        },
+        "x-zuplo-route": {
+          "corsPolicy": "anything-goes",
+          "handler": {
+            "export": "urlForwardHandler",
+            "module": "$import(@zuplo/runtime)",
+            "options": {
+              "baseUrl": "https://authzen-todo-backend.demo.aserto.com"
+            }
+          },
+          "policies": {
+            "inbound": [
+              "open-id-jwt-auth-inbound",
+              "custom-code-inbound"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

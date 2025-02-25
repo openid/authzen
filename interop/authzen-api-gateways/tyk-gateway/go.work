@@ -1,0 +1,6 @@
+go 1.22.6
+
+use (
+	./plugins
+	./tyk-release-5.7.2
+)
