@@ -1045,19 +1045,26 @@ The Action Search API defines the message exchange pattern between a client (PEP
 The Action Search API is based on the Access Evaluation information model.
 
 ## The Action Search API Request {#action-search-request}
+
 The Action Search request is a 3-tuple constructed of three previously defined entities:
 
-`subject`: REQUIRED. The subject (or principal) of type Subject.
+`subject`:
+: REQUIRED. The subject (or principal) of type Subject.
 
-`resource`: REQUIRED. The resource of type Resource.
+`resource`:
+: REQUIRED. The resource of type Resource.
 
-`context`: OPTIONAL. Contextual data about the request.
+`context`:
+: OPTIONAL. Contextual data about the request.
 
-`page`: OPTIONAL. A page token for paged requests.
+`page`:
+: OPTIONAL. A page token for paged requests.
 
 ### Example (non-normative)
+
 The following payload defines a request for the actions that the subject of type user and ID may perform on the resource of type account and ID 123 at 01:22 AM.
-```json
+
+~~~ json
 {
   "subject": {
     "type": "user",
@@ -1071,12 +1078,14 @@ The following payload defines a request for the actions that the subject of type
     "time": "2024-10-26T01:22-07:00"
   }
 }
-```
+~~~
 {: #action-search-request-example title="Example Request"}
 
 ## The Action Search API Response {#action-search-response}
+
 The response is a paged array of Actions.
-```json
+
+~~~ json
 {
   "results": [
     {
@@ -1090,14 +1099,16 @@ The response is a paged array of Actions.
     "next_token": ""
   }
 }
-```
+~~~
 {: #action-search-response-example title="Example Response"}
 
 ### Paged requests
 
 A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
+
 #### Example
-```json
+
+~~~ json
 {
   "results": [
     {
@@ -1111,11 +1122,12 @@ A response that needs to be split across page boundaries returns a non-empty `pa
     "next_token": "alsehrq3495u8"
   }
 }
-```
+~~~
 {: #action-search-response-paged-example title="Example Paged Response"}
 
 To retrieve the next page, provide `page.next_token` in the next request:
-```json
+
+~~~ json
 {
   "subject": {
     "type": "user",
@@ -1132,7 +1144,7 @@ To retrieve the next page, provide `page.next_token` in the next request:
     "next_token": "alsehrq3495u8"
   }
 }
-```
+~~~
 {: #action-search-request-paged-example title="Example Paged Request"}
 
 Note: page size is implementation-dependent.
