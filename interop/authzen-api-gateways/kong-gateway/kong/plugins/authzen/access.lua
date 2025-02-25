@@ -27,11 +27,9 @@ local function evaluate(pidreq,conf)
     local headers = {
         ["Content-Type"] = "application/json"
     }
-    --require('mobdebug').start("docker.for.mac.localhost")
     if key ~= nil then
         headers['Authorization'] = key
     end
-    kong.log.notice("key: ", key)
     local res, err = httpc:request_uri(uri, {
         method = "POST",
         body = pidreq,
