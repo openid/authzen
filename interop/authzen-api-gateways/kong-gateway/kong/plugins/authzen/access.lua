@@ -7,7 +7,7 @@ local function evaluate(pidreq,conf)
     local httpc = http.new()
     kong.log.notice("AuthZEN request: ", pidreq)
     local pdpurls = conf.server.pdp_url
-    local keys = conf.server.keys
+    local keys = os.getenv("PDP_KEYS")
     local keysObj = cjson.decode(keys)
     local pdps = cjson.decode(pdpurls)
     local pdpurl = "https://authzeninteropt.se-plainid.com"

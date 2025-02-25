@@ -41,12 +41,6 @@ plugins:
   config:
     server:
       pdp_url: '{     "Aserto":"https://authzen-gateway-proxy.demo.aserto.com",  "Axiomatics": "https://pdp.alfa.guide",   "Cerbos":"https://authzen-proxy-demo.cerbos.dev",     "PlainID":"https://authzeninteropt.se-plainid.com",     "Rock Solid Knowledge": "https://authzen.identityserver.com",     "Topaz": "https://authzen-topaz.demo.aserto.com" }'
-      keys: '{
-         "Indykite": "Basic 8c2e4ab4-6357-41d5-8459-68d961d76c27603bce95-1cec-4ca0-beb4-86ba658b38f26787d594-f760-4dbb-9e04-6ac099e03511",
-         "PingAuthorize": "Bearer Password1",
-         "SGNL": "Bearer eyJkYXRhIjoiQlp5S2FMb1JyS3UrMkpGTzlnM3k0QVZnYUp5d3pld00xQUhwM3ljZ1E2NjNqeXMzbHJYSElBRFRGUzB3elQ3OTRUTm1PS0tUYnU1VGU0M3kyUWN5Z2c9PSIsImlkIjoiZjUyMjgzNjktYzFkMy00YmViLTkyN2ItNmY2ODZlMzA2ZjFjIiwiaW50ZWdyYXRpb25JZCI6IjUxZmY1ZjZmLTgxNjgtNGExNi04Mzk1LTU4YTBmMjA2MjY5OCIsInRlbmFudElkIjoiNmExZGUzNTMtYTA4NS00MjBiLTg4YWYtOWU4ZWYwZTg1NTliIn0=",
-         "Topaz": "Basic 101520"
-         }'
   protocols:
   - grpc
   - grpcs
