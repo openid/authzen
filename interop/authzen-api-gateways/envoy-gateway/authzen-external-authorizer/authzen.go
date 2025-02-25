@@ -21,6 +21,7 @@ var pdps = map[string]string{
 	"Cerbos":               "https://authzen-proxy-demo.cerbos.dev",
 	"PlainID":              "https://authzeninteropt.se-plainid.com",
 	"Rock Solid Knowledge": "https://authzen.identityserver.com",
+	"Topaz":                "https://authzen-topaz.demo.aserto.com",
 }
 
 // AuthZENSubject represents the subject in the authorization request
