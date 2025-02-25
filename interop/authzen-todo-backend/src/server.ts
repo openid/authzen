@@ -17,12 +17,22 @@ export class Server {
   }
 
   async listPdps(_: Request, res: Response) {
-    const config = {};
-    const versions = Object.keys(pdps);
+    const config = {
+      pdps: {},
+      gateways: {},
+      gatewayPdps: [],
+    };
+    const versions = Object.keys(pdps.pdps);
     for (const v of versions) {
-      config[v] = Object.keys(pdps[v])
+      config.pdps[v] = Object.keys(pdps.pdps[v])
     }
+    config.gateways = pdps.gateways;
+    config.gatewayPdps = Object.keys(pdps.gatewayPdps);
     res.json(config);
+  }
+
+  async listGatewayPdps(_: Request, res: Response) {
+    res.json(pdps.gatewayPdps);
   }
 
   async getUser(req: JWTRequest, res: Response) {

@@ -1,0 +1,29 @@
+{
+  "policies": [
+    {
+      "handler": {
+        "export": "default",
+        "module": "$import(./modules/authzen)",
+        "options": {
+          "config1": "YOUR_VALUE",
+          "config2": true
+        }
+      },
+      "name": "custom-code-inbound",
+      "policyType": "custom-code-inbound"
+    },
+    {
+      "handler": {
+        "export": "OpenIdJwtInboundPolicy",
+        "module": "$import(@zuplo/runtime)",
+        "options": {
+          "audience": "citadel-app",
+          "issuer": "https://citadel.demo.aserto.com/dex",
+          "jwkUrl": "https://citadel.demo.aserto.com/dex/keys"
+        }
+      },
+      "name": "open-id-jwt-auth-inbound",
+      "policyType": "open-id-jwt-auth-inbound"
+    }
+  ]
+}

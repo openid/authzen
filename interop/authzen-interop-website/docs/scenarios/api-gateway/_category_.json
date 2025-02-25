@@ -1,0 +1,8 @@
+{
+  "label": "API Gateway (1.0 Draft 02)",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Payload spec and results from the AuthZEN 1.0 Draft 02 interop at Gartner IAM Summit Lodndon 2025."
+  }
+}

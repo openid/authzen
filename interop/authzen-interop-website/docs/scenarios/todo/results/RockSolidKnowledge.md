@@ -2,7 +2,7 @@
 sidebar_position: 10
 ---
 
-# Rock Solid Knowledge (IdentityServer.com)
+# Rock Solid Knowledge 
 
 Interop results for the [Enforcer](https://www.identityserver.com/products/enforcer) implementation hosted at [`https://authzen.identityserver.com`.](https://authzen.identityserver.com)
 

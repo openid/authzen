@@ -9,9 +9,9 @@ Interop results for the [Cerbos](https://cerbos.dev) implementation hosted at `h
 ## Test results
 
 ```bash
-yarn test https://authzen-proxy-demo.cerbos.dev 1.1-preview markdown
+yarn test https://authzen-proxy-demo.cerbos.dev authorization-api-1_0-02 markdown
 yarn run v1.22.19
-$ node build/test/runner.js https://authzen-proxy-demo.cerbos.dev 1.1-preview markdown
+$ node build/test/runner.js https://authzen-proxy-demo.cerbos.dev authorization-api-1_0-02 markdown
 ```
 
 <table>

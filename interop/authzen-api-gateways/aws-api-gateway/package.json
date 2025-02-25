@@ -1,0 +1,14 @@
+{
+  "name": "aws-lambda-authorizer",
+  "version": "1.0.0",
+  "description": "AWS AuthZEN lambda authorizer",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "jwt-decode": "^4.0.0",
+    "node-fetch": "^3.3.2"
+  },
+  "scripts": {
+    "deploy": "./scripts/deploy-lambda.sh"
+  }
+}
