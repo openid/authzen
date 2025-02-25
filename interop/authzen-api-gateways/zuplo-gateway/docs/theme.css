@@ -1,0 +1,29 @@
+/* Learn about theming here: https://zuplo.com/docs/developer-portal/theme */
+
+:root {
+  --logo-url: url(https://cdn.zuplo.com/dev-portal/v2/made-with-zuplo.svg);
+}
+
+.light {
+  --background-primary: white;
+  --font-family-primary: "-apple-system", "BlinkMacSystemFont", "Segoe UI",
+    "Roboto", "Helvetica Neue", "Ubuntu", "sans-serif";
+  --text-color-h1: rgb(42 47 69);
+  --text-color-h2: rgb(42 47 69);
+  --text-color-primary: rgb(79 86 107);
+}
+
+.dark {
+  --background-primary: #1a1f36;
+  --font-family-primary: "-apple-system", "BlinkMacSystemFont", "Segoe UI",
+    "Roboto", "Helvetica Neue", "Ubuntu", "sans-serif";
+  --text-color-h1: #f7fafc;
+  --text-color-h2: #f7fafc;
+  --text-color-primary: rgb(193 201 210);
+}
+
+/* The logo image */
+.theme-logo {
+  content: var(--logo-url);
+  margin: 20px;
+}
