@@ -5,7 +5,7 @@ import { Todo } from "./interfaces";
 import { Store } from "./store";
 import { Directory } from "./directory";
 import { checkCanUpdateTodos } from "./auth";
-const pdps = require("./pdps.json");
+import pdps from "./pdps.json";
 
 export class Server {
   store: Store;
