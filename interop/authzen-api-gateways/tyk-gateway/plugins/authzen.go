@@ -5,17 +5,18 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httputil"
+	"os"
+	"strings"
+	"time"
+
 	"github.com/TykTechnologies/tyk/apidef/oas"
 	"github.com/TykTechnologies/tyk/ctx"
 	"github.com/TykTechnologies/tyk/log"
 	"github.com/TykTechnologies/tyk/regexp"
 	"github.com/dgrijalva/jwt-go"
 	kin "github.com/getkin/kin-openapi/openapi3"
-	"net/http"
-	"net/http/httputil"
-	"os"
-	"strings"
-	"time"
 )
 
 type PDPCredentials map[string]string
@@ -28,6 +29,7 @@ var (
 		"Cerbos":               "https://authzen-proxy-demo.cerbos.dev",
 		"PlainID":              "https://authzeninteropt.se-plainid.com",
 		"Rock Solid Knowledge": "https://authzen.identityserver.com",
+		"SGNL":                 "https://https://authzen.sgnlapis.cloud",
 		"Topaz":                "https://authzen-topaz.demo.aserto.com",
 	}
 	creds PDPCredentials
