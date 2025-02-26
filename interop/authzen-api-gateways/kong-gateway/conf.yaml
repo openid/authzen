@@ -40,7 +40,7 @@ plugins:
   route: 51799165-1a03-495c-b390-4ac7e7047061
   config:
     server:
-      pdp_url: '{     "Aserto":"https://authzen-gateway-proxy.demo.aserto.com",  "Axiomatics": "https://pdp.alfa.guide",   "Cerbos":"https://authzen-proxy-demo.cerbos.dev",     "PlainID":"https://authzeninteropt.se-plainid.com",     "Rock Solid Knowledge": "https://authzen.identityserver.com",     "Topaz": "https://authzen-topaz.demo.aserto.com" }'
+      pdp_url: '{     "Aserto":"https://authzen-gateway-proxy.demo.aserto.com",  "Axiomatics": "https://pdp.alfa.guide",   "Cerbos":"https://authzen-proxy-demo.cerbos.dev",     "PlainID":"https://authzeninteropt.se-plainid.com",     "Rock Solid Knowledge": "https://authzen.identityserver.com",     "Topaz": "https://authzen-topaz.demo.aserto.com",     "SGNL": "https://authzen.sgnlapis.cloud" }'
   protocols:
   - grpc
   - grpcs
