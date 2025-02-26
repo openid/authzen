@@ -395,7 +395,7 @@ The Access Evaluations API defines the message exchange pattern between a client
 
 The Access Evaluation API Request builds on the information model presented in {{information-model}} and the 4-tuple defined in the Access Evaluation Request ({{access-evaluation-request}}).
 
-To send multiple access evaluation requests in a single message, the caller MAY add an `evaluations` key to the request. The `evaluations` key is an array which contains a list of JSON objects, each typed as a 4-tuple, and specifying a discrete request.
+To send multiple access evaluation requests in a single message, the caller MAY add an `evaluations` key to the request. The `evaluations` key is an array which contains a list of JSON objects, each typed as the 4-tuple as defined in the Access Evaluation Request ({{access-evaluation-request}}), and specifying a discrete request.
 
 If an `evaluations` array is NOT present, the Access Evaluations Request behaves in a backwards-compatible manner with the (single) Access Evaluation API Request ({{access-evaluation-request}}).
 
@@ -466,7 +466,7 @@ While the example above provides the most flexibility in specifying distinct val
 
 Default values offer a more compact syntax that avoids over-duplication of request data.
 
-If any of the top-level `subject`, `action`, `resource`, and `context` keys are provided, they are treated as default values for the 4-tuples specified in the `evaluations` object. Any values specified in the 4-tuples present in the `evaluations` object take precedence over these default values.
+If any of the top-level `subject`, `action`, `resource`, and `context` keys are provided, the value of the top-level key is treated as the default value for the 4-tuples specified in the `evaluations` array. If a top-level key is specified in the 4-tuples present in the `evaluations` array then the value of that will take precedence over these default values.
 
 The following is a non-normative example for specifying three requests that refer to a single subject and context:
 
