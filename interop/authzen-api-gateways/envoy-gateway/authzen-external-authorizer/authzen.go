@@ -3,10 +3,12 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -22,6 +24,29 @@ var pdps = map[string]string{
 	"PlainID":              "https://authzeninteropt.se-plainid.com",
 	"Rock Solid Knowledge": "https://authzen.identityserver.com",
 	"Topaz":                "https://authzen-topaz.demo.aserto.com",
+}
+
+// PDPAuthConfig stores authentication configuration for PDPs
+type PDPAuthConfig struct {
+	Token string `json:"token"`
+}
+
+var pdpAuthConfigs map[string]PDPAuthConfig
+
+func init() {
+	// Initialize PDP auth configurations from environment variable
+	if authConfigB64 := os.Getenv("AUTHZEN_PDP_AUTH_CONFIG"); authConfigB64 != "" {
+		authConfigJSON, err := base64.StdEncoding.DecodeString(authConfigB64)
+		if err != nil {
+			log.Printf("Warning: Failed to decode PDP auth config: %v", err)
+			return
+		}
+
+		if err := json.Unmarshal(authConfigJSON, &pdpAuthConfigs); err != nil {
+			log.Printf("Warning: Failed to parse PDP auth config: %v", err)
+			return
+		}
+	}
 }
 
 // AuthZENSubject represents the subject in the authorization request
@@ -126,6 +151,13 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 		return false, err
 	}
 	req.Header.Set("Content-Type", "application/json")
+
+	// Add authentication token if configured for this PDP
+	if pdpAuthConfigs != nil {
+		if authConfig, exists := pdpAuthConfigs[request.Attributes.Request.Http.Headers["x_authzen_gateway_pdp"]]; exists {
+			req.Header.Set("Authorization", authConfig.Token)
+		}
+	}
 
 	// Send HTTP request with better error handling
 	startTime := time.Now()
