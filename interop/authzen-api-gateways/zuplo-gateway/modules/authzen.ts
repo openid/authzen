@@ -4,6 +4,7 @@ const pdps = {
   "Aserto": "https://authzen-gateway-proxy.demo.aserto.com",
   "Axiomatics": "https://pdp.alfa.guide",
   "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
+  "HexaOPA": "https://interop.authzen.hexaorchestration.org",
   "PlainID": "https://authzeninteropt.se-plainid.com",
   "Rock Solid Knowledge": "https://authzen.identityserver.com",
   "SGNL": "https://authzen.sgnlapis.cloud",
