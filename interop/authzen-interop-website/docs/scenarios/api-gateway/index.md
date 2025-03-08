@@ -378,7 +378,7 @@ However, given the fact that the incoming HTTP request DOES NOT include informat
   },
   "resource": {
     "type": "route",
-    "id": "/todos/{id}"
+    "id": "/todos/{todoId}"
   },
   "context": {
   }
