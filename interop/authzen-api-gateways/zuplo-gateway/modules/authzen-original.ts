@@ -5,6 +5,7 @@ const pdps = {
   "Axiomatics": "https://pdp.alfa.guide",
   "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
   "HexaOPA": "https://interop.authzen.hexaorchestration.org",
+  "PingAuthorize": "https://authzen.idpartners.au",
   "PlainID": "https://authzeninteropt.se-plainid.com",
   "Rock Solid Knowledge": "https://authzen.identityserver.com",
   "SGNL": "https://authzen.sgnlapis.cloud",
