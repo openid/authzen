@@ -47,7 +47,7 @@
     }
   },
   "gateways": {
-    "--Pass Through--": "https://authzen-todo-backend.demo.aserto.com",
+    "--Pass Through--": "http://localhost:8080",
     "AWS API Gateway": "https://aws-gateway.authzen-interop.net",
     "Envoy": "https://authzen-envoy-proxy-demo.cerbos.dev",
     "Kong": "https://plainid-kong-gw.se-plainid.com",
@@ -60,6 +60,8 @@
     "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
     "HexaOPA": "https://interop.authzen.hexaorchestration.org",
     "PlainID": "https://authzeninteropt.se-plainid.com",
-    "Rock Solid Knowledge": "https://authzen.identityserver.com"
+    "Rock Solid Knowledge": "https://authzen.identityserver.com",
+    "SGNL": "https://authzen.sgnlapis.cloud",
+    "Topaz": "https://authzen-topaz.demo.aserto.com"
   }
 }
