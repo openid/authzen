@@ -101,7 +101,7 @@ const resourceMapper = async (
 };
 
 // Authorization Helper Functions
-const getPdpInfo = (req: JWTRequest) => {
+export function getPdpInfo(req: JWTRequest) {
   const pdpHeader = req.headers["x_authzen_pdp"] as string;
   const specVersionHeader =
     (req.headers["x_authzen_spec_version"] as string) || DEFAULT_SPEC_VERSION;
@@ -111,8 +111,8 @@ const getPdpInfo = (req: JWTRequest) => {
   const pdps = config.pdps[specVersion];
   const pdpBaseName = (pdpHeader && pdps[pdpHeader]) ?? AUTHZEN_PDP_URL;
   const pdpAuthHeader = pdpHeader && AUTHZEN_PDP_API_KEYS[pdpHeader];
-  return { specVersion, pdpBaseName, pdpAuthHeader };
-};
+  return { specVersion, pdpBaseName, pdpAuthHeader, pdpHeader };
+}
 
 const getHeaders = (pdpAuthHeader: string) => {
   const headers: Record<string, string> = {
