@@ -9,7 +9,8 @@
       "Open Policy Agent": "https://authzen-opa-proxy-preview.demo.aserto.com",
       "Permit.io": "https://permit-authzen-interop-1-0-preview.up.railway.app",
       "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app",
-      "Topaz": "https://authzen-topaz-proxy-preview.demo.aserto.com"
+      "Topaz": "https://authzen-topaz-proxy-preview.demo.aserto.com",
+      "OpenFGA": "https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C"
     },
     "authorization-api-1_0-01": {
       "Aserto": "https://authzen-proxy.demo.aserto.com",
@@ -25,7 +26,8 @@
       "PlainID": "https://authzeninteropt.se-plainid.com",
       "Rock Solid Knowledge": "https://authzen.identityserver.com",
       "SGNL": "https://authzen.sgnlapis.cloud",
-      "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
+      "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
+      "OpenFGA": "https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C"
     },
     "authorization-api-1_0-02": {
       "Aserto": "https://authzen-proxy.demo.aserto.com",
@@ -40,11 +42,12 @@
       "PingAuthorize": "https://authzen.idpartners.au",
       "PlainID": "https://authzeninteropt.se-plainid.com",
       "SGNL": "https://authzen.sgnlapis.cloud",
-      "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
+      "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
+      "OpenFGA": "https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C"
     }
   },
   "gateways": {
-    "--Pass Through--": "https://authzen-todo-backend.demo.aserto.com",
+    "--Pass Through--": "http://localhost:8080",
     "AWS API Gateway": "https://aws-gateway.authzen-interop.net",
     "Envoy": "https://authzen-envoy-proxy-demo.cerbos.dev",
     "Kong": "https://plainid-kong-gw.se-plainid.com",
@@ -55,10 +58,7 @@
     "Aserto": "http://authzen-gateway-proxy.demo.aserto.com",
     "Axiomatics": "https://pdp.alfa.guide",
     "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
-    "HexaOPA": "https://interop.authzen.hexaorchestration.org",
     "PlainID": "https://authzeninteropt.se-plainid.com",
-    "Rock Solid Knowledge": "https://authzen.identityserver.com",
-    "SGNL": "https://authzen.sgnlapis.cloud",
-    "Topaz": "https://authzen-topaz.demo.aserto.com"
+    "Rock Solid Knowledge": "https://authzen.identityserver.com"
   }
 }
