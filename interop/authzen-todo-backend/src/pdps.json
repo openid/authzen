@@ -55,7 +55,7 @@
     "Zuplo": "https://authzen-todo-main-4df5ceb.d2.zuplo.dev"
   },
   "gatewayPdps": {
-    "Aserto": "http://authzen-gateway-proxy.demo.aserto.com",
+    "Aserto": "https://authzen-todo-backend.demo.aserto.com",
     "Axiomatics": "https://pdp.alfa.guide",
     "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
     "HexaOPA": "https://interop.authzen.hexaorchestration.org",
