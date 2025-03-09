@@ -4,7 +4,9 @@ import { Response } from "express";
 import { Todo } from "./interfaces";
 import { Store } from "./store";
 import { Directory } from "./directory";
+import { createStatefulAuthorizationService } from "./statefulAuthorizationService";
 import { checkCanUpdateTodos } from "./auth";
+import { getPdpInfo } from "./auth";
 import pdps from "./pdps.json";
 
 export class Server {
@@ -34,7 +36,7 @@ export class Server {
   async listGatewayPdps(_: Request, res: Response) {
     res.json(pdps.gatewayPdps);
   }
-
+  
   async getUser(req: JWTRequest, res: Response) {
     const { userID } = req.params;
     if(req.auth.sub === userID) {
@@ -57,7 +59,10 @@ export class Server {
       const user = await this.directory.getUserByIdentity(req.auth.sub);
       todo.OwnerID = user.id;
 
+
       await this.store.insert(todo);
+      await this.getStatefulAuthorizationService(req).insert(todo.ID, req.auth.sub);
+
       res.json({ msg: "Todo created" });
     } catch (error) {
       res.status(422).send({error: (error as Error).message})
@@ -74,6 +79,12 @@ export class Server {
 
   async delete(req: JWTRequest, res: Response) {
     await this.store.delete(req.params.id);
+    await this.getStatefulAuthorizationService(req).delete(req.params.id, req.auth.sub);
     res.json({ msg: "Todo deleted" });
+  }
+
+  private getStatefulAuthorizationService(req: JWTRequest){ 
+      const { pdpBaseName, pdpAuthHeader, pdpHeader } = getPdpInfo(req);
+      return createStatefulAuthorizationService(pdpBaseName, pdpAuthHeader, pdpHeader);
   }
 }
