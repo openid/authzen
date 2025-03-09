@@ -1,5 +1,19 @@
-yarn run v1.22.22
+---
+sidebar_position: 15
+---
+
+# OpenFGA 
+
+Interop results for the [OpenFGA](https://openfga.dev) implementation hosted at [`https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C`](https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C)
+
+## Test results
+
+```bash
+yarn test ttps://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C authorization-api-1_0-02 markdown
+
 $ node build/test/runner.js https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C authorization-api-1_0-02 markdown
+```
+
 <table>
   <tr>
     <th>result</th>
@@ -1056,8 +1070,6 @@ $ node build/test/runner.js https://authzen-interop.openfga.dev/stores/01JG9JGS4
   ]
 }
 ```
-
   </td>
   </tr>
 </table>
-Done in 9.60s.
