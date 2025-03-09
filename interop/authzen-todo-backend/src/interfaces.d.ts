@@ -15,3 +15,8 @@ export interface User {
 export interface UserCache {
   [id: string]: User;
 }
+
+export interface StatefulAuthorizationService {
+  insert(todoId: string, userId: string): Promise<void>;
+  delete(todoId: string, userId: string): Promise<void>;
+}
