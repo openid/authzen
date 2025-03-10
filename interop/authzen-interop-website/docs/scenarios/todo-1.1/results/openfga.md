@@ -9,8 +9,8 @@ Interop results for the [OpenFGA](https://openfga.dev) implementation hosted at 
 ## Test results
 
 ```bash
-yarn test ttps://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C authorization-api-1_0-02 markdown
-
+yarn test https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C authorization-api-1_0-02 markdown
+yarn run v1.22.22
 $ node build/test/runner.js https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C authorization-api-1_0-02 markdown
 ```
 

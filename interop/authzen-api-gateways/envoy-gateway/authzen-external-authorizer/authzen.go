@@ -20,6 +20,7 @@ var pdps = map[string]string{
 	"Axiomatics":           "https://pdp.alfa.guide",
 	"Cerbos":               "https://authzen-proxy-demo.cerbos.dev",
 	"HexaOPA":              "https://interop.authzen.hexaorchestration.org",
+	"OpenFGA":              "https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C",
 	"PingAuthorize":        "https://authzen.idpartners.au",
 	"PlainID":              "https://authzeninteropt.se-plainid.com",
 	"Rock Solid Knowledge": "https://authzen.identityserver.com",
