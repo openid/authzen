@@ -7,7 +7,6 @@
       "HexaOPA": "https://interop.authzen.hexaorchestration.org",
       "Kogito": "https://authzen-proxy-demo.azerad.org",
       "Open Policy Agent": "https://authzen-opa-proxy-preview.demo.aserto.com",
-      "OpenFGA": "https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C",
       "Permit.io": "https://permit-authzen-interop-1-0-preview.up.railway.app",
       "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app",
       "Topaz": "https://authzen-topaz-proxy-preview.demo.aserto.com"
