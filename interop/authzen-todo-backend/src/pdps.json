@@ -52,7 +52,8 @@
     "Envoy": "https://authzen-envoy-proxy-demo.cerbos.dev",
     "Kong": "https://plainid-kong-gw.se-plainid.com",
     "Tyk": "https://tyk-authzen-interop.do.poc.tyk.technology",
-    "Zuplo": "https://authzen-todo-main-4df5ceb.d2.zuplo.dev"
+    "Zuplo": "https://authzen-todo-main-4df5ceb.d2.zuplo.dev",
+    "Layer7": "https://authzen-interop-gw.layer7.broadcom.com"
   },
   "gatewayPdps": {
     "Aserto": "http://authzen-gateway-proxy.demo.aserto.com",
