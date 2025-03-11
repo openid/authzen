@@ -837,6 +837,9 @@ The Subject Search request is a 3-tuple constructed of three previously defined 
 `resource`:
 : REQUIRED. The resource of type Resource.
 
+`context`:
+: OPTIONAL. Contextual data about the request.
+
 `page`:
 : OPTIONAL. A page token for paged requests.
 
@@ -855,6 +858,9 @@ The following payload defines a request for the subjects of type `user` that can
   "resource": {
     "type": "account",
     "id": "123"
+  },
+  "context": {
+    "time": "2024-10-26T01:22-07:00"
   }
 }
 ~~~
@@ -920,6 +926,9 @@ To retrieve the next page, provide `page.next_token` in the next request:
     "type": "account",
     "id": "123"
   },
+  "context": {
+    "time": "2024-10-26T01:22-07:00"
+  },
   "page": {
     "next_token": "alsehrq3495u8"
   }
@@ -946,6 +955,9 @@ The Resource Search request is a 3-tuple constructed of three previously defined
 
 `resource`:
 : REQUIRED. The resource of type Resource. NOTE that the Resource type is REQUIRED but the Resource ID is omitted, and if present, is IGNORED.
+
+`context`:
+: OPTIONAL. Contextual data about the request.
 
 `page`:
 : OPTIONAL. A page token for paged requests.
@@ -1293,7 +1305,7 @@ The Subject Search Request is an HTTPS request with `content-type` of `applicati
 The following is a non-normative example of the HTTPS binding of the Subject Search Request:
 
 ~~~ http
-POST /access/v1/subjectsearch HTTP/1.1
+POST /access/v1/search/subject HTTP/1.1
 Host: pdp.mycompany.com
 Authorization: Bearer <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
@@ -1347,7 +1359,7 @@ The Resource Search Request is an HTTPS request with `content-type` of `applicat
 The following is a non-normative example of the HTTPS binding of the Resource Search Request:
 
 ~~~ http
-POST /access/v1/resourcesearch HTTP/1.1
+POST /access/v1/resource/search HTTP/1.1
 Host: pdp.mycompany.com
 Authorization: Bearer <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
@@ -1401,7 +1413,7 @@ The Action Search Request is an HTTPS request with `content-type` of `applicatio
 The following is a non-normative example of the HTTPS binding of the Action Search Request:
 
 ~~~ http
-POST /access/v1/actionsearch HTTP/1.1
+POST /access/v1/search/action HTTP/1.1
 Host: pdp.mycompany.com
 Authorization: Bearer <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
