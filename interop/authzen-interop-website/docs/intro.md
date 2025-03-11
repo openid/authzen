@@ -62,4 +62,5 @@ API Gateways that support the [Gateway scenario](/docs/scenarios/api-gateway/).
 | Envoy                | https://authzen-envoy-proxy-demo.cerbos.dev                   |
 | Kong                 | https://plainid-kong-gw.se-plainid.com                        |
 | Tyk                  | https://tyk-authzen-interop.do.poc.tyk.technology             |
+| Layer7               | https://authzen-interop-gw.layer7.broadcom.com                |
 | Zuplo                | https://authzen-todo-main-4df5ceb.d2.zuplo.dev                |
