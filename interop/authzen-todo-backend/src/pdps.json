@@ -54,7 +54,6 @@
     "Layer7": "https://authzen-interop-gw.layer7.broadcom.com",
     "Tyk": "https://tyk-authzen-interop.do.poc.tyk.technology",
     "Zuplo": "https://authzen-todo-main-4df5ceb.d2.zuplo.dev"
-    
   },
   "gatewayPdps": {
     "Aserto": "http://authzen-gateway-proxy.demo.aserto.com",
