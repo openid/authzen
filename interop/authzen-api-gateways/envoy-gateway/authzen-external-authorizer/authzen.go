@@ -17,6 +17,7 @@ import (
 // PDP URLs
 var pdps = map[string]string{
 	"Aserto":               "https://authzen-gateway-proxy.demo.aserto.com",
+	"AVP":                  "https://authzen-avp.interop-it.org",
 	"Axiomatics":           "https://pdp.alfa.guide",
 	"Cerbos":               "https://authzen-proxy-demo.cerbos.dev",
 	"HexaOPA":              "https://interop.authzen.hexaorchestration.org",

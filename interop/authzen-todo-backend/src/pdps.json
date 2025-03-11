@@ -1,18 +1,8 @@
 {
   "pdps": {
-    "authorization-api-1_0-00": {
-      "Aserto": "https://authzen-proxy-preview.demo.aserto.com",
-      "Axiomatics": "https://pdp.alfa.guide",
-      "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
-      "HexaOPA": "https://interop.authzen.hexaorchestration.org",
-      "Kogito": "https://authzen-proxy-demo.azerad.org",
-      "Open Policy Agent": "https://authzen-opa-proxy-preview.demo.aserto.com",
-      "Permit.io": "https://permit-authzen-interop-1-0-preview.up.railway.app",
-      "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app",
-      "Topaz": "https://authzen-topaz-proxy-preview.demo.aserto.com"
-    },
     "authorization-api-1_0-01": {
       "Aserto": "https://authzen-proxy.demo.aserto.com",
+      "AVP": "https://authzen-avp.interop-it.org",
       "Axiomatics": "https://pdp.alfa.guide",
       "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
       "EmpowerID": "https://authzen-demo.eidlabs.net",
@@ -30,6 +20,7 @@
     },
     "authorization-api-1_0-02": {
       "Aserto": "https://authzen-proxy.demo.aserto.com",
+      "AVP": "https://authzen-avp.interop-it.org",
       "Axiomatics": "https://pdp.alfa.guide",
       "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
       "EmpowerID": "https://authzen-demo.eidlabs.net",
@@ -57,6 +48,7 @@
   },
   "gatewayPdps": {
     "Aserto": "http://authzen-gateway-proxy.demo.aserto.com",
+    "AVP": "https://authzen-avp.interop-it.org",
     "Axiomatics": "https://pdp.alfa.guide",
     "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
     "HexaOPA": "https://interop.authzen.hexaorchestration.org",
