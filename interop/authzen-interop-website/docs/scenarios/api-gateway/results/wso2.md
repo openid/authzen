@@ -1,16 +1,16 @@
 ---
-sidebar_position: 11
+sidebar_position: 12
 ---
 
-# Amazon VP
+# WSO2
 
-Interop results for the [Amazon Verified Permissions](https://aws.amazon.com/verified-permissions/) implementation hosted at `https://authzen-avp.interop-it.org`.
+Interop results for the [WSO2 Identity Server](https://wso2.com/identity-server/) implementation hosted at `https://authzen-interop-demo.wso2.com/api/identity`.
 
 ## Test results
 ```bash
-AUTHZEN_PDP_API_KEY="<redacted>" yarn test https://authzen-avp.interop-it.org markdown 
-yarn run v1.22.19
-$ node build/runner.js https://authzen-avp.interop-it.org markdown
+AUTHZEN_PDP_API_KEY="<redacted>" yarn test https://authzen-interop-demo.wso2.com/api/identity markdown 
+yarn run v1.22.22
+$ node build/runner.js https://authzen-interop-demo.wso2.com/api/identity markdown
 ```
 <table>
   <tr>

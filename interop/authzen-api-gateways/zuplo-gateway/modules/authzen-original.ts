@@ -11,7 +11,8 @@ const pdps = {
   "PlainID": "https://authzeninteropt.se-plainid.com",
   "Rock Solid Knowledge": "https://authzen.identityserver.com",
   "SGNL": "https://authzen.sgnlapis.cloud",
-  "Topaz": "https://authzen-topaz.demo.aserto.com"
+  "Topaz": "https://authzen-topaz.demo.aserto.com",
+  "WSO2": "https://authzen-interop-demo.wso2.com/api/identity"
 }
 const { AUTHZEN_PDP_API_KEYS } = environment
 const apiKeys = (AUTHZEN_PDP_API_KEYS && JSON.parse(AUTHZEN_PDP_API_KEYS)) ?? {}
