@@ -230,6 +230,17 @@
         "summary": "Get user",
         "description": "Gets information about a user.",
         "operationId": "b61c0cd1-b380-4440-a430-840ea85f3e9f",
+        "parameters": [
+          {
+              "name": "userId",
+              "in": "path",
+              "description": "ID of the user to retrieve.",
+              "required": true,
+              "schema": {
+              "type": "string"
+              }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Properties of a user",
