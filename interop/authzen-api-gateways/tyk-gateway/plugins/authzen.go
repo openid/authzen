@@ -35,6 +35,7 @@ var (
 		"Rock Solid Knowledge": "https://authzen.identityserver.com",
 		"SGNL":                 "https://authzen.sgnlapis.cloud",
 		"Topaz":                "https://authzen-topaz.demo.aserto.com",
+		"WSO2":                 "https://authzen-interop-demo.wso2.com/api/identity",
 	}
 	creds PDPCredentials
 )

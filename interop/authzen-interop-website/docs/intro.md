@@ -51,6 +51,7 @@ The latest scenario defines a defense-in-depth architecture, consisting of API g
 | SGNL                 | ✅ [Results](/docs/scenarios/todo/results/sgnl)               | ✅ [Results](/docs/scenarios/todo-1.0-id/results/SGNL)               | ✅ [Results](/docs/scenarios/todo-1.1/results/SGNL)               | ✅ [Results](/docs/scenarios/api-gateway/results/SGNL)                 |
 | Thales               | ✅ [Results](/docs/scenarios/todo/results/authzforce)         | Did not participate                                                  | Did not participate                                               |    |
 | Topaz                | ✅ [Results](/docs/scenarios/todo/results/topaz)              | ✅ [Results](/docs/scenarios/todo-1.0-id/results/topaz)              | ✅ [Results](/docs/scenarios/todo-1.1/results/topaz)              | ✅ [Results](/docs/scenarios/api-gateway/results/topaz)                |
+| WSO2                 | Did not participate                                           | Did not participate                                                  | ✅ [Results](/docs/scenarios/todo-1.1/results/wso2)               | ✅ [Results](/docs/scenarios/api-gateway/results/wso2)                 |
 | 3Edges               | ✅ [Results](/docs/scenarios/todo/results/3edges)             | Replaced by Indykite                                                 | Replaced by Indykite                                              |    |
 
 ### API Gateways
@@ -64,4 +65,5 @@ API Gateways that support the [Gateway scenario](/docs/scenarios/api-gateway/).
 | Kong                 | https://plainid-kong-gw.se-plainid.com                        |
 | Tyk                  | https://tyk-authzen-interop.do.poc.tyk.technology             |
 | Layer7               | https://authzen-interop-gw.layer7.broadcom.com                |
+| WSO2                 | https://authzen-interop-demo.wso2.com/api/identity            |
 | Zuplo                | https://authzen-todo-main-4df5ceb.d2.zuplo.dev                |
