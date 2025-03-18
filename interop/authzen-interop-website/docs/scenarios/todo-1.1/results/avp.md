@@ -2,7 +2,7 @@
 sidebar_position: 16
 ---
 
-# AWS AVP
+# Amazon VP
 
 Interop results for the [Amazon Verified Permissions](https://aws.amazon.com/verified-permissions/) implementation hosted at `https://authzen-avp.interop-it.org`.
 
