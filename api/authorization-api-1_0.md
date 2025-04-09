@@ -58,6 +58,8 @@ normative:
   RFC4001: # text representation of IP addresses
   RFC6749: # OAuth
   RFC8259: # JSON
+  RFC5785: # well-known
+  RFC8615: # well-known URIs
   RFC9110: # HTTP Semantics
   XACML:
     title: eXtensible Access Control Markup Language (XACML) Version 1.1
@@ -70,6 +72,15 @@ normative:
       role: editor
       org: Entrust
     date: 2006
+
+informative:
+  RFC7519: # JWT
+  RFC7515: # JWS
+  RFC8126: # Writing for IANA
+  IANA_well_known_uris: # IANA well-known registry
+  RFC9525: # Service Identity in TLS
+  RFC7234: # HTTP caching
+
 
 --- abstract
 
@@ -1170,12 +1181,12 @@ Policy Decision Points can have metadata describing their configuration.
 
 ## Data structure {#pdp-metadata-data}
 
-The following Policy Decision Point metadata parameters are used by this specification and are registered in the IANA "AuthZEN PDP Metadata" registry established in Section X.Y.
+The following Policy Decision Point metadata parameters are used by this specification and are registered in the IANA "AuthZEN PDP Metadata" registry established in Section 11.1 of [[this specification]].
 
 ### Endpoint Parameters {#pdp-metadata-data-endpoint}
 
 issuer:
-: REQUIRED. The policy decision point's issuer identifier, which is a URL that uses the "https" scheme and has no query or fragment components. Policy Decision Point metadata is published at a location that is ".well-known" according to RFC 5785 [RFC5785] derived from this issuer identifier, as described in Section X. The issuer identifier is used to prevent policy decision point mix-up attacks.
+: REQUIRED. The policy decision point's issuer identifier, which is a URL that uses the "https" scheme and has no query or fragment components. Policy Decision Point metadata is published at a location that is ".well-known" according to RFC 5785 [RFC5785] derived from this issuer identifier, as described in Section 11.2 of [[this specification]]. The issuer identifier is used to prevent policy decision point mix-up attacks.
 
 access_evaluation_endpoint:
 : REQUIRED. URL of Policy Decision Point Access Evaluation API endpoint
@@ -1201,7 +1212,7 @@ partial_eval_entity_supported:
 
 ### Signature Parameter {#pdp-metadata-data-sig}
 
-In addition to JSON elements, metadata values MAY also be provided as a signed_metadata value, which is a JSON Web Token [JWT] that asserts metadata values about the policy decision point as a bundle. A set of metadata parameters that can be used in signed metadata as claims are defined in Section X. The signed metadata MUST be digitally signed or MACed using JSON Web Signature [JWS] and MUST contain an iss (issuer) claim denoting the party attesting to the claims in the signed metadata.
+In addition to JSON elements, metadata values MAY also be provided as a signed_metadata value, which is a JSON Web Token [RFC7519] that asserts metadata values about the policy decision point as a bundle. A set of metadata parameters that can be used in signed metadata as claims are defined in Section 11.1 of [[this specification]]. The signed metadata MUST be digitally signed or MACed using JSON Web Signature [RFC7515] and MUST contain an iss (issuer) claim denoting the party attesting to the claims in the signed metadata.
 
 Consumers of the metadata MAY ignore the signed metadata if they do not support this feature. If the consumer of the metadata supports signed metadata, metadata values conveyed in the signed metadata MUST take precedence over the corresponding values conveyed using plain JSON elements. Signed metadata is included in the policy decision point metadata JSON object using this OPTIONAL metadata parameter:
 
@@ -1210,9 +1221,9 @@ signed_metadata:
 
 ## Obtaining Policy Decision Point Metadata {#pdp-metadata-access}
 
-Policy Decision Point supporting metadata MUST make a JSON document containing metadata as specified in Section X available at a URL formed by inserting a well-known URI string between the host component and the path and/or query components, if any. The well-known URI string used is `/.well-known/authzen-configuration`.
+Policy Decision Point supporting metadata MUST make a JSON document containing metadata as specified in Section 11.1 of [[this specification]]available at a URL formed by inserting a well-known URI string between the host component and the path and/or query components, if any. The well-known URI string used is `/.well-known/authzen-configuration`.
 
-The syntax and semantics of .well-known are defined in [RFC8615]. The well-known URI path suffix used is registered in the IANA "Well-Known URIs" registry [IANA.well-known].
+The syntax and semantics of .well-known are defined in [RFC8615]. The well-known URI path suffix used is registered in the IANA "Well-Known URIs" registry [IANA_well_known_uris].
 
 ### Policy Decision Point Metadata Request {#pdp-metadata-access-request}
 
@@ -1225,7 +1236,7 @@ Host: pdp.mycompany.com
 
 ### Policy Decision Point Metadata Response {#pdp-metadata-access-response}
 
-The response is a set of metadata parameters about the protected resource's configuration. A successful response MUST use the 200 OK HTTP status code and return a JSON object using the application/json content type that contains a set of metadata parameters as its members that are a subset of the metadata parameters defined in Section 2. Additional metadata parameters MAY be defined and used; any metadata parameters that are not understood MUST be ignored.
+The response is a set of metadata parameters about the protected resource's configuration. A successful response MUST use the 200 OK HTTP status code and return a JSON object using the application/json content type that contains a set of metadata parameters as its members that are a subset of the metadata parameters defined in Section 11.1 of [[this specification]]. Additional metadata parameters MAY be defined and used; any metadata parameters that are not understood MUST be ignored.
 
 Parameters with multiple values are represented as JSON arrays. Parameters with zero values MUST be omitted from the response.
 
@@ -1637,7 +1648,7 @@ When using unsigned metadata, the party issuing the metadata is the policy decis
 
 ## Metadata Caching
 
-Policy decision point metadata is retrieved using an HTTP GET request, as specified in Section X. Normal HTTP caching behaviors apply, meaning that the GET may retrieve a cached copy of the content, rather than the latest copy. Implementations should utlize HTTP caching directives such as Cache-Control with max-age, as defined in [RFC7234], to enable caching of retrieved metadata for appropriate time periods.
+Policy decision point metadata is retrieved using an HTTP GET request, as specified in Section 11.2 of [[this specification]]. Normal HTTP caching behaviors apply, meaning that the GET may retrieve a cached copy of the content, rather than the latest copy. Implementations should utlize HTTP caching directives such as Cache-Control with max-age, as defined in [RFC7234], to enable caching of retrieved metadata for appropriate time periods.
 
 # IANA Considerations
 
@@ -1688,7 +1699,7 @@ Change Controller:
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section X of [[ this specification ]]
+: Section 11.1.1 of [[this specification]]
 
 
 
@@ -1703,7 +1714,7 @@ Change Controller:
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section X of [[ this specification ]]
+: Section 11.1.1 of [[this specification]]
 
 
 
@@ -1711,14 +1722,14 @@ Metadata name:
 : search_endpoint
 
 Metadata description:
-: URL of Policy Decision Point Search API endpoint
+: Section 11.1.1 of [[this specification]]
 
 Change Controller:
 : OpenID_Foundation_AuthZEN_Working_Groug
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section X of [[ this specification ]]
+: Section X of [[this specification]]
 
 
 
@@ -1733,7 +1744,7 @@ Change Controller:
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section X of [[ this specification ]]
+: Section 11.1.1 of [[this specification]]
 
 
 
@@ -1748,7 +1759,7 @@ Change Controller:
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section X of [[ this specification ]]
+: Section 11.1.2 of [[this specification]]
 
 
 
@@ -1763,7 +1774,7 @@ Change Controller:
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section X of [[ this specification ]]
+: Section 11.1.2 of [[this specification]]
 
 
 
@@ -1778,13 +1789,13 @@ Change Controller:
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section X of [[ this specification ]]
+: Section 11.1.3 of [[this specification]]
 
 
 
 ## Well-Known URI Registry
 
-This specification registers the well-known URI defined in Section 3 in the IANA "Well-Known URIs" registry [IANA.well-known].
+This specification registers the well-known URI defined in Section 3 in the IANA "Well-Known URIs" registry [IANA_well_known_uris].
 
 ### Registry Contents
 
@@ -1792,7 +1803,7 @@ URI Suffix:
 : authzen-configuration
 
 Reference:
-: Section X of [[ this specification ]]
+: Section 11.2 of [[this specification]]
 
 Status:
 : permanent
