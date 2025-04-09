@@ -50,6 +50,9 @@ contributor: # Same structure as author list, but goes into contributors
 - name: David Hyland
   org: ID Partners
   email: dave@idpartners.com.au
+- name: Jeff Lombardo
+  org: AWS
+  email: jeffsec@amazon.com
 
 normative:
   RFC4001: # text representation of IP addresses
