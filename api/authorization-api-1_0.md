@@ -50,7 +50,7 @@ contributor: # Same structure as author list, but goes into contributors
 - name: David Hyland
   org: ID Partners
   email: dave@idpartners.com.au
-- name: Jeff Lombardo
+- name: Jean-François "Jeff" Lombardo
   org: AWS
   email: jeffsec@amazon.com
 
@@ -77,7 +77,7 @@ informative:
   RFC7519: # JWT
   RFC7515: # JWS
   RFC8126: # Writing for IANA
-  IANA_well_known_uris: # IANA well-known registry
+  IANA.well_known_uris: # IANA well-known registry
   RFC9525: # Service Identity in TLS
   RFC7234: # HTTP caching
 
