@@ -211,7 +211,7 @@ export default function ResourceSearch({
                   <CardHeader>
                     <div className="flex items-center">
                       <Code className="h-4 w-4 mr-2" />
-                      <CardTitle>Code View</CardTitle>
+                      <CardTitle>Request View</CardTitle>
                     </div>
                     <CardDescription>API request and response</CardDescription>
                   </CardHeader>

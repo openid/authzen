@@ -1,3 +1,10 @@
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import type { Route } from "./+types/action";
 
 export function meta({}: Route.MetaArgs) {
@@ -5,5 +12,16 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function SubjectSearch() {
-  return <h1>SubjectSearch</h1>;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Subject Search</CardTitle>
+        <CardDescription>
+          Select a resource and action to get the subjects which can perform the
+          action
+        </CardDescription>
+      </CardHeader>
+      <CardContent></CardContent>
+    </Card>
+  );
 }
