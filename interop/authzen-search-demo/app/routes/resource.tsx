@@ -61,6 +61,8 @@ export async function action({ request }: Route.ActionArgs) {
 
   const formData = await request.formData();
   const subject = formData.get("subject");
+  const resource = formData.get("resource");
+  const action = formData.get("action");
   const nextToken = formData.get("next_token") ?? "";
 
   if (!subject || subjects.find((s) => s.id === subject) === undefined) {
@@ -75,10 +77,10 @@ export async function action({ request }: Route.ActionArgs) {
       id: subject,
     },
     action: {
-      name: "can_read",
+      name: action,
     },
     resource: {
-      type: "record",
+      type: resource,
     },
     context: {},
     page: {
@@ -146,13 +148,17 @@ export default function ResourceSearch({
     <Card>
       <CardHeader>
         <CardTitle>Resource Search</CardTitle>
-        <CardDescription>Select a user to view their resources</CardDescription>
+        <CardDescription>
+          Select a subject and action to get the resources it would be allowed
+          upon
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form method="post" className="flex flex-col gap-4">
-          <div className="mb-6 flex gap-4">
+          <div className="mb-6 flex gap-4 items-center">
+            <p className="font-semibold text-sm">Subject</p>
             <Select name="subject">
-              <SelectTrigger className="w-full sm:w-[300px]">
+              <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Select a subject" />
               </SelectTrigger>
               <SelectContent>
@@ -161,6 +167,24 @@ export default function ResourceSearch({
                     {subject.username}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+            <p className="font-semibold text-sm">Resource type</p>
+            <Select name="action" defaultValue="can_read">
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue placeholder="Select an resource type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="can_read">record</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="font-semibold text-sm">Action</p>
+            <Select name="action" defaultValue="can_read">
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue placeholder="Select an action" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="can_read">can_read</SelectItem>
               </SelectContent>
             </Select>
             <input
