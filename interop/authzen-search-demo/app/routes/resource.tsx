@@ -29,9 +29,9 @@ import { Form, useNavigation } from "react-router";
 import { Button } from "~/components/ui/button";
 import { pdpCookie } from "~/cookies.server";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { subjects } from "~/data/subjects.server";
 import { pdps } from "~/data/pdps.server";
+import vscDarkPlus from "react-syntax-highlighter/dist/cjs/styles/prism/vsc-dark-plus";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "AuthZEN Search API - Resource Search" }];
@@ -157,7 +157,7 @@ export default function ResourceSearch({
         <Form method="post" className="flex flex-col gap-4">
           <div className="mb-6 flex gap-4 items-center">
             <p className="font-semibold text-sm">Subject</p>
-            <Select name="subject">
+            <Select name="subject" defaultValue={loaderData.subjects[0].id}>
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Select a subject" />
               </SelectTrigger>
