@@ -1359,7 +1359,7 @@ The Resource Search Request is an HTTPS request with `content-type` of `applicat
 The following is a non-normative example of the HTTPS binding of the Resource Search Request:
 
 ~~~ http
-POST /access/v1/resource/search HTTP/1.1
+POST /access/v1/search/resource HTTP/1.1
 Host: pdp.mycompany.com
 Authorization: Bearer <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
