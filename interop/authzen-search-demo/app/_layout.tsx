@@ -1,6 +1,6 @@
 import type { Route } from "./+types/_layout";
 
-import { Outlet, useFetcher, useLocation } from "react-router";
+import { data, Outlet, useFetcher, useLocation } from "react-router";
 
 import { pdpCookie } from "./cookies.server";
 import { SidebarProvider } from "./components/ui/sidebar";
@@ -12,10 +12,23 @@ export async function loader({ request }: Route.LoaderArgs) {
   const cookieHeader = request.headers.get("Cookie");
   const cookie = (await pdpCookie.parse(cookieHeader)) || {};
 
-  return {
-    pdps,
-    activePdp: cookie.selectedPdp || "Cerbos",
-  };
+  // set the PDP cookie if it doesn't exist
+  const activePdp = cookie.selectedPdp || "Cerbos";
+  if (!cookie.selectedPdp) {
+    cookie.selectedPdp = activePdp;
+  }
+
+  return data(
+    {
+      pdps,
+      activePdp,
+    },
+    {
+      headers: {
+        "Set-Cookie": await pdpCookie.serialize(cookie),
+      },
+    }
+  );
 }
 
 export default function Layout({ loaderData }: Route.ComponentProps) {

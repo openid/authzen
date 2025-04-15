@@ -7,7 +7,6 @@ export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
   const selectedPDP = formData.get("pdp");
   const returnTo = formData.get("returnTo")?.toString() || "/";
-  console.log("Selected PDP:", selectedPDP);
 
   // Now set the cookie with the selected PDP
   const cookie = (await pdpCookie.parse(cookieHeader)) || {};
