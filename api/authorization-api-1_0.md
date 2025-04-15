@@ -7,7 +7,7 @@ wg: OpenID AuthZEN
 
 docname: authorization-api-1_0
 
-title: Authorization API 1.0 – draft 03
+title: Authorization API 1.0 – draft 04
 abbrev: azapi
 lang: en
 kw:
@@ -386,7 +386,7 @@ The following is a non-normative example of a Reason Object:
 
 ~~~ json
 {
-  "decision": true,
+  "decision": false,
   "context": {
     "id": "0",
     "reason_admin": {
