@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"log"
 	"net"
@@ -19,8 +20,14 @@ import (
 )
 
 type AuthServer struct {
-	httpClient  *http.Client
-	openApiSpec openapi3.T
+	httpClient     *http.Client
+	openApiSpec    openapi3.T
+	pdpAuthConfigs map[string]PDPAuthConfig
+}
+
+// PDPAuthConfig stores authentication configuration for PDPs
+type PDPAuthConfig struct {
+	Token string `json:"token"`
 }
 
 func denied(code int32, body string) *auth_pb.CheckResponse {
@@ -84,6 +91,21 @@ func main() {
 		log.Fatalf("failed to parse OpenAPI JSON: %v", err)
 	}
 
+	var pdpAuthConfigs map[string]PDPAuthConfig
+
+	if authConfigB64 := os.Getenv("AUTHZEN_PDP_AUTH_CONFIG"); authConfigB64 != "" {
+		authConfigJSON, err := base64.StdEncoding.DecodeString(authConfigB64)
+		if err != nil {
+			log.Printf("Warning: Failed to decode PDP auth config: %v", err)
+			return
+		}
+
+		if err := json.Unmarshal(authConfigJSON, &pdpAuthConfigs); err != nil {
+			log.Printf("Warning: Failed to parse PDP auth config: %v", err)
+			return
+		}
+	}
+
 	lis, err := net.Listen("tcp", "0.0.0.0:3001")
 
 	if err != nil {
@@ -104,7 +126,8 @@ func main() {
 		httpClient: &http.Client{
 			Timeout: time.Second * 10,
 		},
-		openApiSpec: openApiSpec,
+		openApiSpec:    openApiSpec,
+		pdpAuthConfigs: pdpAuthConfigs,
 	}
 	auth_pb.RegisterAuthorizationServer(s, server)
 

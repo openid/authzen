@@ -30,6 +30,11 @@ return {
                     type = "string",
                     default = "https://authzeninteropt.se-plainid.com"
                   },
+                },
+                {
+                    keys = {
+                        type = "string"
+                    },
                 }
               },
             },

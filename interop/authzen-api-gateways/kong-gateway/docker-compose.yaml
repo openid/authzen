@@ -9,5 +9,8 @@ services:
     KONG_DATABASE: off
     KONG_DECLARATIVE_CONFIG: "/plugins/conf.yaml"
     KONG_LUA_PACKAGE_PATH: "/plugins/?.lua"
+    KONG_NGINX_MAIN_ENV: PDP_KEYS
+#    PDP KEYS GOES THERE IN JSON FORMAT
+    PDP_KEYS: '{ "VENDOR":"KEY" }'
    ports:
      - "8000:8000/tcp"

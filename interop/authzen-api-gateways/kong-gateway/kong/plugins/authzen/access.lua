@@ -7,23 +7,33 @@ local function evaluate(pidreq,conf)
     local httpc = http.new()
     kong.log.notice("AuthZEN request: ", pidreq)
     local pdpurls = conf.server.pdp_url
+    local keys = os.getenv("PDP_KEYS")
+    local keysObj = cjson.decode(keys)
     local pdps = cjson.decode(pdpurls)
     local pdpurl = "https://authzeninteropt.se-plainid.com"
+    local key = nil
     local pdp = ngx.req.get_headers()['x_authzen_gateway_pdp']
     if pdp ~= nil then
         local tmp = pdps[pdp]
         if tmp ~= nil then
             pdpurl = tmp
         end
+        key = keysObj[pdp]
     end
+
     local uri = pdpurl .. "/access/v1/evaluation"
     kong.log.notice("AuthZEN endpoint: " ,uri)
+
+    local headers = {
+        ["Content-Type"] = "application/json"
+    }
+    if key ~= nil then
+        headers['Authorization'] = key
+    end
     local res, err = httpc:request_uri(uri, {
         method = "POST",
         body = pidreq,
-        headers = {
-            ["Content-Type"] = "application/json"
-        },
+        headers = headers,
         keepalive_timeout = 60,
         keepalive_pool = 10
     })

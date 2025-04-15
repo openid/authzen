@@ -361,9 +361,12 @@ The `resource.properties` contains an attribute called `ownerID` which contains 
     "name": "can_update_todo"
   },
   "resource": {
-    "ownerID": "<email_of_owner>",
-    "type": "todo"
-  },
+      "type": "todo",
+      "id": "<uuid-of-the-todo>",
+      "properties": {
+        "ownerID": "<email_of_owner>"
+      }
+    },
   "context": {
   }
 }
@@ -389,8 +392,11 @@ For the user Morty, the following request will return a `true` decision:
     "name": "can_update_todo"
   },
   "resource": {
-    "ownerID": "morty@the-citadel.com",
-    "type": "todo"
+    "type": "todo",
+    "id": "7240d0db-8ff0-41ec-98b2-34a096273b9f",
+    "properties": {
+      "ownerID": "morty@the-citadel.com"
+    }
   },
   "context": {
   }

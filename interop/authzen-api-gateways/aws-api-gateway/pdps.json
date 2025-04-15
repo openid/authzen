@@ -1,8 +1,14 @@
 {
   "Aserto": "https://authzen-gateway-proxy.demo.aserto.com",
+  "AVP": "https://authzen-avp.interop-it.org",
   "Axiomatics": "https://pdp.alfa.guide",
   "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
+  "HexaOPA": "https://interop.authzen.hexaorchestration.org",
+  "OpenFGA": "https://authzen-interop.openfga.dev/stores/01JNW1803442023HVDKV03FB3A",
+  "PingAuthorize": "https://authzen.idpartners.au",
   "PlainID": "https://authzeninteropt.se-plainid.com",
   "Rock Solid Knowledge": "https://authzen.identityserver.com",
-  "Topaz": "https://authzen-topaz.demo.aserto.com"
+  "SGNL": "https://authzen.sgnlapis.cloud",
+  "Topaz": "https://authzen-topaz.demo.aserto.com",
+  "WSO2": "https://authzen-interop-demo.wso2.com/api/identity"
 }

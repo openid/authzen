@@ -1,18 +1,8 @@
 {
   "pdps": {
-    "authorization-api-1_0-00": {
-      "Aserto": "https://authzen-proxy-preview.demo.aserto.com",
-      "Axiomatics": "https://pdp.alfa.guide",
-      "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
-      "HexaOPA": "https://interop.authzen.hexaorchestration.org",
-      "Kogito": "https://authzen-proxy-demo.azerad.org",
-      "Open Policy Agent": "https://authzen-opa-proxy-preview.demo.aserto.com",
-      "Permit.io": "https://permit-authzen-interop-1-0-preview.up.railway.app",
-      "Thales AuthZForce": "https://restful-pdp-vji43cydea-uc.a.run.app",
-      "Topaz": "https://authzen-topaz-proxy-preview.demo.aserto.com"
-    },
     "authorization-api-1_0-01": {
       "Aserto": "https://authzen-proxy.demo.aserto.com",
+      "AVP": "https://authzen-avp.interop-it.org",
       "Axiomatics": "https://pdp.alfa.guide",
       "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
       "EmpowerID": "https://authzen-demo.eidlabs.net",
@@ -20,15 +10,18 @@
       "Indykite": "https://api-authzen-authz.3edges.io",
       "Kogito": "https://authzen-proxy-demo.azerad.org",
       "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
+      "OpenFGA": "https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C",
       "Permit.io": "https://permit-authzen-interop.up.railway.app",
       "PingAuthorize": "https://authzen.idpartners.au",
       "PlainID": "https://authzeninteropt.se-plainid.com",
       "Rock Solid Knowledge": "https://authzen.identityserver.com",
       "SGNL": "https://authzen.sgnlapis.cloud",
-      "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
+      "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
+      "WSO2": "https://authzen-interop-demo.wso2.com/api/identity"
     },
     "authorization-api-1_0-02": {
       "Aserto": "https://authzen-proxy.demo.aserto.com",
+      "AVP": "https://authzen-avp.interop-it.org",
       "Axiomatics": "https://pdp.alfa.guide",
       "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
       "EmpowerID": "https://authzen-demo.eidlabs.net",
@@ -36,11 +29,14 @@
       "Indykite": "https://api-authzen-authz.3edges.io",
       "Kogito": "https://authzen-proxy-demo.azerad.org",
       "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
+      "OpenFGA": "https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C",
       "Permit.io": "https://permit-authzen-interop.up.railway.app",
       "PingAuthorize": "https://authzen.idpartners.au",
       "PlainID": "https://authzeninteropt.se-plainid.com",
+      "Rock Solid Knowledge": "https://authzen.identityserver.com",
       "SGNL": "https://authzen.sgnlapis.cloud",
-      "Topaz": "https://authzen-topaz-proxy.demo.aserto.com"
+      "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
+      "WSO2": "https://authzen-interop-demo.wso2.com/api/identity"
     }
   },
   "gateways": {
@@ -48,15 +44,23 @@
     "AWS API Gateway": "https://aws-gateway.authzen-interop.net",
     "Envoy": "https://authzen-envoy-proxy-demo.cerbos.dev",
     "Kong": "https://plainid-kong-gw.se-plainid.com",
+    "Layer7": "https://authzen-interop-gw.layer7.broadcom.com",
     "Tyk": "https://tyk-authzen-interop.do.poc.tyk.technology",
+    "WSO2": "https://authzen-gateway-proxy.wso2.com/authzentodo/1.0.0",
     "Zuplo": "https://authzen-todo-main-4df5ceb.d2.zuplo.dev"
   },
   "gatewayPdps": {
     "Aserto": "http://authzen-gateway-proxy.demo.aserto.com",
+    "AVP": "https://authzen-avp.interop-it.org",
     "Axiomatics": "https://pdp.alfa.guide",
     "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
+    "HexaOPA": "https://interop.authzen.hexaorchestration.org",
+    "OpenFGA": "https://authzen-interop.openfga.dev/stores/01JNW1803442023HVDKV03FB3A",
+    "PingAuthorize": "https://authzen.idpartners.au",
     "PlainID": "https://authzeninteropt.se-plainid.com",
     "Rock Solid Knowledge": "https://authzen.identityserver.com",
-    "Topaz": "https://authzen-topaz.demo.aserto.com"
+    "SGNL": "https://authzen.sgnlapis.cloud",
+    "Topaz": "https://authzen-topaz.demo.aserto.com",
+    "WSO2": "https://authzen-interop-demo.wso2.com/api/identity"
   }
 }

@@ -17,11 +17,17 @@ import (
 // PDP URLs
 var pdps = map[string]string{
 	"Aserto":               "https://authzen-gateway-proxy.demo.aserto.com",
+	"AVP":                  "https://authzen-avp.interop-it.org",
 	"Axiomatics":           "https://pdp.alfa.guide",
 	"Cerbos":               "https://authzen-proxy-demo.cerbos.dev",
+	"HexaOPA":              "https://interop.authzen.hexaorchestration.org",
+	"OpenFGA":              "https://authzen-interop.openfga.dev/stores/01JNW1803442023HVDKV03FB3A",
+	"PingAuthorize":        "https://authzen.idpartners.au",
 	"PlainID":              "https://authzeninteropt.se-plainid.com",
 	"Rock Solid Knowledge": "https://authzen.identityserver.com",
+	"SGNL":                 "https://authzen.sgnlapis.cloud",
 	"Topaz":                "https://authzen-topaz.demo.aserto.com",
+	"WSO2":                 "https://authzen-interop-demo.wso2.com/api/identity",
 }
 
 // AuthZENSubject represents the subject in the authorization request
@@ -117,6 +123,7 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 		log.Printf("Failed to encode payload: %v\n", err)
 		return false, err
 	}
+	log.Printf("PDP: %+v\n", pdpUrl)
 	log.Printf("Payload: %+v\n", authZENPayload)
 
 	// Create HTTP request with context
@@ -126,6 +133,14 @@ func (server *AuthServer) AuthorizeRequest(ctx context.Context, request *auth_pb
 		return false, err
 	}
 	req.Header.Set("Content-Type", "application/json")
+
+	// Add authentication token if configured for this PDP
+	if server.pdpAuthConfigs != nil {
+		if authConfig, exists := server.pdpAuthConfigs[request.Attributes.Request.Http.Headers["x_authzen_gateway_pdp"]]; exists {
+			log.Printf("Adding authorization header to PDP request")
+			req.Header.Set("Authorization", authConfig.Token)
+		}
+	}
 
 	// Send HTTP request with better error handling
 	startTime := time.Now()
