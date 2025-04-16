@@ -1201,7 +1201,7 @@ search_endpoint_action:
 : OPTIONAL. URL of Policy Decision Point Search API endpoint for action element
 
 search_endpoint_resource:
-: OPTIONAL. URL of Policy Decision Point Search API endpoint for action element
+: OPTIONAL. URL of Policy Decision Point Search API endpoint for resource element
 
 partial_eval_endpoint:
 : OPTIONAL. URL of Policy Decision Point Partial Evaluation API endpoint
