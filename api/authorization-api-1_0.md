@@ -1194,8 +1194,14 @@ access_evaluation_endpoint:
 access_evaluations_endpoint:
 : OPTIONAL. URL of Policy Decision Point Access Evaluations API endpoint
 
-search_endpoint:
-: OPTIONAL. URL of Policy Decision Point Search API endpoint
+search_endpoint_subject:
+: OPTIONAL. URL of Policy Decision Point Search API endpoint for subject element
+
+search_endpoint_action:
+: OPTIONAL. URL of Policy Decision Point Search API endpoint for action element
+
+search_endpoint_resource:
+: OPTIONAL. URL of Policy Decision Point Search API endpoint for action element
 
 partial_eval_endpoint:
 : OPTIONAL. URL of Policy Decision Point Partial Evaluation API endpoint
@@ -1203,9 +1209,6 @@ partial_eval_endpoint:
 Note that the non presence of any of those parameter is sufficient for the policy enforcement point to determine that the policy decision point is not capable and therefore will not return a result for the associated API
 
 ### Support Parameters {#pdp-metadata-data-support}
-
-search_endpoint_entity_supported:
-: OPTIONAL. JSON array containing a list of strings representing entities among `subject`, `action`, and `resource`. This metadata entry MUST be present if and URL is specified in the `search_endpoint` entry.
 
 partial_eval_entity_supported:
 : OPTIONAL. JSON array containing a list of strings representing entities among `subject`, `action`, and `resource`. This metadata entry MUST be present if and URL is specified in the `partial_eval_endpoint` entry.
