@@ -824,9 +824,15 @@ The Subject Search API defines the message exchange pattern between a client (PE
 
 The Subject Search API is based on the Access Evaluation information model, but omits the Subject ID.
 
+## Subject Search Semantics
+
+While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
+
+In addition, it is RECOMMENDED that a subject search is performed transitively, traversing intermediate attributes and/or relationships. For example, if the members of group G are designated as viewers on a document D, then a search for all users that are viewers of document D will include all the members of group G.
+
 ## The Subject Search API Request {#subject-search-request}
 
-The Subject Search request is a 3-tuple constructed of three previously defined entities:
+The Subject Search request is a 4-tuple constructed of three previously defined entities:
 
 `subject`:
 : REQUIRED. The subject (or principal) of type Subject.  NOTE that the Subject type is REQUIRED but the Subject ID can be omitted, and if present, is IGNORED.
@@ -943,9 +949,15 @@ The Resource Search API defines the message exchange pattern between a client (P
 
 The Resource Search API is based on the Access Evaluation information model, but omits the Resource ID.
 
+## Resource Search Semantics
+
+While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
+
+In addition, it is RECOMMENDED that a resource search is performed transitively, traversing intermediate attributes and/or relationships. For example, if user U is a viewer of folder F that contains a set of documents, then a search for all documents that user U can view will include all of the documents in folder F.
+
 ## The Resource Search API Request {#resource-search-request}
 
-The Resource Search request is a 3-tuple constructed of three previously defined entities:
+The Resource Search request is a 4-tuple constructed of three previously defined entities:
 
 `subject`:
 : REQUIRED. The subject (or principal) of type Subject.
@@ -1054,7 +1066,11 @@ Note: page size is implementation-dependent.
 
 The Action Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the actions that match the search criteria.
 
-The Action Search API is based on the Access Evaluation information model.
+The Action Search API is based on the Access Evaluation information model, but omits the Action Name.
+
+## Action Search Semantics
+
+While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
 
 ## The Action Search API Request {#action-search-request}
 
