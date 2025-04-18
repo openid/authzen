@@ -1,6 +1,6 @@
 {
   "name": "authzen-todo-backend",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "AuthZEN todo backend interop sample",
   "main": "src/index.ts",
   "scripts": {
@@ -10,6 +10,8 @@
     "dev": "nodemon --ignore db/* ./src/index.ts",
     "docker-build": "scripts/docker-build.sh",
     "docker-run": "scripts/docker-run.sh",
+    "gcp-build": "scripts/build-gcp.sh",
+    "gcp-deploy": "scripts/deploy-gcp.sh",
     "tsc": "tsc --noEmit --incremental",
     "release": "./scripts/release.sh",
     "test": "node build/test/runner.js",
