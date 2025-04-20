@@ -11,7 +11,7 @@
   ],
   "properties": {
     "subject": {
-      "description": "A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.",
+      "description": "A Subject is the user or machine principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.",
       "$comment": "https://openid.net/specs/authorization-api-1_0-01.html#name-subject",
       "type": "object",
       "required": [
@@ -79,7 +79,7 @@
       }
     },
     "action": {
-      "description": "A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.",
+      "description": "A Subject is the user or machine principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.",
       "$comment": "https://openid.net/specs/authorization-api-1_0-01.html#name-action",
       "type": "object",
       "required": [
