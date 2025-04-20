@@ -3,7 +3,7 @@ This repository contains the output of the [OpenID AuthZEN](https://openid.net/w
 
 ## API spec
 
-The AuthZEN authorization API is versioned in markdown at `api/authzorization-api-1_0.md`. A GitHub workflow builds this into HTML. See the "Building the spec" section for more details.
+The AuthZEN authorization API is versioned in markdown at `api/authorization-api-1_0.md`. A GitHub workflow builds this into HTML. See the "Building the spec" section for more details.
 
 ## Interop harness
 

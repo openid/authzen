@@ -557,7 +557,7 @@ The `evaluations` request payload includes an OPTIONAL `options` key, with a JSO
 
 This provides a general-purpose mechanism for providing caller-supplied metadata on how the request is to be executed.
 
-One such option conrtols *evaluation semantics*, and is described in {{evaluations-semantics}}.
+One such option controls *evaluation semantics*, and is described in {{evaluations-semantics}}.
 
 A non-normative example of the `options` field is shown below:
 
@@ -634,13 +634,13 @@ Response:
 {
   "evaluations": [
     {
-      decision: true
+      "decision": true
     },
     {
-      decision: false
+      "decision": false
     },
     {
-      decision: true
+      "decision": true
     }
   ]
 }
@@ -689,10 +689,10 @@ Response:
 {
   "evaluations": [
     {
-      decision: true
+      "decision": true
     },
     {
-      decision: false,
+      "decision": false,
       context: {
         "id": "200",
         "reason": "deny_on_first_deny"
@@ -745,7 +745,7 @@ Response:
 {
   "evaluations": [
     {
-      decision: true
+      "decision": true
     }
   ]
 }
@@ -859,7 +859,7 @@ The following payload defines a request for the subjects of type `user` that can
     "type": "user"
   },
   "action": {
-    "name": "can_read",
+    "name": "can_read"
   },
   "resource": {
     "type": "account",
@@ -926,7 +926,7 @@ To retrieve the next page, provide `page.next_token` in the next request:
     "type": "user"
   },
   "action": {
-    "name": "can_read",
+    "name": "can_read"
   },
   "resource": {
     "type": "account",
@@ -985,7 +985,7 @@ The following payload defines a request for the resources of type `account` on w
     "id": "alice@acmecorp.com"
   },
   "action": {
-    "name": "can_read",
+    "name": "can_read"
   },
   "resource": {
     "type": "account"
@@ -1049,7 +1049,7 @@ To retrieve the next page, provide `page.next_token` in the next request:
     "id": "alice@acmecorp.com"
   },
   "action": {
-    "name": "can_read",
+    "name": "can_read"
   },
   "resource": {
     "type": "account"
@@ -1203,7 +1203,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
   },
   "resource": {
     "type": "todo",
-    "id": "1",
+    "id": "1"
   },
   "action": {
     "name": "can_read"
@@ -1335,7 +1335,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
   },
   "resource": {
     "type": "account",
-    "id": "123",
+    "id": "123"
   }
 }
 ~~~
