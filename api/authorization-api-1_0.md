@@ -96,7 +96,7 @@ This document describes the API version 1.0. Any updates to this API through sub
 The information model for requests and responses include the following entities: Subject, Action, Resource, Context, and Decision. These are all defined below.
 
 ## Subject {#subject}
-A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.
+A Subject is the user or machine principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.
 
 A Subject is a JSON ({{RFC8259}}) object that contains two REQUIRED keys, `type` and `id`, which have a value typed `string`, and an OPTIONAL key, `properties`, with a value of a JSON object.
 
@@ -1557,7 +1557,7 @@ The PDP SHOULD apply reasonable protections to avoid common attacks tied to requ
 
 # Terminology
 Subject:
-: The user or robotic principal about whom the Authorization API call is being made.
+: The user or machine principal about whom the Authorization API call is being made.
 
 Resource:
 : The target of the request; the resource about which the Authorization API is being made.
