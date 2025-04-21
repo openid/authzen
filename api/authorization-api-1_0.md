@@ -7,7 +7,7 @@ wg: OpenID AuthZEN
 
 docname: authorization-api-1_0
 
-title: Authorization API 1.0 – draft 04
+title: Authorization API 1.0 – draft 03
 abbrev: azapi
 lang: en
 kw:
@@ -50,11 +50,16 @@ contributor: # Same structure as author list, but goes into contributors
 - name: David Hyland
   org: ID Partners
   email: dave@idpartners.com.au
+- name: Jean-François "Jeff" Lombardo
+  org: AWS
+  email: jeffsec@amazon.com
 
 normative:
   RFC4001: # text representation of IP addresses
   RFC6749: # OAuth
   RFC8259: # JSON
+  RFC5785: # well-known
+  RFC8615: # well-known URIs
   RFC9110: # HTTP Semantics
   XACML:
     title: eXtensible Access Control Markup Language (XACML) Version 1.1
@@ -67,6 +72,15 @@ normative:
       role: editor
       org: Entrust
     date: 2006
+
+informative:
+  RFC7519: # JWT
+  RFC7515: # JWS
+  RFC8126: # Writing for IANA
+  IANA.well_known_uris: # IANA well-known registry
+  RFC9525: # Service Identity in TLS
+  RFC7234: # HTTP caching
+
 
 --- abstract
 
@@ -96,7 +110,7 @@ This document describes the API version 1.0. Any updates to this API through sub
 The information model for requests and responses include the following entities: Subject, Action, Resource, Context, and Decision. These are all defined below.
 
 ## Subject {#subject}
-A Subject is the user or machine principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.
+A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.
 
 A Subject is a JSON ({{RFC8259}}) object that contains two REQUIRED keys, `type` and `id`, which have a value typed `string`, and an OPTIONAL key, `properties`, with a value of a JSON object.
 
@@ -372,7 +386,7 @@ The following is a non-normative example of a Reason Object:
 
 ~~~ json
 {
-  "decision": false,
+  "decision": true,
   "context": {
     "id": "0",
     "reason_admin": {
@@ -557,7 +571,7 @@ The `evaluations` request payload includes an OPTIONAL `options` key, with a JSO
 
 This provides a general-purpose mechanism for providing caller-supplied metadata on how the request is to be executed.
 
-One such option controls *evaluation semantics*, and is described in {{evaluations-semantics}}.
+One such option conrtols *evaluation semantics*, and is described in {{evaluations-semantics}}.
 
 A non-normative example of the `options` field is shown below:
 
@@ -634,13 +648,13 @@ Response:
 {
   "evaluations": [
     {
-      "decision": true
+      decision: true
     },
     {
-      "decision": false
+      decision: false
     },
     {
-      "decision": true
+      decision: true
     }
   ]
 }
@@ -689,10 +703,10 @@ Response:
 {
   "evaluations": [
     {
-      "decision": true
+      decision: true
     },
     {
-      "decision": false,
+      decision: false,
       context: {
         "id": "200",
         "reason": "deny_on_first_deny"
@@ -745,7 +759,7 @@ Response:
 {
   "evaluations": [
     {
-      "decision": true
+      decision: true
     }
   ]
 }
@@ -824,15 +838,9 @@ The Subject Search API defines the message exchange pattern between a client (PE
 
 The Subject Search API is based on the Access Evaluation information model, but omits the Subject ID.
 
-## Subject Search Semantics
-
-While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
-
-In addition, it is RECOMMENDED that a subject search is performed transitively, traversing intermediate attributes and/or relationships. For example, if the members of group G are designated as viewers on a document D, then a search for all users that are viewers of document D will include all the members of group G.
-
 ## The Subject Search API Request {#subject-search-request}
 
-The Subject Search request is a 4-tuple constructed of three previously defined entities:
+The Subject Search request is a 3-tuple constructed of three previously defined entities:
 
 `subject`:
 : REQUIRED. The subject (or principal) of type Subject.  NOTE that the Subject type is REQUIRED but the Subject ID can be omitted, and if present, is IGNORED.
@@ -859,7 +867,7 @@ The following payload defines a request for the subjects of type `user` that can
     "type": "user"
   },
   "action": {
-    "name": "can_read"
+    "name": "can_read",
   },
   "resource": {
     "type": "account",
@@ -926,7 +934,7 @@ To retrieve the next page, provide `page.next_token` in the next request:
     "type": "user"
   },
   "action": {
-    "name": "can_read"
+    "name": "can_read",
   },
   "resource": {
     "type": "account",
@@ -949,15 +957,9 @@ The Resource Search API defines the message exchange pattern between a client (P
 
 The Resource Search API is based on the Access Evaluation information model, but omits the Resource ID.
 
-## Resource Search Semantics
-
-While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
-
-In addition, it is RECOMMENDED that a resource search is performed transitively, traversing intermediate attributes and/or relationships. For example, if user U is a viewer of folder F that contains a set of documents, then a search for all documents that user U can view will include all of the documents in folder F.
-
 ## The Resource Search API Request {#resource-search-request}
 
-The Resource Search request is a 4-tuple constructed of three previously defined entities:
+The Resource Search request is a 3-tuple constructed of three previously defined entities:
 
 `subject`:
 : REQUIRED. The subject (or principal) of type Subject.
@@ -985,7 +987,7 @@ The following payload defines a request for the resources of type `account` on w
     "id": "alice@acmecorp.com"
   },
   "action": {
-    "name": "can_read"
+    "name": "can_read",
   },
   "resource": {
     "type": "account"
@@ -1049,7 +1051,7 @@ To retrieve the next page, provide `page.next_token` in the next request:
     "id": "alice@acmecorp.com"
   },
   "action": {
-    "name": "can_read"
+    "name": "can_read",
   },
   "resource": {
     "type": "account"
@@ -1066,11 +1068,7 @@ Note: page size is implementation-dependent.
 
 The Action Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the actions that match the search criteria.
 
-The Action Search API is based on the Access Evaluation information model, but omits the Action Name.
-
-## Action Search Semantics
-
-While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
+The Action Search API is based on the Access Evaluation information model.
 
 ## The Action Search API Request {#action-search-request}
 
@@ -1177,6 +1175,99 @@ To retrieve the next page, provide `page.next_token` in the next request:
 
 Note: page size is implementation-dependent.
 
+# Policy Decision Point Metadata {#pdp-metadata}
+
+Policy Decision Points can have metadata describing their configuration. 
+
+## Data structure {#pdp-metadata-data}
+
+The following Policy Decision Point metadata parameters are used by this specification and are registered in the IANA "AuthZEN PDP Metadata" registry established in Section 11.1 of [[this specification]].
+
+### Endpoint Parameters {#pdp-metadata-data-endpoint}
+
+issuer:
+: REQUIRED. The policy decision point's issuer identifier, which is a URL that uses the "https" scheme and has no query or fragment components. Policy Decision Point metadata is published at a location that is ".well-known" according to RFC 5785 [RFC5785] derived from this issuer identifier, as described in Section 11.2 of [[this specification]]. The issuer identifier is used to prevent policy decision point mix-up attacks.
+
+access_evaluation_endpoint:
+: REQUIRED. URL of Policy Decision Point Access Evaluation API endpoint
+
+access_evaluations_endpoint:
+: OPTIONAL. URL of Policy Decision Point Access Evaluations API endpoint
+
+search_endpoint_subject:
+: OPTIONAL. URL of Policy Decision Point Search API endpoint for subject element
+
+search_endpoint_action:
+: OPTIONAL. URL of Policy Decision Point Search API endpoint for action element
+
+search_endpoint_resource:
+: OPTIONAL. URL of Policy Decision Point Search API endpoint for resource element
+
+partial_eval_endpoint:
+: OPTIONAL. URL of Policy Decision Point Partial Evaluation API endpoint
+
+Note that the non presence of any of those parameter is sufficient for the policy enforcement point to determine that the policy decision point is not capable and therefore will not return a result for the associated API
+
+### Support Parameters {#pdp-metadata-data-support}
+
+partial_eval_entity_supported:
+: OPTIONAL. JSON array containing a list of strings representing entities among `subject`, `action`, and `resource`. This metadata entry MUST be present if and URL is specified in the `partial_eval_endpoint` entry.
+
+### Signature Parameter {#pdp-metadata-data-sig}
+
+In addition to JSON elements, metadata values MAY also be provided as a signed_metadata value, which is a JSON Web Token [RFC7519] that asserts metadata values about the policy decision point as a bundle. A set of metadata parameters that can be used in signed metadata as claims are defined in Section 11.1 of [[this specification]]. The signed metadata MUST be digitally signed or MACed using JSON Web Signature [RFC7515] and MUST contain an iss (issuer) claim denoting the party attesting to the claims in the signed metadata.
+
+Consumers of the metadata MAY ignore the signed metadata if they do not support this feature. If the consumer of the metadata supports signed metadata, metadata values conveyed in the signed metadata MUST take precedence over the corresponding values conveyed using plain JSON elements. Signed metadata is included in the policy decision point metadata JSON object using this OPTIONAL metadata parameter:
+
+signed_metadata:
+: A JWT containing metadata parameters about the protected resource as claims. This is a string value consisting of the entire signed JWT. A signed_metadata parameter SHOULD NOT appear as a claim in the JWT; it is RECOMMENDED to reject any metadata in which this occurs.
+
+## Obtaining Policy Decision Point Metadata {#pdp-metadata-access}
+
+Policy Decision Point supporting metadata MUST make a JSON document containing metadata as specified in Section 11.1 of [[this specification]]available at a URL formed by inserting a well-known URI string between the host component and the path and/or query components, if any. The well-known URI string used is `/.well-known/authzen-configuration`.
+
+The syntax and semantics of .well-known are defined in [RFC8615]. The well-known URI path suffix used is registered in the IANA "Well-Known URIs" registry [IANA_well_known_uris].
+
+### Policy Decision Point Metadata Request {#pdp-metadata-access-request}
+
+A policy decision point metadata document MUST be queried using an HTTP GET request at the previously specified URL. The consumer of the metadata would make the following request when the resource identifier is https://pdp.mycompany.com:
+
+~~~ http
+GET /.well-known/authzen-configuration HTTP/1.1
+Host: pdp.mycompany.com
+~~~
+
+### Policy Decision Point Metadata Response {#pdp-metadata-access-response}
+
+The response is a set of metadata parameters about the protected resource's configuration. A successful response MUST use the 200 OK HTTP status code and return a JSON object using the application/json content type that contains a set of metadata parameters as its members that are a subset of the metadata parameters defined in Section 11.1 of [[this specification]]. Additional metadata parameters MAY be defined and used; any metadata parameters that are not understood MUST be ignored.
+
+Parameters with multiple values are represented as JSON arrays. Parameters with zero values MUST be omitted from the response.
+
+An error response uses the applicable HTTP status code value.
+
+The following is a non-normative example response:
+
+~~~ http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "issuer": "https://pdp.mycompany.com",
+  "access_evaluation_endpoint": "https://pdp.mycompany.com/access/v1/evaluation",
+  "search_endpoint": "https://pdp.mycompany.com/access/v1/search",
+  "search_endpoint_entity_supported": [
+    "subject",
+    "resource"
+  ]
+}
+~~~
+
+### Policy Decision Point Metadata Validation
+
+The "issuer" value returned MUST be identical to the policy decision point's issuer identifier value into which the well-known URI string was inserted to create the URL used to retrieve the metadata.  If these values are not identical, the data contained in the response MUST NOT be used.
+
+The recipient MUST validate that any signed metadata was signed by a key belonging to the issuer and that the signature is valid. If the signature does not validate or the issuer is not trusted, the recipient SHOULD treat this as an error condition.
+
 # Transport
 
 This specification defines an HTTPS binding which MUST be implemented by a compliant PDP.
@@ -1203,7 +1294,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
   },
   "resource": {
     "type": "todo",
-    "id": "1"
+    "id": "1",
   },
   "action": {
     "name": "can_read"
@@ -1335,7 +1426,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
   },
   "resource": {
     "type": "account",
-    "id": "123"
+    "id": "123",
   }
 }
 ~~~
@@ -1375,7 +1466,7 @@ The Resource Search Request is an HTTPS request with `content-type` of `applicat
 The following is a non-normative example of the HTTPS binding of the Resource Search Request:
 
 ~~~ http
-POST /access/v1/search/resource HTTP/1.1
+POST /access/v1/resource/search HTTP/1.1
 Host: pdp.mycompany.com
 Authorization: Bearer <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
@@ -1553,11 +1644,185 @@ In ABAC, there is occasionally conversations around the trust between PEP and PD
 
 The PDP SHOULD apply reasonable protections to avoid common attacks tied to request payload size, the number of requests, invalid JSON, nested JSON attacks, or memory consumption. Rate limiting is one such way to address such issues.
 
+## Differences between Unsigned and Signed Metadata
+
+Unsigned metadata is integrity protected by use of TLS at the site where it is hosted. This means that its security is dependent upon the Internet Public Key Infrastructure (PKI) [RFC9525]. Signed metadata is additionally integrity protected by the JWS signature applied by the issuer, which is not dependent upon the Internet PKI.
+When using unsigned metadata, the party issuing the metadata is the policy decision point itself. Whereas, when using signed metadata, the party issuing the metadata is represented by the iss (issuer) claim in the signed metadata. When using signed metadata, applications can make trust decisions based on the issuer that performed the signing -- information that is not available when using unsigned metadata. How these trust decisions are made is out of scope for this specification.
+
+## Metadata Caching
+
+Policy decision point metadata is retrieved using an HTTP GET request, as specified in Section 11.2 of [[this specification]]. Normal HTTP caching behaviors apply, meaning that the GET may retrieve a cached copy of the content, rather than the latest copy. Implementations should utlize HTTP caching directives such as Cache-Control with max-age, as defined in [RFC7234], to enable caching of retrieved metadata for appropriate time periods.
+
+# IANA Considerations
+
+The following registration procedure is used for the registry established by this specification.
+
+Values are registered on a Specification Required [RFC8126] basis after a two-week review period on the oauth-ext-review@ietf.org mailing list, on the advice of one or more Designated Experts. However, to allow for the allocation of values prior to publication of the final version of a specification, the Designated Experts may approve registration once they are satisfied that the specification will be completed and published. However, if the specification is not completed and published in a timely manner, as determined by the Designated Experts, the Designated Experts may request that IANA withdraw the registration.
+
+Registration requests sent to the mailing list for review should use an appropriate subject (e.g., "Request to register AuthZEN Policy Decision Point Metadata: example").
+
+Within the review period, the Designated Experts will either approve or deny the registration request, communicating this decision to the review list and IANA. Denials should include an explanation and, if applicable, suggestions as to how to make the request successful. The IANA escalation process is followed when the Designated Experts are not responsive within 14 days.
+
+Criteria that should be applied by the Designated Experts includes determining whether the proposed registration duplicates existing functionality, determining whether it is likely to be of general applicability or whether it is useful only for a single application, and whether the registration makes sense.
+
+IANA must only accept registry updates from the Designated Experts and should direct all requests for registration to the review mailing list.
+
+It is suggested that multiple Designated Experts be appointed who are able to represent the perspectives of different applications using this specification, in order to enable broadly-informed review of registration decisions. In cases where a registration decision could be perceived as creating a conflict of interest for a particular Expert, that Expert should defer to the judgment of the other Experts.
+
+The reason for the use of the mailing list is to enable public review of registration requests, enabling both Designated Experts and other interested parties to provide feedback on proposed registrations. The reason to allow the Designated Experts to allocate values prior to publication as a final specification is to enable giving authors of specifications proposing registrations the benefit of review by the Designated Experts before the specification is completely done, so that if problems are identified, the authors can iterate and fix them before publication of the final specification.
+
+## AuthZEN Policy Decision Point Metadata Registry
+
+This specification establishes the IANA "AuthZEN Policy Decision Point Metadata" registry for AuthZEN policy decision point metadata names. The registry records the policy decision point metadata parameter and a reference to the specification that defines it.
+
+### Registration Template
+
+Metadata Name:
+: The name requested (e.g., "resource"). This name is case-sensitive. Names may not match other registered names in a case-insensitive manner unless the Designated Experts state that there is a compelling reason to allow an exception.
+
+Metadata Description:
+: Brief description of the metadata (e.g., "Resource identifier URL").
+
+Change Controller:
+: For IETF stream RFCs, list the "IETF". For others, give the name of the responsible party. Other details (e.g., postal address, email address, home page URI) may also be included.
+
+Specification Document(s):
+: Reference to the document or documents that specify the parameter, preferably including URIs that can be used to retrieve copies of the documents. An indication of the relevant sections may also be included but is not required.
+
+### Initial Registry Contents
+
+Metadata name:
+: access_evaluation_endpoint
+
+Metadata description:
+: URL of Policy Decision Point Access Evaluation API endpoint
+
+Change Controller:
+: OpenID_Foundation_AuthZEN_Working_Groug
+: mailto:openid-specs-authzen@lists.openid.net
+
+Specification Document(s):
+: Section 11.1.1 of [[this specification]]
+
+
+
+Metadata name:
+: access_evaluations_endpoint
+
+Metadata description:
+: URL of Policy Decision Point Access Evaluations API endpoint
+
+Change Controller:
+: OpenID_Foundation_AuthZEN_Working_Groug
+: mailto:openid-specs-authzen@lists.openid.net
+
+Specification Document(s):
+: Section 11.1.1 of [[this specification]]
+
+
+
+Metadata name:
+: search_endpoint
+
+Metadata description:
+: Section 11.1.1 of [[this specification]]
+
+Change Controller:
+: OpenID_Foundation_AuthZEN_Working_Groug
+: mailto:openid-specs-authzen@lists.openid.net
+
+Specification Document(s):
+: Section X of [[this specification]]
+
+
+
+Metadata name:
+: partial_eval_endpoint
+
+Metadata description:
+: URL of Policy Decision Point Partial Evaluation API endpoint
+
+Change Controller:
+: OpenID_Foundation_AuthZEN_Working_Groug
+: mailto:openid-specs-authzen@lists.openid.net
+
+Specification Document(s):
+: Section 11.1.1 of [[this specification]]
+
+
+
+Metadata name:
+: search_endpoint_entity_supported
+
+Metadata description:
+: JSON array containing a list of strings representing entities
+
+Change Controller:
+: OpenID_Foundation_AuthZEN_Working_Groug
+: mailto:openid-specs-authzen@lists.openid.net
+
+Specification Document(s):
+: Section 11.1.2 of [[this specification]]
+
+
+
+Metadata name:
+: partial_eval_entity_supported
+
+Metadata description:
+: JSON array containing a list of strings representing entities
+
+Change Controller:
+: OpenID_Foundation_AuthZEN_Working_Groug
+: mailto:openid-specs-authzen@lists.openid.net
+
+Specification Document(s):
+: Section 11.1.2 of [[this specification]]
+
+
+
+Metadata name:
+: signed_metadata
+
+Metadata description:
+: JWT containing metadata parameters about the protected resource as claims.
+
+Change Controller:
+: OpenID_Foundation_AuthZEN_Working_Groug
+: mailto:openid-specs-authzen@lists.openid.net
+
+Specification Document(s):
+: Section 11.1.3 of [[this specification]]
+
+
+
+## Well-Known URI Registry
+
+This specification registers the well-known URI defined in Section 3 in the IANA "Well-Known URIs" registry [IANA_well_known_uris].
+
+### Registry Contents
+
+URI Suffix:
+: authzen-configuration
+
+Reference:
+: Section 11.2 of [[this specification]]
+
+Status:
+: permanent
+
+Change Controller:
+: OpenID_Foundation_AuthZEN_Working_Groug
+: mailto:openid-specs-authzen@lists.openid.net
+
+Related Information:
+: (none)
+
 --- back
 
 # Terminology
 Subject:
-: The user or machine principal about whom the Authorization API call is being made.
+: The user or robotic principal about whom the Authorization API call is being made.
 
 Resource:
 : The target of the request; the resource about which the Authorization API is being made.
