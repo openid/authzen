@@ -1194,24 +1194,25 @@ access_evaluation_endpoint:
 access_evaluations_endpoint:
 : OPTIONAL. URL of Policy Decision Point Access Evaluations API endpoint
 
-search_endpoint_subject:
+search_subject_endpoint:
 : OPTIONAL. URL of Policy Decision Point Search API endpoint for subject element
 
-search_endpoint_action:
+search_action_endpoint:
 : OPTIONAL. URL of Policy Decision Point Search API endpoint for action element
 
-search_endpoint_resource:
+search_resource_endpoint:
 : OPTIONAL. URL of Policy Decision Point Search API endpoint for resource element
 
-partial_eval_endpoint:
-: OPTIONAL. URL of Policy Decision Point Partial Evaluation API endpoint
+partial_eval_user_endpoint:
+: OPTIONAL. URL of Policy Decision Point Partial Evaluation API endpoint for subject element
+
+partial_eval_action_endpoint:
+: OPTIONAL. URL of Policy Decision Point Partial Evaluation API endpoint for action element
+
+partial_eval_resource_endpoint:
+: OPTIONAL. URL of Policy Decision Point Partial Evaluation API endpoint for resource element
 
 Note that the non presence of any of those parameter is sufficient for the policy enforcement point to determine that the policy decision point is not capable and therefore will not return a result for the associated API
-
-### Support Parameters {#pdp-metadata-data-support}
-
-partial_eval_entity_supported:
-: OPTIONAL. JSON array containing a list of strings representing entities among `subject`, `action`, and `resource`. This metadata entry MUST be present if and URL is specified in the `partial_eval_endpoint` entry.
 
 ### Signature Parameter {#pdp-metadata-data-sig}
 
@@ -1254,11 +1255,9 @@ Content-Type: application/json
 {
   "issuer": "https://pdp.mycompany.com",
   "access_evaluation_endpoint": "https://pdp.mycompany.com/access/v1/evaluation",
-  "search_endpoint": "https://pdp.mycompany.com/access/v1/search",
-  "search_endpoint_entity_supported": [
-    "subject",
-    "resource"
-  ]
+  "search_user_endpoint": "https://pdp.mycompany.com/access/v1/search/user",
+  "search_resource_endpoint": "https://pdp.mycompany.com/access/v1/search/resource",
+  "partial_eval_action_endpoint": "https://pdp.mycompany.com/access/v1/partial_eval/action"
 }
 ~~~
 
