@@ -1257,7 +1257,7 @@ The "issuer" value returned MUST be identical to the policy decision point's iss
 
 The recipient MUST validate that any signed metadata was signed by a key belonging to the issuer and that the signature is valid. If the signature does not validate or the issuer is not trusted, the recipient SHOULD treat this as an error condition.
 
-# Transport {#pdp-metadata-data-endpoint-transport}
+# Transport {#transport}
 
 This specification defines an HTTPS binding which MUST be implemented by a compliant PDP.
 
