@@ -7,7 +7,7 @@ wg: OpenID AuthZEN
 
 docname: authorization-api-1_0
 
-title: Authorization API 1.0 – draft 03
+title: Authorization API 1.0 – draft 04
 abbrev: azapi
 lang: en
 kw:
@@ -571,7 +571,7 @@ The `evaluations` request payload includes an OPTIONAL `options` key, with a JSO
 
 This provides a general-purpose mechanism for providing caller-supplied metadata on how the request is to be executed.
 
-One such option conrtols *evaluation semantics*, and is described in {{evaluations-semantics}}.
+One such option controls *evaluation semantics*, and is described in {{evaluations-semantics}}.
 
 A non-normative example of the `options` field is shown below:
 
@@ -1181,12 +1181,12 @@ Policy Decision Points can have metadata describing their configuration.
 
 ## Data structure {#pdp-metadata-data}
 
-The following Policy Decision Point metadata parameters are used by this specification and are registered in the IANA "AuthZEN PDP Metadata" registry established in Section 11.1 of [[this specification]].
+The following Policy Decision Point metadata parameters are used by this specification and are registered in the IANA "AuthZEN PDP Metadata" registry established in {{iana-pdp-registry}}.
 
 ### Endpoint Parameters {#pdp-metadata-data-endpoint}
 
 issuer:
-: REQUIRED. The policy decision point's issuer identifier, which is a URL that uses the "https" scheme and has no query or fragment components. Policy Decision Point metadata is published at a location that is ".well-known" according to RFC 5785 [RFC5785] derived from this issuer identifier, as described in Section 11.2 of [[this specification]]. The issuer identifier is used to prevent policy decision point mix-up attacks.
+: REQUIRED. The policy decision point's issuer identifier, which is a URL that uses the "https" scheme and has no query or fragment components. Policy Decision Point metadata is published at a location that is ".well-known" according to {{RFC5785}} derived from this issuer identifier, as described in {{pdp-metadata-access}}. The issuer identifier is used to prevent policy decision point mix-up attacks.
 
 access_evaluation_endpoint:
 : REQUIRED. URL of Policy Decision Point Access Evaluation API endpoint
@@ -1203,20 +1203,11 @@ search_action_endpoint:
 search_resource_endpoint:
 : OPTIONAL. URL of Policy Decision Point Search API endpoint for resource element
 
-partial_eval_user_endpoint:
-: OPTIONAL. URL of Policy Decision Point Partial Evaluation API endpoint for subject element
-
-partial_eval_action_endpoint:
-: OPTIONAL. URL of Policy Decision Point Partial Evaluation API endpoint for action element
-
-partial_eval_resource_endpoint:
-: OPTIONAL. URL of Policy Decision Point Partial Evaluation API endpoint for resource element
-
 Note that the non presence of any of those parameter is sufficient for the policy enforcement point to determine that the policy decision point is not capable and therefore will not return a result for the associated API
 
 ### Signature Parameter {#pdp-metadata-data-sig}
 
-In addition to JSON elements, metadata values MAY also be provided as a signed_metadata value, which is a JSON Web Token [RFC7519] that asserts metadata values about the policy decision point as a bundle. A set of metadata parameters that can be used in signed metadata as claims are defined in Section 11.1 of [[this specification]]. The signed metadata MUST be digitally signed or MACed using JSON Web Signature [RFC7515] and MUST contain an iss (issuer) claim denoting the party attesting to the claims in the signed metadata.
+In addition to JSON elements, metadata values MAY also be provided as a signed_metadata value, which is a JSON Web Token {{RFC7519}} that asserts metadata values about the policy decision point as a bundle. A set of metadata parameters that can be used in signed metadata as claims are defined in {{pdp-metadata-data-endpoint}}. The signed metadata MUST be digitally signed or MACed using JSON Web Signature {{RFC7515}} and MUST contain an iss (issuer) claim denoting the party attesting to the claims in the signed metadata.
 
 Consumers of the metadata MAY ignore the signed metadata if they do not support this feature. If the consumer of the metadata supports signed metadata, metadata values conveyed in the signed metadata MUST take precedence over the corresponding values conveyed using plain JSON elements. Signed metadata is included in the policy decision point metadata JSON object using this OPTIONAL metadata parameter:
 
@@ -1225,9 +1216,9 @@ signed_metadata:
 
 ## Obtaining Policy Decision Point Metadata {#pdp-metadata-access}
 
-Policy Decision Point supporting metadata MUST make a JSON document containing metadata as specified in Section 11.1 of [[this specification]]available at a URL formed by inserting a well-known URI string between the host component and the path and/or query components, if any. The well-known URI string used is `/.well-known/authzen-configuration`.
+Policy Decision Point supporting metadata MUST make a JSON document containing metadata as specified in {{pdp-metadata-data-endpoint}} available at a URL formed by inserting a well-known URI string between the host component and the path and/or query components, if any. The well-known URI string used is `/.well-known/authzen-configuration`.
 
-The syntax and semantics of .well-known are defined in [RFC8615]. The well-known URI path suffix used is registered in the IANA "Well-Known URIs" registry [IANA_well_known_uris].
+The syntax and semantics of .well-known are defined in {{RFC8615}}. The well-known URI path suffix used is registered in the IANA "Well-Known URIs" registry {{IANA.well_known_uris}}.
 
 ### Policy Decision Point Metadata Request {#pdp-metadata-access-request}
 
@@ -1240,7 +1231,7 @@ Host: pdp.mycompany.com
 
 ### Policy Decision Point Metadata Response {#pdp-metadata-access-response}
 
-The response is a set of metadata parameters about the protected resource's configuration. A successful response MUST use the 200 OK HTTP status code and return a JSON object using the application/json content type that contains a set of metadata parameters as its members that are a subset of the metadata parameters defined in Section 11.1 of [[this specification]]. Additional metadata parameters MAY be defined and used; any metadata parameters that are not understood MUST be ignored.
+The response is a set of metadata parameters about the protected resource's configuration. A successful response MUST use the `200 OK HTTP` status code and return a JSON object using the `application/json` content type that contains a set of metadata parameters as its members that are a subset of the metadata parameters defined in {{pdp-metadata-data-endpoint}}. Additional metadata parameters MAY be defined and used; any metadata parameters that are not understood MUST be ignored.
 
 Parameters with multiple values are represented as JSON arrays. Parameters with zero values MUST be omitted from the response.
 
@@ -1256,18 +1247,17 @@ Content-Type: application/json
   "issuer": "https://pdp.mycompany.com",
   "access_evaluation_endpoint": "https://pdp.mycompany.com/access/v1/evaluation",
   "search_user_endpoint": "https://pdp.mycompany.com/access/v1/search/user",
-  "search_resource_endpoint": "https://pdp.mycompany.com/access/v1/search/resource",
-  "partial_eval_action_endpoint": "https://pdp.mycompany.com/access/v1/partial_eval/action"
+  "search_resource_endpoint": "https://pdp.mycompany.com/access/v1/search/resource"
 }
 ~~~
 
-### Policy Decision Point Metadata Validation
+### Policy Decision Point Metadata Validation {#pdp-metadata-data-endpoint-validation}
 
 The "issuer" value returned MUST be identical to the policy decision point's issuer identifier value into which the well-known URI string was inserted to create the URL used to retrieve the metadata.  If these values are not identical, the data contained in the response MUST NOT be used.
 
 The recipient MUST validate that any signed metadata was signed by a key belonging to the issuer and that the signature is valid. If the signature does not validate or the issuer is not trusted, the recipient SHOULD treat this as an error condition.
 
-# Transport
+# Transport {#pdp-metadata-data-endpoint-transport}
 
 This specification defines an HTTPS binding which MUST be implemented by a compliant PDP.
 
@@ -1608,10 +1598,6 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-response-request-id title="Example HTTPS response with a Request Id Header"}
 
-# IANA Considerations {#IANA}
-
-This specification does not introduce any new identifiers that would require registration with IANA.
-
 # Security Considerations {#Security}
 
 ## Communication Integrity and Confidentiality
@@ -1650,13 +1636,13 @@ When using unsigned metadata, the party issuing the metadata is the policy decis
 
 ## Metadata Caching
 
-Policy decision point metadata is retrieved using an HTTP GET request, as specified in Section 11.2 of [[this specification]]. Normal HTTP caching behaviors apply, meaning that the GET may retrieve a cached copy of the content, rather than the latest copy. Implementations should utlize HTTP caching directives such as Cache-Control with max-age, as defined in [RFC7234], to enable caching of retrieved metadata for appropriate time periods.
+Policy decision point metadata is retrieved using an HTTP GET request, as specified in Section 11.2 of [[this specification]]. Normal HTTP caching behaviors apply, meaning that the GET may retrieve a cached copy of the content, rather than the latest copy. Implementations should utilize HTTP caching directives such as Cache-Control with max-age, as defined in {{RFC7234}}, to enable caching of retrieved metadata for appropriate time periods.
 
-# IANA Considerations
+# IANA Considerations {#iana}
 
 The following registration procedure is used for the registry established by this specification.
 
-Values are registered on a Specification Required [RFC8126] basis after a two-week review period on the oauth-ext-review@ietf.org mailing list, on the advice of one or more Designated Experts. However, to allow for the allocation of values prior to publication of the final version of a specification, the Designated Experts may approve registration once they are satisfied that the specification will be completed and published. However, if the specification is not completed and published in a timely manner, as determined by the Designated Experts, the Designated Experts may request that IANA withdraw the registration.
+Values are registered on a Specification Required {{RFC8126}} basis after a two-week review period on the oauth-ext-review@ietf.org mailing list, on the advice of one or more Designated Experts. However, to allow for the allocation of values prior to publication of the final version of a specification, the Designated Experts may approve registration once they are satisfied that the specification will be completed and published. However, if the specification is not completed and published in a timely manner, as determined by the Designated Experts, the Designated Experts may request that IANA withdraw the registration.
 
 Registration requests sent to the mailing list for review should use an appropriate subject (e.g., "Request to register AuthZEN Policy Decision Point Metadata: example").
 
@@ -1670,11 +1656,11 @@ It is suggested that multiple Designated Experts be appointed who are able to re
 
 The reason for the use of the mailing list is to enable public review of registration requests, enabling both Designated Experts and other interested parties to provide feedback on proposed registrations. The reason to allow the Designated Experts to allocate values prior to publication as a final specification is to enable giving authors of specifications proposing registrations the benefit of review by the Designated Experts before the specification is completely done, so that if problems are identified, the authors can iterate and fix them before publication of the final specification.
 
-## AuthZEN Policy Decision Point Metadata Registry
+## AuthZEN Policy Decision Point Metadata Registry {#iana-pdp-registry}
 
 This specification establishes the IANA "AuthZEN Policy Decision Point Metadata" registry for AuthZEN policy decision point metadata names. The registry records the policy decision point metadata parameter and a reference to the specification that defines it.
 
-### Registration Template
+### Registration Template {#iana-pdp-registry-template}
 
 Metadata Name:
 : The name requested (e.g., "resource"). This name is case-sensitive. Names may not match other registered names in a case-insensitive manner unless the Designated Experts state that there is a compelling reason to allow an exception.
@@ -1688,7 +1674,7 @@ Change Controller:
 Specification Document(s):
 : Reference to the document or documents that specify the parameter, preferably including URIs that can be used to retrieve copies of the documents. An indication of the relevant sections may also be included but is not required.
 
-### Initial Registry Contents
+### Initial Registry Contents {#iana-pdp-registry-content}
 
 Metadata name:
 : access_evaluation_endpoint
@@ -1701,7 +1687,7 @@ Change Controller:
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section 11.1.1 of [[this specification]]
+: Section {{pdp-metadata-data-endpoint}}
 
 
 
@@ -1716,67 +1702,38 @@ Change Controller:
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section 11.1.1 of [[this specification]]
+: Section {{pdp-metadata-data-endpoint}}
 
 
 
 Metadata name:
-: search_endpoint
+: search_subject_endpoint
 
 Metadata description:
-: Section 11.1.1 of [[this specification]]
+: URL of the Search Endpooint based on Subject element
 
 Change Controller:
 : OpenID_Foundation_AuthZEN_Working_Groug
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section X of [[this specification]]
+: Section {{pdp-metadata-data-endpoint}}
+
 
 
 
 Metadata name:
-: partial_eval_endpoint
+: search_resource_endpoint
 
 Metadata description:
-: URL of Policy Decision Point Partial Evaluation API endpoint
+: URL of the Search Endpooint based on Resource element
 
 Change Controller:
 : OpenID_Foundation_AuthZEN_Working_Groug
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section 11.1.1 of [[this specification]]
-
-
-
-Metadata name:
-: search_endpoint_entity_supported
-
-Metadata description:
-: JSON array containing a list of strings representing entities
-
-Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Groug
-: mailto:openid-specs-authzen@lists.openid.net
-
-Specification Document(s):
-: Section 11.1.2 of [[this specification]]
-
-
-
-Metadata name:
-: partial_eval_entity_supported
-
-Metadata description:
-: JSON array containing a list of strings representing entities
-
-Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Groug
-: mailto:openid-specs-authzen@lists.openid.net
-
-Specification Document(s):
-: Section 11.1.2 of [[this specification]]
+: Section {{pdp-metadata-data-endpoint}}
 
 
 
@@ -1791,21 +1748,21 @@ Change Controller:
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section 11.1.3 of [[this specification]]
+: Section {{pdp-metadata-data-endpoint}}
 
 
 
-## Well-Known URI Registry
+## Well-Known URI Registry {#iana-wk-registry}
 
-This specification registers the well-known URI defined in Section 3 in the IANA "Well-Known URIs" registry [IANA_well_known_uris].
+This specification registers the well-known URI defined in Section 3 in the IANA "Well-Known URIs" registry {{IANA.well_known_uris}}.
 
-### Registry Contents
+### Registry Contents {#iana-wk-registry-content}
 
 URI Suffix:
 : authzen-configuration
 
 Reference:
-: Section 11.2 of [[this specification]]
+: Section {{pdp-metadata-data-endpoint}}
 
 Status:
 : permanent
