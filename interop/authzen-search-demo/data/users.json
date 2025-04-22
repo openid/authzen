@@ -1,0 +1,32 @@
+[
+	{
+		"name": "alice",
+		"role": "manager",
+		"department": "Sales"
+	},
+	{
+		"name": "bob",
+		"role": "employee",
+		"department": "Legal"
+	},
+	{
+		"name": "carol",
+		"role": "contractor",
+		"department": "Legal"
+	},
+	{
+		"name": "dan",
+		"role": "manager",
+		"department": "Finance"
+	},
+	{
+		"name": "erin",
+		"role": "employee",
+		"department": "Finance"
+	},
+	{
+		"name": "felix",
+		"role": "contractor",
+		"department": "Accounting"
+	}
+]
