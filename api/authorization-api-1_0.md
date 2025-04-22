@@ -818,19 +818,21 @@ The following is a non-normative example of a response to an Access Evaluations 
 }
 ~~~
 
-# Subject Search API {#subject-search-api}
+# Search API
+
+## Subject Search API {#subject-search-api}
 
 The Subject Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the subjects that match the search criteria.
 
 The Subject Search API is based on the Access Evaluation information model, but omits the Subject ID.
 
-## Subject Search Semantics
+### Subject Search Semantics
 
 While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
 
 In addition, it is RECOMMENDED that a subject search is performed transitively, traversing intermediate attributes and/or relationships. For example, if the members of group G are designated as viewers on a document D, then a search for all users that are viewers of document D will include all the members of group G.
 
-## The Subject Search API Request {#subject-search-request}
+### The Subject Search API Request {#subject-search-request}
 
 The Subject Search request is a 4-tuple constructed of three previously defined entities:
 
@@ -849,7 +851,7 @@ The Subject Search request is a 4-tuple constructed of three previously defined 
 `page`:
 : OPTIONAL. A page token for paged requests.
 
-### Example (non-normative)
+#### Example (non-normative)
 
 The following payload defines a request for the subjects of type `user` that can perform the `can_read` action on the resource of type `account` and ID `123`.
 
@@ -872,7 +874,7 @@ The following payload defines a request for the subjects of type `user` that can
 ~~~
 {: #subject-search-request-example title="Example Request"}
 
-## The Subject Search API Response {#subject-search-response}
+### The Subject Search API Response {#subject-search-response}
 
 The response is a paged array of Subjects.
 
@@ -894,11 +896,11 @@ The response is a paged array of Subjects.
 }
 ~~~
 
-### Paged requests
+#### Paged requests
 
 A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
 
-#### Example
+##### Example
 
 ~~~ json
 {
@@ -943,19 +945,19 @@ To retrieve the next page, provide `page.next_token` in the next request:
 
 Note: page size is implementation-dependent.
 
-# Resource Search API {#resource-search-api}
+## Resource Search API {#resource-search-api}
 
 The Resource Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the resources that match the search criteria.
 
 The Resource Search API is based on the Access Evaluation information model, but omits the Resource ID.
 
-## Resource Search Semantics
+### Resource Search Semantics
 
 While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
 
 In addition, it is RECOMMENDED that a resource search is performed transitively, traversing intermediate attributes and/or relationships. For example, if user U is a viewer of folder F that contains a set of documents, then a search for all documents that user U can view will include all of the documents in folder F.
 
-## The Resource Search API Request {#resource-search-request}
+### The Resource Search API Request {#resource-search-request}
 
 The Resource Search request is a 4-tuple constructed of three previously defined entities:
 
@@ -974,7 +976,7 @@ The Resource Search request is a 4-tuple constructed of three previously defined
 `page`:
 : OPTIONAL. A page token for paged requests.
 
-### Example (non-normative)
+#### Example (non-normative)
 
 The following payload defines a request for the resources of type `account` on which the subject of type `user` and ID `alice@acmecorp.com` can perform the `can_read` action.
 
@@ -994,7 +996,7 @@ The following payload defines a request for the resources of type `account` on w
 ~~~
 {: #resource-search-request-example title="Example Request"}
 
-## The Resource Search API Response {#resource-search-response}
+### The Resource Search API Response {#resource-search-response}
 
 The response is a paged array of Resources.
 
@@ -1016,11 +1018,11 @@ The response is a paged array of Resources.
 }
 ~~~
 
-### Paged requests
+#### Paged requests
 
 A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
 
-#### Example
+##### Example
 
 ~~~ json
 {
@@ -1062,17 +1064,17 @@ To retrieve the next page, provide `page.next_token` in the next request:
 
 Note: page size is implementation-dependent.
 
-# Action Search API {#action-search-api}
+## Action Search API {#action-search-api}
 
 The Action Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the actions that match the search criteria.
 
 The Action Search API is based on the Access Evaluation information model, but omits the Action Name.
 
-## Action Search Semantics
+### Action Search Semantics
 
 While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
 
-## The Action Search API Request {#action-search-request}
+### The Action Search API Request {#action-search-request}
 
 The Action Search request is a 3-tuple constructed of three previously defined entities:
 
@@ -1088,7 +1090,7 @@ The Action Search request is a 3-tuple constructed of three previously defined e
 `page`:
 : OPTIONAL. A page token for paged requests.
 
-### Example (non-normative)
+#### Example (non-normative)
 
 The following payload defines a request for the actions that the subject of type user and ID may perform on the resource of type account and ID 123 at 01:22 AM.
 
@@ -1109,7 +1111,7 @@ The following payload defines a request for the actions that the subject of type
 ~~~
 {: #action-search-request-example title="Example Request"}
 
-## The Action Search API Response {#action-search-response}
+### The Action Search API Response {#action-search-response}
 
 The response is a paged array of Actions.
 
@@ -1130,11 +1132,11 @@ The response is a paged array of Actions.
 ~~~
 {: #action-search-response-example title="Example Response"}
 
-### Paged requests
+#### Paged requests
 
 A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
 
-#### Example
+##### Example
 
 ~~~ json
 {
