@@ -50,7 +50,8 @@ contributor: # Same structure as author list, but goes into contributors
 - name: David Hyland
   org: ID Partners
   email: dave@idpartners.com.au
-- name: Jean-François "Jeff" Lombardo
+- name: Jean-François Lombardo
+  nickname: Jeff
   org: AWS
   email: jeffsec@amazon.com
 
@@ -81,7 +82,6 @@ informative:
   RFC9525: # Service Identity in TLS
   RFC7234: # HTTP caching
 
-
 --- abstract
 
 The Authorization API enables Policy Decision Points (PDPs) and Policy Enforcement Points (PEPs) to communicate authorization requests and decisions to each other without requiring knowledge of each other's inner workings. The Authorization API is served by the PDP and is called by the PEP. The Authorization API includes an Evaluation endpoint, which provides specific access decisions. Other endpoints may be added in the future for other scenarios, including searching for subjects, resources or actions.
@@ -110,7 +110,7 @@ This document describes the API version 1.0. Any updates to this API through sub
 The information model for requests and responses include the following entities: Subject, Action, Resource, Context, and Decision. These are all defined below.
 
 ## Subject {#subject}
-A Subject is the user or robotic principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.
+A Subject is the user or machine principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.
 
 A Subject is a JSON ({{RFC8259}}) object that contains two REQUIRED keys, `type` and `id`, which have a value typed `string`, and an OPTIONAL key, `properties`, with a value of a JSON object.
 
@@ -386,7 +386,7 @@ The following is a non-normative example of a Reason Object:
 
 ~~~ json
 {
-  "decision": true,
+  "decision": false,
   "context": {
     "id": "0",
     "reason_admin": {
@@ -648,13 +648,13 @@ Response:
 {
   "evaluations": [
     {
-      decision: true
+      "decision": true
     },
     {
-      decision: false
+      "decision": false
     },
     {
-      decision: true
+      "decision": true
     }
   ]
 }
@@ -703,10 +703,10 @@ Response:
 {
   "evaluations": [
     {
-      decision: true
+      "decision": true
     },
     {
-      decision: false,
+      "decision": false,
       context: {
         "id": "200",
         "reason": "deny_on_first_deny"
@@ -759,7 +759,7 @@ Response:
 {
   "evaluations": [
     {
-      decision: true
+      "decision": true
     }
   ]
 }
@@ -838,9 +838,15 @@ The Subject Search API defines the message exchange pattern between a client (PE
 
 The Subject Search API is based on the Access Evaluation information model, but omits the Subject ID.
 
+## Subject Search Semantics
+
+While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
+
+In addition, it is RECOMMENDED that a subject search is performed transitively, traversing intermediate attributes and/or relationships. For example, if the members of group G are designated as viewers on a document D, then a search for all users that are viewers of document D will include all the members of group G.
+
 ## The Subject Search API Request {#subject-search-request}
 
-The Subject Search request is a 3-tuple constructed of three previously defined entities:
+The Subject Search request is a 4-tuple constructed of three previously defined entities:
 
 `subject`:
 : REQUIRED. The subject (or principal) of type Subject.  NOTE that the Subject type is REQUIRED but the Subject ID can be omitted, and if present, is IGNORED.
@@ -867,7 +873,7 @@ The following payload defines a request for the subjects of type `user` that can
     "type": "user"
   },
   "action": {
-    "name": "can_read",
+    "name": "can_read"
   },
   "resource": {
     "type": "account",
@@ -934,7 +940,7 @@ To retrieve the next page, provide `page.next_token` in the next request:
     "type": "user"
   },
   "action": {
-    "name": "can_read",
+    "name": "can_read"
   },
   "resource": {
     "type": "account",
@@ -957,9 +963,15 @@ The Resource Search API defines the message exchange pattern between a client (P
 
 The Resource Search API is based on the Access Evaluation information model, but omits the Resource ID.
 
+## Resource Search Semantics
+
+While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
+
+In addition, it is RECOMMENDED that a resource search is performed transitively, traversing intermediate attributes and/or relationships. For example, if user U is a viewer of folder F that contains a set of documents, then a search for all documents that user U can view will include all of the documents in folder F.
+
 ## The Resource Search API Request {#resource-search-request}
 
-The Resource Search request is a 3-tuple constructed of three previously defined entities:
+The Resource Search request is a 4-tuple constructed of three previously defined entities:
 
 `subject`:
 : REQUIRED. The subject (or principal) of type Subject.
@@ -987,7 +999,7 @@ The following payload defines a request for the resources of type `account` on w
     "id": "alice@acmecorp.com"
   },
   "action": {
-    "name": "can_read",
+    "name": "can_read"
   },
   "resource": {
     "type": "account"
@@ -1051,7 +1063,7 @@ To retrieve the next page, provide `page.next_token` in the next request:
     "id": "alice@acmecorp.com"
   },
   "action": {
-    "name": "can_read",
+    "name": "can_read"
   },
   "resource": {
     "type": "account"
@@ -1068,7 +1080,11 @@ Note: page size is implementation-dependent.
 
 The Action Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the actions that match the search criteria.
 
-The Action Search API is based on the Access Evaluation information model.
+The Action Search API is based on the Access Evaluation information model, but omits the Action Name.
+
+## Action Search Semantics
+
+While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
 
 ## The Action Search API Request {#action-search-request}
 
@@ -1257,7 +1273,7 @@ The "issuer" value returned MUST be identical to the policy decision point's iss
 
 The recipient MUST validate that any signed metadata was signed by a key belonging to the issuer and that the signature is valid. If the signature does not validate or the issuer is not trusted, the recipient SHOULD treat this as an error condition.
 
-# Transport {#transport}
+# Transport
 
 This specification defines an HTTPS binding which MUST be implemented by a compliant PDP.
 
@@ -1283,7 +1299,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
   },
   "resource": {
     "type": "todo",
-    "id": "1",
+    "id": "1"
   },
   "action": {
     "name": "can_read"
@@ -1415,7 +1431,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
   },
   "resource": {
     "type": "account",
-    "id": "123",
+    "id": "123"
   }
 }
 ~~~
@@ -1455,7 +1471,7 @@ The Resource Search Request is an HTTPS request with `content-type` of `applicat
 The following is a non-normative example of the HTTPS binding of the Resource Search Request:
 
 ~~~ http
-POST /access/v1/resource/search HTTP/1.1
+POST /access/v1/search/resource HTTP/1.1
 Host: pdp.mycompany.com
 Authorization: Bearer <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
@@ -1600,7 +1616,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 # Security Considerations {#Security}
 
-## Communication Integrity and Confidentiality
+## Communication Integrity and Confidentiality {#security-integrity-confidentiality}
 
 In the ABAC architecture, the PEP-PDP connection is the most sensitive one and needs to be secured to guarantee:
 
@@ -1609,7 +1625,7 @@ In the ABAC architecture, the PEP-PDP connection is the most sensitive one and n
 
 As a result, the connection between the PEP and the PDP MUST be secured using the most adequate means given the choice of transport (e.g. TLS for HTTP REST).
 
-## Policy Confidentiality and Sender Authentication
+## Policy Confidentiality and Sender Authentication {#security-confidentiality-authn}
 
 Additionally, the PDP SHOULD authenticate the calling PEP. There are several ways authentication can be established. These ways are out of scope of this specification. They MAY include:
 
@@ -1621,22 +1637,22 @@ The choice and strength of either mechanism is not in scope.
 
 Authenticating the PEP allows the PDP to avoid common attacks (such as DoS - see below) and/or reveal its internal policies. A malicious actor could craft a large number of requests to try and understand what policies the PDP is configured with. Requesting a client (PEP) be authenticated mitigates that risk.
 
-## Trust
+## Trust {#security-trust}
 
 In ABAC, there is occasionally conversations around the trust between PEP and PDP: how can the PDP trust the PEP to send the right values in? This is a misplaced concern. The PDP must trust the PEP as ultimately, the PEP is the one responsible for enforcing the decision the PDP produces.
 
-## Availability & Denial of Service
+## Availability & Denial of Service {#security-avail-dos}}
 
 The PDP SHOULD apply reasonable protections to avoid common attacks tied to request payload size, the number of requests, invalid JSON, nested JSON attacks, or memory consumption. Rate limiting is one such way to address such issues.
 
-## Differences between Unsigned and Signed Metadata
+## Differences between Unsigned and Signed Metadata {#security-metadata-sig}
 
 Unsigned metadata is integrity protected by use of TLS at the site where it is hosted. This means that its security is dependent upon the Internet Public Key Infrastructure (PKI) [RFC9525]. Signed metadata is additionally integrity protected by the JWS signature applied by the issuer, which is not dependent upon the Internet PKI.
 When using unsigned metadata, the party issuing the metadata is the policy decision point itself. Whereas, when using signed metadata, the party issuing the metadata is represented by the iss (issuer) claim in the signed metadata. When using signed metadata, applications can make trust decisions based on the issuer that performed the signing -- information that is not available when using unsigned metadata. How these trust decisions are made is out of scope for this specification.
 
-## Metadata Caching
+## Metadata Caching {#security-metadata-caching}
 
-Policy decision point metadata is retrieved using an HTTP GET request, as specified in Section 11.2 of [[this specification]]. Normal HTTP caching behaviors apply, meaning that the GET may retrieve a cached copy of the content, rather than the latest copy. Implementations should utilize HTTP caching directives such as Cache-Control with max-age, as defined in {{RFC7234}}, to enable caching of retrieved metadata for appropriate time periods.
+Policy decision point metadata is retrieved using an HTTP GET request, as specified in {{pdp-metadata-access-request}}. Normal HTTP caching behaviors apply, meaning that the GET may retrieve a cached copy of the content, rather than the latest copy. Implementations should utilize HTTP caching directives such as Cache-Control with max-age, as defined in {{RFC7234}}, to enable caching of retrieved metadata for appropriate time periods.
 
 # IANA Considerations {#iana}
 
@@ -1774,11 +1790,12 @@ Change Controller:
 Related Information:
 : (none)
 
+
 --- back
 
 # Terminology
 Subject:
-: The user or robotic principal about whom the Authorization API call is being made.
+: The user or machine principal about whom the Authorization API call is being made.
 
 Resource:
 : The target of the request; the resource about which the Authorization API is being made.
