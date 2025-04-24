@@ -2,7 +2,7 @@
 stand_alone: true
 ipr: none
 cat: std # Check
-subm`iss`iontype: IETF
+submissiontype: IETF
 wg: OpenID AuthZEN
 
 docname: authorization-api-1_0
@@ -593,7 +593,7 @@ By default, every request in the `evaluations` array is executed and a response 
 With that said, three evaluation semantics are supported:
 
 1. *Execute all of the requests (potentially in parallel), return all of the results.* Any failure can be denoted by `decision: false` and MAY provide a reason code in the context.
-2. *Deny on first denial (or failure).* This semantic could be desired if a PEP wants to `iss`ue a few requests in a particular order, with any denial (error, or `decision: false`) "short-circuiting" the evaluations call and returning on the first denial. This essentially works like the `&&` operator in programming languages.
+2. *Deny on first denial (or failure).* This semantic could be desired if a PEP wants to issue a few requests in a particular order, with any denial (error, or `decision: false`) "short-circuiting" the evaluations call and returning on the first denial. This essentially works like the `&&` operator in programming languages.
 3. *Permit on first permit.* This is the converse "short-circuiting" semantic, working like the `||` operator in programming languages.
 
 To select the desired evaluations semantic, a caller can pass in `options.evaluations_semantic` with exactly one of the following values:
@@ -1644,12 +1644,12 @@ In ABAC, there is occasionally conversations around the trust between PEP and PD
 
 ## Availability & Denial of Service {#security-avail-dos}}
 
-The PDP SHOULD apply reasonable protections to avoid common attacks tied to request payload size, the number of requests, invalid JSON, nested JSON attacks, or memory consumption. Rate limiting is one such way to address such `iss`ues.
+The PDP SHOULD apply reasonable protections to avoid common attacks tied to request payload size, the number of requests, invalid JSON, nested JSON attacks, or memory consumption. Rate limiting is one such way to address such issues.
 
 ## Differences between Unsigned and Signed Metadata {#security-metadata-sig}
 
 Unsigned metadata is integrity protected by use of TLS at the site where it is hosted. This means that its security is dependent upon the Internet Public Key Infrastructure (PKI) {{RFC9525}}. Signed metadata is additionally integrity protected by the JWS signature applied by the issuer, which is not dependent upon the Internet PKI.
-When using unsigned metadata, the party `iss`uing the metadata is the policy decision point itself. Whereas, when using signed metadata, the party `iss`uing the metadata is represented by the `iss` (issuer) claim in the signed metadata. When using signed metadata, applications can make trust decisions based on the issuer that performed the signing -- information that is not available when using unsigned metadata. How these trust decisions are made is out of scope for this specification.
+When using unsigned metadata, the party issuing the metadata is the policy decision point itself. Whereas, when using signed metadata, the party issuing the metadata is represented by the `iss` (issuer) claim in the signed metadata. When using signed metadata, applications can make trust decisions based on the issuer that performed the signing -- information that is not available when using unsigned metadata. How these trust decisions are made is out of scope for this specification.
 
 ## Metadata Caching {#security-metadata-caching}
 
