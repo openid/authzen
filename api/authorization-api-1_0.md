@@ -1202,7 +1202,7 @@ The following Policy Decision Point metadata parameters are used by this specifi
 
 ### Endpoint Parameters {#pdp-metadata-data-endpoint}
 
-policy_decision_point:
+`policy_decision_point`:
 : REQUIRED. The policy decision point's policy decision point identifier, which is a URL that uses the "https" scheme and has no query or fragment components. Policy Decision Point metadata is published at a location that is ".well-known" according to {{RFC5785}} derived from this policy decision point identifier, as described in {{pdp-metadata-access}}. The policy decision point identifier is used to prevent policy decision point mix-up attacks.
 
 `access_evaluation_endpoint`:
@@ -1262,15 +1262,15 @@ Content-Type: application/json
 
 {
   "policy_decision_point": "https://pdp.mycompany.com",
-  "`access_evaluation_endpoint`": "https://pdp.mycompany.com/access/v1/evaluation",
-  "search_user_endpoint": "https://pdp.mycompany.com/access/v1/search/user",
-  "`search_resource_endpoint`": "https://pdp.mycompany.com/access/v1/search/resource"
+  "access_evaluation_endpoint": "https://pdp.mycompany.com/access/v1/evaluation",
+  "search_subject_endpoint": "https://pdp.mycompany.com/access/v1/search/subject",
+  "search_resource_endpoint": "https://pdp.mycompany.com/access/v1/search/resource"
 }
 ~~~
 
 ### Policy Decision Point Metadata Validation {#pdp-metadata-data-endpoint-validation}
 
-The "policy_decision_point" value returned MUST be identical to the policy decision point identifier value into which the well-known URI string was inserted to create the URL used to retrieve the metadata.  If these values are not identical, the data contained in the response MUST NOT be used.
+The "`policy_decision_point`" value returned MUST be identical to the policy decision point identifier value into which the well-known URI string was inserted to create the URL used to retrieve the metadata.  If these values are not identical, the data contained in the response MUST NOT be used.
 
 The recipient MUST validate that any signed metadata was signed by a key belonging to the issuer and that the signature is valid. If the signature does not validate or the issuer is not trusted, the recipient SHOULD treat this as an error condition.
 
@@ -1692,6 +1692,21 @@ Specification Document(s):
 : Reference to the document or documents that specify the parameter, preferably including URIs that can be used to retrieve copies of the documents. An indication of the relevant sections may also be included but is not required.
 
 ### Initial Registry Contents {#iana-pdp-registry-content}
+
+Metadata name:
+: `policy_decision_point`
+
+Metadata description:
+: Base URL of the Policy Decision Point
+
+Change Controller:
+: OpenID_Foundation_AuthZEN_Working_Groug
+: mailto:openid-specs-authzen@lists.openid.net
+
+Specification Document(s):
+: Section {{pdp-metadata-data-endpoint}}
+
+
 
 Metadata name:
 : `access_evaluation_endpoint`
