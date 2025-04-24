@@ -2,7 +2,7 @@
 stand_alone: true
 ipr: none
 cat: std # Check
-submissiontype: IETF
+subm`iss`iontype: IETF
 wg: OpenID AuthZEN
 
 docname: authorization-api-1_0
@@ -81,6 +81,7 @@ informative:
   IANA.well_known_uris: # IANA well-known registry
   RFC9525: # Service Identity in TLS
   RFC7234: # HTTP caching
+  RFC9525: # PKI
 
 --- abstract
 
@@ -592,7 +593,7 @@ By default, every request in the `evaluations` array is executed and a response 
 With that said, three evaluation semantics are supported:
 
 1. *Execute all of the requests (potentially in parallel), return all of the results.* Any failure can be denoted by `decision: false` and MAY provide a reason code in the context.
-2. *Deny on first denial (or failure).* This semantic could be desired if a PEP wants to issue a few requests in a particular order, with any denial (error, or `decision: false`) "short-circuiting" the evaluations call and returning on the first denial. This essentially works like the `&&` operator in programming languages.
+2. *Deny on first denial (or failure).* This semantic could be desired if a PEP wants to `iss`ue a few requests in a particular order, with any denial (error, or `decision: false`) "short-circuiting" the evaluations call and returning on the first denial. This essentially works like the `&&` operator in programming languages.
 3. *Permit on first permit.* This is the converse "short-circuiting" semantic, working like the `||` operator in programming languages.
 
 To select the desired evaluations semantic, a caller can pass in `options.evaluations_semantic` with exactly one of the following values:
@@ -1204,31 +1205,31 @@ The following Policy Decision Point metadata parameters are used by this specifi
 policy_decision_point:
 : REQUIRED. The policy decision point's policy decision point identifier, which is a URL that uses the "https" scheme and has no query or fragment components. Policy Decision Point metadata is published at a location that is ".well-known" according to {{RFC5785}} derived from this policy decision point identifier, as described in {{pdp-metadata-access}}. The policy decision point identifier is used to prevent policy decision point mix-up attacks.
 
-access_evaluation_endpoint:
+`access_evaluation_endpoint`:
 : REQUIRED. URL of Policy Decision Point Access Evaluation API endpoint
 
-access_evaluations_endpoint:
+`access_evaluations_endpoint`:
 : OPTIONAL. URL of Policy Decision Point Access Evaluations API endpoint
 
-search_subject_endpoint:
+`search_subject_endpoint`:
 : OPTIONAL. URL of Policy Decision Point Search API endpoint for subject element
 
-search_action_endpoint:
+`search_action_endpoint`:
 : OPTIONAL. URL of Policy Decision Point Search API endpoint for action element
 
-search_resource_endpoint:
+`search_resource_endpoint`:
 : OPTIONAL. URL of Policy Decision Point Search API endpoint for resource element
 
-Note that the non presence of any of those parameter is sufficient for the policy enforcement point to determine that the policy decision point is not capable and therefore will not return a result for the associated API
+Note that the non presence of any of those parameter is sufficient for the policy enforcement point to determine that the policy decision point is not capable and therefore will not return a result for the associated API.
 
 ### Signature Parameter {#pdp-metadata-data-sig}
 
-In addition to JSON elements, metadata values MAY also be provided as a signed_metadata value, which is a JSON Web Token {{RFC7519}} that asserts metadata values about the policy decision point as a bundle. A set of metadata parameters that can be used in signed metadata as claims are defined in {{pdp-metadata-data-endpoint}}. The signed metadata MUST be digitally signed or MACed using JSON Web Signature {{RFC7515}} and MUST contain an iss (issuer) claim denoting the party attesting to the claims in the signed metadata.
+In addition to JSON elements, metadata values MAY also be provided as a `signed_metadata` value, which is a JSON Web Token {{RFC7519}} that asserts metadata values about the policy decision point as a bundle. A set of metadata parameters that can be used in signed metadata as claims are defined in {{pdp-metadata-data-endpoint}}. The signed metadata MUST be digitally signed or MACed using JSON Web Signature {{RFC7515}} and MUST contain an `iss` (issuer) claim denoting the party attesting to the claims in the signed metadata.
 
 Consumers of the metadata MAY ignore the signed metadata if they do not support this feature. If the consumer of the metadata supports signed metadata, metadata values conveyed in the signed metadata MUST take precedence over the corresponding values conveyed using plain JSON elements. Signed metadata is included in the policy decision point metadata JSON object using this OPTIONAL metadata parameter:
 
-signed_metadata:
-: A JWT containing metadata parameters about the protected resource as claims. This is a string value consisting of the entire signed JWT. A signed_metadata parameter SHOULD NOT appear as a claim in the JWT; it is RECOMMENDED to reject any metadata in which this occurs.
+`signed_metadata`:
+: A JWT containing metadata parameters about the protected resource as claims. This is a string value consisting of the entire signed JWT. A `signed_metadata` parameter SHOULD NOT appear as a claim in the JWT; it is RECOMMENDED to reject any metadata in which this occurs.
 
 ## Obtaining Policy Decision Point Metadata {#pdp-metadata-access}
 
@@ -1261,9 +1262,9 @@ Content-Type: application/json
 
 {
   "policy_decision_point": "https://pdp.mycompany.com",
-  "access_evaluation_endpoint": "https://pdp.mycompany.com/access/v1/evaluation",
+  "`access_evaluation_endpoint`": "https://pdp.mycompany.com/access/v1/evaluation",
   "search_user_endpoint": "https://pdp.mycompany.com/access/v1/search/user",
-  "search_resource_endpoint": "https://pdp.mycompany.com/access/v1/search/resource"
+  "`search_resource_endpoint`": "https://pdp.mycompany.com/access/v1/search/resource"
 }
 ~~~
 
@@ -1643,12 +1644,12 @@ In ABAC, there is occasionally conversations around the trust between PEP and PD
 
 ## Availability & Denial of Service {#security-avail-dos}}
 
-The PDP SHOULD apply reasonable protections to avoid common attacks tied to request payload size, the number of requests, invalid JSON, nested JSON attacks, or memory consumption. Rate limiting is one such way to address such issues.
+The PDP SHOULD apply reasonable protections to avoid common attacks tied to request payload size, the number of requests, invalid JSON, nested JSON attacks, or memory consumption. Rate limiting is one such way to address such `iss`ues.
 
 ## Differences between Unsigned and Signed Metadata {#security-metadata-sig}
 
-Unsigned metadata is integrity protected by use of TLS at the site where it is hosted. This means that its security is dependent upon the Internet Public Key Infrastructure (PKI) [RFC9525]. Signed metadata is additionally integrity protected by the JWS signature applied by the issuer, which is not dependent upon the Internet PKI.
-When using unsigned metadata, the party issuing the metadata is the policy decision point itself. Whereas, when using signed metadata, the party issuing the metadata is represented by the iss (issuer) claim in the signed metadata. When using signed metadata, applications can make trust decisions based on the issuer that performed the signing -- information that is not available when using unsigned metadata. How these trust decisions are made is out of scope for this specification.
+Unsigned metadata is integrity protected by use of TLS at the site where it is hosted. This means that its security is dependent upon the Internet Public Key Infrastructure (PKI) {{RFC9525}}. Signed metadata is additionally integrity protected by the JWS signature applied by the issuer, which is not dependent upon the Internet PKI.
+When using unsigned metadata, the party `iss`uing the metadata is the policy decision point itself. Whereas, when using signed metadata, the party `iss`uing the metadata is represented by the `iss` (issuer) claim in the signed metadata. When using signed metadata, applications can make trust decisions based on the issuer that performed the signing -- information that is not available when using unsigned metadata. How these trust decisions are made is out of scope for this specification.
 
 ## Metadata Caching {#security-metadata-caching}
 
@@ -1658,7 +1659,7 @@ Policy decision point metadata is retrieved using an HTTP GET request, as specif
 
 The following registration procedure is used for the registry established by this specification.
 
-Values are registered on a Specification Required {{RFC8126}} basis after a two-week review period on the oauth-ext-review@ietf.org mailing list, on the advice of one or more Designated Experts. However, to allow for the allocation of values prior to publication of the final version of a specification, the Designated Experts may approve registration once they are satisfied that the specification will be completed and published. However, if the specification is not completed and published in a timely manner, as determined by the Designated Experts, the Designated Experts may request that IANA withdraw the registration.
+Values are registered on a Specification Required {{RFC8126}} basis after a two-week review period on the openid-specs-authzen@lists.openid.net mailing list, on the advice of one or more Designated Experts. However, to allow for the allocation of values prior to publication of the final version of a specification, the Designated Experts may approve registration once they are satisfied that the specification will be completed and published. However, if the specification is not completed and published in a timely manner, as determined by the Designated Experts, the Designated Experts may request that IANA withdraw the registration.
 
 Registration requests sent to the mailing list for review should use an appropriate subject (e.g., "Request to register AuthZEN Policy Decision Point Metadata: example").
 
@@ -1693,7 +1694,7 @@ Specification Document(s):
 ### Initial Registry Contents {#iana-pdp-registry-content}
 
 Metadata name:
-: access_evaluation_endpoint
+: `access_evaluation_endpoint`
 
 Metadata description:
 : URL of Policy Decision Point Access Evaluation API endpoint
@@ -1708,7 +1709,7 @@ Specification Document(s):
 
 
 Metadata name:
-: access_evaluations_endpoint
+: `access_evaluations_endpoint`
 
 Metadata description:
 : URL of Policy Decision Point Access Evaluations API endpoint
@@ -1723,7 +1724,7 @@ Specification Document(s):
 
 
 Metadata name:
-: search_subject_endpoint
+: `search_subject_endpoint`
 
 Metadata description:
 : URL of the Search Endpooint based on Subject element
@@ -1739,7 +1740,7 @@ Specification Document(s):
 
 
 Metadata name:
-: search_resource_endpoint
+: `search_resource_endpoint`
 
 Metadata description:
 : URL of the Search Endpooint based on Resource element
@@ -1754,7 +1755,7 @@ Specification Document(s):
 
 
 Metadata name:
-: signed_metadata
+: `signed_metadata`
 
 Metadata description:
 : JWT containing metadata parameters about the protected resource as claims.
