@@ -51,7 +51,6 @@ contributor: # Same structure as author list, but goes into contributors
   org: ID Partners
   email: dave@idpartners.com.au
 - name: Jean-François Lombardo
-  nickname: Jeff
   org: AWS
   email: jeffsec@amazon.com
 
@@ -78,10 +77,9 @@ informative:
   RFC7519: # JWT
   RFC7515: # JWS
   RFC8126: # Writing for IANA
-  IANA.well_known_uris: # IANA well-known registry
+  IANA.well-known-uris: # IANA well-known registry
   RFC9525: # Service Identity in TLS
   RFC7234: # HTTP caching
-  RFC9525: # PKI
 
 --- abstract
 
@@ -435,7 +433,7 @@ The following is a non-normative example for specifying three requests, with no 
         "type": "document",
         "id": "boxcarring.md"
       },
-      "context":{
+      "context": {
         "time": "2024-05-31T15:22-07:00"
       }
     },
@@ -451,7 +449,7 @@ The following is a non-normative example for specifying three requests, with no 
         "type": "document",
         "id": "subject-search.md"
       },
-      "context":{
+      "context": {
         "time": "2024-05-31T15:22-07:00"
       }
     },
@@ -467,7 +465,7 @@ The following is a non-normative example for specifying three requests, with no 
         "type": "document",
         "id": "resource-search.md"
       },
-      "context":{
+      "context": {
         "time": "2024-05-31T15:22-07:00"
       }
     }
@@ -491,7 +489,7 @@ The following is a non-normative example for specifying three requests that refe
     "type": "user",
     "id": "alice@acmecorp.com"
   },
-  "context":{
+  "context": {
     "time": "2024-05-31T15:22-07:00"
   },
   "evaluations": [
@@ -534,7 +532,7 @@ The following is a non-normative example for specifying three requests that refe
     "type": "user",
     "id": "alice@acmecorp.com"
   },
-  "context":{
+  "context": {
     "time": "2024-05-31T15:22-07:00"
   },
   "action": {
@@ -574,11 +572,20 @@ This provides a general-purpose mechanism for providing caller-supplied metadata
 
 One such option controls *evaluation semantics*, and is described in {{evaluations-semantics}}.
 
-A non-normative example of the `options` field is shown below:
+A non-normative example of the `options` field is shown below, following an `evaluations` array provided for the sake of completeness:
 
 ~~~json
 {
-  "evaluations": [...],
+  "evaluations": [{
+    "resource": {
+      "type": "doc",
+      "id": "1"
+    },
+    "subject": {
+      "type": "doc",
+      "id": "2"
+    }
+  }],
   "options": {
     "evaluation_semantics": "execute_all",
     "another_option": "value"
@@ -708,7 +715,7 @@ Response:
     },
     {
       "decision": false,
-      context: {
+      "context": {
         "id": "200",
         "reason": "deny_on_first_deny"
       }
@@ -736,7 +743,7 @@ Permit on first permit:
       "resource": {
         "type": "document",
         "id": "1"
-      },
+      }
     },
     {
       "resource": {
@@ -1235,7 +1242,7 @@ Consumers of the metadata MAY ignore the signed metadata if they do not support 
 
 Policy Decision Point supporting metadata MUST make a JSON document containing metadata as specified in {{pdp-metadata-data-endpoint}} available at a URL formed by inserting a well-known URI string between the host component and the path and/or query components, if any. The well-known URI string used is `/.well-known/authzen-configuration`.
 
-The syntax and semantics of .well-known are defined in {{RFC8615}}. The well-known URI path suffix used is registered in the IANA "Well-Known URIs" registry {{IANA.well_known_uris}}.
+The syntax and semantics of .well-known are defined in {{RFC8615}}. The well-known URI path suffix used is registered in the IANA "Well-Known URIs" registry {{IANA.well-known-uris}}.
 
 ### Policy Decision Point Metadata Request {#pdp-metadata-access-request}
 
@@ -1344,7 +1351,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
     "type": "user",
     "id": "alice@acmecorp.com"
   },
-  "context":{
+  "context": {
     "time": "2024-05-31T15:22-07:00"
   },
   "action": {
@@ -1700,7 +1707,7 @@ Metadata description:
 : Base URL of the Policy Decision Point
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Groug
+: OpenID_Foundation_AuthZEN_Working_Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
@@ -1715,7 +1722,7 @@ Metadata description:
 : URL of Policy Decision Point Access Evaluation API endpoint
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Groug
+: OpenID_Foundation_AuthZEN_Working_Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
@@ -1730,7 +1737,7 @@ Metadata description:
 : URL of Policy Decision Point Access Evaluations API endpoint
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Groug
+: OpenID_Foundation_AuthZEN_Working_Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
@@ -1745,7 +1752,7 @@ Metadata description:
 : URL of the Search Endpooint based on Subject element
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Groug
+: OpenID_Foundation_AuthZEN_Working_Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
@@ -1761,7 +1768,7 @@ Metadata description:
 : URL of the Search Endpooint based on Resource element
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Groug
+: OpenID_Foundation_AuthZEN_Working_Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
@@ -1776,7 +1783,7 @@ Metadata description:
 : JWT containing metadata parameters about the protected resource as claims.
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Groug
+: OpenID_Foundation_AuthZEN_Working_Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
@@ -1786,7 +1793,7 @@ Specification Document(s):
 
 ## Well-Known URI Registry {#iana-wk-registry}
 
-This specification registers the well-known URI defined in Section 3 in the IANA "Well-Known URIs" registry {{IANA.well_known_uris}}.
+This specification registers the well-known URI defined in Section 3 in the IANA "Well-Known URIs" registry {{IANA.well-known-uris}}.
 
 ### Registry Contents {#iana-wk-registry-content}
 
@@ -1800,7 +1807,7 @@ Status:
 : permanent
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Groug
+: OpenID_Foundation_AuthZEN_Working_Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Related Information:
@@ -1839,7 +1846,7 @@ This template uses extracts from templates written by
 
 # Document History
 
-[[ To be removed from the final specification ]]
+** To be removed from the final specification **
 
 * 00 - Initial version.
 * 01 - Refactored the optional fields of Subject, Action, and Resource into a `properties` sub-object, making it easier to design meaningful JSON-schema and protobuf contracts for the API. Also changed the `evaluations` field from an object to an array, to preserve ordering semantics.
