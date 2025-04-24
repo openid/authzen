@@ -1201,8 +1201,8 @@ The following Policy Decision Point metadata parameters are used by this specifi
 
 ### Endpoint Parameters {#pdp-metadata-data-endpoint}
 
-issuer:
-: REQUIRED. The policy decision point's issuer identifier, which is a URL that uses the "https" scheme and has no query or fragment components. Policy Decision Point metadata is published at a location that is ".well-known" according to {{RFC5785}} derived from this issuer identifier, as described in {{pdp-metadata-access}}. The issuer identifier is used to prevent policy decision point mix-up attacks.
+policy_decision_point:
+: REQUIRED. The policy decision point's policy decision point identifier, which is a URL that uses the "https" scheme and has no query or fragment components. Policy Decision Point metadata is published at a location that is ".well-known" according to {{RFC5785}} derived from this policy decision point identifier, as described in {{pdp-metadata-access}}. The policy decision point identifier is used to prevent policy decision point mix-up attacks.
 
 access_evaluation_endpoint:
 : REQUIRED. URL of Policy Decision Point Access Evaluation API endpoint
@@ -1260,7 +1260,7 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "issuer": "https://pdp.mycompany.com",
+  "policy_decision_point": "https://pdp.mycompany.com",
   "access_evaluation_endpoint": "https://pdp.mycompany.com/access/v1/evaluation",
   "search_user_endpoint": "https://pdp.mycompany.com/access/v1/search/user",
   "search_resource_endpoint": "https://pdp.mycompany.com/access/v1/search/resource"
@@ -1269,7 +1269,7 @@ Content-Type: application/json
 
 ### Policy Decision Point Metadata Validation {#pdp-metadata-data-endpoint-validation}
 
-The "issuer" value returned MUST be identical to the policy decision point's issuer identifier value into which the well-known URI string was inserted to create the URL used to retrieve the metadata.  If these values are not identical, the data contained in the response MUST NOT be used.
+The "policy_decision_point" value returned MUST be identical to the policy decision point identifier value into which the well-known URI string was inserted to create the URL used to retrieve the metadata.  If these values are not identical, the data contained in the response MUST NOT be used.
 
 The recipient MUST validate that any signed metadata was signed by a key belonging to the issuer and that the signature is valid. If the signature does not validate or the issuer is not trusted, the recipient SHOULD treat this as an error condition.
 
