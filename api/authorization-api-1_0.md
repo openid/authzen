@@ -1849,8 +1849,10 @@ This template uses extracts from templates written by
 ** To be removed from the final specification **
 
 * 00 - Initial version.
-* 01 - Refactored the optional fields of Subject, Action, and Resource into a `properties` sub-object, making it easier to design meaningful JSON-schema and protobuf contracts for the API. Also changed the `evaluations` field from an object to an array, to preserve ordering semantics.
+* 01 - First Implementers Draft. Refactored the optional fields of Subject, Action, and Resource into a `properties` sub-object, making it easier to design meaningful JSON-schema and protobuf contracts for the API.
 * 02 - Added the evaluations API.
+* 03 - Added the search (subject, resource, action) APIs.
+* 04 - Added metadata discovery.
 
 # Notices {#Notices}
 Copyright (c) 2025 The OpenID Foundation.
