@@ -44,9 +44,9 @@ contributor: # Same structure as author list, but goes into contributors
 - name: Erik Gustavson
   org: SGNL
   email: erik@sgnl.ai
-- name: Alex Babeanu
-  org: 3Edges
-  email: alex@3edges.com
+- name: Alexandre Babeanu
+  org: Indykite
+  email: alex.babeanu@indykite.com
 - name: David Hyland
   org: ID Partners
   email: dave@idpartners.com.au
