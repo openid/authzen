@@ -1,6 +1,6 @@
 import json
 
-def generate_test_cases_and_markdown(header, access_matrix):
+def generate_test_cases_and_markdown(header, access_matrix, searchResultType, searchResultCategory, lookupType, lookupCategory, destination_md="results.md", destination_json="results.json"):
     """
     Generates test cases and a Markdown table from the access matrix.
 
@@ -18,28 +18,28 @@ def generate_test_cases_and_markdown(header, access_matrix):
     markdown_lines.append(header)
     markdown_lines.append("|--------|--------|--------------------------|")
 
-    for username, actions in access_matrix.items():
-        for action, records in actions.items():
-            record_list = ", ".join(map(str, records))  # Convert record IDs to a comma-separated string
-            markdown_lines.append(f"| {username} | {action}   | [{record_list}] |")
+    for key, actions in access_matrix.items():
+        for action, result_set in actions.items():
+            result_list = ", ".join(map(str, result_set))  # Convert record IDs to a comma-separated string
+            markdown_lines.append(f"| {key} | {action}   | [{result_list}] |")
             results = []
-            for record_id in records:
+            for result_id in result_set:
                 results.append({
-                    "type": "record",
-                    "id": str(record_id)
+                    "type": searchResultType,
+                    "id": str(result_id)
                 })
 
             test_case = {
                 "request": {
-                    "subject": {
-                        "type": "user",
-                        "id": username
+                    lookupCategory: {
+                        "type": lookupType,
+                        "id": key
                     },
                     "action": {
                         "name": action
                     },
-                    "resource": {
-                        "type": "record"
+                    searchResultCategory: {
+                        "type": searchResultType
                     }
                 },
                 "expected": {
@@ -49,11 +49,17 @@ def generate_test_cases_and_markdown(header, access_matrix):
 
             test_cases.append(test_case)
 
+    # Write the Markdown table to a file
+    with open(destination_md, "w") as file:
+        file.write("\n".join(markdown_lines))
+
+    with open(destination_json, "w") as file:
+        json.dump(test_cases, file, indent=2)
     return test_cases, markdown_lines
 
 # File paths
-users_file = "../../data/users.json"
-records_file = "../../data/records.json"
+users_file = "../data/users.json"
+records_file = "../data/records.json"
 markdown_results = "results.md"
 json_test_cases = "results.json"
 
@@ -98,20 +104,7 @@ for user in users:
 
 
 # Generate test cases and Markdown table
-test_cases, markdown_lines = generate_test_cases_and_markdown("| User   | Action | Records                  |", access_matrix)
-
-
-
-# Write the Markdown table to a file
-with open(markdown_results, "w") as file:
-    file.write("\n".join(markdown_lines))
-
-print(f"Markdown table written to '{markdown_results}'.")
-
-with open(json_test_cases, "w") as file:
-    json.dump(test_cases, file, indent=2)
-
-print(f"Test cases written to '{json_test_cases}'.")
+test_cases, markdown_lines = generate_test_cases_and_markdown("| User   | Action | Records                  |", access_matrix, "record", "resource", "user", "subject", "resource/results.md", "resource/results.json")
 
 # Now invert access matrix to get the users for each record
 # Interchange record and username in access_matrix
@@ -124,17 +117,4 @@ for username, actions in access_matrix.items():
                 record_access_matrix[record_id] = {"view": [], "edit": [], "delete": []}
             record_access_matrix[record_id][action].append(username)
 
-test_cases, markdown_lines = generate_test_cases_and_markdown("| Record   | Action | Users                  |", record_access_matrix)
-
-# Write the Markdown table to a file
-with open("resource_"+markdown_results, "w") as file:
-    file.write("\n".join(markdown_lines))
-
-print(f"Markdown table written to resource_'{markdown_results}'.")
-
-with open("resource_"+json_test_cases, "w") as file:
-    json.dump(test_cases, file, indent=2)
-
-print(f"Test cases written to resource_'{json_test_cases}'.")
-
-
+test_cases, markdown_lines = generate_test_cases_and_markdown("| Record   | Action | Users                  |", record_access_matrix, "user", "subject", "record", "resource", "subject/results.md", "subject/results.json")
