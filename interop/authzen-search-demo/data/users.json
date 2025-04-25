@@ -1,31 +1,31 @@
 [
 	{
-		"name": "alice",
+		"id": "alice",
 		"role": "manager",
 		"department": "Sales"
 	},
 	{
-		"name": "bob",
+		"id": "bob",
 		"role": "employee",
 		"department": "Legal"
 	},
 	{
-		"name": "carol",
+		"id": "carol",
 		"role": "contractor",
 		"department": "Legal"
 	},
 	{
-		"name": "dan",
+		"id": "dan",
 		"role": "manager",
 		"department": "Finance"
 	},
 	{
-		"name": "erin",
+		"id": "erin",
 		"role": "employee",
 		"department": "Finance"
 	},
 	{
-		"name": "felix",
+		"id": "felix",
 		"role": "contractor",
 		"department": "Accounting"
 	}

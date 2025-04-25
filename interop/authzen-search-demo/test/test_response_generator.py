@@ -73,7 +73,7 @@ with open(records_file, "r") as file:
 access_matrix = {}
 
 for user in users:
-    username = user["name"]
+    username = user["id"]
     user_department = user.get("department")
     is_manager = user.get("role") == "manager"
     access_matrix[username] = {"view": [], "edit": [], "delete": []}
