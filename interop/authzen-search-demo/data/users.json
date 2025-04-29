@@ -1,32 +1,32 @@
 [
-	{
-		"id": "alice",
-		"role": "manager",
-		"department": "Sales"
-	},
-	{
-		"id": "bob",
-		"role": "employee",
-		"department": "Legal"
-	},
-	{
-		"id": "carol",
-		"role": "contractor",
-		"department": "Legal"
-	},
-	{
-		"id": "dan",
-		"role": "manager",
-		"department": "Finance"
-	},
-	{
-		"id": "erin",
-		"role": "employee",
-		"department": "Finance"
-	},
-	{
-		"id": "felix",
-		"role": "contractor",
-		"department": "Accounting"
-	}
+  {
+    "id": "alice",
+    "role": "manager",
+    "department": "Sales"
+  },
+  {
+    "id": "bob",
+    "role": "employee",
+    "department": "Legal"
+  },
+  {
+    "id": "carol",
+    "role": "contractor",
+    "department": "Legal"
+  },
+  {
+    "id": "dan",
+    "role": "manager",
+    "department": "Finance"
+  },
+  {
+    "id": "erin",
+    "role": "employee",
+    "department": "Finance"
+  },
+  {
+    "id": "felix",
+    "role": "contractor",
+    "department": "Accounting"
+  }
 ]
