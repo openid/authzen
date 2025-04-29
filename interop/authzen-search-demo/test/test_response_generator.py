@@ -65,20 +65,20 @@ json_test_cases = "results.json"
 
 # Load users and records
 with open(users_file, "r") as file:
-    users = json.load(file)
+    allUsers = json.load(file)
 
 with open(records_file, "r") as file:
-    records = json.load(file)
+    allRecords = json.load(file)
 
 access_matrix = {}
 
-for user in users:
+for user in allUsers:
     username = user["id"]
     user_department = user.get("department")
     is_manager = user.get("role") == "manager"
     access_matrix[username] = {"view": [], "edit": [], "delete": []}
 
-    for record in records:
+    for record in allRecords:
         record_id = record["id"]
         record_owner = record["owner"]
         record_department = record.get("department")
@@ -140,8 +140,12 @@ test_cases, markdown_lines = generate_test_cases_and_markdown("| User   | Record
 # Generate the action results - my generate_test_cases_and_markdown is not generic enough to cater to action so hacking together a
 # file for action here.
 action_results = []
-for username, records in user_record_action_matrix.items():
-    for record_id, actions in records.items():
+
+for user in allUsers:
+    username = user["id"]
+    for record in allRecords:
+        record_id = record["id"]
+        actions = user_record_action_matrix.get(username, {}).get(record_id, [])
         resultContent = []
         for action in actions:
             resultContent.append({
@@ -170,3 +174,5 @@ with open(output_file, "w") as file:
     json.dump(action_results, file, indent=2)
 
 print(f"Converted results written to '{output_file}'.")
+        
+
