@@ -30,8 +30,8 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import vscDarkPlus from "react-syntax-highlighter/dist/cjs/styles/prism/vsc-dark-plus";
 import { Code } from "lucide-react";
 import { pdpCookie } from "~/cookies.server";
-import { pdps } from "~/data/pdps.server";
 import { actionResponse } from "~/lib/schema";
+import { callPdp } from "~/lib/callPdp";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "AuthZEN Search API - Action Search" }];
@@ -52,12 +52,7 @@ export async function action({ request }: Route.ActionArgs) {
       error: "No PDP selected",
     };
   }
-  const pdp = pdps.find((pdp) => pdp.name === cookie.selectedPdp);
-  if (!pdp) {
-    return {
-      error: "PDP not found",
-    };
-  }
+
   const formData = await request.formData();
   const user = formData.get("user");
   const resource = formData.get("resource");
@@ -79,22 +74,13 @@ export async function action({ request }: Route.ActionArgs) {
     context: {},
   };
   try {
-    // make AuthZEN API call to get resources for the subject
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
-    if (pdp.headers) {
-      Object.entries(pdp.headers).forEach(([key, value]) => {
-        headers.append(key, value);
-      });
-    }
-    const authZENResponse = await fetch(`${pdp.host}/access/v1/search/action`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(authZENRequest),
-    })
-      .then((res) => res.json())
-      .then((res) => actionResponse.parse(res));
+    const response = await callPdp(
+      "/access/v1/search/action",
+      authZENRequest,
+      cookie.selectedPdp
+    );
 
+    const authZENResponse = actionResponse.parse(response);
     return {
       authZENRequest,
       authZENResponse,
