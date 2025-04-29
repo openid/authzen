@@ -118,3 +118,55 @@ for username, actions in access_matrix.items():
             record_access_matrix[record_id][action].append(username)
 
 test_cases, markdown_lines = generate_test_cases_and_markdown("| Record   | Action | Users                  |", record_access_matrix, "user", "subject", "record", "resource", "subject/results.md", "subject/results.json")
+
+# Now invert access matrix to get the actions for each record and user
+# interchange action and username in access_matrix
+# Invert access matrix to get actions for each username and record ID
+# Invert access matrix to get actions for each user and record ID
+user_record_action_matrix = {}
+
+for username, actions in access_matrix.items():
+    if username not in user_record_action_matrix:
+        user_record_action_matrix[username] = {}
+
+    for action, records in actions.items():
+        for record_id in records:
+            if record_id not in user_record_action_matrix[username]:
+                user_record_action_matrix[username][record_id] = []
+            user_record_action_matrix[username][record_id].append(action)
+
+test_cases, markdown_lines = generate_test_cases_and_markdown("| User   | Record ID | Action List                  |", user_record_action_matrix, "action", "action", "user", "subject", "action/results.md", "action/results.json")
+
+# Generate the action results - my generate_test_cases_and_markdown is not generic enough to cater to action so hacking together a
+# file for action here.
+action_results = []
+for username, records in user_record_action_matrix.items():
+    for record_id, actions in records.items():
+        resultContent = []
+        for action in actions:
+            resultContent.append({
+                "name": action
+            })
+        result = {
+            "request": {
+                "subject": {
+                    "type": "user",
+                    "id": username
+                },
+                "resource": {
+                    "type": "record",
+                    "id": record_id
+                }
+            },
+            "expected": {
+                "results": resultContent
+            }
+        }
+        action_results.append(result)
+
+# Write the transformed results to the output file
+output_file = "action/results.json"
+with open(output_file, "w") as file:
+    json.dump(action_results, file, indent=2)
+
+print(f"Converted results written to '{output_file}'.")
