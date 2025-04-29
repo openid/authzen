@@ -29,7 +29,7 @@ import { Form, useNavigation } from "react-router";
 import { Button } from "~/components/ui/button";
 import { pdpCookie } from "~/cookies.server";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { subjects } from "~/data/subjects.server";
+import { users } from "~/data/users.server";
 import { pdps } from "~/data/pdps.server";
 import vscDarkPlus from "react-syntax-highlighter/dist/cjs/styles/prism/vsc-dark-plus";
 
@@ -39,7 +39,7 @@ export function meta({}: Route.MetaArgs) {
 
 export async function loader({}: Route.LoaderArgs) {
   return {
-    subjects,
+    users,
   };
 }
 
@@ -60,12 +60,11 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   const formData = await request.formData();
-  const subject = formData.get("subject");
+  const user = formData.get("user");
   const resource = formData.get("resource");
   const action = formData.get("action");
-  const nextToken = formData.get("next_token") ?? "";
 
-  if (!subject || subjects.find((s) => s.id === subject) === undefined) {
+  if (!user || users.find((s) => s.id === user) === undefined) {
     return {
       error: "Invalid subject selected",
     };
@@ -74,7 +73,7 @@ export async function action({ request }: Route.ActionArgs) {
   const authZENRequest = {
     subject: {
       type: "user",
-      id: subject,
+      id: user,
     },
     action: {
       name: action,
@@ -83,9 +82,6 @@ export async function action({ request }: Route.ActionArgs) {
       type: resource,
     },
     context: {},
-    page: {
-      next_token: nextToken,
-    },
   };
 
   try {
@@ -97,7 +93,7 @@ export async function action({ request }: Route.ActionArgs) {
     //   headers.append("Authorization", pdp.auth);
     // }
 
-    // const authZENResponse = await fetch(`${pdp.host}/access/v1/resource`, {
+    // const authZENResponse = await fetch(`${pdp.host}/access/v1/search/resource`, {
     //   method: "POST",
     //   headers,
     //   body: JSON.stringify(authZENRequest),
@@ -124,9 +120,6 @@ export async function action({ request }: Route.ActionArgs) {
           id: "231",
         },
       ],
-      page: {
-        next_token: "abc123",
-      },
     };
     return {
       authZENRequest,
@@ -149,33 +142,32 @@ export default function ResourceSearch({
       <CardHeader>
         <CardTitle>Resource Search</CardTitle>
         <CardDescription>
-          Select a subject and action to get the resources it would be allowed
-          upon
+          Select a user and action to get the resources it would be allowed upon
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form method="post" className="flex flex-col gap-4">
           <div className="mb-6 flex gap-4 items-center">
             <p className="font-semibold text-sm">Subject</p>
-            <Select name="subject" defaultValue={loaderData.subjects[0].id}>
+            <Select name="user" defaultValue={loaderData.users[0].id}>
               <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Select a subject" />
+                <SelectValue placeholder="Select a user" />
               </SelectTrigger>
               <SelectContent>
-                {loaderData.subjects.map((subject) => (
-                  <SelectItem key={subject.id} value={subject.id}>
-                    {subject.username}
+                {loaderData.users.map((user) => (
+                  <SelectItem key={user.id} value={user.id}>
+                    {user.id}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <p className="font-semibold text-sm">Resource type</p>
-            <Select name="action" defaultValue="can_read">
+            <Select name="resource" defaultValue="record">
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Select an resource type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="can_read">record</SelectItem>
+                <SelectItem value="record">record</SelectItem>
               </SelectContent>
             </Select>
             <p className="font-semibold text-sm">Action</p>
@@ -187,11 +179,6 @@ export default function ResourceSearch({
                 <SelectItem value="can_read">can_read</SelectItem>
               </SelectContent>
             </Select>
-            <input
-              type="hidden"
-              name="next_token"
-              value={actionData?.authZENResponse?.page?.next_token}
-            />
             <Button
               type={"submit"}
               disabled={navigation.state === "submitting"}
@@ -223,11 +210,6 @@ export default function ResourceSearch({
                     ))}
                   </TableBody>
                 </Table>
-                {actionData.authZENResponse.page.next_token !== "" && (
-                  <Button variant="outline" className="mt-4">
-                    View More
-                  </Button>
-                )}
               </div>
 
               <div>
@@ -256,7 +238,7 @@ export default function ResourceSearch({
                           wrapLines={true}
                           customStyle={{ margin: 0, background: "black" }}
                         >
-                          POST /access/v1/resource
+                          POST /access/v1/resources
                         </SyntaxHighlighter>
                         <SyntaxHighlighter
                           language="json"
