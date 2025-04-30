@@ -11,3 +11,10 @@ export const subjectResponse = z.object({
 export const actionResponse = z.object({
   results: z.array(z.object({ name: z.string() })),
 });
+
+export const metadataResponse = z.object({
+  policy_decision_point: z.string(),
+  access_evaluation_endpoint: z.string().optional(),
+  search_subject_endpoint: z.string().optional(),
+  search_resource_endpoint: z.string().optional(),
+});
