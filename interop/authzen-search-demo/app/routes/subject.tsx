@@ -32,6 +32,7 @@ import { pdpCookie } from "~/cookies.server";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { subjectResponse } from "~/lib/schema";
 import { callPdp } from "~/lib/callPdp";
+import { users } from "~/data/users.server";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "AuthZEN Search API - Subject Search" }];
@@ -81,9 +82,16 @@ export async function action({ request }: Route.ActionArgs) {
 
     const authZENResponse = subjectResponse.parse(response);
 
+    const responseData = authZENResponse.results
+      .map((subject) => {
+        return users.find((user) => user.id === subject.id);
+      })
+      .filter(Boolean);
+
     return {
       authZENRequest,
       authZENResponse,
+      responseData,
     };
   } catch (error) {
     console.error("Error fetching data from PDP", error);
@@ -165,15 +173,19 @@ export default function SubjectSearch({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Subject ID</TableHead>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Department</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {actionData.authZENResponse.results?.map((subject) => (
-                      <TableRow key={subject.id}>
+                    {actionData.responseData.map((subject) => (
+                      <TableRow key={subject?.id}>
                         <TableCell className="font-medium">
-                          {subject.id}
+                          {subject?.id}
                         </TableCell>
+                        <TableCell>{subject?.role}</TableCell>
+                        <TableCell>{subject?.department}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

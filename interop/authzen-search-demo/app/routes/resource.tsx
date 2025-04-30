@@ -33,6 +33,7 @@ import { users } from "~/data/users.server";
 import vscDarkPlus from "react-syntax-highlighter/dist/cjs/styles/prism/vsc-dark-plus";
 import { resourceResponse } from "~/lib/schema";
 import { callPdp } from "~/lib/callPdp";
+import { records } from "~/data/records.server";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "AuthZEN Search API - Resource Search" }];
@@ -87,9 +88,16 @@ export async function action({ request }: Route.ActionArgs) {
 
     const authZENResponse = resourceResponse.parse(response);
 
+    const responseData = authZENResponse.results
+      .map((record) => {
+        return records.find((r) => r.id + "" === record.id);
+      })
+      .filter(Boolean);
+
     return {
       authZENRequest,
       authZENResponse,
+      responseData,
     };
   } catch (error) {
     console.error("Error fetching data from PDP", error);
@@ -166,15 +174,21 @@ export default function ResourceSearch({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Resource ID</TableHead>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Department</TableHead>
+                      <TableHead>Owner</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {actionData.authZENResponse.results?.map((resource) => (
-                      <TableRow key={resource.id}>
+                    {actionData.responseData.map((resource) => (
+                      <TableRow key={resource?.id}>
                         <TableCell className="font-medium">
-                          {resource.id}
+                          {resource?.id}
                         </TableCell>
+                        <TableCell>{resource?.title}</TableCell>
+                        <TableCell>{resource?.department}</TableCell>
+                        <TableCell>{resource?.owner}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
