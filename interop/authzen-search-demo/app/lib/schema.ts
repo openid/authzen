@@ -9,5 +9,5 @@ export const subjectResponse = z.object({
 });
 
 export const actionResponse = z.object({
-  results: z.array(z.string()),
+  results: z.array(z.object({ name: z.string() })),
 });

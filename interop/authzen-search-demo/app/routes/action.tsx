@@ -81,6 +81,7 @@ export async function action({ request }: Route.ActionArgs) {
     );
 
     const authZENResponse = actionResponse.parse(response);
+
     return {
       authZENRequest,
       authZENResponse,
@@ -173,8 +174,10 @@ export default function ActionSearch({
                   </TableHeader>
                   <TableBody>
                     {actionData.authZENResponse.results?.map((action) => (
-                      <TableRow key={action}>
-                        <TableCell className="font-medium">{action}</TableCell>
+                      <TableRow key={action.name}>
+                        <TableCell className="font-medium">
+                          {action.name}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

@@ -40,7 +40,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
       <main className="flex-1 bg-background">
         <div className="flex gap-4 flex-col">
           <PDPPicker
-            pdpList={loaderData.pdps.map((pdp) => pdp.name)}
+            pdpList={Object.keys(loaderData.pdps)}
             activePdp={loaderData.activePdp}
             setPdp={function (pdp: string): void {
               fetcher.submit(

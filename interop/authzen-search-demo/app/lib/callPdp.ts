@@ -5,7 +5,7 @@ export async function callPdp(
   payload: object,
   pdpId: string
 ) {
-  const pdp = pdps.find((pdp) => pdp.name === pdpId);
+  const pdp = pdps[pdpId];
   if (!pdp) {
     return {
       error: "PDP not found",
