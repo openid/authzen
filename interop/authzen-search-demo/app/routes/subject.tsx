@@ -206,7 +206,7 @@ export default function SubjectSearch({
                           wrapLines={true}
                           customStyle={{ margin: 0, background: "black" }}
                         >
-                          POST /access/v1/resources
+                          POST /access/v1/search/subject
                         </SyntaxHighlighter>
                         <SyntaxHighlighter
                           language="json"

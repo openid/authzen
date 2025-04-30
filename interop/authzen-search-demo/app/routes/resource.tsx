@@ -207,7 +207,7 @@ export default function ResourceSearch({
                           wrapLines={true}
                           customStyle={{ margin: 0, background: "black" }}
                         >
-                          POST /access/v1/resources
+                          POST /access/v1/search/resource
                         </SyntaxHighlighter>
                         <SyntaxHighlighter
                           language="json"
