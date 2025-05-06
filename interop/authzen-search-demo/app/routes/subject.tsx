@@ -118,49 +118,60 @@ export default function SubjectSearch({
       <CardContent>
         <Form method="post" className="flex flex-col gap-4">
           <div className="mb-6 flex gap-4 items-center">
-            <p className="font-semibold text-sm">Subject type</p>
-            <Select name="subjectType" defaultValue={"user"}>
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Select a subject type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="user">user</SelectItem>
-              </SelectContent>
-            </Select>
-            <input type="hidden" name="resource" value="record" />
-            <p className="font-semibold text-sm">Resource ID</p>
-            <Select
-              name="resourceId"
-              defaultValue={loaderData.records[0].id + ""}
-            >
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Select a record" />
-              </SelectTrigger>
-              <SelectContent>
-                {loaderData.records.map((record) => (
-                  <SelectItem key={record.id} value={record.id + ""}>
-                    {record.id}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="font-semibold text-sm">Action</p>
-            <Select name="action" defaultValue="view">
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Select an action" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="view">view</SelectItem>
-                <SelectItem value="edit">edit</SelectItem>
-                <SelectItem value="delete">delete</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              type={"submit"}
-              disabled={navigation.state === "submitting"}
-            >
-              {navigation.state === "submitting" ? "Evaluating..." : "Evaluate"}
-            </Button>
+            <div className="flex flex-col gap-1">
+              <p className="font-semibold text-sm">Subject type</p>
+              <Select name="subjectType" defaultValue={"user"}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Select a subject type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">user</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <input type="hidden" name="resource" value="record" />
+              <p className="font-semibold text-sm">Resource ID</p>
+              <Select
+                name="resourceId"
+                defaultValue={loaderData.records[0].id + ""}
+              >
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Select a record" />
+                </SelectTrigger>
+                <SelectContent>
+                  {loaderData.records.map((record) => (
+                    <SelectItem key={record.id} value={record.id + ""}>
+                      {record.id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="font-semibold text-sm">Action</p>
+              <Select name="action" defaultValue="view">
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Select an action" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="view">view</SelectItem>
+                  <SelectItem value="edit">edit</SelectItem>
+                  <SelectItem value="delete">delete</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="font-semibold text-sm invisible">-</p>
+              <Button
+                type={"submit"}
+                disabled={navigation.state === "submitting"}
+              >
+                {navigation.state === "submitting"
+                  ? "Evaluating..."
+                  : "Evaluate"}
+              </Button>
+            </div>
           </div>
 
           {actionData?.error && (

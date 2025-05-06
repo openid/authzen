@@ -123,45 +123,56 @@ export default function ResourceSearch({
       <CardContent>
         <Form method="post" className="flex flex-col gap-4">
           <div className="mb-6 flex gap-4 items-center">
-            <p className="font-semibold text-sm">Subject</p>
-            <Select name="user" defaultValue={loaderData.users[0].id}>
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Select a user" />
-              </SelectTrigger>
-              <SelectContent>
-                {loaderData.users.map((user) => (
-                  <SelectItem key={user.id} value={user.id}>
-                    {user.id}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="font-semibold text-sm">Resource type</p>
-            <Select name="resource" defaultValue="record">
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Select an resource type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="record">record</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="font-semibold text-sm">Action</p>
-            <Select name="action" defaultValue="view">
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Select an action" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="view">view</SelectItem>
-                <SelectItem value="edit">edit</SelectItem>
-                <SelectItem value="delete">delete</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              type={"submit"}
-              disabled={navigation.state === "submitting"}
-            >
-              {navigation.state === "submitting" ? "Evaluating..." : "Evaluate"}
-            </Button>
+            <div className="flex flex-col gap-1">
+              <p className="font-semibold text-sm">Subject</p>
+              <Select name="user" defaultValue={loaderData.users[0].id}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Select a user" />
+                </SelectTrigger>
+                <SelectContent>
+                  {loaderData.users.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="font-semibold text-sm">Resource type</p>
+              <Select name="resource" defaultValue="record">
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Select an resource type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="record">record</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="font-semibold text-sm">Action</p>
+              <Select name="action" defaultValue="view">
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Select an action" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="view">view</SelectItem>
+                  <SelectItem value="edit">edit</SelectItem>
+                  <SelectItem value="delete">delete</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="font-semibold text-sm invisible">-</p>
+              <Button
+                type={"submit"}
+                disabled={navigation.state === "submitting"}
+              >
+                {navigation.state === "submitting"
+                  ? "Evaluating..."
+                  : "Evaluate"}
+              </Button>
+            </div>
           </div>
 
           {actionData?.error && (
