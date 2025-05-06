@@ -9,7 +9,7 @@ export class Store {
     this.db = db;
   }
 
-  static async open(filename = "./todo.db"): Promise<Store> {
+  static async open(filename = "./db/todo.db"): Promise<Store> {
     const db = await open({
       filename,
       driver: sqlite3.Database,
