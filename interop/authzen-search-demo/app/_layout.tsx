@@ -76,6 +76,16 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                     <CircleMinusIcon />
                   )}
                   <div className="text-sm text-muted-foreground">
+                    Evaluation
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {loaderData.pdpMetadata.access_evaluations_endpoint ? (
+                    <CheckCircle2Icon />
+                  ) : (
+                    <CircleMinusIcon />
+                  )}
+                  <div className="text-sm text-muted-foreground">
                     Evaluations
                   </div>
                 </div>
@@ -97,6 +107,16 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                   )}
                   <div className="text-sm text-muted-foreground">
                     Subject Search
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {loaderData.pdpMetadata.search_action_endpoint ? (
+                    <CheckCircle2Icon />
+                  ) : (
+                    <CircleMinusIcon />
+                  )}
+                  <div className="text-sm text-muted-foreground">
+                    Action Search
                   </div>
                 </div>
               </div>
