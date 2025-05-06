@@ -1,7 +1,7 @@
 {
   "pdps": {
     "authorization-api-1_0-01": {
-      "Aserto": "https://authzen-proxy.demo.aserto.com",
+      "Aserto": "https://topaz-proxy.demo.authzen-interop.net",
       "AVP": "https://authzen-avp.interop-it.org",
       "Axiomatics": "https://pdp.alfa.guide",
       "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
@@ -9,18 +9,18 @@
       "HexaOPA": "https://interop.authzen.hexaorchestration.org",
       "Indykite": "https://api-authzen-authz.3edges.io",
       "Kogito": "https://authzen-proxy-demo.azerad.org",
-      "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
+      "Open Policy Agent": "https://opa-proxy.demo.authzen-interop.net",
       "OpenFGA": "https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C",
       "Permit.io": "https://permit-authzen-interop.up.railway.app",
       "PingAuthorize": "https://authzen.idpartners.au",
       "PlainID": "https://authzeninteropt.se-plainid.com",
       "Rock Solid Knowledge": "https://authzen.identityserver.com",
       "SGNL": "https://authzen.sgnlapis.cloud",
-      "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
+      "Topaz": "https://topaz-proxy.demo.authzen-interop.net",
       "WSO2": "https://authzen-interop-demo.wso2.com/api/identity"
     },
     "authorization-api-1_0-02": {
-      "Aserto": "https://authzen-proxy.demo.aserto.com",
+      "Aserto": "https://topaz-proxy.demo.authzen-interop.net",
       "AVP": "https://authzen-avp.interop-it.org",
       "Axiomatics": "https://pdp.alfa.guide",
       "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
@@ -28,19 +28,20 @@
       "HexaOPA": "https://interop.authzen.hexaorchestration.org",
       "Indykite": "https://api-authzen-authz.3edges.io",
       "Kogito": "https://authzen-proxy-demo.azerad.org",
-      "Open Policy Agent": "https://authzen-opa-proxy.demo.aserto.com",
+      "Open Policy Agent": "https://opa-proxy.demo.authzen-interop.net",
       "OpenFGA": "https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C",
       "Permit.io": "https://permit-authzen-interop.up.railway.app",
       "PingAuthorize": "https://authzen.idpartners.au",
       "PlainID": "https://authzeninteropt.se-plainid.com",
       "Rock Solid Knowledge": "https://authzen.identityserver.com",
       "SGNL": "https://authzen.sgnlapis.cloud",
-      "Topaz": "https://authzen-topaz-proxy.demo.aserto.com",
+      "Topaz": "https://topaz-proxy.demo.authzen-interop.net",
       "WSO2": "https://authzen-interop-demo.wso2.com/api/identity"
     }
   },
   "gateways": {
     "--Pass Through--": "https://todo-backend.authzen-interop.net",
+    "--Local--": "http://localhost:3001",
     "AWS API Gateway": "https://aws-gateway.authzen-interop.net",
     "Envoy": "https://authzen-envoy-proxy-demo.cerbos.dev",
     "Kong": "https://plainid-kong-gw.se-plainid.com",
@@ -50,7 +51,7 @@
     "Zuplo": "https://authzen-todo-main-4df5ceb.d2.zuplo.dev"
   },
   "gatewayPdps": {
-    "Aserto": "http://authzen-gateway-proxy.demo.aserto.com",
+    "Aserto": "http://topaz-gateway.demo.authzen-interop.net",
     "AVP": "https://authzen-avp.interop-it.org",
     "Axiomatics": "https://pdp.alfa.guide",
     "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
@@ -60,7 +61,7 @@
     "PlainID": "https://authzeninteropt.se-plainid.com",
     "Rock Solid Knowledge": "https://authzen.identityserver.com",
     "SGNL": "https://authzen.sgnlapis.cloud",
-    "Topaz": "https://authzen-topaz.demo.aserto.com",
+    "Topaz": "https://topaz-gateway.demo.authzen-interop.net",
     "WSO2": "https://authzen-interop-demo.wso2.com/api/identity"
   }
 }

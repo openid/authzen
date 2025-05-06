@@ -4,14 +4,14 @@ sidebar_position: 3
 
 # Open Policy Agent
 
-Interop results for the [OPA](https://openpolicyagent.org/) implementation hosted at `https://authzen-opa-proxy.demo.aserto.com`.
+Interop results for the [OPA](https://openpolicyagent.org/) implementation hosted at `https://opa-proxy.demo.authzen-interop.net`.
 
 ## Test results
 
 ```bash
-yarn test https://authzen-opa-proxy.demo.aserto.com authorization-api-1_0-02 markdown
+yarn test https://opa-proxy.demo.authzen-interop.net authorization-api-1_0-02 markdown
 yarn run v1.22.19
-$ node build/test/runner.js https://authzen-opa-proxy.demo.aserto.com authorization-api-1_0-02 markdown
+$ node build/test/runner.js https://opa-proxy.demo.authzen-interop.net authorization-api-1_0-02 markdown
 ```
 
 <table>

@@ -36,7 +36,7 @@ static_resources:
                           route:
                             cluster: backend_cluster
                             timeout: 10s
-                            host_rewrite_literal: authzen-todo-backend.demo.aserto.com
+                            host_rewrite_literal: todo-backend.authzen-interop.net
                 http_filters:
                   - name: envoy.filters.http.ext_authz
                     typed_config:
@@ -86,7 +86,7 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: authzen-todo-backend.demo.aserto.com
+                      address: todo-backend.authzen-interop.net
                       port_value: 443
       transport_socket:
         name: envoy.transport_sockets.tls

@@ -32,7 +32,7 @@
           "payloadFormatVersion" : "1.0",
           "type" : "http_proxy",
           "httpMethod" : "ANY",
-          "uri" : "https://authzen-todo-backend.demo.aserto.com/{todoId}",
+          "uri" : "https://todo-backend.authzen-interop.net/{todoId}",
           "connectionType" : "INTERNET"
         }
       },
@@ -50,7 +50,7 @@
           "payloadFormatVersion" : "1.0",
           "type" : "http_proxy",
           "httpMethod" : "ANY",
-          "uri" : "https://authzen-todo-backend.demo.aserto.com/{todoId}",
+          "uri" : "https://todo-backend.authzen-interop.net/{todoId}",
           "connectionType" : "INTERNET"
         }
       },
@@ -79,7 +79,7 @@
           "payloadFormatVersion" : "1.0",
           "type" : "http_proxy",
           "httpMethod" : "ANY",
-          "uri" : "https://authzen-todo-backend.demo.aserto.com/todos",
+          "uri" : "https://todo-backend.authzen-interop.net/todos",
           "connectionType" : "INTERNET",
           "timeoutInMillis" : 30000
         }
@@ -98,7 +98,7 @@
           "payloadFormatVersion" : "1.0",
           "type" : "http_proxy",
           "httpMethod" : "ANY",
-          "uri" : "https://authzen-todo-backend.demo.aserto.com/todos",
+          "uri" : "https://todo-backend.authzen-interop.net/todos",
           "connectionType" : "INTERNET",
           "timeoutInMillis" : 30000
         }
@@ -119,7 +119,7 @@
           "payloadFormatVersion" : "1.0",
           "type" : "http_proxy",
           "httpMethod" : "ANY",
-          "uri" : "https://authzen-todo-backend.demo.aserto.com/users",
+          "uri" : "https://todo-backend.authzen-interop.net/users",
           "connectionType" : "INTERNET"
         }
       },

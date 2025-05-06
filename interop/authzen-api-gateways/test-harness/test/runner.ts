@@ -2,7 +2,7 @@ import clc from "cli-color";
 import { evaluation } from "./decisions.json";
 
 const AUTHZEN_PDP_URL =
-  process.argv[2] || "https://authzen-gateway-proxy.demo.aserto.com";
+  process.argv[2] || "https://topaz-gateway.demo.authzen-interop.net";
 const AUTHZEN_PDP_API_KEY = process.env.AUTHZEN_PDP_API_KEY;
 
 enum OutputTypes {

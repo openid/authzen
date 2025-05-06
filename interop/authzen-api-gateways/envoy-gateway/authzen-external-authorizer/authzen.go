@@ -16,7 +16,7 @@ import (
 
 // PDP URLs
 var pdps = map[string]string{
-	"Aserto":               "https://authzen-gateway-proxy.demo.aserto.com",
+	"Aserto":               "https://topaz-gateway.demo.authzen-interop.net",
 	"AVP":                  "https://authzen-avp.interop-it.org",
 	"Axiomatics":           "https://pdp.alfa.guide",
 	"Cerbos":               "https://authzen-proxy-demo.cerbos.dev",
@@ -26,7 +26,7 @@ var pdps = map[string]string{
 	"PlainID":              "https://authzeninteropt.se-plainid.com",
 	"Rock Solid Knowledge": "https://authzen.identityserver.com",
 	"SGNL":                 "https://authzen.sgnlapis.cloud",
-	"Topaz":                "https://authzen-topaz.demo.aserto.com",
+	"Topaz":                "https://topaz-gateway.demo.authzen-interop.net",
 	"WSO2":                 "https://authzen-interop-demo.wso2.com/api/identity",
 }
 
