@@ -41,7 +41,6 @@
   },
   "gateways": {
     "--Pass Through--": "https://todo-backend.authzen-interop.net",
-    "--Local--": "http://localhost:3001",
     "AWS API Gateway": "https://aws-gateway.authzen-interop.net",
     "Envoy": "https://authzen-envoy-proxy-demo.cerbos.dev",
     "Kong": "https://plainid-kong-gw.se-plainid.com",
