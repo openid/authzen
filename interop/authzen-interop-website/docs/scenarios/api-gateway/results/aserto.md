@@ -4,16 +4,16 @@ sidebar_position: 1
 
 # Aserto
 
-Interop results for the [Aserto](https://www.aserto.com/) implementation hosted at https://authzen-gateway-proxy.demo.aserto.com.
+Interop results for the [Aserto](https://www.aserto.com/) implementation hosted at https://topaz-gateway.demo.authzen-interop.net.
 
 For more information, please refer to the [code](https://github.com/aserto-dev/authzen-gateway-proxy).
 
 ## Test results
 
 ```bash
-yarn test https://authzen-gateway-proxy.demo.aserto.com markdown
+AUTHZEN_PDP_API_KEY=<basic redacted> yarn test https://topaz-gateway.demo.authzen-interop.net markdown
 yarn run v1.22.19
-$ node build/runner.js https://authzen-gateway-proxy.demo.aserto.com markdown
+$ node build/runner.js https://topaz-gateway.demo.authzen-interop.net markdown
 ```
 <table>
   <tr>

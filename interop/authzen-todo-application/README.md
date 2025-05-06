@@ -14,9 +14,9 @@ In addition to providing a standard Todo interface based on the [TodoMVC](https:
 
 This sample requires a backend that implements the Todo API.
 
-The [authzen-todo-backend](https://github.com/aserto-dev/authzen-todo-backend) repo contains a Node.JS implementation of the API, which calls an AuthZEN-compliant Policy Decision Point (PDP) to authorize each request. See instructions in that repo for how to build, configure, and run the backend.
+The [authzen-todo-backend](https://github.com/openid/authzen/tree/main/interop/authzen-todo-backend) repo contains a Node.JS implementation of the API, which calls an AuthZEN-compliant Policy Decision Point (PDP) to authorize each request. See instructions in that repo for how to build, configure, and run the backend.
 
-Alternatively, the backend is hosted [here](https://authzen-todo-backend.demo.aserto.com). The `.env` file in this repo set the `REACT_APP_API_ORIGIN` environment variable to this service. If you'd like to point it instead to your own backend, simply change the value of this variable (e.g. `http://localhost:8080`).
+Alternatively, the backend is hosted [here](https://todo-backend.authzen-interop.net). The `.env` file in this repo set the `REACT_APP_API_ORIGIN` environment variable to this service. If you'd like to point it instead to your own backend, simply change the value of this variable (e.g. `http://localhost:8080`).
 
 ## Identities
 

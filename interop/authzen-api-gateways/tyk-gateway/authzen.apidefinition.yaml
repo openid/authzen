@@ -95,4 +95,4 @@ x-tyk-api-gateway:
       strip: true
       value: /
   upstream:
-    url: https://authzen-todo-backend.demo.aserto.com
+    url: https://todo-backend.authzen-interop.net

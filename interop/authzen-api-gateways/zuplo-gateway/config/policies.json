@@ -18,8 +18,8 @@
         "module": "$import(@zuplo/runtime)",
         "options": {
           "audience": "citadel-app",
-          "issuer": "https://citadel.demo.aserto.com/dex",
-          "jwkUrl": "https://citadel.demo.aserto.com/dex/keys"
+          "issuer": "https://citadel.authzen-interop.net/dex",
+          "jwkUrl": "https://citadel.authzen-interop.net/dex/keys"
         }
       },
       "name": "open-id-jwt-auth-inbound",

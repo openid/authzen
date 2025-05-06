@@ -1,7 +1,7 @@
 _transform: false
 _format_version: '3.0'
 services:
-- host: authzen-todo-backend.demo.aserto.com
+- host: todo-backend.authzen-interop.net
   port: 443
   name: AuthZEN_Interop
   retries: 5
@@ -40,7 +40,7 @@ plugins:
   route: 51799165-1a03-495c-b390-4ac7e7047061
   config:
     server:
-      pdp_url: '{     "Aserto":"https://authzen-gateway-proxy.demo.aserto.com",    "AVP": "https://authzen-avp.interop-it.org",    "Axiomatics": "https://pdp.alfa.guide",   "Cerbos":"https://authzen-proxy-demo.cerbos.dev",     "OpenFGA": "https://authzen-interop.openfga.dev/stores/01JNW1803442023HVDKV03FB3A",     "PlainID":"https://authzeninteropt.se-plainid.com",     "Rock Solid Knowledge": "https://authzen.identityserver.com",     "Topaz": "https://authzen-topaz.demo.aserto.com",     "SGNL": "https://authzen.sgnlapis.cloud",       "WSO2": "https://authzen-interop-demo.wso2.com/api/identity" }'
+      pdp_url: '{     "Aserto":"https://topaz-gateway.demo.authzen-interop.net",    "AVP": "https://authzen-avp.interop-it.org",    "Axiomatics": "https://pdp.alfa.guide",   "Cerbos":"https://authzen-proxy-demo.cerbos.dev",     "OpenFGA": "https://authzen-interop.openfga.dev/stores/01JNW1803442023HVDKV03FB3A",     "PlainID":"https://authzeninteropt.se-plainid.com",     "Rock Solid Knowledge": "https://authzen.identityserver.com",     "Topaz": "https://topaz-gateway.demo.authzen-interop.net",     "SGNL": "https://authzen.sgnlapis.cloud",       "WSO2": "https://authzen-interop-demo.wso2.com/api/identity" }'
   protocols:
   - grpc
   - grpcs
@@ -59,7 +59,7 @@ plugins:
   config:
     origins:
       - http://localhost:3000
-      - https://citadel.demo.aserto.com
+      - https://citadel.authzen-interop.net
       - https://todo.authzen-interop.net
     credentials: false
     preflight_continue: false
