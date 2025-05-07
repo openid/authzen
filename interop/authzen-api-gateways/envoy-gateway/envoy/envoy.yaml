@@ -38,6 +38,9 @@ static_resources:
                             timeout: 10s
                             host_rewrite_literal: todo-backend.authzen-interop.net
                 http_filters:
+                  - name: envoy.filters.http.cors
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
                   - name: envoy.filters.http.ext_authz
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
@@ -77,6 +80,7 @@ static_resources:
                       port_value: 3001
     - name: backend_cluster
       type: LOGICAL_DNS
+      dns_lookup_family: V4_ONLY
       connect_timeout: 5s
       lb_policy: ROUND_ROBIN
       load_assignment:
@@ -92,3 +96,4 @@ static_resources:
         name: envoy.transport_sockets.tls
         typed_config:
           "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+          sni: todo-backend.authzen-interop.net
