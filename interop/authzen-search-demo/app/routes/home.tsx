@@ -5,5 +5,16 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <h1>Home</h1>;
+  return (
+    <div>
+      <h1>
+        <span className="text-2xl font-bold">AuthZEN Search API</span>
+        <br />
+        <span className="text-xl font-light">
+          A demo of the AuthZEN Search API
+        </span>
+      </h1>
+      <img src="/arch.png" alt="Architecture" className="w-full mx-auto my-4" />
+    </div>
+  );
 }
