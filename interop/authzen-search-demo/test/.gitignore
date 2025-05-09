@@ -6,6 +6,7 @@
 
 # Generated files
 .docusaurus
+package-lock.json
 .cache-loader
 
 # Misc
