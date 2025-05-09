@@ -1,790 +1,792 @@
-[
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "alice"
+{
+  "evaluation": [
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "action": {
+          "name": "view"
+        },
+        "resource": {
+          "type": "record"
+        }
       },
-      "action": {
-        "name": "view"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "101"
+          },
+          {
+            "type": "record",
+            "id": "102"
+          },
+          {
+            "type": "record",
+            "id": "103"
+          },
+          {
+            "type": "record",
+            "id": "104"
+          },
+          {
+            "type": "record",
+            "id": "105"
+          },
+          {
+            "type": "record",
+            "id": "106"
+          },
+          {
+            "type": "record",
+            "id": "107"
+          },
+          {
+            "type": "record",
+            "id": "108"
+          },
+          {
+            "type": "record",
+            "id": "109"
+          },
+          {
+            "type": "record",
+            "id": "110"
+          },
+          {
+            "type": "record",
+            "id": "111"
+          },
+          {
+            "type": "record",
+            "id": "112"
+          },
+          {
+            "type": "record",
+            "id": "113"
+          },
+          {
+            "type": "record",
+            "id": "114"
+          },
+          {
+            "type": "record",
+            "id": "115"
+          },
+          {
+            "type": "record",
+            "id": "116"
+          },
+          {
+            "type": "record",
+            "id": "117"
+          },
+          {
+            "type": "record",
+            "id": "118"
+          },
+          {
+            "type": "record",
+            "id": "119"
+          },
+          {
+            "type": "record",
+            "id": "120"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "101"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
         },
-        {
-          "type": "record",
-          "id": "102"
+        "action": {
+          "name": "edit"
         },
-        {
-          "type": "record",
-          "id": "103"
-        },
-        {
-          "type": "record",
-          "id": "104"
-        },
-        {
-          "type": "record",
-          "id": "105"
-        },
-        {
-          "type": "record",
-          "id": "106"
-        },
-        {
-          "type": "record",
-          "id": "107"
-        },
-        {
-          "type": "record",
-          "id": "108"
-        },
-        {
-          "type": "record",
-          "id": "109"
-        },
-        {
-          "type": "record",
-          "id": "110"
-        },
-        {
-          "type": "record",
-          "id": "111"
-        },
-        {
-          "type": "record",
-          "id": "112"
-        },
-        {
-          "type": "record",
-          "id": "113"
-        },
-        {
-          "type": "record",
-          "id": "114"
-        },
-        {
-          "type": "record",
-          "id": "115"
-        },
-        {
-          "type": "record",
-          "id": "116"
-        },
-        {
-          "type": "record",
-          "id": "117"
-        },
-        {
-          "type": "record",
-          "id": "118"
-        },
-        {
-          "type": "record",
-          "id": "119"
-        },
-        {
-          "type": "record",
-          "id": "120"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "alice"
       },
-      "action": {
-        "name": "edit"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "101"
+          },
+          {
+            "type": "record",
+            "id": "107"
+          },
+          {
+            "type": "record",
+            "id": "110"
+          },
+          {
+            "type": "record",
+            "id": "113"
+          },
+          {
+            "type": "record",
+            "id": "119"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "101"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
         },
-        {
-          "type": "record",
-          "id": "107"
+        "action": {
+          "name": "delete"
         },
-        {
-          "type": "record",
-          "id": "110"
-        },
-        {
-          "type": "record",
-          "id": "113"
-        },
-        {
-          "type": "record",
-          "id": "119"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "alice"
       },
-      "action": {
-        "name": "delete"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "101"
+          },
+          {
+            "type": "record",
+            "id": "107"
+          },
+          {
+            "type": "record",
+            "id": "113"
+          },
+          {
+            "type": "record",
+            "id": "119"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "101"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
         },
-        {
-          "type": "record",
-          "id": "107"
+        "action": {
+          "name": "view"
         },
-        {
-          "type": "record",
-          "id": "113"
-        },
-        {
-          "type": "record",
-          "id": "119"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "bob"
       },
-      "action": {
-        "name": "view"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "101"
+          },
+          {
+            "type": "record",
+            "id": "102"
+          },
+          {
+            "type": "record",
+            "id": "103"
+          },
+          {
+            "type": "record",
+            "id": "105"
+          },
+          {
+            "type": "record",
+            "id": "108"
+          },
+          {
+            "type": "record",
+            "id": "112"
+          },
+          {
+            "type": "record",
+            "id": "114"
+          },
+          {
+            "type": "record",
+            "id": "116"
+          },
+          {
+            "type": "record",
+            "id": "117"
+          },
+          {
+            "type": "record",
+            "id": "119"
+          },
+          {
+            "type": "record",
+            "id": "120"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "101"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
         },
-        {
-          "type": "record",
-          "id": "102"
+        "action": {
+          "name": "edit"
         },
-        {
-          "type": "record",
-          "id": "103"
-        },
-        {
-          "type": "record",
-          "id": "105"
-        },
-        {
-          "type": "record",
-          "id": "108"
-        },
-        {
-          "type": "record",
-          "id": "112"
-        },
-        {
-          "type": "record",
-          "id": "114"
-        },
-        {
-          "type": "record",
-          "id": "116"
-        },
-        {
-          "type": "record",
-          "id": "117"
-        },
-        {
-          "type": "record",
-          "id": "119"
-        },
-        {
-          "type": "record",
-          "id": "120"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "bob"
       },
-      "action": {
-        "name": "edit"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "102"
+          },
+          {
+            "type": "record",
+            "id": "108"
+          },
+          {
+            "type": "record",
+            "id": "114"
+          },
+          {
+            "type": "record",
+            "id": "120"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "102"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
         },
-        {
-          "type": "record",
-          "id": "108"
+        "action": {
+          "name": "delete"
         },
-        {
-          "type": "record",
-          "id": "114"
-        },
-        {
-          "type": "record",
-          "id": "120"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "bob"
       },
-      "action": {
-        "name": "delete"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "102"
+          },
+          {
+            "type": "record",
+            "id": "108"
+          },
+          {
+            "type": "record",
+            "id": "114"
+          },
+          {
+            "type": "record",
+            "id": "120"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "102"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
         },
-        {
-          "type": "record",
-          "id": "108"
+        "action": {
+          "name": "view"
         },
-        {
-          "type": "record",
-          "id": "114"
-        },
-        {
-          "type": "record",
-          "id": "120"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "carol"
       },
-      "action": {
-        "name": "view"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "101"
+          },
+          {
+            "type": "record",
+            "id": "102"
+          },
+          {
+            "type": "record",
+            "id": "103"
+          },
+          {
+            "type": "record",
+            "id": "105"
+          },
+          {
+            "type": "record",
+            "id": "108"
+          },
+          {
+            "type": "record",
+            "id": "109"
+          },
+          {
+            "type": "record",
+            "id": "112"
+          },
+          {
+            "type": "record",
+            "id": "115"
+          },
+          {
+            "type": "record",
+            "id": "116"
+          },
+          {
+            "type": "record",
+            "id": "117"
+          },
+          {
+            "type": "record",
+            "id": "119"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "101"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
         },
-        {
-          "type": "record",
-          "id": "102"
+        "action": {
+          "name": "edit"
         },
-        {
-          "type": "record",
-          "id": "103"
-        },
-        {
-          "type": "record",
-          "id": "105"
-        },
-        {
-          "type": "record",
-          "id": "108"
-        },
-        {
-          "type": "record",
-          "id": "109"
-        },
-        {
-          "type": "record",
-          "id": "112"
-        },
-        {
-          "type": "record",
-          "id": "115"
-        },
-        {
-          "type": "record",
-          "id": "116"
-        },
-        {
-          "type": "record",
-          "id": "117"
-        },
-        {
-          "type": "record",
-          "id": "119"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "carol"
       },
-      "action": {
-        "name": "edit"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "103"
+          },
+          {
+            "type": "record",
+            "id": "109"
+          },
+          {
+            "type": "record",
+            "id": "115"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "103"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
         },
-        {
-          "type": "record",
-          "id": "109"
+        "action": {
+          "name": "delete"
         },
-        {
-          "type": "record",
-          "id": "115"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "carol"
       },
-      "action": {
-        "name": "delete"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "103"
+          },
+          {
+            "type": "record",
+            "id": "109"
+          },
+          {
+            "type": "record",
+            "id": "115"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "103"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
         },
-        {
-          "type": "record",
-          "id": "109"
+        "action": {
+          "name": "view"
         },
-        {
-          "type": "record",
-          "id": "115"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "dan"
       },
-      "action": {
-        "name": "view"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "101"
+          },
+          {
+            "type": "record",
+            "id": "102"
+          },
+          {
+            "type": "record",
+            "id": "103"
+          },
+          {
+            "type": "record",
+            "id": "104"
+          },
+          {
+            "type": "record",
+            "id": "105"
+          },
+          {
+            "type": "record",
+            "id": "106"
+          },
+          {
+            "type": "record",
+            "id": "107"
+          },
+          {
+            "type": "record",
+            "id": "108"
+          },
+          {
+            "type": "record",
+            "id": "109"
+          },
+          {
+            "type": "record",
+            "id": "110"
+          },
+          {
+            "type": "record",
+            "id": "111"
+          },
+          {
+            "type": "record",
+            "id": "112"
+          },
+          {
+            "type": "record",
+            "id": "113"
+          },
+          {
+            "type": "record",
+            "id": "114"
+          },
+          {
+            "type": "record",
+            "id": "115"
+          },
+          {
+            "type": "record",
+            "id": "116"
+          },
+          {
+            "type": "record",
+            "id": "117"
+          },
+          {
+            "type": "record",
+            "id": "118"
+          },
+          {
+            "type": "record",
+            "id": "119"
+          },
+          {
+            "type": "record",
+            "id": "120"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "101"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
         },
-        {
-          "type": "record",
-          "id": "102"
+        "action": {
+          "name": "edit"
         },
-        {
-          "type": "record",
-          "id": "103"
-        },
-        {
-          "type": "record",
-          "id": "104"
-        },
-        {
-          "type": "record",
-          "id": "105"
-        },
-        {
-          "type": "record",
-          "id": "106"
-        },
-        {
-          "type": "record",
-          "id": "107"
-        },
-        {
-          "type": "record",
-          "id": "108"
-        },
-        {
-          "type": "record",
-          "id": "109"
-        },
-        {
-          "type": "record",
-          "id": "110"
-        },
-        {
-          "type": "record",
-          "id": "111"
-        },
-        {
-          "type": "record",
-          "id": "112"
-        },
-        {
-          "type": "record",
-          "id": "113"
-        },
-        {
-          "type": "record",
-          "id": "114"
-        },
-        {
-          "type": "record",
-          "id": "115"
-        },
-        {
-          "type": "record",
-          "id": "116"
-        },
-        {
-          "type": "record",
-          "id": "117"
-        },
-        {
-          "type": "record",
-          "id": "118"
-        },
-        {
-          "type": "record",
-          "id": "119"
-        },
-        {
-          "type": "record",
-          "id": "120"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "dan"
       },
-      "action": {
-        "name": "edit"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "104"
+          },
+          {
+            "type": "record",
+            "id": "110"
+          },
+          {
+            "type": "record",
+            "id": "115"
+          },
+          {
+            "type": "record",
+            "id": "116"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "104"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
         },
-        {
-          "type": "record",
-          "id": "110"
+        "action": {
+          "name": "delete"
         },
-        {
-          "type": "record",
-          "id": "115"
-        },
-        {
-          "type": "record",
-          "id": "116"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "dan"
       },
-      "action": {
-        "name": "delete"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "104"
+          },
+          {
+            "type": "record",
+            "id": "110"
+          },
+          {
+            "type": "record",
+            "id": "116"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "104"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
         },
-        {
-          "type": "record",
-          "id": "110"
+        "action": {
+          "name": "view"
         },
-        {
-          "type": "record",
-          "id": "116"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "erin"
       },
-      "action": {
-        "name": "view"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "105"
+          },
+          {
+            "type": "record",
+            "id": "111"
+          },
+          {
+            "type": "record",
+            "id": "115"
+          },
+          {
+            "type": "record",
+            "id": "117"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "105"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
         },
-        {
-          "type": "record",
-          "id": "111"
+        "action": {
+          "name": "edit"
         },
-        {
-          "type": "record",
-          "id": "115"
-        },
-        {
-          "type": "record",
-          "id": "117"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "erin"
       },
-      "action": {
-        "name": "edit"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "105"
+          },
+          {
+            "type": "record",
+            "id": "111"
+          },
+          {
+            "type": "record",
+            "id": "117"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "105"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
         },
-        {
-          "type": "record",
-          "id": "111"
+        "action": {
+          "name": "delete"
         },
-        {
-          "type": "record",
-          "id": "117"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "erin"
       },
-      "action": {
-        "name": "delete"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "105"
+          },
+          {
+            "type": "record",
+            "id": "111"
+          },
+          {
+            "type": "record",
+            "id": "117"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "105"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
         },
-        {
-          "type": "record",
-          "id": "111"
+        "action": {
+          "name": "view"
         },
-        {
-          "type": "record",
-          "id": "117"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "felix"
       },
-      "action": {
-        "name": "view"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "104"
+          },
+          {
+            "type": "record",
+            "id": "106"
+          },
+          {
+            "type": "record",
+            "id": "109"
+          },
+          {
+            "type": "record",
+            "id": "111"
+          },
+          {
+            "type": "record",
+            "id": "112"
+          },
+          {
+            "type": "record",
+            "id": "114"
+          },
+          {
+            "type": "record",
+            "id": "118"
+          },
+          {
+            "type": "record",
+            "id": "120"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "104"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
         },
-        {
-          "type": "record",
-          "id": "106"
+        "action": {
+          "name": "edit"
         },
-        {
-          "type": "record",
-          "id": "109"
-        },
-        {
-          "type": "record",
-          "id": "111"
-        },
-        {
-          "type": "record",
-          "id": "112"
-        },
-        {
-          "type": "record",
-          "id": "114"
-        },
-        {
-          "type": "record",
-          "id": "118"
-        },
-        {
-          "type": "record",
-          "id": "120"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "felix"
       },
-      "action": {
-        "name": "edit"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "106"
+          },
+          {
+            "type": "record",
+            "id": "112"
+          },
+          {
+            "type": "record",
+            "id": "118"
+          }
+        ]
       }
     },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "106"
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
         },
-        {
-          "type": "record",
-          "id": "112"
+        "action": {
+          "name": "delete"
         },
-        {
-          "type": "record",
-          "id": "118"
+        "resource": {
+          "type": "record"
         }
-      ]
-    }
-  },
-  {
-    "request": {
-      "subject": {
-        "type": "user",
-        "id": "felix"
       },
-      "action": {
-        "name": "delete"
-      },
-      "resource": {
-        "type": "record"
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "106"
+          },
+          {
+            "type": "record",
+            "id": "112"
+          },
+          {
+            "type": "record",
+            "id": "118"
+          }
+        ]
       }
-    },
-    "expected": {
-      "results": [
-        {
-          "type": "record",
-          "id": "106"
-        },
-        {
-          "type": "record",
-          "id": "112"
-        },
-        {
-          "type": "record",
-          "id": "118"
-        }
-      ]
     }
-  }
-]
+  ]
+}

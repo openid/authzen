@@ -4,22 +4,28 @@ import axios, { AxiosError } from 'axios';
 import { deepStrictEqual } from 'assert'; // Using Node.js assert for deep comparison
 
 // --- Configuration ---
-// !!! IMPORTANT: Replace this with your actual API endpoint URL !!!
-const API_ENDPOINT_URL = 'https://authzen-proxy-demo.cerbos.dev/'+'access/v1/search/subject';
-const RESULTS_FILE_PATH = path.join(__dirname, '../subject/results.json');
+// const AUTHZEN_PDP_API_KEY = process.env.AUTHZEN_PDP_API_KEY;
+const API_ENDPOINT_URL = process.argv[2] || 'https://authzen-proxy-demo.cerbos.dev/';
+const SUBJECT_SEARCH_ROUTE = 'access/v1/search/subject';
+const ACTION_SEARCH_ROUTE = 'access/v1/search/action';
+const RESOURCE_SEARCH_ROUTE = 'access/v1/search/resource';
+const SUBJECT_RESULTS_FILE_PATH = path.join(__dirname, '../subject/results.json');
+const ACTION_RESULTS_FILE_PATH = path.join(__dirname, '../action/results.json');
+const RESOURCE_RESULTS_FILE_PATH = path.join(__dirname, '../resource/results.json');
 
 // --- Interfaces based on your results.json structure ---
 interface RequestResource {
   type: string;
-  id: string;
+  id?: string;
 }
 
 interface RequestAction {
-  name: string;
+  name?: string;
 }
 
 interface RequestSubject {
   type: string;
+  id?: string;
 }
 
 interface RequestPayload {
@@ -80,14 +86,19 @@ function compareResponses(actual: ExpectedResponse, expected: ExpectedResponse):
 
 // --- Main script logic ---
 async function runTests() {
-  console.log(`Reading results from: ${RESULTS_FILE_PATH}`);
+  await runTestSuite(SUBJECT_RESULTS_FILE_PATH,SUBJECT_SEARCH_ROUTE);
+  await runTestSuite(ACTION_RESULTS_FILE_PATH,ACTION_SEARCH_ROUTE);
+  await runTestSuite(RESOURCE_RESULTS_FILE_PATH,RESOURCE_SEARCH_ROUTE);
+}
+async function runTestSuite(testFile: string, apiRoute: string) {
+  console.log(`Reading results from: ${testFile}`);
   let resultsData: ResultsFile;
 
   try {
-    const fileContent = await fs.readFile(RESULTS_FILE_PATH, 'utf-8');
+    const fileContent = await fs.readFile(testFile, 'utf-8');
     resultsData = JSON.parse(fileContent) as ResultsFile;
   } catch (error) {
-    console.error(`Failed to read or parse ${RESULTS_FILE_PATH}:`, error);
+    console.error(`Failed to read or parse ${testFile}:`, error);
     return;
   }
 
@@ -100,7 +111,7 @@ async function runTests() {
     console.log("Expected Response:", JSON.stringify(testCase.expected, null, 2));
 
     try {
-      const response = await axios.post<ExpectedResponse>(API_ENDPOINT_URL, testCase.request, {
+      const response = await axios.post<ExpectedResponse>(API_ENDPOINT_URL+apiRoute, testCase.request, {
         headers: {
           'Content-Type': 'application/json',
         },
