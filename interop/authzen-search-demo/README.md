@@ -1,18 +1,27 @@
-# Welcome to React Router!
+# AuthZEN Search Demo App
 
-A modern, production-ready template for building full-stack React applications using React Router.
+Supports:
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+- Resource search
+- Action search
+- Subject search
+- Metadata
 
-## Features
+Expects the PDP configuration to be passed as a base64 encoded JSON object env variable called `PDP_CONFIG` like the following:
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+```json
+{
+  "Cerbos": {
+    "host": "https://authzen-proxy-demo.cerbos.dev"
+  },
+  "Topaz": {
+    "host": "https://topaz-search.demo.authzen-interop.net",
+    "headers": {
+      "Authorization": "basic <sometoke"
+    }
+  }
+}
+```
 
 ## Getting Started
 
@@ -54,34 +63,3 @@ docker build -t my-app .
 # Run the container
 docker run -p 8080:8080 my-app
 ```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
