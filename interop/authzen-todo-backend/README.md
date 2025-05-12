@@ -19,8 +19,8 @@ Optionally, set the `AUTHZEN_PDP_API_KEY` variable if your authorizer needs an A
 Example `.env` file:
 
 ```shell
-JWKS_URI=https://citadel.demo.aserto.com/dex/keys
-ISSUER=https://citadel.demo.aserto.com/dex
+JWKS_URI=https://citadel.authzen-interop.net/dex/keys
+ISSUER=https://citadel.authzen-interop.net/dex
 AUDIENCE=citadel-app
 
 AUTHZEN_PDP_URL=https://authorizer.domain.com

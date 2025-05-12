@@ -4,16 +4,16 @@ sidebar_position: 6
 
 # Topaz
 
-Interop results for the [Topaz](https://www.topaz.sh/) implementation hosted at https://authzen-topaz-proxy-preview.demo.aserto.com. Note that this implementation deploys a Topaz sidecar in the same pod as the proxy.
+Interop results for the [Topaz](https://www.topaz.sh/) implementation hosted at https://authzen-topaz-proxy-preview.demo.authzen-interop.net. Note that this implementation deploys a Topaz sidecar in the same pod as the proxy.
 
-For more information, please refer to the [code](https://github.com/aserto-dev/authzen-topaz-proxy) and [playground](https://authzen-topaz-proxy-preview.demo.aserto.com), demonstrating the scenario.
+For more information, please refer to the [code](https://github.com/aserto-dev/authzen-topaz-proxy) and [playground](https://authzen-topaz-proxy-preview.demo.authzen-interop.net), demonstrating the scenario.
 
 ## Test results
 
 ```bash
-yarn test https://authzen-topaz-proxy-preview.demo.aserto.com markdown
+yarn test https://topaz-proxy.demo.authzen-interop.net markdown
 yarn run v1.22.19
-$ node build/test/runner.js https://authzen-topaz-proxy-preview.demo.aserto.com markdown
+$ node build/test/runner.js https://topaz-proxy.demo.authzen-interop.net markdown
 ```
 <table>
   <tr>
