@@ -10,9 +10,8 @@ Interop results for the [PlainID](https://www.plainid.com/) implementation hoste
 
 ```bash
 yarn test https://authzeninteropt.se-plainid.com markdown
-yarn run v1.22.22
+yarn run v1.22.19
 $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
-```
 <table>
   <tr>
     <th>result</th>
@@ -24,16 +23,1254 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 
 ```js
 {
-  "subject": {
-    "type": "identity",
-    "id": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+  "resource": {
+    "type": "record",
+    "id": "101"
   },
   "action": {
-    "name": "GET"
+    "name": "view"
   },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
   "resource": {
-    "type": "route",
-    "id": "/users/{userId}"
+    "type": "record",
+    "id": "101"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "101"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "102"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "102"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "102"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "103"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "103"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "103"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "104"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "104"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "104"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "105"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "105"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "105"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "106"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "106"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "106"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "107"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "107"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "107"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "108"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "108"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "108"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "109"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "109"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "109"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "110"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "110"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "110"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "111"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "111"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "111"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "112"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "112"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "112"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "113"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "113"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "113"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "114"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "114"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "114"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "115"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "115"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "115"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "116"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "116"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "116"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "117"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "117"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "117"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "118"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "118"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "118"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "119"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "119"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "119"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "120"
+  },
+  "action": {
+    "name": "view"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "120"
+  },
+  "action": {
+    "name": "edit"
+  },
+  "subject": {
+    "type": "user"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "resource": {
+    "type": "record",
+    "id": "120"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "subject": {
+    "type": "user"
   }
 }
 ```
@@ -47,15 +1284,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "alice"
   },
   "action": {
-    "name": "GET"
+    "name": "view"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos"
+    "type": "record"
   }
 }
 ```
@@ -69,15 +1305,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "alice"
   },
   "action": {
-    "name": "POST"
+    "name": "edit"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos"
+    "type": "record"
   }
 }
 ```
@@ -91,15 +1326,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "alice"
   },
   "action": {
-    "name": "PUT"
+    "name": "delete"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos/{todoId}"
+    "type": "record"
   }
 }
 ```
@@ -113,15 +1347,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDA2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "bob"
   },
   "action": {
-    "name": "DELETE"
+    "name": "view"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos/{todoId}"
+    "type": "record"
   }
 }
 ```
@@ -135,15 +1368,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "bob"
   },
   "action": {
-    "name": "GET"
+    "name": "edit"
   },
   "resource": {
-    "type": "route",
-    "id": "/users/{userId}"
+    "type": "record"
   }
 }
 ```
@@ -157,15 +1389,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "bob"
   },
   "action": {
-    "name": "GET"
+    "name": "delete"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos"
+    "type": "record"
   }
 }
 ```
@@ -179,15 +1410,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "carol"
   },
   "action": {
-    "name": "POST"
+    "name": "view"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos"
+    "type": "record"
   }
 }
 ```
@@ -201,15 +1431,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "carol"
   },
   "action": {
-    "name": "PUT"
+    "name": "edit"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos/{todoId}"
+    "type": "record"
   }
 }
 ```
@@ -223,15 +1452,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDE2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "carol"
   },
   "action": {
-    "name": "DELETE"
+    "name": "delete"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos/{todoId}"
+    "type": "record"
   }
 }
 ```
@@ -245,15 +1473,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "dan"
   },
   "action": {
-    "name": "GET"
+    "name": "view"
   },
   "resource": {
-    "type": "route",
-    "id": "/users/{userId}"
+    "type": "record"
   }
 }
 ```
@@ -267,15 +1494,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "dan"
   },
   "action": {
-    "name": "GET"
+    "name": "edit"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos"
+    "type": "record"
   }
 }
 ```
@@ -289,15 +1515,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "dan"
   },
   "action": {
-    "name": "POST"
+    "name": "delete"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos"
+    "type": "record"
   }
 }
 ```
@@ -311,15 +1536,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "erin"
   },
   "action": {
-    "name": "PUT"
+    "name": "view"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos/{todoId}"
+    "type": "record"
   }
 }
 ```
@@ -333,15 +1557,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDI2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "erin"
   },
   "action": {
-    "name": "DELETE"
+    "name": "edit"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos/{todoId}"
+    "type": "record"
   }
 }
 ```
@@ -355,15 +1578,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "erin"
   },
   "action": {
-    "name": "GET"
+    "name": "delete"
   },
   "resource": {
-    "type": "route",
-    "id": "/users/{userId}"
+    "type": "record"
   }
 }
 ```
@@ -377,15 +1599,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "felix"
   },
   "action": {
-    "name": "GET"
+    "name": "view"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos"
+    "type": "record"
   }
 }
 ```
@@ -399,15 +1620,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "felix"
   },
   "action": {
-    "name": "POST"
+    "name": "edit"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos"
+    "type": "record"
   }
 }
 ```
@@ -421,15 +1641,14 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
+    "type": "user",
+    "id": "felix"
   },
   "action": {
-    "name": "PUT"
+    "name": "delete"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos/{todoId}"
+    "type": "record"
   }
 }
 ```
@@ -443,15 +1662,12 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDM2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
-  },
-  "action": {
-    "name": "DELETE"
+    "type": "user",
+    "id": "alice"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos/{todoId}"
+    "type": "record",
+    "id": "101"
   }
 }
 ```
@@ -465,15 +1681,12 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
-  },
-  "action": {
-    "name": "GET"
+    "type": "user",
+    "id": "alice"
   },
   "resource": {
-    "type": "route",
-    "id": "/users/{userId}"
+    "type": "record",
+    "id": "102"
   }
 }
 ```
@@ -487,15 +1700,12 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
-  },
-  "action": {
-    "name": "GET"
+    "type": "user",
+    "id": "alice"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos"
+    "type": "record",
+    "id": "103"
   }
 }
 ```
@@ -509,15 +1719,12 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
-  },
-  "action": {
-    "name": "POST"
+    "type": "user",
+    "id": "alice"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos"
+    "type": "record",
+    "id": "104"
   }
 }
 ```
@@ -531,15 +1738,12 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
-  },
-  "action": {
-    "name": "PUT"
+    "type": "user",
+    "id": "alice"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos/{todoId}"
+    "type": "record",
+    "id": "105"
   }
 }
 ```
@@ -553,15 +1757,2178 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
 ```js
 {
   "subject": {
-    "type": "identity",
-    "id": "CiRmZDQ2MTRkMy1jMzlhLTQ3ODEtYjdiZC04Yjk2ZjVhNTEwMGQSBWxvY2Fs"
-  },
-  "action": {
-    "name": "DELETE"
+    "type": "user",
+    "id": "alice"
   },
   "resource": {
-    "type": "route",
-    "id": "/todos/{todoId}"
+    "type": "record",
+    "id": "106"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "107"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "108"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "109"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "110"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "111"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "112"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "113"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "114"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "115"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "116"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "117"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "118"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "119"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "alice"
+  },
+  "resource": {
+    "type": "record",
+    "id": "120"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "101"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "102"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "103"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "104"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "105"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "106"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "107"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "108"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "109"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "110"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "111"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "112"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "113"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "114"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "115"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "116"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "117"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "118"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "119"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "bob"
+  },
+  "resource": {
+    "type": "record",
+    "id": "120"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "101"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "102"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "103"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "104"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "105"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "106"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "107"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "108"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "109"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "110"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "111"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "112"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "113"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "114"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "115"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "116"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "117"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "118"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "119"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "carol"
+  },
+  "resource": {
+    "type": "record",
+    "id": "120"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "101"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "102"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "103"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "104"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "105"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "106"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "107"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "108"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "109"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "110"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "111"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "112"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "113"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "114"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "115"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "116"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "117"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "118"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "119"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "dan"
+  },
+  "resource": {
+    "type": "record",
+    "id": "120"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "101"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "102"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "103"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "104"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "105"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "106"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "107"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "108"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "109"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "110"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "111"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "112"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "113"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "114"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "115"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "116"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "117"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "118"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "119"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "erin"
+  },
+  "resource": {
+    "type": "record",
+    "id": "120"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "101"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "102"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "103"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "104"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "105"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "106"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "107"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "108"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "109"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "110"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "111"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "112"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "113"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "114"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "115"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "116"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "117"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "118"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "119"
+  }
+}
+```
+
+  </td>
+  </tr>
+  <tr>
+    <td bgColor="green">PASS</td>
+    <td>
+
+```js
+{
+  "subject": {
+    "type": "user",
+    "id": "felix"
+  },
+  "resource": {
+    "type": "record",
+    "id": "120"
   }
 }
 ```
@@ -569,3 +3936,4 @@ $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
   </td>
   </tr>
 </table>
+

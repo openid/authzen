@@ -1,18 +1,17 @@
 ---
-sidebar_position: 2
+sidebar_position: 4
 ---
 
-# Cerbos
+# Apache KIE
 
-Interop results for the [Cerbos](https://cerbos.dev) implementation hosted at `https://authzen-proxy-demo.cerbos.dev`.
+Interop results for the [Apache KIE](hhttps://kie.apache.org/) implementation hosted at https://authzen-proxy-demo.azerad.org.
 
 ## Test results
 
 ```bash
-yarn test https://authzen-proxy-demo.cerbos.dev markdown
+yarn test https://authzen-proxy-demo.azerad.org markdown
 yarn run v1.22.19
-$ node build/runner.js https://authzen-proxy-demo.cerbos.dev markdown
-```
+$ node build/runner.js https://authzen-proxy-demo.azerad.org markdown
 <table>
   <tr>
     <th>result</th>
