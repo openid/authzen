@@ -12,6 +12,7 @@ Interop results for the [PlainID](https://www.plainid.com/) implementation hoste
 yarn test https://authzeninteropt.se-plainid.com markdown
 yarn run v1.22.19
 $ node build/runner.js https://authzeninteropt.se-plainid.com markdown
+```
 <table>
   <tr>
     <th>result</th>
