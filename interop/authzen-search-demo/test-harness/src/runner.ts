@@ -4,7 +4,7 @@ import { evaluation as subjects } from "./subject/results.json";
 import { evaluation as resources } from "./resource/results.json";
 
 const AUTHZEN_PDP_URL =
-  process.argv[2] || "https://topaz-search.demoauthzen-interop.net";
+  process.argv[2] || "https://topaz-search.demo.authzen-interop.net";
 const AUTHZEN_PDP_API_KEY = process.env.AUTHZEN_PDP_API_KEY;
 
 enum OutputTypes {
