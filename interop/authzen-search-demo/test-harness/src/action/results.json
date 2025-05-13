@@ -1,0 +1,2226 @@
+{
+  "evaluation": [
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "101"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "102"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "103"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "104"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "105"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "106"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "107"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "108"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "109"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "110"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "111"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "112"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "113"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "114"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "115"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "116"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "117"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "118"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "119"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "resource": {
+          "type": "record",
+          "id": "120"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "101"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "102"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "103"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "104"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "105"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "106"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "107"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "108"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "109"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "110"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "111"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "112"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "113"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "114"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "115"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "116"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "117"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "118"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "119"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "resource": {
+          "type": "record",
+          "id": "120"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "101"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "102"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "103"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "104"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "105"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "106"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "107"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "108"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "109"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "110"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "111"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "112"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "113"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "114"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "115"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "116"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "117"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "118"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "119"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "resource": {
+          "type": "record",
+          "id": "120"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "101"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "102"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "103"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "104"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "105"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "106"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "107"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "108"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "109"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "110"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "111"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "112"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "113"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "114"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "115"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "116"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "117"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "118"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "119"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "resource": {
+          "type": "record",
+          "id": "120"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "101"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "102"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "103"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "104"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "105"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "106"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "107"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "108"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "109"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "110"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "111"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "112"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "113"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "114"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "115"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "116"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "117"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "118"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "119"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "resource": {
+          "type": "record",
+          "id": "120"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "101"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "102"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "103"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "104"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "105"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "106"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "107"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "108"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "109"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "110"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "111"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "112"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "113"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "114"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "115"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "116"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "117"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "118"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          },
+          {
+            "name": "edit"
+          },
+          {
+            "name": "delete"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "119"
+        }
+      },
+      "expected": {
+        "results": []
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "resource": {
+          "type": "record",
+          "id": "120"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "name": "view"
+          }
+        ]
+      }
+    }
+  ]
+}
