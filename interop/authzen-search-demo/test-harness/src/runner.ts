@@ -42,9 +42,6 @@ async function main() {
     process.exit(0);
   }
 
-  //const decisionFile ='./action/results.json'
-  //const { evaluation } = require(decisionFile);
-
   const results: Result[] = [];
 
   for (const subject of subjects || []) {
