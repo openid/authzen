@@ -134,15 +134,7 @@ function status(response: Expected, expected: Expected) {
   const sortedActualResults = sortResults(response.results || []);
   const sortedExpectedResults = sortResults(expected.results || []);
 
-  const actualResults = sortedActualResults.filter((r) => {
-    const actionResult = r as { name: string };
-    if (actionResult.name) {
-      return actionResult.name === "delete" || actionResult.name === "edit" || actionResult.name === "view"
-    }
-    return r;
-  })
-
-  const actualJson = JSON.stringify(actualResults, (_, value) => value === null ? undefined : value);
+  const actualJson = JSON.stringify(sortedActualResults, (_, value) => value === null ? undefined : value);
   const expectedjson = JSON.stringify(sortedExpectedResults, (_, value) => value === null ? undefined : value);
 
   return actualJson === expectedjson ? "PASS" : "FAIL"  
