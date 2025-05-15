@@ -64,6 +64,7 @@ The latest scenario defines a defense-in-depth architecture, consisting of API g
 | Cerbos               | ✅ [Results](/docs/scenarios/search/results/cerbos)           |
 | PlainID              | ✅ [Results](/docs/scenarios/search/results/plainid)          |
 | Topaz                | ✅ [Results](/docs/scenarios/search/results/topaz)            |
+| WSO2                 | ✅ [Results](/docs/scenarios/search/results/wso2 )            |
 
 
 ### API Gateways
