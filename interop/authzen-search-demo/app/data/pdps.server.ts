@@ -6,7 +6,7 @@
 //     "host": "https://authzen-proxy-demo.cerbos.dev"
 //   },
 //   "Topaz": {
-//     "host": "https://topaz-search.demo.authzen-interop.net",
+//     "host": "https://topaz-search.authzen-interop.net",
 //     "headers": {
 //       "Authorization": "basic 101520"
 //     }
