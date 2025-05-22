@@ -28,7 +28,7 @@
       "HexaOPA": "https://interop.authzen.hexaorchestration.org",
       "Indykite": "https://api-authzen-authz.3edges.io",
       "Kogito": "https://authzen-proxy-demo.azerad.org",
-      "Open Policy Agent": "https://opa-proxy.demo.authzen-interop.net",
+      "Open Policy Agent": "https://opa-proxy.authzen-interop.net",
       "OpenFGA": "https://authzen-interop.openfga.dev/stores/01JG9JGS4W0950VN17G8NNAH3C",
       "Permit.io": "https://permit-authzen-interop.up.railway.app",
       "PingAuthorize": "https://authzen.idpartners.au",
@@ -50,7 +50,7 @@
     "Zuplo": "https://authzen-todo-main-4df5ceb.d2.zuplo.dev"
   },
   "gatewayPdps": {
-    "Aserto": "http://topaz-gateway.demo.authzen-interop.net",
+    "Aserto": "http://topaz-gateway.authzen-interop.net",
     "AVP": "https://authzen-avp.interop-it.org",
     "Axiomatics": "https://pdp.alfa.guide",
     "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
@@ -60,7 +60,7 @@
     "PlainID": "https://authzeninteropt.se-plainid.com",
     "Rock Solid Knowledge": "https://authzen.identityserver.com",
     "SGNL": "https://authzen.sgnlapis.cloud",
-    "Topaz": "https://topaz-gateway.demo.authzen-interop.net",
+    "Topaz": "https://topaz-gateway.authzen-interop.net",
     "WSO2": "https://authzen-interop-demo.wso2.com/api/identity"
   }
 }
