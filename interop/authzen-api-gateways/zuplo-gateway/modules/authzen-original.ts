@@ -1,7 +1,7 @@
 import { HttpProblems, ZuploContext, ZuploRequest, environment } from "@zuplo/runtime"
 
 const pdps = {
-  "Aserto": "https://topaz-gateway.demo.authzen-interop.net",
+  "Aserto": "https://topaz-gateway.authzen-interop.net",
   "AVP": "https://authzen-avp.interop-it.org",
   "Axiomatics": "https://pdp.alfa.guide",
   "Cerbos": "https://authzen-proxy-demo.cerbos.dev",
@@ -11,7 +11,7 @@ const pdps = {
   "PlainID": "https://authzeninteropt.se-plainid.com",
   "Rock Solid Knowledge": "https://authzen.identityserver.com",
   "SGNL": "https://authzen.sgnlapis.cloud",
-  "Topaz": "https://topaz-gateway.demo.authzen-interop.net",
+  "Topaz": "https://topaz-gateway.authzen-interop.net",
   "WSO2": "https://authzen-interop-demo.wso2.com/api/identity"
 }
 const { AUTHZEN_PDP_API_KEYS } = environment
