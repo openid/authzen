@@ -15,7 +15,7 @@ Expects the PDP configuration to be passed as a base64 encoded JSON object env v
     "host": "https://authzen-proxy-demo.cerbos.dev"
   },
   "Topaz": {
-    "host": "https://topaz-search.demo.authzen-interop.net",
+    "host": "https://topaz-search.authzen-interop.net",
     "headers": {
       "Authorization": "basic <sometoke"
     }
