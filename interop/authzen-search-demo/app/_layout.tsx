@@ -71,16 +71,16 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
               {loaderData.pdpMetadata && (
                 <div className="flex gap-4">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2Icon />
+                    <CheckCircle2Icon size={20} />
                     <div className="text-sm text-muted-foreground">
                       Metadata
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     {loaderData.pdpMetadata.access_evaluation_endpoint ? (
-                      <CheckCircle2Icon />
+                      <CheckCircle2Icon size={20} />
                     ) : (
-                      <CircleMinusIcon />
+                      <CircleMinusIcon size={20} />
                     )}
                     <div className="text-sm text-muted-foreground">
                       Evaluation
@@ -88,9 +88,9 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     {loaderData.pdpMetadata.access_evaluations_endpoint ? (
-                      <CheckCircle2Icon />
+                      <CheckCircle2Icon size={20} />
                     ) : (
-                      <CircleMinusIcon />
+                      <CircleMinusIcon size={20} />
                     )}
                     <div className="text-sm text-muted-foreground">
                       Evaluations
@@ -98,9 +98,9 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     {loaderData.pdpMetadata.search_resource_endpoint ? (
-                      <CheckCircle2Icon />
+                      <CheckCircle2Icon size={20} />
                     ) : (
-                      <CircleMinusIcon />
+                      <CircleMinusIcon size={20} />
                     )}
                     <div className="text-sm text-muted-foreground">
                       Resource Search
@@ -108,9 +108,9 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     {loaderData.pdpMetadata.search_subject_endpoint ? (
-                      <CheckCircle2Icon />
+                      <CheckCircle2Icon size={20} />
                     ) : (
-                      <CircleMinusIcon />
+                      <CircleMinusIcon size={20} />
                     )}
                     <div className="text-sm text-muted-foreground">
                       Subject Search
@@ -118,9 +118,9 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     {loaderData.pdpMetadata.search_action_endpoint ? (
-                      <CheckCircle2Icon />
+                      <CheckCircle2Icon size={20} />
                     ) : (
-                      <CircleMinusIcon />
+                      <CircleMinusIcon size={20} />
                     )}
                     <div className="text-sm text-muted-foreground">
                       Action Search
