@@ -8,12 +8,7 @@ import { AppSidebar } from "./components/app-sidebar";
 import { PDPPicker } from "./components/pdp-picker";
 import { pdps } from "./data/pdps.server";
 import { getPDPMetadata } from "./lib/callPdp";
-import {
-  CheckCircle,
-  CheckCircle2Icon,
-  CheckIcon,
-  CircleMinusIcon,
-} from "lucide-react";
+import { CheckCircle2Icon, CircleMinusIcon } from "lucide-react";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const cookieHeader = request.headers.get("Cookie");
@@ -25,6 +20,8 @@ export async function loader({ request }: Route.LoaderArgs) {
     cookie.selectedPdp = activePdp;
   }
 
+  const pdp = pdps[activePdp];
+
   let pdpMetadata = undefined;
   try {
     pdpMetadata = await getPDPMetadata(activePdp);
@@ -32,8 +29,9 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   return data(
     {
-      pdps,
+      pdps: Object.keys(pdps) || [],
       activePdp,
+      activePdpHost: pdp.host,
       pdpMetadata,
     },
     {
@@ -54,7 +52,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
         <div className="flex gap-4 flex-col">
           <div className="flex items-center gap-4 p-2 bg-sidebar-primary-foreground border-b border-b-border">
             <PDPPicker
-              pdpList={Object.keys(loaderData.pdps)}
+              pdpList={loaderData.pdps}
               activePdp={loaderData.activePdp}
               setPdp={function (pdp: string): void {
                 fetcher.submit(
@@ -63,64 +61,74 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                 );
               }}
             />
-            {loaderData.pdpMetadata && (
-              <div className="flex gap-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2Icon />
-                  <div className="text-sm text-muted-foreground">Metadata</div>
+            <div className="gap-1 flex flex-col">
+              {loaderData.activePdpHost && (
+                <div className="text-sm text-muted-foreground">
+                  <span className="font-semibold">Host: </span>
+                  {loaderData.activePdpHost}
                 </div>
-                <div className="flex items-center gap-2">
-                  {loaderData.pdpMetadata.access_evaluation_endpoint ? (
-                    <CheckCircle2Icon />
-                  ) : (
-                    <CircleMinusIcon />
-                  )}
-                  <div className="text-sm text-muted-foreground">
-                    Evaluation
+              )}
+              {loaderData.pdpMetadata && (
+                <div className="flex gap-4">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2Icon size={20} />
+                    <div className="text-sm text-muted-foreground">
+                      Metadata
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {loaderData.pdpMetadata.access_evaluation_endpoint ? (
+                      <CheckCircle2Icon size={20} />
+                    ) : (
+                      <CircleMinusIcon size={20} />
+                    )}
+                    <div className="text-sm text-muted-foreground">
+                      Evaluation
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {loaderData.pdpMetadata.access_evaluations_endpoint ? (
+                      <CheckCircle2Icon size={20} />
+                    ) : (
+                      <CircleMinusIcon size={20} />
+                    )}
+                    <div className="text-sm text-muted-foreground">
+                      Evaluations
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {loaderData.pdpMetadata.search_resource_endpoint ? (
+                      <CheckCircle2Icon size={20} />
+                    ) : (
+                      <CircleMinusIcon size={20} />
+                    )}
+                    <div className="text-sm text-muted-foreground">
+                      Resource Search
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {loaderData.pdpMetadata.search_subject_endpoint ? (
+                      <CheckCircle2Icon size={20} />
+                    ) : (
+                      <CircleMinusIcon size={20} />
+                    )}
+                    <div className="text-sm text-muted-foreground">
+                      Subject Search
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {loaderData.pdpMetadata.search_action_endpoint ? (
+                      <CheckCircle2Icon size={20} />
+                    ) : (
+                      <CircleMinusIcon size={20} />
+                    )}
+                    <div className="text-sm text-muted-foreground">
+                      Action Search
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {loaderData.pdpMetadata.access_evaluations_endpoint ? (
-                    <CheckCircle2Icon />
-                  ) : (
-                    <CircleMinusIcon />
-                  )}
-                  <div className="text-sm text-muted-foreground">
-                    Evaluations
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {loaderData.pdpMetadata.search_resource_endpoint ? (
-                    <CheckCircle2Icon />
-                  ) : (
-                    <CircleMinusIcon />
-                  )}
-                  <div className="text-sm text-muted-foreground">
-                    Resource Search
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {loaderData.pdpMetadata.search_subject_endpoint ? (
-                    <CheckCircle2Icon />
-                  ) : (
-                    <CircleMinusIcon />
-                  )}
-                  <div className="text-sm text-muted-foreground">
-                    Subject Search
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {loaderData.pdpMetadata.search_action_endpoint ? (
-                    <CheckCircle2Icon />
-                  ) : (
-                    <CircleMinusIcon />
-                  )}
-                  <div className="text-sm text-muted-foreground">
-                    Action Search
-                  </div>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
           <div className="container mx-auto max-w-10/12">
             <Outlet />
