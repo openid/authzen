@@ -12,7 +12,6 @@ yarn test https://pdp-authz.int1.eidlabs.net markdown
 yarn run v1.22.22
 $ node build/runner.js https://pdp-authz.int1.eidlabs.net markdown
 ```
-```
 <table>
   <tr>
     <th>result</th>
