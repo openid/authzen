@@ -58,14 +58,16 @@ The latest scenario defines a defense-in-depth architecture, consisting of API g
 
 #### Search scenario
 
-| Implementation       | [Search PEP 03](/docs/scenarios/search/)                      |
-| -------------------- | ------------------------------------------------------------- |
-| Apache KIE           | ✅ [Results](/docs/scenarios/search/results/apachekie)        |
-| Cerbos               | ✅ [Results](/docs/scenarios/search/results/cerbos)           |
-| PlainID              | ✅ [Results](/docs/scenarios/search/results/plainid)          |
-| Topaz                | ✅ [Results](/docs/scenarios/search/results/topaz)            |
-| WSO2                 | ✅ [Results](/docs/scenarios/search/results/wso2 )            |
-
+| Implementation              | [Search PEP 03](/docs/scenarios/search/)                      |
+| --------------------------- | ------------------------------------------------------------- |
+| Apache KIE                  | ✅ [Results](/docs/scenarios/search/results/apachekie)        |
+| Axiomatics                  | ✅ [Results](/docs/scenarios/search/results/axiomatics)       |
+| Cerbos                      | ✅ [Results](/docs/scenarios/search/results/cerbos)           |
+| EmpowerID                   | ✅ [Results](/docs/scenarios/search/results/empowerid)        |
+| PingAuthorize (ID Partners) | ✅ [Results](/docs/scenarios/search/results/ping)             |
+| PlainID                     | ✅ [Results](/docs/scenarios/search/results/plainid)          |
+| Topaz                       | ✅ [Results](/docs/scenarios/search/results/topaz)            |
+| WSO2                        | ✅ [Results](/docs/scenarios/search/results/wso2 )            |
 
 ### API Gateways
 

@@ -1,17 +1,17 @@
 ---
-sidebar_position: 7
+sidebar_position: 6
 ---
 
-# Axiomatics
+# PingAuthorize (ID Partners)
 
-Interop results for the [Axiomatics](https://www.axiomatics.com/) implementation hosted at https://pdp.alfa.guide.
+Interop results for the [ID Partners adapter for PingAuthorize](https://www.pingidentity.com/en/platform/capabilities/authorization/pingauthorize.html) implementation hosted at `https://authzen.idpartners.au`.
 
 ## Test results
 
 ```bash
-yarn test https://pdp.alfa.guide markdown
+AUTHZEN_PDP_API_KEY="<redacted>" yarn test https://authzen.idpartners.au markdown
 yarn run v1.22.22
-$ node build/runner.js https://pdp.alfa.guide markdown
+$ node build/runner.js https://authzen.idpartners.au markdown
 ```
 <table>
   <tr>

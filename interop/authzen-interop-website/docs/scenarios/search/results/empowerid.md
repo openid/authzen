@@ -1,17 +1,17 @@
 ---
-sidebar_position: 7
+sidebar_position: 8
 ---
 
-# Axiomatics
+# EmpowerID
 
-Interop results for the [Axiomatics](https://www.axiomatics.com/) implementation hosted at https://pdp.alfa.guide.
+Interop results for the [EmpowerID](https://www.empowerid.com/) implementation hosted at `https://pdp-authz.int1.eidlabs.net`.
 
 ## Test results
-
 ```bash
-yarn test https://pdp.alfa.guide markdown
+yarn test https://pdp-authz.int1.eidlabs.net markdown 
 yarn run v1.22.22
-$ node build/runner.js https://pdp.alfa.guide markdown
+$ node build/runner.js https://pdp-authz.int1.eidlabs.net markdown
+```
 ```
 <table>
   <tr>
@@ -3937,4 +3937,3 @@ $ node build/runner.js https://pdp.alfa.guide markdown
   </td>
   </tr>
 </table>
-
