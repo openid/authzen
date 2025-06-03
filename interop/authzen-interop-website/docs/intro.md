@@ -64,6 +64,7 @@ The latest scenario defines a defense-in-depth architecture, consisting of API g
 | Axiomatics                  | ✅ [Results](/docs/scenarios/search/results/axiomatics)       |
 | Cerbos                      | ✅ [Results](/docs/scenarios/search/results/cerbos)           |
 | EmpowerID                   | ✅ [Results](/docs/scenarios/search/results/empowerid)        |
+| Indykite                    | ✅ [Results](/docs/scenarios/search/results/indykite)        |
 | PingAuthorize (ID Partners) | ✅ [Results](/docs/scenarios/search/results/ping)             |
 | PlainID                     | ✅ [Results](/docs/scenarios/search/results/plainid)          |
 | Topaz                       | ✅ [Results](/docs/scenarios/search/results/topaz)            |
