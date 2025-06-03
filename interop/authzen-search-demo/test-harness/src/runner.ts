@@ -6,6 +6,7 @@ import { evaluation as resources } from "./resource/results.json";
 const AUTHZEN_PDP_URL =
   process.argv[2] || "https://topaz-search.authzen-interop.net";
 const AUTHZEN_PDP_API_KEY = process.env.AUTHZEN_PDP_API_KEY;
+const AUTHZEN_PDP_API_HEADER = process.env.AUTHZEN_PDP_API_HEADER;
 
 enum OutputTypes {
   MARKDOWN,
@@ -84,7 +85,7 @@ async function execute(
     const response = await fetch(`${AUTHZEN_PDP_URL}/access/v1/search/${endpoint}`, {
       method: "POST",
       headers: {
-        Authorization: AUTHZEN_PDP_API_KEY,
+        [process.env.AUTHZEN_PDP_API_HEADER || "authorization"]: AUTHZEN_PDP_API_KEY,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(REQ),
@@ -123,7 +124,7 @@ function status(response: Expected, expected: Expected) {
       const bAsTypeId = (b as { type: string, id: string });
       if (aAsTypeId.type) {
         if (aAsTypeId.type !== bAsTypeId.type) return aAsTypeId.type.localeCompare(bAsTypeId.type);
-        return aAsTypeId.id.localeCompare(bAsTypeId.id);  
+        return aAsTypeId.id.localeCompare(bAsTypeId.id);
       }
       const aAsName = (a as { name: string });
       const bAsName = (b as { name: string });
@@ -137,7 +138,7 @@ function status(response: Expected, expected: Expected) {
   const actualJson = JSON.stringify(sortedActualResults, (_, value) => value === null ? undefined : value);
   const expectedjson = JSON.stringify(sortedExpectedResults, (_, value) => value === null ? undefined : value);
 
-  return actualJson === expectedjson ? "PASS" : "FAIL"  
+  return actualJson === expectedjson ? "PASS" : "FAIL"
 }
 
 function logResult(result: Result) {
