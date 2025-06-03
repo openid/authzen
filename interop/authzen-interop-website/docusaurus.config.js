@@ -76,6 +76,11 @@ const config = {
             label: 'Todo Application',
             postion: 'left',
           },
+          {
+            href: 'https://search.authzen-interop.net',
+            label: 'Search Application',
+            postion: 'left',
+          },
           // {to: '/blog', label: 'Blog', position: 'left'},
           {
             href: 'https://github.com/openid/authzen',
