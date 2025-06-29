@@ -333,7 +333,7 @@ In addition to the mandatory `"decision"` property, a response MAY also contain 
 
 - `reason`
 - `properties`
-- `obligation`
+- `obligations`
 - `metadata`
 - `environment`
 
@@ -377,14 +377,14 @@ The following are non-normative examples of Reason Field objects:
   "error-123": "Location restriction violation."
 }
 ~~~
-{: #reason-example title="Example Reason Field: access denial."}
+{: #reason-example1 title="Example Reason Field: access denial."}
 
 ~~~ json
 {
   "MGR-OK": "Manager access granted."
 }
 ~~~
-{: #reason-example title="Example Reason Field: access granted."}
+{: #reason-example2 title="Example Reason Field: access granted."}
 
 Putting it all together, the following is a non-normative example of a Reason Object comprising Reason Fields:
 
@@ -401,7 +401,7 @@ Putting it all together, the following is a non-normative example of a Reason Ob
   }
 ]
 ~~~
-{: #reason-example title="Example reason object with Reason Fields: access denied."}
+{: #reason-example3 title="Example reason object with Reason Fields: access denied."}
 
 #### Properties context field
 OPTIONAL - The properties element is a JSON object made of custom, implementation-specific `key = value` property pairs. When provided as part of the decision response, the custom properties can provide justification, expected claims or additional information pertaining to the decision made by the PDP. The PEP can then either use these properties for further processing, or pass them along to the client for end-user interaction.
@@ -416,7 +416,7 @@ The following are a non-normative examples of custom properties response element
   "department": "Sales"
 }
 ~~~
-{: #properties-example title="Example custom justification properties."}
+{: #properties-example1 title="Example custom justification properties."}
 
 ~~~ json
 {
@@ -426,9 +426,9 @@ The following are a non-normative examples of custom properties response element
   "is_within_business_hrs": true
 }
 ~~~
-{: #properties-example title="Another example of custom justification properties."}
+{: #properties-example2 title="Another example of custom justification properties."}
 
-#### Obligation context field
+#### s context field
 OPTIONAL - Obligations are a set of operations that the PEP must perform in conjunction with an authorization decision. They serve as mandatory instructions that extend the simple "Permit" or "Deny" outcome.
 
 The PEP is responsible for implementing and enforcing the obligations received with an authorization decision. If the PEP fails to fulfill an obligation that was part of a Permit decision, it must then deny access to the requested resource. This ensures that the stipulated actions are indeed carried out.
@@ -444,9 +444,9 @@ Common Use Cases:
 
 - _Data Transformation_ : Watermarking a document before it is returned to the user.
 
-When used, the `obligation` context field MUST be an array of JSON objects. The obligation elements MAY follow the {{XACML}} Core specification styled URI identifiers and formats, but MAY also, and instead use custom implementation-specific strings or identifiers.
+When used, the `obligations` context field MUST be an array of JSON objects. The obligations elements MAY follow the {{XACML}} Core specification styled URI identifiers and formats, but MAY also, and instead use custom implementation-specific strings or identifiers.
 
-If an obligation object is provided in the PDP response, then the PEP MUST understand and perform all associated obligations. 
+If an `obligations` object is provided in the PDP response, then the PEP MUST understand it and perform all prescribed actions. 
 
 The following non-normative example depicts a single obligation to notify a manager about a denied attempt, expressed here using URI identifers:
 
@@ -474,7 +474,7 @@ The following non-normative example depicts a single obligation to notify a mana
   }
 ]
 ~~~
-{: #properties-example title="Non-normative Example obligation with XACML Identifiers"}
+{: #obligations-example1 title="Non-normative Example obligation with XACML Identifiers"}
 
 The following non-normative example depicts two obligations, expressed in custom implementation-specific JSON format, requiring the PEP to seek the specified `acr` and `amr` claim values for the user's `access_token` (in-effect requesting a higher level of assurance for the user's authentication; i.e., a step-up authentication), and also to email a manager about the access attempt:
 
@@ -496,7 +496,7 @@ The following non-normative example depicts two obligations, expressed in custom
   }
 ]
 ~~~
-{: #properties-example title="Non-normative Example obligations expressed with custom values"}
+{: #obligations-example2 title="Non-normative Example obligations expressed with custom values"}
 
 #### Metadata context field
 OPTIONAL - The `metadata` field is a simple JSON object, made of `key = value` pairs that can provide additional information about the request execution or the state of the PDP server or underlying services. These values can be statistics, numbers or strings, and are implementation-specific.  
@@ -512,7 +512,7 @@ The following is a non-normative example of some Metadata context values:
   "number-of-records": 2000
 }
 ~~~
-{: #properties-example title="Non-normative Example metadata context"}
+{: #metadata-example title="Non-normative Example metadata context"}
 
 #### Environment
 OPTIONAL - The `environment` field can be used to convey environmental conditions or facts that help explain or justify the access decision. These environmental conditions can include the time of day or location, but may also include any implementation-specific `key = value` pairs.
@@ -528,7 +528,7 @@ The following is a non-mnormative example of an `envrionment` context, expressin
   "os": "ubuntu24.04.2LTS-AMDx64"
 }
 ~~~
-{: #properties-example title="Non-normative Example metadata context"}
+{: #environment-example title="Non-normative Example metadata context"}
 
 #### Full `context` example
 Putting it all together, the following is a non-normative example of a full AuthZEN response, showcasing all the REQUIRED and possible OPTIONAL response elements:
