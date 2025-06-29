@@ -59,6 +59,7 @@ normative:
   RFC6749: # OAuth
   RFC8259: # JSON
   RFC5785: # well-known
+  RFC7231: # HTTP Semantics
   RFC8615: # well-known URIs
   RFC9110: # HTTP Semantics
   XACML:
@@ -328,77 +329,256 @@ The following is a non-normative example of a simple Decision:
 {: #decision-example title="Example Decision"}
 
 ### Additional Context in a Response
-In addition to a `"decision"`, a response may contain a `"context"` field which can be any JSON object.  This context can convey additional information that can be used by the PEP as part of the decision evaluation process. Examples include:
+In addition to the mandatory `"decision"` property, a response MAY also contain additional information to help the PEP, Client or end user decide on the best course of action in reaction to the decision, or to trigger a specific behaviour within the PEP. The response MAY therefore also contain an OPTIONAL  `context` JSON object, with the following JSON fields:
 
-- XACML's notion of "advice" and "obligations"
-- Hints for rendering UI state
-- Instructions for step-up authentication
+- `reason`
+- `properties`
+- `obligation`
+- `metadata`
+- `environment`
 
-### Example Context
-An implementation MAY follow a structured approach to `"context"`, in which it presents the reasons that an authorization request failed.
+Any of these context fields MAY contain natual language messages or explanations. Internationalization (i18n) is a Client and User Experience (UX) concern and out of scope for this specification. Implementations of this specification MAY choose to return multi-lingual messages, but in that case the PEP SHOULD also be able to process these internationalized responses.
 
-- A list of identifiers representing the items (policies, graph nodes, tuples) that were used in the decision-making process.
-- A list of reasons as to why access is permitted or denied.
+These context response fields are detailed in the following sections...
 
-#### Reasons
-Reasons MAY be provided by the PDP. 
+#### Reason context field
+OPTIONAL - The `reason` element is a JSON Array object representing the Reasons why the decision was made, typically in natural language or some other implementation-specific human-readable format. This object can convey information that can be used by the PEP as part of the access enforcement process, or just passed back to the requesting client. The Reason object clarifies and complements the decision, whether access was granted or not.
 
-##### Reason Field {#reason-field}
-A Reason Field is a JSON object that has keys and values of type `string`. The following are non-normative examples of Reason Field objects:
+A PEP can ignore this field if it doesn't know how to process it.
 
-~~~ json
-{
-  "en": "location restriction violation"
-}
-~~~
-{: #reason-example title="Example Reason"}
-
-##### Reason Object {#reason-object}
-A Reason Object specifies a particular reason. It is a JSON object that has the following fields:
+The Reason object being a JSON object, implementations MUST follow the following structure; the `reason` context contains the following elements:
 
 `id`:
-: REQUIRED. A string value that specifies the reason within the scope of a particular response.
+: REQUIRED. A string value that specifies the reason within the scope of a particular response. In case the PDP returns several reasons, the `id` MUST uniquely identify each one of them. The `id` MAY also match specific reasons held by the PDP, part of a reasons list or dictionnary for example, and used for audit correlations.
 
 `reason_admin`:
-: OPTIONAL. The reason, which MUST NOT be shared with the user, but useful for administrative purposes that indicates why the access was denied. The value of this field is a Reason Field object ({{reason-field}}).
+: OPTIONAL. The reason, which MUST NOT be shared with the end user, but useful for administrative purposes that indicates why the access was granted or denied. The value of this field is a Reason Field object ({{reason-field}}).
 
 `reason_user`:
-: OPTIONAL. The reason, which MAY be shared with the user that indicates why the access was denied. The value of this field is a Reason Field object ({{reason-field}}).
+: OPTIONAL. The reason, which MAY be shared with the end user that indicates why the access was granted or denied. The value of this field is a Reason Field object ({{reason-field}}). 
 
-The following is a non-normative example of a Reason Object:
+##### Reason Field {#reason-field}
+A Reason Field is a JSON object with `String` key and value pairs, which has the following form:
+
+`{ "reason-code": "reason-description"}`
+
+where:
+
+`reason-code`:
+: REQUIRED. A String value representing a code that uniquely identifies the error. Implementations that do not use any error-code mechanism SHOULD default to valid HTTP Error codes (see {{RFC7231}} ).
+
+`reason-description`:
+: REQUIRED. A String holding the human-readable natural language description of the reason the decision was made.
+
+The following are non-normative examples of Reason Field objects:
 
 ~~~ json
 {
-  "id": "0",
-  "reason_admin": {
-    "en": "Request failed policy C076E82F"
-  },
-  "reason_user": {
-    "en-403": "Insufficient privileges. Contact your administrator",
-    "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
-  }
+  "error-123": "Location restriction violation."
 }
 ~~~
-{: #example-reason-object title="Example of a Reason Object"}
+{: #reason-example title="Example Reason Field: access denial."}
 
-### Sample Response with additional context (non-normative)
+~~~ json
+{
+  "MGR-OK": "Manager access granted."
+}
+~~~
+{: #reason-example title="Example Reason Field: access granted."}
+
+Putting it all together, the following is a non-normative example of a Reason Object comprising Reason Fields:
+
+~~~ json
+[
+  {
+    "id": "0",
+    "reason_admin": {
+      "403": "Request failed policy C076E82F"
+    },
+    "reason_user": {
+      "403": "Insufficient privileges. Contact your administrator"
+    }
+  }
+]
+~~~
+{: #reason-example title="Example reason object with Reason Fields: access denied."}
+
+#### Properties context field
+OPTIONAL - The properties element is a JSON object made of custom, implementation-specific `key = value` property pairs. When provided as part of the decision response, the custom properties can provide justification, expected claims or additional information pertaining to the decision made by the PDP. The PEP can then either use these properties for further processing, or pass them along to the client for end-user interaction.
+
+A PEP can ignore this field if it doesn't know how to process it.
+
+The following are a non-normative examples of custom properties response elements:
+
+~~~ json
+{
+  "group": "Employee",
+  "department": "Sales"
+}
+~~~
+{: #properties-example title="Example custom justification properties."}
+
+~~~ json
+{
+  "is_role_manager" : false,
+  "is_same_group": true,
+  "is_active":	true,
+  "is_within_business_hrs": true
+}
+~~~
+{: #properties-example title="Another example of custom justification properties."}
+
+#### Obligation context field
+OPTIONAL - Obligations are a set of operations that the PEP must perform in conjunction with an authorization decision. They serve as mandatory instructions that extend the simple "Permit" or "Deny" outcome.
+
+The PEP is responsible for implementing and enforcing the obligations received with an authorization decision. If the PEP fails to fulfill an obligation that was part of a Permit decision, it must then deny access to the requested resource. This ensures that the stipulated actions are indeed carried out.
+
+Common Use Cases: 
+- _Logging and Accountability_: Recording access attempts, especially for sensitive data (e.g., logging that a doctor accessed a patient's medical record under emergency conditions).
+
+- _Notifications_: Triggering alerts or sending emails (e.g., notifying a manager if an unauthorized access attempt occurs).
+
+- _Multi-Factor Authentication/Trust Elevation_: Redirecting a user to an additional authentication step after an initial decision (e.g., requiring a higher assurance authentication method).
+
+- _"Break-the-Glass" Scenarios_: Allowing override of a denial under specific, monitored circumstances, with an obligation to log the override.
+
+- _Data Transformation_ : Watermarking a document before it is returned to the user.
+
+When used, the `obligation` context field MUST be an array of JSON objects. The obligation elements MAY follow the {{XACML}} Core specification styled URI identifiers and formats, but MAY also, and instead use custom implementation-specific strings or identifiers.
+
+If an obligation object is provided in the PDP response, then the PEP MUST understand and perform all associated obligations. 
+
+The following non-normative example depicts a single obligation to notify a manager about a denied attempt, expressed here using URI identifers:
+
+~~~ json
+[
+  {
+    "Id": "urn:example:obligation:notifyManager",
+    "AttributeAssignment": [
+      {
+        "AttributeId": "urn:example:attribute:managerEmail",
+        "Value": "manager@example.com",
+        "DataType": "string"
+      },
+      {
+        "AttributeId": "urn:example:attribute:deniedUser",
+        "Value": "bob.jones",
+        "DataType": "string"
+      },
+      {
+        "AttributeId": "urn:example:attribute:reasonForDenial",
+        "Value": "InsufficientPrivileges",
+        "DataType": "string"
+      }
+    ]
+  }
+]
+~~~
+{: #properties-example title="Non-normative Example obligation with XACML Identifiers"}
+
+The following non-normative example depicts two obligations, expressed in custom implementation-specific JSON format, requiring the PEP to seek the specified `acr` and `amr` claim values for the user's `access_token` (in-effect requesting a higher level of assurance for the user's authentication; i.e., a step-up authentication), and also to email a manager about the access attempt:
+
+~~~ json
+[
+  {
+    "acr_values": "urn:com:example:loa:3",
+    "amr_values": "mfa hwk"
+  },
+  {
+    "action": {
+      "type": "email",
+      "parameters": {
+        "to": "manager@example.com",
+        "subject": "Insufficient Assurance Level in Access Request",
+        "body": "<userid>"
+      }
+    }
+  }
+]
+~~~
+{: #properties-example title="Non-normative Example obligations expressed with custom values"}
+
+#### Metadata context field
+OPTIONAL - The `metadata` field is a simple JSON object, made of `key = value` pairs that can provide additional information about the request execution or the state of the PDP server or underlying services. These values can be statistics, numbers or strings, and are implementation-specific.  
+
+A PEP can ignore this field if it doesn't know how to process it.
+
+The following is a non-normative example of some Metadata context values:
+
+~~~ json
+{
+  "response-time": 60,
+  "response-time-unit": "ms",
+  "number-of-records": 2000
+}
+~~~
+{: #properties-example title="Non-normative Example metadata context"}
+
+#### Environment
+OPTIONAL - The `environment` field can be used to convey environmental conditions or facts that help explain or justify the access decision. These environmental conditions can include the time of day or location, but may also include any implementation-specific `key = value` pairs.
+
+A PEP can ignore this field if it doesn't know how to process it.
+
+The following is a non-mnormative example of an `envrionment` context, expressing a request location identified by its IP address, a request date time and a requesting device Operating System :
+
+~~~ json
+{
+  "ip": "10.10.0.1",
+  "datetime": "2025-06-27T18:03:07Z",
+  "os": "ubuntu24.04.2LTS-AMDx64"
+}
+~~~
+{: #properties-example title="Non-normative Example metadata context"}
+
+#### Full `context` example
+Putting it all together, the following is a non-normative example of a full AuthZEN response, showcasing all the REQUIRED and possible OPTIONAL response elements:
 
 ~~~ json
 {
   "decision": false,
   "context": {
-    "id": "0",
-    "reason_admin": {
-      "en": "Request failed policy C076E82F"
+    "reason": {
+      "id": "0",
+      "reason_admin": {
+        "insufficient_user_authentication": "Request failed policy C076E82F"
+      },
+      "reason_user": {
+        "insufficient_user_authentication": "This access requires strong authentication."
+      }
     },
-    "reason_user": {
-      "en-403": "Insufficient privileges. Contact your administrator",
-      "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
+    "properties": {
+      "group": "Employee",
+      "department": "Sales"
+    },
+    "obligation": [
+      {
+        "acr_values": "urn:com:example:loa:3",
+        "amr_values": "mfa hwk"
+      },
+      {
+        "action": {
+          "type": "email",
+          "parameters": {
+            "to": "manager@example.com",
+            "subject": "Insufficient Assurance Level in Access Request",
+            "body": "<userid>"
+          }
+        }
+      }
+    ],
+    "metadata": {
+      "response-time": 60,
+      "response-time-unit": "ms",
+      "number-of-records": 2000
+    },
+    "environment": {
+      "ip": "10.10.0.1",
+      "datetime": "2025-06-27T18:03:07Z",
+      "os": "ubuntu24.04.2LTS-AMDx64"
     }
   }
 }
 ~~~
-{: #response-with-context-example title="Example Response with Context"}
 
 # Access Evaluations API {#access-evaluations-api}
 
@@ -716,8 +896,12 @@ Response:
     {
       "decision": false,
       "context": {
-        "id": "200",
-        "reason": "deny_on_first_deny"
+        "reason": {
+          "id": "200",
+          "reason_admin": {
+            "deny_on_first_deny": "Deny on First Deny."
+          }
+        }
       }
     }
   ]
@@ -779,7 +963,7 @@ Like the request format, the Access Evaluations Response format for an Access Ev
 
 In case the `evaluations` array is present, it is RECOMMENDED that the `decision` key of the response will be omitted. If present, it can be ignored by the caller.
 
-The following is a non-normative example of a Access Evaluations Response to an Access Evaluations Request containing three evaluation objects:
+The following is a non-normative example of a Access Evaluations Response to an Access Evaluations Request containing three evaluation objects and reasons (expressed here with custom error codes):
 
 ~~~json
 {
@@ -790,13 +974,23 @@ The following is a non-normative example of a Access Evaluations Response to an 
     {
       "decision": false,
       "context": {
-        "reason": "resource not found"
+        "reason": {
+          "id": "0",
+          "reason_user": {
+            "not_found": "resource not found."
+          }
+        }
       }
     },
     {
       "decision": false,
       "context": {
-        "reason": "Subject is a viewer of the resource"
+        "reason": {
+          "id": "0",
+          "reason_user": {
+            "view_only": "Subject is a viewer of the resource."
+          }
+        }
       }
     }
   ]
@@ -813,7 +1007,7 @@ The first type of error is handled at the transport level. For example, for the 
 
 The second type of error is handled at the payload level. Decisions default to *closed* (i.e. `false`), but the `context` field can include errors that are specific to that request.
 
-The following is a non-normative example of a response to an Access Evaluations Request containing three evaluation objects, two of them demonstrating how errors can be returned for two of the evaluation requests:
+The following is a non-normative example of a response to an Access Evaluations Request containing three evaluation objects, two of them demonstrating how errors can be returned for two of the evaluation requests (the errors here follow the HTTP error numbers):
 
 ~~~json
 {
@@ -824,20 +1018,84 @@ The following is a non-normative example of a response to an Access Evaluations 
     {
       "decision": false,
       "context": {
-        "error": {
-          "status": 404,
-          "message": "Resource not found"
+        "reason": {
+          "id": "0",
+          "reason_user": {
+            "404": "Resource not found."
+          }
         }
       }
     },
     {
       "decision": false,
       "context": {
-        "reason": "Subject is a viewer of the resource"
+        "reason": {
+          "id": "0",
+          "reason_user": {
+            "403": "Subject is a viewer of the resource."
+          }
+        }
       }
     }
   ]
 }
+~~~
+
+# Search APIs
+Many use-cases require the Client app or system to retrieve some authorized data from a backend system. These searches MUST return only the data elements that Subject is actually authorized to access. PDP systemts implementing this specification MAY support either or all the following types of Searches:
+
+Subject Search:
+: Search all the subjects who can perform a specified type of action on a given resource. These are questions of the type: "Who can write to Document-123?" .
+
+Resource Search:
+: Search all the Resources of a given type that the given Subject has the given Access to. These are seach questions of the type: "Which Documents can Alice write to ?".
+
+Action Search:
+: Seach all the possible actions that a given user can perform on a given resource. These are search questions of the type: "What actions can Alice perform on Document-123?".
+
+The Search APIs are detailed in the sections below.
+
+## Search pagination
+All searches involve querying a backend data store or Policy Information Point (PIP). All searches may therefore return many results, and the Search API responses therefore need to support pagination in order to enable PEPs and Clients to process the data in chunks and improve response times.
+
+The two following pagination types are supported, depending on the nature of the PIP used in the backend (i.e., implementations may select the pagination method appropriate to their environments):
+
+Token:
+: Pagination is made using tokens that need to be passed along with every subsequent search for the next page. In this case, the PEP wants to support an "infinite scrolling" type of pagination, potentially requesting page after page in subsequent calls.
+
+Offset:
+: Pagination is performed by passing two parameters along with each Search request: `offset`, which points to the beginning record for the current page, and `limit`, which determines the number of records to return starting from the `offset` record (i.e., the page size). In this case, the PEP requests a specific set of records.
+
+## Pagination semantics
+Pagination is expressed as a JSON object that can be optionally added to all Search API requests. The pagination JSON element has the following formats:
+
+### Token pagination
+The JSON onject representing the Token pagination type contains the following fields:
+
+- `pagination_type`: a string specifying which type of pagination the present request uses. Possible values: `token` or `offset`.
+- `next_token`: the token to supply to retrieve the next page. It is typically a backend managed pointer to the current data record.
+
+The following non-normative example depicts a pagination element that complies to the `token` semantics:
+~~~ json
+"page": {
+    "pagination_type": "token",
+    "next_token": "alsehrq3495u8"
+  }
+~~~
+### Offset pagination
+Offset pagination semantics use the following fields:
+
+- `pagination_type`: a string specifying which type of pagination the present request uses. Possible values: `token` or `offset`.
+- `offset`: an integer representing the number of records to skip to reach the desired page start.
+- `limit`: an integer representing the number of records to return from the `offset` starting point.
+
+The following non-normative example depicts pagination element that complies to the `offset` semantics:
+~~~ json
+"page": {
+    "pagination_type": "offset",
+    "offset": 250, 
+    "limit": 25
+  }
 ~~~
 
 # Subject Search API {#subject-search-api}
@@ -911,7 +1169,8 @@ The response is a paged array of Subjects.
     }
   ],
   "page": {
-    "next_token": ""
+    "pagination_type": "token"
+    "next_token": "AbC1345"
   }
 }
 ~~~
@@ -935,6 +1194,7 @@ A response that needs to be split across page boundaries returns a non-empty `pa
     }
   ],
   "page": {
+    "pagination_type": "token",
     "next_token": "alsehrq3495u8"
   }
 }
@@ -958,7 +1218,33 @@ To retrieve the next page, provide `page.next_token` in the next request:
     "time": "2024-10-26T01:22-07:00"
   },
   "page": {
+    "pagination_type": "token",
     "next_token": "alsehrq3495u8"
+  }
+}
+~~~
+
+The following is a non-normative example showing the same search, but using offset pagination:
+
+~~~ json
+{
+  "subject": {
+    "type": "user"
+  },
+  "action": {
+    "name": "can_read"
+  },
+  "resource": {
+    "type": "account",
+    "id": "123"
+  },
+  "context": {
+    "time": "2024-10-26T01:22-07:00"
+  },
+  "page": {
+    "pagination_type": "offset",
+    "offset": 200,
+    "limit": 50
   }
 }
 ~~~
@@ -1033,6 +1319,7 @@ The response is a paged array of Resources.
     }
   ],
   "page": {
+    "pagination_type": "token",
     "next_token": ""
   }
 }
@@ -1057,6 +1344,7 @@ A response that needs to be split across page boundaries returns a non-empty `pa
     }
   ],
   "page": {
+    "pagination_type": "token",
     "next_token": "alsehrq3495u8"
   }
 }
@@ -1077,6 +1365,7 @@ To retrieve the next page, provide `page.next_token` in the next request:
     "type": "account"
   },
   "page": {
+    "pagination_type": "token",
     "next_token": "alsehrq3495u8"
   }
 }
@@ -1146,6 +1435,7 @@ The response is a paged array of Actions.
     }
   ],
   "page": {
+    "pagination_type": "token",
     "next_token": ""
   }
 }
@@ -1169,6 +1459,7 @@ A response that needs to be split across page boundaries returns a non-empty `pa
     }
   ],
   "page": {
+    "pagination_type": "token",
     "next_token": "alsehrq3495u8"
   }
 }
@@ -1191,6 +1482,7 @@ To retrieve the next page, provide `page.next_token` in the next request:
     "time": "2024-10-26T01:22-07:00"
   },
   "page": {
+    "pagination_type": "token",
     "next_token": "alsehrq3495u8"
   }
 }
