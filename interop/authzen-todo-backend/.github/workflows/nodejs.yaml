@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  AUTHZEN_PDP_URL: https://topaz-proxy.demo.authzen-interop.net
+  AUTHZEN_PDP_URL: https://topaz-todo-proxy.authzen-interop.net
 
 jobs:
   tests:
