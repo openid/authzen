@@ -4,16 +4,16 @@ sidebar_position: 1
 
 # Aserto
 
-Interop results for the [Aserto](https://www.aserto.com/) implementation hosted at https://topaz-proxy.demo.authzen-interop.net.
+Interop results for the [Aserto](https://www.aserto.com/) implementation hosted at https://topaz-todo-proxy.authzen-interop.net.
 
-For more information, please refer to the [code](https://github.com/aserto-dev/authzen-topaz-proxy) and [playground](https://topaz-proxy.demo.authzen-interop.net), demonstrating the scenario.
+For more information, please refer to the [code](https://github.com/aserto-dev/authzen-topaz-proxy) and [playground](https://topaz-todo-proxy.authzen-interop.net), demonstrating the scenario.
 
 ## Test results
 
 ```bash
-yarn test https://topaz-proxy.demo.authzen-interop.net authorization-api-1_0-02  markdown
+yarn test https://topaz-todo-proxy.authzen-interop.net authorization-api-1_0-02  markdown
 yarn run v1.22.19
-$ node build/test/runner.js https://topaz-proxy.demo.authzen-interop.net authorization-api-1_0-02  markdown
+$ node build/test/runner.js https://topaz-todo-proxy.authzen-interop.net authorization-api-1_0-02  markdown
 ```
 
 <table>
