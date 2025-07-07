@@ -329,7 +329,7 @@ The following is a non-normative example of a simple Decision:
 {: #decision-example title="Example Decision"}
 
 ### Additional Context in a Response
-In addition to the mandatory `"decision"` property, a response MAY also contain additional information to help the PEP, Client or end user decide on the best course of action in reaction to the decision, or to trigger a specific behaviour within the PEP. The response MAY therefore also contain an OPTIONAL  `context` JSON object, with the following JSON fields:
+In addition to the mandatory `"decision"` property, a response MAY also contain additional information to help the PEP, Client or end user decide on the best course of action in reaction to the decision, or to trigger a specific behaviour within the PEP. The response MAY therefore also contain an OPTIONAL  `context` JSON object, with the following OPTIONAL JSON fields:
 
 - `reason`
 - `properties`
@@ -337,9 +337,11 @@ In addition to the mandatory `"decision"` property, a response MAY also contain 
 - `metadata`
 - `environment`
 
-Any of these context fields MAY contain natual language messages or explanations. Internationalization (i18n) is a Client and User Experience (UX) concern and out of scope for this specification. Implementations of this specification MAY choose to return multi-lingual messages, but in that case the PEP SHOULD also be able to process these internationalized responses.
+These fields are all OPTIONAL and normative. They MAY be included independently in the `context` element of a response, in any order. 
 
-These context response fields are detailed in the following sections...
+Any of these context fields MAY contain natual language messages or explanations. Internationalization (i18n) is a Client and User Experience (UX) concern and out of scope for this specification. Implementations of this specification MAY choose to return multi-lingual messages, but in that case the PEP SHOULD also be able to process these internationalized responses. In any case, the way i18n may be implemented is out of scope for this specification.
+
+These context response fields are detailed in the following sections.
 
 #### Reason context field
 OPTIONAL - The `reason` element is a JSON Array object representing the Reasons why the decision was made, typically in natural language or some other implementation-specific human-readable format. This object can convey information that can be used by the PEP as part of the access enforcement process, or just passed back to the requesting client. The Reason object clarifies and complements the decision, whether access was granted or not.
@@ -349,7 +351,7 @@ A PEP can ignore this field if it doesn't know how to process it.
 The Reason object being a JSON object, implementations MUST follow the following structure; the `reason` context contains the following elements:
 
 `id`:
-: REQUIRED. A string value that specifies the reason within the scope of a particular response. In case the PDP returns several reasons, the `id` MUST uniquely identify each one of them. The `id` MAY also match specific reasons held by the PDP, part of a reasons list or dictionnary for example, and used for audit correlations.
+: REQUIRED. A string value that specifies the reason within the scope of a particular response. In case the PDP returns several reasons, the `id` MUST uniquely identify each one of them. The `id` MAY also match specific reasons held by the PDP, part of a reasons list or dictionary for example, and used for audit correlations.
 
 `reason_admin`:
 : OPTIONAL. The reason, which MUST NOT be shared with the end user, but useful for administrative purposes that indicates why the access was granted or denied. The value of this field is a Reason Field object ({{reason-field}}).
@@ -365,7 +367,7 @@ A Reason Field is a JSON object with `String` key and value pairs, which has the
 where:
 
 `reason-code`:
-: REQUIRED. A String value representing a code that uniquely identifies the error. Implementations that do not use any error-code mechanism SHOULD default to valid HTTP Error codes (see {{RFC7231}} ).
+: REQUIRED. A String value representing a code that uniquely identifies the error. Implementations that do not use any custom error-code mechanism SHOULD default to valid HTTP Error codes (see {{RFC7231}} ).
 
 `reason-description`:
 : REQUIRED. A String holding the human-readable natural language description of the reason the decision was made.
@@ -428,7 +430,7 @@ The following are a non-normative examples of custom properties response element
 ~~~
 {: #properties-example2 title="Another example of custom justification properties."}
 
-#### s context field
+#### Obligations context field
 OPTIONAL - Obligations are a set of operations that the PEP must perform in conjunction with an authorization decision. They serve as mandatory instructions that extend the simple "Permit" or "Deny" outcome.
 
 The PEP is responsible for implementing and enforcing the obligations received with an authorization decision. If the PEP fails to fulfill an obligation that was part of a Permit decision, it must then deny access to the requested resource. This ensures that the stipulated actions are indeed carried out.
@@ -1042,7 +1044,7 @@ The following is a non-normative example of a response to an Access Evaluations 
 ~~~
 
 # Search APIs
-Many use-cases require the Client app or system to retrieve some authorized data from a backend system. These searches MUST return only the data elements that Subject is actually authorized to access. PDP systemts implementing this specification MAY support either or all the following types of Searches:
+Many use-cases require the Client app or system to retrieve some authorized data from a backend system. These searches MUST return only the data elements that Subject is actually authorized to access. PDP systems implementing this specification MAY support either or all the following types of Searches:
 
 Subject Search:
 : Search all the subjects who can perform a specified type of action on a given resource. These are questions of the type: "Who can write to Document-123?" .
