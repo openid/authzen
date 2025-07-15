@@ -80,6 +80,7 @@ informative:
   IANA.well-known-uris: # IANA well-known registry
   RFC9525: # Service Identity in TLS
   RFC7234: # HTTP caching
+  W3C.json-ld11: # JSON Linked Data
 
 --- abstract
 
@@ -111,7 +112,7 @@ The information model for requests and responses include the following entities:
 ## Subject {#subject}
 A Subject is the user or machine principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.
 
-A Subject is a JSON ({{RFC8259}}) object that contains two REQUIRED keys, `type` and `id`, which have a value typed `string`, and an OPTIONAL key, `properties`, with a value of a JSON object.
+A Subject is a JSON ({{RFC8259}}) object that contains two REQUIRED keys, `type` and `id`, which have a value typed `string`, and an OPTIONAL key, `properties`, with a value of a JSON object. The Subject MAY contain {{W3C.json-ld11}} keys starting with the `@`-symbol.
 
 `type`:
 : REQUIRED. A `string` value that specifies the type of the Subject.
@@ -200,6 +201,8 @@ A Resource is the target of an access request. It is a JSON ({{RFC8259}}) object
 `properties`:
 : OPTIONAL. A JSON object containing any number of key-value pairs, which can be used to express additional properties of a Resource.
 
+The Resource MAY contain {{W3C.json-ld11}} keys starting with the `@`-symbol.
+
 ### Examples (non-normative)
 
 The following is a non-normative example of a Resource with a `type` and a simple `id`:
@@ -231,7 +234,7 @@ The following is a non-normative example of a Resource containing a `library_rec
 ## Action {#action}
 An Action is the type of access that the requester intends to perform.
 
-Action is a JSON ({{RFC8259}}) object that contains a REQUIRED `name` key with a `string` value, and an OPTIONAL `properties` key with a JSON object value.
+Action is a JSON ({{RFC8259}}) object that contains a REQUIRED `name` key with a `string` value, and an OPTIONAL `properties` key with a JSON object value. The Action MAY contain {{W3C.json-ld11}} keys starting with the `@`-symbol.
 
 `name`:
 : REQUIRED. The name of the Action.
@@ -249,7 +252,7 @@ The following is a non-normative example of an action:
 {: #action-example title="Example Action"}
 
 ## Context {#context}
-The Context object is a set of attributes that represent environmental or contextual data about the request such as time of day. It is a JSON ({{RFC8259}}) object.
+The Context object is a set of attributes that represent environmental or contextual data about the request such as time of day. It is a JSON ({{RFC8259}}) object. The Context MAY contain {{W3C.json-ld11}} keys starting with the `@`-symbol.
 
 The following is a non-normative example of a Context:
 
@@ -278,6 +281,8 @@ The Access Evaluation request is a 4-tuple constructed of the four previously de
 
 `context`:
 : OPTIONAL. The context (or environment) of type Context.
+
+The Access Evaluation Request MAY contain {{W3C.json-ld11}} keys starting with the `@`-symbol.
 
 ### Example (non-normative)
 
@@ -871,6 +876,8 @@ The Subject Search request is a 4-tuple constructed of three previously defined 
 `page`:
 : OPTIONAL. A page token for paged requests.
 
+The Subject Search Request MAY contain {{W3C.json-ld11}} keys starting with the `@`-symbol.
+
 ### Example (non-normative)
 
 The following payload defines a request for the subjects of type `user` that can perform the `can_read` action on the resource of type `account` and ID `123`.
@@ -996,6 +1003,8 @@ The Resource Search request is a 4-tuple constructed of three previously defined
 `page`:
 : OPTIONAL. A page token for paged requests.
 
+The Resource Search Request MAY contain {{W3C.json-ld11}} keys starting with the `@`-symbol.
+
 ### Example (non-normative)
 
 The following payload defines a request for the resources of type `account` on which the subject of type `user` and ID `alice@acmecorp.com` can perform the `can_read` action.
@@ -1109,6 +1118,8 @@ The Action Search request is a 3-tuple constructed of three previously defined e
 
 `page`:
 : OPTIONAL. A page token for paged requests.
+
+The Action Search Request MAY contain {{W3C.json-ld11}} keys starting with the `@`-symbol.
 
 ### Example (non-normative)
 
