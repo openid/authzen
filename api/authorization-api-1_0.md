@@ -1613,7 +1613,7 @@ To make this concrete:
 - the PDP indicates to the caller that the authorization request is denied by sending a response with a `200` HTTPS status code, along with a payload of `{ "decision": false }`.
 
 ### Request Identification
-All requests to the API MAY have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. If present, the request identifier SHALL be provided using the HTTPS Header `X-Request-ID`. The value of this header is an arbitrary string. The following non-normative example describes this header:
+All requests to the API MAY have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. If present, it is RECOMMENDED to use the HTTPS Header `X-Request-ID` as the request identifier. The value of this header is an arbitrary string. The following non-normative example describes this header:
 
 ~~~ http
 POST /access/v1/evaluation HTTP/1.1
@@ -1623,7 +1623,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #request-id-example title="Example HTTPS request with a Request Id Header"}
 
 ### Request Identification in a Response
-A PDP responding to an Authorization API request that contains an `X-Request-ID` header MUST include a request identifier in the response. The request identifier is specified in the HTTPS Response header: `X-Request-ID`. If the PEP specified a request identifier in the request, the PDP MUST include the same identifier in the response to that request.
+When an Authorization API request contains a request identifier the PDP MUST include a request identifier in the response. It is RECOMMENDED to specify the request identifier using the HTTPS Response header `X-Request-ID`. If the PEP specified a request identifier in the request, the PDP MUST include the same identifier in the response to that request.
 
 The following is a non-normative example of an HTTPS Response with this header:
 
