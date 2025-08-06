@@ -373,7 +373,7 @@ The PDP may provide reasons to explain a decision. In the non-normative example 
 {: #response-with-reason-context-example title="Non-normative Example Response with reason Context"}
 
 #### Non-normative Example 2: conveying metadata and environmental elements
-In the following non-normative example, the PDP justifies its decision to the PEP by suggesting the environmental conditions did not meet its policies. Metadata pertaining to the request response times are also provided:
+In the following non-normative example, the PDP justifies its decision by including environmental conditions that did not meet its policies. Metadata pertaining to the decision response times are also provided:
 
 ~~~ json
 {
