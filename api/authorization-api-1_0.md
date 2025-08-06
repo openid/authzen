@@ -426,7 +426,7 @@ If an `evaluations` array is NOT present, the Access Evaluations Request behaves
 
 If an `evaluations` array IS present and contains one or more objects, these form distinct requests that the PDP will evaluate. These requests are independent from each other, and may be executed sequentially or in parallel, left to the discretion of each implementation.
 
-If the `evaluations` array IS present and contains one or more objects, the top-level `subject`, `action`, `resource`, and `context` keys (4-tuple) in the request object MAY be omitted. However, if one or more of these values is present, they provide default values for their respective fields in the evaluation requests. This behavior is described in {{default-values}}.
+The top-level `subject`, `action`, `resource`, and `context` keys provide default values for their respective fields in `evaluations` array.  The top-level `subject`, `action` and `resource` keys MAY be omitted if the `evaluations` array IS present, contains one or more objects and every object in the `evaluations` array contains the respective given top-level key. This behavior is described in {{default-values}}.
 
 The following is a non-normative example for specifying three requests, with no default values:
 
@@ -491,7 +491,7 @@ While the example above provides the most flexibility in specifying distinct val
 
 Default values offer a more compact syntax that avoids over-duplication of request data.
 
-If any of the top-level `subject`, `action`, `resource`, and `context` keys are provided, the value of the top-level key is treated as the default value for the 4-tuples specified in the `evaluations` array. If a top-level key is specified in the 4-tuples present in the `evaluations` array then the value of that will take precedence over these default values.
+If any of the top-level `subject`, `action`, `resource`, and `context` keys are provided, the value of the top-level key is treated as the default value for the 4-tuples specified in the `evaluations` array. If a top-level key is specified in the 4-tuples present in the `evaluations` array then the value of that will take precedence over these default values. If the `subject`, `action` or `resource` is omitted in the `evaluations` array then a default value for the key MUST be provided in the top-level keys.
 
 The following is a non-normative example for specifying three requests that refer to a single subject and context:
 
