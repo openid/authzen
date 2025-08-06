@@ -342,7 +342,7 @@ The following is a non-normative example of a simple Decision:
 ### Additional Context in a Response
 In addition to a `"decision"`, a response MAY contain a `"context"` field which can be any JSON object. This context can convey additional information that can be used by the PEP as part of the decision enforcement process.
 
-Examples include, but are not limitied to:
+Examples include, but are not limited to:
 
 - Reason(s) a decision was made,
 - "Advices" and/or "Obligations" tied to the access decision,
