@@ -355,7 +355,7 @@ Examples include, but are not limitied to:
 The following are all non-normative examples of possible and valid contexts, provided here just to illustrate possible usages. Again, the actual semantics and format of the `context` object is an implementation concern and out-of-scope of this specification; these are mere non-normative examples.
 
 #### Non-normative Example 1: conveying decision Reasons
-Reasons MAY be provided by the PDP to explain a decision. The in the non-normative example below, implementers wanted to return a HTTP error code and convey different reasons to administrators and end-users:
+The PDP may provide reasons to explain a decision. In the non-normative example below implementers return an HTTP error code and convey different reasons to administrators and end-users:
 
 ~~~ json
 {
