@@ -80,20 +80,21 @@ informative:
   IANA.well-known-uris: # IANA well-known registry
   RFC9525: # Service Identity in TLS
   RFC7234: # HTTP caching
+  NIST.SP.800-162: # ABAC
 
 --- abstract
 
-The Authorization API enables Policy Decision Points (PDPs) and Policy Enforcement Points (PEPs) to communicate authorization requests and decisions to each other without requiring knowledge of each other's inner workings. The Authorization API is served by the PDP and is called by the PEP. The Authorization API includes an Evaluation endpoint, which provides specific access decisions. Other endpoints may be added in the future for other scenarios, including searching for subjects, resources or actions.
+The Authorization API enables Policy Decision Points (PDPs) and Policy Enforcement Points (PEPs) to communicate authorization requests and decisions to each other without requiring knowledge of each other's inner workings. The Authorization API is served by the PDP and is called by the PEP. The Authorization API includes evaluation endpoints, which provide specific access decisions, and search endpoints, which enable searching for subjects, resources or actions.
 
 --- middle
 
 # Introduction
-Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML ({{XACML}}) and NIST's ABAC SP 800-162. Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
+Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML ({{XACML}}) and NIST's ABAC SP 800-162 ({{NIST.SP.800-162}}). Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
 
 # Model
 The Authorization API is a transport-agnostic API published by the PDP, to which the PEP acts as a client. Possible bindings of this specification, such as HTTPS or gRPC, are described in Transport ({{transport}}).
 
-Authorization for the Authorization API itself is out of scope for this document, since authorization for APIs is well-documented elsewhere. For example, the Authorization API's HTTPS binding MAY support authorization using an `Authorization` header, using a `basic` or `bearer` token. Support for OAuth 2.0 ({{RFC6749}}) is RECOMMENDED. 
+Authentication for the Authorization API itself is out of scope for this document, since authentication for APIs is well-documented elsewhere. Support for OAuth 2.0 ({{RFC6749}}) is RECOMMENDED.
 
 # Features
 The core feature of the Authorization API is the Access Evaluation API, which enables a PEP to find out if a specific request can be permitted to access a specific resource. The following are non-normative examples:
@@ -101,6 +102,17 @@ The core feature of the Authorization API is the Access Evaluation API, which en
 - Can Alice view document #123?
 - Can Alice view document #123 at 16:30 on Tuesday, June 11, 2024?
 - Can a manager print?
+
+The Access Evaluations API enables execution of multiple evaluations in a single request. The following are non-normative example:
+
+- Can Alice view documents 123, 234 and 345 on Tuesday, June 11, 2024?
+- Can document 123 be viewed by Alice and Bob?
+
+The Search APIs provide lists of resources, subjects or actions which would be allowed access. The following are non-normative example:
+
+- Which documents can Alice view?
+- Who can view document 123?
+- What actions can Alice perform on document 123 on Tuesday, June 11, 2024?
 
 # API Version
 This document describes the API version 1.0. Any updates to this API through subsequent revisions of this document or other documents MAY augment this API, but MUST NOT modify the API described here. Augmentation MAY include additional API methods or additional parameters to existing API methods, additional authorization mechanisms, or additional optional headers in API requests. All API methods for version 1.0 MUST be immediately preceded by the relative URL path `/v1/`.
@@ -414,7 +426,7 @@ If an `evaluations` array is NOT present, the Access Evaluations Request behaves
 
 If an `evaluations` array IS present and contains one or more objects, these form distinct requests that the PDP will evaluate. These requests are independent from each other, and may be executed sequentially or in parallel, left to the discretion of each implementation.
 
-If the `evaluations` array IS present and contains one or more objects, the top-level `subject`, `action`, `resource`, and `context` keys (4-tuple) in the request object MAY be omitted. However, if one or more of these values is present, they provide default values for their respective fields in the evaluation requests. This behavior is described in {{default-values}}.
+The top-level `subject`, `action`, `resource`, and `context` keys provide default values for their respective fields in `evaluations` array.  The top-level `subject`, `action` and `resource` keys MAY be omitted if the `evaluations` array IS present, contains one or more objects and every object in the `evaluations` array contains the respective given top-level key. This behavior is described in {{default-values}}.
 
 The following is a non-normative example for specifying three requests, with no default values:
 
@@ -479,7 +491,7 @@ While the example above provides the most flexibility in specifying distinct val
 
 Default values offer a more compact syntax that avoids over-duplication of request data.
 
-If any of the top-level `subject`, `action`, `resource`, and `context` keys are provided, the value of the top-level key is treated as the default value for the 4-tuples specified in the `evaluations` array. If a top-level key is specified in the 4-tuples present in the `evaluations` array then the value of that will take precedence over these default values.
+If any of the top-level `subject`, `action`, `resource`, and `context` keys are provided, the value of the top-level key is treated as the default value for the 4-tuples specified in the `evaluations` array. If a top-level key is specified in the 4-tuples present in the `evaluations` array then the value of that will take precedence over these default values. If the `subject`, `action` or `resource` is omitted in the `evaluations` array then a default value for the key MUST be provided in the top-level keys.
 
 The following is a non-normative example for specifying three requests that refer to a single subject and context:
 
@@ -1601,7 +1613,7 @@ To make this concrete:
 - the PDP indicates to the caller that the authorization request is denied by sending a response with a `200` HTTPS status code, along with a payload of `{ "decision": false }`.
 
 ### Request Identification
-All requests to the API MAY have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. If present, the request identifier SHALL be provided using the HTTPS Header `X-Request-ID`. The value of this header is an arbitrary string. The following non-normative example describes this header:
+All requests to the API MAY have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. If present, it is RECOMMENDED to use the HTTPS Header `X-Request-ID` as the request identifier. The value of this header is an arbitrary string. The following non-normative example describes this header:
 
 ~~~ http
 POST /access/v1/evaluation HTTP/1.1
@@ -1611,7 +1623,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #request-id-example title="Example HTTPS request with a Request Id Header"}
 
 ### Request Identification in a Response
-A PDP responding to an Authorization API request that contains an `X-Request-ID` header MUST include a request identifier in the response. The request identifier is specified in the HTTPS Response header: `X-Request-ID`. If the PEP specified a request identifier in the request, the PDP MUST include the same identifier in the response to that request.
+When an Authorization API request contains a request identifier the PDP MUST include a request identifier in the response. It is RECOMMENDED to specify the request identifier using the HTTPS Response header `X-Request-ID`. If the PEP specified a request identifier in the request, the PDP MUST include the same identifier in the response to that request.
 
 The following is a non-normative example of an HTTPS Response with this header:
 
