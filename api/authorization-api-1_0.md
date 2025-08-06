@@ -108,7 +108,7 @@ The Access Evaluations API enables execution of multiple evaluations in a single
 - Can Alice view documents 123, 234 and 345 on Tuesday, June 11, 2024?
 - Can document 123 be viewed by Alice and Bob?
 
-The Search API's provide lists of resources, subjects or actions which would be allowed access. The following are non-normative example:
+The Search APIs provide lists of resources, subjects or actions which would be allowed access. The following are non-normative example:
 
 - Which documents can Alice view?
 - Who can view document 123?
