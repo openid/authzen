@@ -407,7 +407,7 @@ In the following non-normative example, the PDP requests a step-up authenticatio
 ~~~
 {: #response-with-step-up-example title="Non-normative Example Response with a step-up request Context"}
 
-Even though this specification doesn't enforce any semantics for the `context` response object, if provided at all, the PEP MUST be able to understand this object. 
+If the PEP does not understand information in the `context` response object in the event of a `decision: true`, the PEP MAY choose to reject the decision.
 
 # Access Evaluations API {#access-evaluations-api}
 
