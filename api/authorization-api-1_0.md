@@ -340,77 +340,74 @@ The following is a non-normative example of a simple Decision:
 {: #decision-example title="Example Decision"}
 
 ### Additional Context in a Response
-In addition to a `"decision"`, a response may contain a `"context"` field which can be any JSON object.  This context can convey additional information that can be used by the PEP as part of the decision evaluation process. Examples include:
+In addition to a `"decision"`, a response MAY contain a `"context"` field which can be any JSON object. This context can convey additional information that can be used by the PEP as part of the decision enforcement process.
 
-- XACML's notion of "advice" and "obligations"
-- Hints for rendering UI state
-- Instructions for step-up authentication
+Examples include, but are not limited to:
 
-### Example Context
-An implementation MAY follow a structured approach to `"context"`, in which it presents the reasons that an authorization request failed.
+- Reason(s) a decision was made,
+- "Advices" and/or "Obligations" tied to the access decision,
+- Hints for rendering UI state,
+- Instructions for step-up authentication,
+- Environmental information,
+- etc.
 
-- A list of identifiers representing the items (policies, graph nodes, tuples) that were used in the decision-making process.
-- A list of reasons as to why access is permitted or denied.
+### Example Contexts
+The following are all non-normative examples of possible and valid contexts, provided here just to illustrate possible usages. Again, the actual semantics and format of the `context` object is an implementation concern and out-of-scope of this specification; these are mere non-normative examples.
 
-#### Reasons
-Reasons MAY be provided by the PDP. 
-
-##### Reason Field {#reason-field}
-A Reason Field is a JSON object that has keys and values of type `string`. The following are non-normative examples of Reason Field objects:
-
-~~~ json
-{
-  "en": "location restriction violation"
-}
-~~~
-{: #reason-example title="Example Reason"}
-
-##### Reason Object {#reason-object}
-A Reason Object specifies a particular reason. It is a JSON object that has the following fields:
-
-`id`:
-: REQUIRED. A string value that specifies the reason within the scope of a particular response.
-
-`reason_admin`:
-: OPTIONAL. The reason, which MUST NOT be shared with the user, but useful for administrative purposes that indicates why the access was denied. The value of this field is a Reason Field object ({{reason-field}}).
-
-`reason_user`:
-: OPTIONAL. The reason, which MAY be shared with the user that indicates why the access was denied. The value of this field is a Reason Field object ({{reason-field}}).
-
-The following is a non-normative example of a Reason Object:
-
-~~~ json
-{
-  "id": "0",
-  "reason_admin": {
-    "en": "Request failed policy C076E82F"
-  },
-  "reason_user": {
-    "en-403": "Insufficient privileges. Contact your administrator",
-    "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
-  }
-}
-~~~
-{: #example-reason-object title="Example of a Reason Object"}
-
-### Sample Response with additional context (non-normative)
+#### Non-normative Example 1: conveying decision Reasons
+The PDP may provide reasons to explain a decision. In the non-normative example below implementers return an HTTP error code and convey different reasons to administrators and end-users:
 
 ~~~ json
 {
   "decision": false,
   "context": {
-    "id": "0",
     "reason_admin": {
-      "en": "Request failed policy C076E82F"
+      "403": "Request failed policy C076E82F"
     },
     "reason_user": {
-      "en-403": "Insufficient privileges. Contact your administrator",
-      "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
+      "403": "Insufficient privileges. Contact your administrator"
     }
   }
 }
 ~~~
-{: #response-with-context-example title="Example Response with Context"}
+{: #response-with-reason-context-example title="Non-normative Example Response with reason Context"}
+
+#### Non-normative Example 2: conveying metadata and environmental elements
+In the following non-normative example, the PDP justifies its decision by including environmental conditions that did not meet its policies. Metadata pertaining to the decision response times are also provided:
+
+~~~ json
+{
+  "decision": false,
+  "context": {
+    "metadata": {
+      "response-time": 60,
+      "response-time-unit": "ms"
+    },
+    "environment": {
+      "ip": "10.10.0.1",
+      "datetime": "2025-06-27T18:03:07Z",
+      "os": "ubuntu24.04.2LTS-AMDx64"
+    }
+  }
+}
+~~~
+{: #response-with-environment-context-example title="Non-normative Example Response with Environment and Metadata Context"}
+
+#### Non-normative Example 3: requesting step-up authentication
+In the following non-normative example, the PDP requests a step-up authentication of the requesting subject, by signalling the required `acr` and `amr` access token claim values it expects to see in order to approve the request:
+
+~~~ json
+{
+  "decision": false,
+  "context": {
+    "acr_values": "urn:com:example:loa:3",
+    "amr_values": "mfa hwk"
+  }
+}
+~~~
+{: #response-with-step-up-example title="Non-normative Example Response with a step-up request Context"}
+
+If the PEP does not understand information in the `context` response object in the event of a `decision: true`, the PEP MAY choose to reject the decision.
 
 # Access Evaluations API {#access-evaluations-api}
 
