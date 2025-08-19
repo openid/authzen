@@ -1656,7 +1656,7 @@ Authenticating the PEP allows the PDP to avoid common attacks (such as DoS - see
 
 ## Sender Authentication Failure {#security-sender-authentn-fail}
 
-If the protected resource request does not include authentication credentials, does not contain an the proper the correct authentication scheme, or does not have a valid authentication scheme proof that enables access to the protected resource, the resource server MUST respond with a 401 HTTP code and SHOULD include the HTTP "WWW-Authenticate" response header field; it MAY include it in response to other conditions as well. The "WWW-Authenticate" header field uses the framework defined by HTTP/1.1 [RFC2617] and indicate the expected auth-scheme as long as the realm that has authority for it.
+If the protected resource request does not include the proper authentication credentials, does not contain an the proper the correct authentication scheme, or does not have a valid authentication scheme proof that enables access to the protected resource, the resource server MUST respond with a 401 HTTP code and SHOULD include the HTTP "WWW-Authenticate" response header field; it MAY include it in response to other conditions as well. The "WWW-Authenticate" header field uses the framework defined by HTTP/1.1 [RFC2617] and indicate the expected auth-scheme as long as the realm that has authority for it.
 
 The following is a non-normative example response:
 
