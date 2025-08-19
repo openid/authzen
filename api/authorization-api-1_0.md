@@ -1236,7 +1236,10 @@ The following Policy Decision Point metadata parameters are used by this specifi
 `search_resource_endpoint`:
 : OPTIONAL. URL of Policy Decision Point Search API endpoint for resource element
 
-Note that the non presence of any of those parameter is sufficient for the policy enforcement point to determine that the policy decision point is not capable and therefore will not return a result for the associated API.
+`capabilites`:
+: OPTIONAL. JSON array containing a list of reagistered IAMA URNs referencing PDP specific capabilities.
+
+Note that the non presence of any of those parameters is sufficient for the policy enforcement point to determine that the policy decision point is not capable and therefore will not return a result for the associated API.
 
 ### Signature Parameter {#pdp-metadata-data-sig}
 
@@ -1786,6 +1789,21 @@ Specification Document(s):
 
 
 Metadata name:
+: `capabilities`
+
+Metadata description:
+: Array of URNs describing specifc PDP capabilities
+
+Change Controller:
+: OpenID_Foundation_AuthZEN_Working_Group
+: mailto:openid-specs-authzen@lists.openid.net
+
+Specification Document(s):
+: Section {{pdp-metadata-data-endpoint}}
+
+
+
+Metadata name:
 : `signed_metadata`
 
 Metadata description:
@@ -1821,6 +1839,13 @@ Change Controller:
 
 Related Information:
 : (none)
+
+
+
+## AuthZEN PDP capabilities Registry {#iana-wk-registry}
+
+This specification establishes the IANA "AuthZEN Policy Decision Point Capabilities" registry for AuthZEN policy decision point specific capabilities or features. The content of this registry will be specificied by AuthZEN compliance PDP vendors that want to declare interoperable capabilities.
+
 
 
 --- back
