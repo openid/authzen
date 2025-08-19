@@ -1853,7 +1853,7 @@ Related Information:
 
 
 
-## AuthZEN PDP capabilities Registry {#iana-wk-registry}
+## AuthZEN PDP capabilities Registry {#iana-wk-registry-pdp}
 
 This specification establishes the IANA "AuthZEN Policy Decision Point Capabilities" registry for AuthZEN policy decision point specific capabilities or features. The content of this registry will be specificied by AuthZEN compliance PDP vendors that want to declare interoperable capabilities.
 
