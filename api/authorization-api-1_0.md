@@ -1660,6 +1660,17 @@ The choice and strength of either mechanism is not in scope.
 
 Authenticating the PEP allows the PDP to avoid common attacks (such as DoS - see below) and/or reveal its internal policies. A malicious actor could craft a large number of requests to try and understand what policies the PDP is configured with. Requesting a client (PEP) be authenticated mitigates that risk.
 
+## Sender Authentication Failure {#security-sender-authentn-fail}
+
+If the protected resource request does not include the proper authentication credentials, or does not have a valid authentication scheme proof that enables access to the protected resource, the resource server MUST respond with a 401 HTTP code and SHOULD include the HTTP "WWW-Authenticate" response header field; it MAY include it in response to other conditions as well. The "WWW-Authenticate" header field uses the framework defined by HTTP/1.1 [RFC2617] and indicates the expected authentication scheme as well as the realm that has authority for it.
+
+The following is a non-normative example response:
+
+```http
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Bearer realm="https://as.example.com"
+```
+
 ## Trust {#security-trust}
 
 In ABAC, there is occasionally conversations around the trust between PEP and PDP: how can the PDP trust the PEP to send the right values in? This is a misplaced concern. The PDP must trust the PEP as ultimately, the PEP is the one responsible for enforcing the decision the PDP produces.
