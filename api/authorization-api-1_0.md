@@ -53,6 +53,9 @@ contributor: # Same structure as author list, but goes into contributors
 - name: Jean-François Lombardo
   org: AWS
   email: jeffsec@amazon.com
+- name: Alex Olivier
+  org: Cerbos
+  email: alex@cerbos.dev
 
 normative:
   RFC4001: # text representation of IP addresses
@@ -596,7 +599,7 @@ A non-normative example of the `options` field is shown below, following an `eva
     }
   }],
   "options": {
-    "evaluation_semantics": "execute_all",
+    "evaluations_semantic": "execute_all",
     "another_option": "value"
   }
 }
