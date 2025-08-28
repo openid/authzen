@@ -1305,13 +1305,14 @@ Additional transport bindings (e.g. gRPC) MAY be defined in the future in the fo
 ## HTTPS Binding
 
 ### HTTPS Access Evaluation Request
-The Access Evaluation Request is an HTTPS request with `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluation Request, as defined in {{access-evaluation-request}}.
+The Access Evaluation Request is an HTTPS request to the URL defined in `access_evaluation_endpoint` in the Policy Decision Point Metadata, as defined in {#pdp-metadata-data-endpoint}. It has the `Content-Type` of `application/json` and its body is a JSON object that contains the Access Evaluation Request, as defined in {{access-evaluation-request}}.
 
 The following is a non-normative example of the HTTPS binding of the Access Evaluation Request:
 
 ~~~ http
 POST /access/v1/evaluation HTTP/1.1
 Host: pdp.mycompany.com
+Content-Type: application/json
 Authorization: Bearer <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
@@ -1341,7 +1342,7 @@ Following is a non-normative example of an HTTPS Access Evaluation Response:
 
 ~~~ http
 HTTP/1.1 OK
-Content-type: application/json
+Content-Type: application/json
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
@@ -1351,13 +1352,14 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #example-access-evaluation-response title="Example of an HTTP Access Evaluation Response"}
 
 ### HTTPS Access Evaluations Request
-The Access Evaluations Request is an HTTPS request with `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluations Request, as defined in {{access-evaluations-request}}.
+The Access Evaluations Request is an HTTPS request to the URL defined in `access_evaluations_endpoint` in the Policy Decision Point Metadata, as defined in {#pdp-metadata-data-endpoint}. It has the `Content-Type` of `application/json`and its body is a JSON object that contains the Access Evaluations Request, as defined in {{access-evaluations-request}}.
 
 The following is a non-normative example of a the HTTPS binding of the Access Evaluations Request:
 
 ~~~ http
 POST /access/v1/evaluations HTTP/1.1
 Host: pdp.mycompany.com
+Content-Type: application/json
 Authorization: Bearer <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
@@ -1406,7 +1408,7 @@ The following is a non-normative example of an HTTPS Access Evaluations Response
 
 ~~~ http
 HTTP/1.1 OK
-Content-type: application/json
+Content-Type: application/json
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
@@ -1435,13 +1437,14 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #example-access-evaluations-response title="Example of an HTTPS Access Evaluations Response"}
 
 ### HTTPS Subject Search Request
-The Subject Search Request is an HTTPS request with `content-type` of `application/json`. Its body is a JSON object that contains the Subject Search Request, as defined in {{subject-search-request}}.
+The Subject Search Request is an HTTPS request to the URL defined in `search_subject_endpoint` in the Policy Decision Point Metadata, as defined in {#pdp-metadata-data-endpoint}. It has the `Content-Type` of `application/json` and its body is a JSON object that contains the Subject Search Request, as defined in {{subject-search-request}}.
 
 The following is a non-normative example of the HTTPS binding of the Subject Search Request:
 
 ~~~ http
 POST /access/v1/search/subject HTTP/1.1
 Host: pdp.mycompany.com
+Content-Type: application/json
 Authorization: Bearer <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
@@ -1467,7 +1470,7 @@ The following is a non-normative example of an HTTPS Subject Search Response:
 
 ~~~ http
 HTTP/1.1 OK
-Content-type: application/json
+Content-Type: application/json
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
@@ -1489,13 +1492,14 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #example-subject-search-response title="Example of an HTTPS Subject Search Response"}
 
 ### HTTPS Resource Search Request
-The Resource Search Request is an HTTPS request with `content-type` of `application/json`. Its body is a JSON object that contains the Resource Search Request, as defined in {{resource-search-request}}.
+The Resource Search Request is an HTTPS request to the URL defined in `search_resource_endpoint` in the Policy Decision Point Metadata, as defined in {#pdp-metadata-data-endpoint}. It has the `Content-Type` of `application/json` and its body is a JSON object that contains the Resource Search Request, as defined in {{resource-search-request}}.
 
 The following is a non-normative example of the HTTPS binding of the Resource Search Request:
 
 ~~~ http
 POST /access/v1/search/resource HTTP/1.1
 Host: pdp.mycompany.com
+Content-Type: application/json
 Authorization: Bearer <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
@@ -1521,7 +1525,7 @@ The following is a non-normative example of an HTTPS Resource Search Response:
 
 ~~~ http
 HTTP/1.1 OK
-Content-type: application/json
+Content-Type: application/json
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
@@ -1543,13 +1547,14 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #example-resource-search-response title="Example of an HTTPS Resource Search Response"}
 
 ### HTTPS Action Search Request
-The Action Search Request is an HTTPS request with `content-type` of `application/json`. Its body is a JSON object that contains the Action Search Request, as defined in {{action-search-request}}.
+The Action Search Request is an HTTPS request to the URL defined in `search_action_endpoint` in the Policy Decision Point Metadata, as defined in {#pdp-metadata-data-endpoint}. It has the `Content-Type` of `application/json` and its body is a JSON object that contains the Action Search Request, as defined in {{action-search-request}}.
 
 The following is a non-normative example of the HTTPS binding of the Action Search Request:
 
 ~~~ http
 POST /access/v1/search/action HTTP/1.1
 Host: pdp.mycompany.com
+Content-Type: application/json
 Authorization: Bearer <myoauthtoken>
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
@@ -1576,7 +1581,7 @@ The following is a non-normative example of an HTTPS Action Search Response:
 
 ~~~ http
 HTTP/1.1 OK
-Content-type: application/json
+Content-Type: application/json
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
@@ -1632,7 +1637,7 @@ The following is a non-normative example of an HTTPS Response with this header:
 
 ~~~ http
 HTTP/1.1 OK
-Content-type: application/json
+Content-Type: application/json
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-response-request-id title="Example HTTPS response with a Request Id Header"}
@@ -1775,7 +1780,7 @@ Metadata name:
 : `search_subject_endpoint`
 
 Metadata description:
-: URL of the Search Endpooint based on Subject element
+: URL of the Search Endpoint based on Subject element
 
 Change Controller:
 : OpenID_Foundation_AuthZEN_Working_Group
@@ -1786,12 +1791,26 @@ Specification Document(s):
 
 
 
-
 Metadata name:
 : `search_resource_endpoint`
 
 Metadata description:
-: URL of the Search Endpooint based on Resource element
+: URL of the Search Endpoint based on Resource element
+
+Change Controller:
+: OpenID_Foundation_AuthZEN_Working_Group
+: mailto:openid-specs-authzen@lists.openid.net
+
+Specification Document(s):
+: Section {{pdp-metadata-data-endpoint}}
+
+
+
+Metadata name:
+: `search_action_endpoint`
+
+Metadata description:
+: URL of the Search Endpoint based on Action element
 
 Change Controller:
 : OpenID_Foundation_AuthZEN_Working_Group
@@ -1829,7 +1848,6 @@ Change Controller:
 
 Specification Document(s):
 : Section {{pdp-metadata-data-endpoint}}
-
 
 
 ## Well-Known URI Registry {#iana-wk-registry}
