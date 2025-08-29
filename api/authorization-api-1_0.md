@@ -58,7 +58,6 @@ contributor: # Same structure as author list, but goes into contributors
   email: alex@cerbos.dev
 
 normative:
-  RFC4001: # text representation of IP addresses
   RFC6749: # OAuth
   RFC8259: # JSON
   RFC5785: # well-known
@@ -83,6 +82,7 @@ informative:
   IANA.well-known-uris: # IANA well-known registry
   RFC9525: # Service Identity in TLS
   RFC7234: # HTTP caching
+  RFC2617: # HTTP authentication
   NIST.SP.800-162: # ABAC
 
 --- abstract
@@ -126,7 +126,7 @@ The information model for requests and responses include the following entities:
 ## Subject {#subject}
 A Subject is the user or machine principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.
 
-A Subject is a JSON ({{RFC8259}}) object that contains two REQUIRED keys, `type` and `id`, which have a `string` value, and an OPTIONAL key, `properties`, with a value of a JSON object.
+A Subject is a JSON object ({{Section 4 of RFC8259}}) that contains two REQUIRED keys, `type` and `id`, which have a `string` value, and an OPTIONAL key, `properties`, with a value of a JSON object.
 
 `type`:
 : REQUIRED. A `string` value that specifies the type of the Subject.
@@ -135,13 +135,11 @@ A Subject is a JSON ({{RFC8259}}) object that contains two REQUIRED keys, `type`
 : REQUIRED. A `string` value containing the unique identifier of the Subject, scoped to the `type`.
 
 `properties`:
-: OPTIONAL. A JSON object which can be used to express additional properties of a Subject.
+: OPTIONAL. A JSON object which can be used to express additional attributes of a Subject.
 
 
 ### Subject Properties {#subject-properties}
-Many authorization systems are stateless, and expect the client (PEP) to pass in any properties or attributes used in the evaluation of the authorization policy. To satisfy this requirement, Subjects MAY include zero or more additional attributes as key-value pairs, under the `properties` object.
-
-An attribute can be single-valued or multi-valued. It can be a primitive type (string, boolean, number) or a complex type such as a JSON object or JSON array.
+Many authorization systems are stateless, and expect the client (PEP) to pass in all relevant attributes used in the evaluation of the authorization policy. To satisfy this requirement, Subjects MAY include additional attributes as key-value pairs, under the `properties` object. A property can contain any JSON value as described in {{Section 3 of RFC8259}}).
 
 Examples of subject attributes can include, but are not limited to:
 
@@ -190,7 +188,7 @@ The following is a non-normative example of a subject which adds IP address and 
 {: #subject-device-id-example title="Example Subject with IP Address and Device ID"}
 
 ## Resource {#resource}
-A Resource is the target of an access request. It is a JSON ({{RFC8259}}) object that is constructed similar to a Subject entity. It has the following keys:
+A Resource is the target of an access request. It is a JSON object ({{Section 4 of RFC8259}}) that is constructed similar to a Subject entity. It has the following keys:
 
 `type`:
 : REQUIRED. A `string` value that specifies the type of the Resource.
@@ -199,9 +197,9 @@ A Resource is the target of an access request. It is a JSON ({{RFC8259}}) object
 : REQUIRED. A `string` value containing the unique identifier of the Resource, scoped to the `type`.
 
 `properties`:
-: OPTIONAL. A JSON object which can be used to express additional properties of a Resource.
+: OPTIONAL. A JSON object which can be used to express additional attributes of a Resource.
 
-### Resource properties {#resource-properties}
+### Resource Properties {#resource-properties}
 
 Similarly to the Subject properties, the PEP can also provide attributes for the Resource in the properties field.
 
@@ -238,13 +236,13 @@ The following is a non-normative example of a Resource containing a `library_rec
 ## Action {#action}
 An Action is the type of access that the requester intends to perform.
 
-Action is a JSON ({{RFC8259}}) object that contains a REQUIRED `name` key with a `string` value, and an OPTIONAL `properties` key with a JSON object value.
+Action is a JSON object ({{Section 4 of RFC8259}}) that contains a REQUIRED `name` key with a `string` value, and an OPTIONAL `properties` key with a JSON object value.
 
 `name`:
 : REQUIRED. The name of the Action.
 
 `properties`:
-: OPTIONAL. A JSON object which can be used to express additional properties of an Action.
+: OPTIONAL. A JSON object which can be used to express additional attributes of an Action.
 
 ### Action Properties {#action-properties}
 
@@ -278,7 +276,7 @@ The following is a non-normative example of an action with additional properties
 ## Context {#context}
 The Context represents the environment of the access evaluation request.
 
-Context is a JSON ({{RFC8259}}) object which can be used to express properties of the environment. 
+Context is a JSON object ({{Section 4 of RFC8259}}) which can be used to express attributes of the environment. 
 
 Examples of context attributes can include, but are not limited to:
 
@@ -313,7 +311,7 @@ The following example of a Context provides a JSON Schema definition which can b
 ## Decision {#decision}
 A Decision is the result of the evaluation of an access request. It provides the information required for the PEP to enforce the decision.
 
-Decision is a JSON ({{RFC8259}}) object that contains a REQUIRED `decision` key with a `boolean` value, and an OPTIONAL `context` key with a JSON object value.
+Decision is a JSON object ({{Section 4 of RFC8259}}) that contains a REQUIRED `decision` key with a `boolean` value, and an OPTIONAL `context` key with a JSON object value.
 
 `decision`:
 : REQUIRED. A boolean value that specifies whether the Decision is to allow or deny the operation.
@@ -336,7 +334,7 @@ The following is a non-normative example of a minimal Decision:
 {: #decision-example title="Example Decision"}
 
 ### Decision Context {#decision-context}
-In addition to a `"decision"`, a response MAY contain a `"context"` field which can be any JSON object. This context can convey additional information that can be used by the PEP as part of the decision enforcement process.
+In addition to a `decision`, a response MAY contain a `context` field which can be any JSON object. This context can convey additional information that can be used by the PEP as part of the decision enforcement process.
 
 Examples include, but are not limited to:
 
@@ -465,7 +463,7 @@ If an `evaluations` array is NOT present or is empty, the Access Evaluations Req
 
 If an `evaluations` array IS present and contains one or more objects, these form distinct requests that the PDP will evaluate. These requests are independent from each other, and may be executed sequentially or in parallel, left to the discretion of each implementation.
 
-The top-level `subject`, `action`, `resource`, and `context` keys provide default values for their respective fields in the `evaluations` array.  The top-level `subject`, `action` and `resource` keys MAY be omitted if the `evaluations` array IS present, contains one or more objects, and every object in the `evaluations` array contains the respective top-level key. This behavior is described in {{default-values}}.
+The top-level `subject`, `action`, `resource`, and `context` keys provide default values for their respective fields in the `evaluations` array.  The top-level `subject`, `action` and `resource` keys MAY be omitted if the `evaluations` array is present, contains one or more objects, and every object in the `evaluations` array contains the respective top-level key. This behavior is described in {{default-values}}.
 
 The following is a non-normative example for specifying three requests, with no default values:
 
@@ -524,13 +522,13 @@ The following is a non-normative example for specifying three requests, with no 
 }
 ~~~
 
-### Default values
+### Default values {#default-values}
 
 While the example above provides the most flexibility in specifying distinct values in each request for every evaluation, it is common for boxcarred requests to share one or more values of the evaluation request. For example, evaluations MAY all refer to a single subject, and/or have the same contextual (environmental) attributes.
 
 Default values offer a more compact syntax that avoids over-duplication of request data.
 
-If any of the top-level `subject`, `action`, `resource`, and `context` keys are provided, the value of the top-level key is treated as the default value for the evaluation specified in the `evaluations` array. If a top-level key is specified within an individual request in the `evaluations` array, its value takes precedence over the corresponding top-level default value. If the `subject`, `action` or `resource` is omitted in the `evaluations` array then a default value for the key MUST be provided in the top-level keys.
+The top-level `subject`, `action`, `resource`, and `context` keys provide default values for each object in the evaluations array. Any of these keys specified within an individual evaluation object overrides the corresponding top-level default. Because `subject`, `action`, and `resource` are required for a valid evaluation, any of these keys omitted from an evaluation object MUST be provided as a top-level key.
 
 The following is a non-normative example for specifying three requests that refer to a single subject and context:
 
@@ -644,14 +642,14 @@ A non-normative example of the `options` field is shown below, following an `eva
 }
 ~~~
 
-#### Evaluations semantics
+#### Evaluations semantics {#evaluations-semantics}
 
 By default, every request in the `evaluations` array is executed and a response returned in the same array order. This is the most common use-case for boxcarring multiple evaluation requests in a single payload.
 
 This specification supports three evaluation semantics:
 
-1. *Execute all of the requests (potentially in parallel), return all of the results.* Any failure can be denoted by `decision: false` and MAY provide a reason code in the context.
-2. *Deny on first denial (or failure).* This semantic could be desired if a PEP wants to issue a few requests in a particular order, with any denial (error, or `decision: false`) "short-circuiting" the evaluations call and returning on the first denial. This essentially works like the `&&` operator in programming languages.
+1. *Execute all of the requests (potentially in parallel), return all of the results.* Any failure can be denoted by `"decision": false` and MAY provide a reason code in the context.
+2. *Deny on first denial (or failure).* This semantic could be desired if a PEP wants to issue a few requests in a particular order, with any denial (error, or `"decision": false`) "short-circuiting" the evaluations call and returning on the first denial. This essentially works like the `&&` operator in programming languages.
 3. *Permit on first permit.* This is the converse "short-circuiting" semantic, working like the `||` operator in programming languages.
 
 To select the desired evaluation semantic, a caller can pass in `options.evaluations_semantic` with exactly one of the following values:
@@ -899,7 +897,7 @@ The Subject Search API is based on the Access Evaluation information model, but 
 
 ## Subject Search Semantics
 
-While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
+While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `"decision": true` response.
 
 In addition, it is RECOMMENDED that a subject search is performed transitively, traversing intermediate attributes and/or relationships. For example, if the members of group G are designated as viewers on a document D, then a search for all users that are viewers of document D will include all the members of group G.
 
@@ -1333,7 +1331,7 @@ Content-Type: application/json
 
 ### Policy Decision Point Metadata Validation {#pdp-metadata-data-endpoint-validation}
 
-The "`policy_decision_point`" value returned MUST be identical to the Policy Decision Point identifier value into which the well-known URI string was inserted to create the URL used to retrieve the metadata.  If these values are not identical, the data contained in the response MUST NOT be used.
+The `policy_decision_point` value returned MUST be identical to the Policy Decision Point identifier value into which the well-known URI string was inserted to create the URL used to retrieve the metadata.  If these values are not identical, the data contained in the response MUST NOT be used.
 
 The recipient MUST validate that any signed metadata was signed by a key belonging to the issuer and that the signature is valid. If the signature does not validate or the issuer is not trusted, the recipient SHOULD treat this as an error condition.
 
@@ -1708,7 +1706,7 @@ Authenticating the PEP allows the PDP to avoid common attacks (such as DoS - see
 
 ## Sender Authentication Failure {#security-sender-authentn-fail}
 
-If the protected resource request does not include the proper authentication credentials, or does not have a valid authentication scheme proof that enables access to the protected resource, the resource server MUST respond with a 401 HTTP status code and SHOULD include the HTTP "WWW-Authenticate" response header field; it MAY include it in response to other conditions as well. The "WWW-Authenticate" header field uses the framework defined by HTTP/1.1 [RFC2617] and indicates the expected authentication scheme as well as the realm that has authority for it.
+If the protected resource request does not include the proper authentication credentials, or does not have a valid authentication scheme proof that enables access to the protected resource, the resource server MUST respond with a 401 HTTP status code and SHOULD include the HTTP "WWW-Authenticate" response header field; it MAY include it in response to other conditions as well. The "WWW-Authenticate" header field uses the framework defined by HTTP/1.1 {{RFC2617}} and indicates the expected authentication scheme as well as the realm that has authority for it.
 
 The following is a non-normative example response:
 
