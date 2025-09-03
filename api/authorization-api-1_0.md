@@ -648,7 +648,7 @@ By default, every request in the `evaluations` array is executed and a response 
 
 This specification supports three evaluation semantics:
 
-1. *Execute all of the requests (potentially in parallel), return all of the results.* Any failure can be denoted by `"decision": false` and MAY provide a reason code in the context.
+1. *Execute all requests (potentially in parallel), return all results.* Any failure can be denoted by `"decision": false` and MAY provide a reason code in the context.
 2. *Deny on first denial (or failure).* This semantic could be desired if a PEP wants to issue a few requests in a particular order, with any denial (error, or `"decision": false`) "short-circuiting" the evaluations call and returning on the first denial. This essentially works like the `&&` operator in programming languages.
 3. *Permit on first permit.* This is the converse "short-circuiting" semantic, working like the `||` operator in programming languages.
 
@@ -889,24 +889,133 @@ The following is a non-normative example of a response to an Access Evaluations 
 }
 ~~~
 
-# Subject Search API {#subject-search-api}
 
-The Subject Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the subjects that match the search criteria.
+# Search APIs {#search}
 
-The Subject Search API is based on the Access Evaluation information model, but omits the Subject ID.
+The Search APIs define the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all subjects, resources, or actions that match the search criteria.
 
-## Subject Search Semantics
+## Search Semantics {#search-semantics}
 
-While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `"decision": true` response.
+While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an Access Evaluation API call MUST result in a `"decision": true` response.
 
-In addition, it is RECOMMENDED that a subject search is performed transitively, traversing intermediate attributes and/or relationships. For example, if the members of group G are designated as viewers on a document D, then a search for all users that are viewers of document D will include all the members of group G.
+In addition, it is RECOMMENDED that a search be performed transitively, traversing intermediate attributes and/or relationships. For example, if user U is a member of group G, and group G is designated as a viewer on a document D, then a search for all subjects that can view document D will include user U.
 
-## The Subject Search API Request {#subject-search-request}
+## Search API Request {#search-request}
+
+A search request is constructed based on the Subject, Resource, Action and Context entities defined in the Information Model ({{information-model}}). For a search request, the unique identifier of the entity being searched for is omitted. Additionally, a `page` object as defined in {{search-request-pagination}} MAY be provided.
+
+The following is a non-normative example of a request to retrieve the resources that user `alice@example.com` can read:
+
+~~~ json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "action": {
+    "name": "can_read"
+  },
+  "resource": {
+    "type": "account"
+  }
+}
+~~~
+{: #search-request-example title="Example Search Request"}
+
+### Pagination Request {#search-request-pagination}
+
+A search request MAY include a `page` object to control pagination. This object can contain the following keys:
+
+`next_token`: 
+: OPTIONAL. An opaque token consisting of a string value obtained from a previous response's `page` object to retrieve the next set of results.
+
+`limit`: 
+: OPTIONAL. An integer indicating a desired maximum number of results for the server to return. The server MAY implement this feature but is not required to do so and MAY ignore the value.
+
+The following is a non-normative example of a request to retrieve a subsequent page of results with a desired limit of 20 results:
+
+~~~ json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "action": {
+    "name": "can_read"
+  },
+  "resource": {
+    "type": "account"
+  },
+  "page": {
+    "next_token": "alsehrq3495u8",
+    "limit": 20
+  }
+}
+~~~
+{: #search-request-pagination-example title="Example Search Request with pagination"}
+
+## Search API Response {#search-response}
+
+The response to a search request is a JSON object with the following keys:
+
+`page`:
+: OPTIONAL. An object providing pagination information as defined in {{search-response-pagination}}. It is RECOMMENDED that the page object be the first key in the response. This allows clients to provide progress indicators while processing large response bodies.
+
+`results`:
+: REQUIRED. An array that contains zero or more entities, as defined in the Information Model ({{information-model}}). It MUST contain only entities of the type being searched for (e.g., Subjects, Resources, or Actions).
+
+`context`:
+: OPTIONAL. An object that can convey additional information that can be used by the PEP, similar to its function in the Access Evaluation Response.
+
+### Pagination Response {#search-response-pagination}
+
+A search response MAY contain a `page` object that provides pagination information with the following keys:
+
+`next_token`: 
+: OPTIONAL. An opaque string value to be used in a subsequent request to retrieve the next page of results.
+
+`count`: 
+: OPTIONAL. An integer representing the number of results included in the current response.
+
+`total`:
+: OPTIONAL. An integer representing the total number of results available across all pages for the query.
+
+The following is a non-normative example of a search response:
+
+~~~ json
+{
+  "page": {
+    "next_token": "n0rzpr10ds0x6",
+    "count": 2,
+    "total": 1198
+  },
+  "context": {
+    "query_execution_time_ms": 42
+  },
+  "results": [
+    {
+      "type": "account",
+      "id": "123"
+    },
+    {
+      "type": "account",
+      "id": "456"
+    }
+  ]
+}
+~~~
+{: #search-response-example title="Example Search Response"}
+
+## Subject Search API {#subject-search-api}
+
+The Subject Search API returns all subjects that match the search criteria. It is based on the Access Evaluation information model but omits the identifier of the Subject from the request.
+
+### The Subject Search API Request {#subject-search-request}
 
 The Subject Search request is an object consisting of the following entities:
 
 `subject`:
-: REQUIRED. The subject (or principal) of type Subject.  NOTE that the Subject type is REQUIRED but the Subject ID can be omitted, and if present, is IGNORED.
+: REQUIRED. The subject (or principal) of type Subject. This object MUST contain a `type` key, but its `id` key SHOULD be omitted. If present, the `id` key and its value MUST be ignored.
 
 `action`:
 : REQUIRED. The action (or verb) of type Action.
@@ -918,7 +1027,7 @@ The Subject Search request is an object consisting of the following entities:
 : OPTIONAL. Contextual data about the request.
 
 `page`:
-: OPTIONAL. A page token for paged requests.
+: OPTIONAL. A page object for paginated requests.
 
 ### Example (non-normative)
 
@@ -941,92 +1050,13 @@ The following payload defines a request for the subjects of type `user` that can
   }
 }
 ~~~
-{: #subject-search-request-example title="Example Request"}
+{: #subject-search-request-example title="Example Subject Search Request"}
 
-## The Subject Search API Response {#subject-search-response}
+## Resource Search API {#resource-search-api}
 
-The response is a paged array of Subjects.
+The Resource Search API returns all resources that match the search criteria. It is based on the Access Evaluation information model but omits the identifier of the Resource from the request.
 
-~~~ json
-{
-  "results": [
-    {
-      "type": "user",
-      "id": "alice@example.com"
-    },
-    {
-      "type": "user",
-      "id": "bob@example.com"
-    }
-  ],
-  "page": {
-    "next_token": ""
-  }
-}
-~~~
-
-### Paged requests
-
-A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
-
-#### Example
-
-~~~ json
-{
-  "results": [
-    {
-      "type": "user",
-      "id": "alice@example.com"
-    },
-    {
-      "type": "user",
-      "id": "bob@example.com"
-    }
-  ],
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
-}
-~~~
-
-To retrieve the next page, provide `page.next_token` in the next request:
-
-~~~ json
-{
-  "subject": {
-    "type": "user"
-  },
-  "action": {
-    "name": "can_read"
-  },
-  "resource": {
-    "type": "account",
-    "id": "123"
-  },
-  "context": {
-    "time": "2024-10-26T01:22-07:00"
-  },
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
-}
-~~~
-
-Note: page size is implementation-dependent.
-
-# Resource Search API {#resource-search-api}
-
-The Resource Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the resources that match the search criteria.
-
-The Resource Search API is based on the Access Evaluation information model, but omits the Resource ID.
-
-## Resource Search Semantics
-
-While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
-
-In addition, it is RECOMMENDED that a resource search is performed transitively, traversing intermediate attributes and/or relationships. For example, if user U is a viewer of folder F that contains a set of documents, then a search for all documents that user U can view will include all of the documents in folder F.
-
-## The Resource Search API Request {#resource-search-request}
+### The Resource Search API Request {#resource-search-request}
 
 The Resource Search request is an object consisting of the following entities:
 
@@ -1037,13 +1067,13 @@ The Resource Search request is an object consisting of the following entities:
 : REQUIRED. The action (or verb) of type Action.
 
 `resource`:
-: REQUIRED. The resource of type Resource. NOTE that the Resource type is REQUIRED but the Resource ID is omitted, and if present, is IGNORED.
+: REQUIRED. The resource of type Resource. This object MUST contain a `type` key, but its `id` key SHOULD be omitted. If present, the `id` key and its value MUST be ignored.
 
 `context`:
 : OPTIONAL. Contextual data about the request.
 
 `page`:
-: OPTIONAL. A page token for paged requests.
+: OPTIONAL. A page object for paginated requests.
 
 ### Example (non-normative)
 
@@ -1063,87 +1093,13 @@ The following payload defines a request for the resources of type `account` on w
   }
 }
 ~~~
-{: #resource-search-request-example title="Example Request"}
+{: #resource-search-request-example title="Example Resource Search Request"}
 
-## The Resource Search API Response {#resource-search-response}
+## Action Search API {#action-search-api}
 
-The response is a paged array of Resources.
+The Action Search API returns all actions that match the search criteria. It is based on the Access Evaluation information model but omits the Action from the request.
 
-~~~ json
-{
-  "results": [
-    {
-      "type": "account",
-      "id": "123"
-    },
-    {
-      "type": "account",
-      "id": "456"
-    }
-  ],
-  "page": {
-    "next_token": ""
-  }
-}
-~~~
-
-### Paged requests
-
-A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
-
-#### Example
-
-~~~ json
-{
-  "results": [
-    {
-      "type": "account",
-      "id": "123"
-    },
-    {
-      "type": "account",
-      "id": "456"
-    }
-  ],
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
-}
-~~~
-
-To retrieve the next page, provide `page.next_token` in the next request:
-
-~~~ json
-{
-  "subject": {
-    "type": "user",
-    "id": "alice@example.com"
-  },
-  "action": {
-    "name": "can_read"
-  },
-  "resource": {
-    "type": "account"
-  },
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
-}
-~~~
-
-Note: page size is implementation-dependent.
-
-# Action Search API {#action-search-api}
-
-The Action Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the actions that match the search criteria.
-
-The Action Search API is based on the Access Evaluation information model, but omits the Action.
-
-## Action Search Semantics
-
-While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
-
-## The Action Search API Request {#action-search-request}
+### The Action Search API Request {#action-search-request}
 
 The Action Search request is an object consisting of the following entities:
 
@@ -1157,13 +1113,13 @@ The Action Search request is an object consisting of the following entities:
 : OPTIONAL. Contextual data about the request.
 
 `page`:
-: OPTIONAL. A page token for paged requests.
+: OPTIONAL. A page object for paginated requests.
 
 Note: Unlike the Subject and Resource Search APIs, the `action` key is omitted from the Action Search request payload.
 
 ### Example (non-normative)
 
-The following payload defines a request for the actions that the subject of type `user` with ID `123` may perform on the resource of type account and ID 123 at 01:22 AM.
+The following payload defines a request for the actions that the subject of type `user` with ID `123` may perform on the resource of type `account` and ID `123` at 01:22 AM.
 
 ~~~ json
 {
@@ -1180,75 +1136,7 @@ The following payload defines a request for the actions that the subject of type
   }
 }
 ~~~
-{: #action-search-request-example title="Example Request"}
-
-## The Action Search API Response {#action-search-response}
-
-The response is a paged array of Actions.
-
-~~~ json
-{
-  "results": [
-    {
-      "name": "can_read"
-    },
-    {
-      "name": "can_write"
-    }
-  ],
-  "page": {
-    "next_token": ""
-  }
-}
-~~~
-{: #action-search-response-example title="Example Response"}
-
-### Paged requests
-
-A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
-
-#### Example
-
-~~~ json
-{
-  "results": [
-    {
-      "name": "can_read"
-    },
-    {
-      "name": "can_write"
-    }
-  ],
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
-}
-~~~
-{: #action-search-response-paged-example title="Example Paged Response"}
-
-To retrieve the next page, provide `page.next_token` in the next request:
-
-~~~ json
-{
-  "subject": {
-    "type": "user",
-    "id": "123"
-  },
-  "resource": {
-    "type": "account",
-    "id": "123"
-  },
-  "context": {
-    "time": "2024-10-26T01:22-07:00"
-  },
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
-}
-~~~
-{: #action-search-request-paged-example title="Example Paged Request"}
-
-Note: page size is implementation-dependent.
+{: #action-search-request-example title="Example Action Search Request"}
 
 # Policy Decision Point Metadata {#pdp-metadata}
 
@@ -1509,7 +1397,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #example-subject-search-request title="Example of an HTTPS Subject Search Request"}
 
 ### HTTPS Subject Search Response
-The success response to a Subject Search Request is a Subject Search Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Subject Search Response, as defined in {{subject-search-response}}.
+The success response to a Subject Search Request is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Search Response, as defined in {{search-response}} containing Subject entities as its `results`.
 
 The following is a non-normative example of an HTTPS Subject Search Response:
 
@@ -1567,7 +1455,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #example-resource-search-request title="Example of an HTTPS Resource Search Request"}
 
 ### HTTPS Resource Search Response
-The success response to a Resource Search Request is a Resource Search Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Resource Search Response, as defined in {{resource-search-response}}.
+The success response to a Resource Search Request is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Search Response, as defined in {{search-response}} containing Resource entities as its `results`.
 
 The following is a non-normative example of an HTTPS Resource Search Response:
 
@@ -1625,7 +1513,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #example-action-search-request title="Example of an HTTPS Action Search Request"}
 
 ### HTTPS Action Search Response
-The success response to an Action Search Request is an Action Search Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Action Search Response, as defined in {{action-search-response}}.
+The success response to an Action Search Request is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Search Response, as defined in {{search-response}} containing Action entities as its `results`.
 
 The following is a non-normative example of an HTTPS Action Search Response:
 
