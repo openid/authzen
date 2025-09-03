@@ -1309,7 +1309,9 @@ Additional transport bindings (e.g. gRPC) MAY be defined in the future in the fo
 ## HTTPS Binding
 
 ### HTTPS Access Evaluation Request
-The Access Evaluation Request is an HTTPS request to the URL defined in `access_evaluation_endpoint` in the Policy Decision Point Metadata, as defined in {#pdp-metadata-data-endpoint}. It has the `Content-Type` of `application/json` and its body is a JSON object that contains the Access Evaluation Request, as defined in {{access-evaluation-request}}.
+The Access Evaluation Request is made via an HTTPS POST request. The request MUST include a `Content-Type` header with the value `application/json`. The request body MUST be a JSON object that conforms to the Access Evaluation Request structure, as defined in {{access-evaluation-request}}.
+
+The request URL MUST be the value of the `access_evaluation_endpoint` parameter if it is provided in the PDP Metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the relative path `/access/v1/evaluation` to the Policy Decision Point's base URL (which is the `policy_decision_point` value from the PDP Metadata, if available).
 
 The following is a non-normative example of the HTTPS binding of the Access Evaluation Request:
 
@@ -1356,7 +1358,9 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #example-access-evaluation-response title="Example of an HTTP Access Evaluation Response"}
 
 ### HTTPS Access Evaluations Request
-The Access Evaluations Request is an HTTPS request to the URL defined in `access_evaluations_endpoint` in the Policy Decision Point Metadata, as defined in {#pdp-metadata-data-endpoint}. It has the `Content-Type` of `application/json` and its body is a JSON object that contains the Access Evaluations Request, as defined in {{access-evaluations-request}}.
+The Access Evaluations Request is made via an HTTPS POST request. The request MUST include a `Content-Type` header with the value `application/json`. The request body MUST be a JSON object that conforms to the Access Evaluations Request structure, as defined in {{access-evaluations-request}}.
+
+The request URL MUST be the value of the `access_evaluations_endpoint` parameter if it is provided in the PDP Metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the relative path `/access/v1/evaluations` to the Policy Decision Point's base URL (which is the `policy_decision_point` value from the PDP Metadata, if available).
 
 The following is a non-normative example of a the HTTPS binding of the Access Evaluations Request:
 
@@ -1441,7 +1445,9 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #example-access-evaluations-response title="Example of an HTTPS Access Evaluations Response"}
 
 ### HTTPS Subject Search Request
-The Subject Search Request is an HTTPS request to the URL defined in `search_subject_endpoint` in the Policy Decision Point Metadata, as defined in {#pdp-metadata-data-endpoint}. It has the `Content-Type` of `application/json` and its body is a JSON object that contains the Subject Search Request, as defined in {{subject-search-request}}.
+The Subject Search Request is made via an HTTPS POST request. The request MUST include a `Content-Type` header with the value `application/json`. The request body MUST be a JSON object that conforms to the Subject Search Request structure, as defined in {{subject-search-request}}.
+
+The request URL MUST be the value of the `search_subject_endpoint` parameter if it is provided in the PDP Metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the relative path `/access/v1/search/subject` to the Policy Decision Point's base URL (which is the `policy_decision_point` value from the PDP Metadata, if available).
 
 The following is a non-normative example of the HTTPS binding of the Subject Search Request:
 
@@ -1496,7 +1502,10 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #example-subject-search-response title="Example of an HTTPS Subject Search Response"}
 
 ### HTTPS Resource Search Request
-The Resource Search Request is an HTTPS request to the URL defined in `search_resource_endpoint` in the Policy Decision Point Metadata, as defined in {#pdp-metadata-data-endpoint}. It has the `Content-Type` of `application/json` and its body is a JSON object that contains the Resource Search Request, as defined in {{resource-search-request}}.
+
+The Resource Search Request is made via an HTTPS POST request. The request MUST include a `Content-Type` header with the value `application/json`. The request body MUST be a JSON object that conforms to the Resource Search Request structure, as defined in {{resource-search-request}}.
+
+The request URL MUST be the value of the `search_resource_endpoint` parameter if it is provided in the PDP Metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the relative path `/access/v1/search/resource` to the Policy Decision Point's base URL (which is the `policy_decision_point` value from the PDP Metadata, if available).
 
 The following is a non-normative example of the HTTPS binding of the Resource Search Request:
 
@@ -1551,7 +1560,9 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 {: #example-resource-search-response title="Example of an HTTPS Resource Search Response"}
 
 ### HTTPS Action Search Request
-The Action Search Request is an HTTPS request to the URL defined in `search_action_endpoint` in the Policy Decision Point Metadata, as defined in {#pdp-metadata-data-endpoint}. It has the `Content-Type` of `application/json` and its body is a JSON object that contains the Action Search Request, as defined in {{action-search-request}}.
+The Action Search Request is made via an HTTPS POST request. The request MUST include a `Content-Type` header with the value `application/json`. The request body MUST be a JSON object that conforms to the Action Search Request structure, as defined in {{action-search-request}}.
+
+The request URL MUST be the value of the `search_action_endpoint` parameter if it is provided in the PDP Metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the relative path `/access/v1/search/action` to the Policy Decision Point's base URL (which is the `policy_decision_point` value from the PDP Metadata, if available).
 
 The following is a non-normative example of the HTTPS binding of the Action Search Request:
 
