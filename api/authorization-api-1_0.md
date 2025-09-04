@@ -904,20 +904,22 @@ In addition, it is RECOMMENDED that a search be performed transitively, traversi
 
 The set of results returned by Search APIs can be very large. Search APIs use `page` objects in requests and responses to navigate and return subsets of the larger result set.
 
-To facilitate this, a `position` value is used that indicates a specific starting point within the result set. The `position` value is considered opaque and can consist of any type of position indicator such as, but not limited to, cursors, tokens or numeric offsets.
+To facilitate this, an `offset` value is used that indicates a specific starting point within the result set. The `offset` value may also contain non-numeric values such as cursors or tokens.
+
+Paginated search responses include a `next_offset` value. This allows clients to paginate across a result set without needing to know the mechanism for determining the next offset.
 
 Clients of the Search APIs can paginate across a result set by:
-- issuing an initial request without a `position` value,
-- repeatedly passing the `next_position` value from a response as the `position` value of the next request,
-- until no `next_position` value is provided. 
+- issuing an initial request without an `offset` value,
+- repeatedly passing the `next_offset` value from a response as the `offset` value of the next request,
+- until no `next_offset` value is provided.
 
 This pagination model does not guarantee an atomic snapshot of the result set. Consequently, if items are added or removed while paginating, clients SHOULD be prepared that results can be repeated or omitted between pages.
 
-If a search request omits the `page` object, omits the `position` key, or if the `position` value is an empty string, then the first page of the result set MUST be returned.
+If a search request omits the `page` object, omits the `offset` key, or if the `offset` value is null, then the first page of the result set MUST be returned.
 
-If a search response does not contain all remaining results from a given `position`, it MUST contain a `page` object with a non-empty `next_position` value that can be used in a subsequent request to retrieve the next page of search results. 
+If a search response does not contain all remaining results from a given `offset`, it MUST contain a `page` object with a non-empty `next_offset` value that can be used in a subsequent request to retrieve the next page of search results. 
 
-If a search response contains all remaining results from a given `position` and includes a `page` object, that `page` object MUST NOT contain a non-empty `next_position` value.
+If a search response contains all remaining results from a given `offset` and includes a `page` object, that `page` object MUST NOT contain a non-null `next_offset` value.
 
 ## Search API Request {#search-request}
 
@@ -945,8 +947,8 @@ The following is a non-normative example of a request to retrieve the resources 
 
 A search request MAY include a `page` object to control pagination. This object can contain the following keys:
 
-`position`: 
-: OPTIONAL. An opaque string value specifying a position in the result set, as described in {{search-pagination}}. 
+`offset`: 
+: OPTIONAL. A value specifying an offset in the result set, as described in {{search-pagination}}. 
 
 `limit`: 
 : OPTIONAL. An integer indicating a desired maximum number of results for the server to return. The server MAY implement this feature but is not required to do so and MAY ignore the value.
@@ -966,7 +968,7 @@ The following is a non-normative example of a request to retrieve a subsequent p
     "type": "account"
   },
   "page": {
-    "position": "alsehrq3495u8",
+    "offset": 80,
     "limit": 20
   }
 }
@@ -987,12 +989,35 @@ The response to a search request is a JSON object with the following keys:
 `context`:
 : OPTIONAL. An object that can convey additional information that can be used by the PEP, similar to its function in the Access Evaluation Response.
 
+The following is a non-normative example of a search response using a non-numeric offset:
+
+~~~ json
+{
+  "context": {
+    "query_execution_time_ms": 42
+  },
+  "results": [
+    {
+      "type": "account",
+      "id": "123"
+    },
+    {
+      "type": "account",
+      "id": "456"
+    },
+    ...
+  ]
+}
+~~~
+{: #search-response-example title="Example Search Response"}
+
+
 ### Search Response Pagination {#search-response-pagination}
 
 A search response MAY contain a `page` object that provides pagination information with the following keys:
 
-`next_position`: 
-: OPTIONAL. An opaque string value that can be used to retrieve the next page of the result set, as described in {{search-pagination}}. 
+`next_offset`: 
+: OPTIONAL. A value that can be used to retrieve the next page of the result set, as described in {{search-pagination}}. 
 
 `count`: 
 : OPTIONAL. An integer representing the number of results included in the current response.
@@ -1000,14 +1025,14 @@ A search response MAY contain a `page` object that provides pagination informati
 `total`:
 : OPTIONAL. An integer representing the total number of results available for the complete result set, across all pages.
 
-The following is a non-normative example of a search response:
+The following is a non-normative example of a search response using a non-numeric offset:
 
 ~~~ json
 {
   "page": {
-    "next_position": "100",
-    "count": 2,
-    "total": 102
+    "next_offset": "alsehrq3495u8",
+    "count": 20,
+    "total": 105
   },
   "context": {
     "query_execution_time_ms": 42
@@ -1020,11 +1045,12 @@ The following is a non-normative example of a search response:
     {
       "type": "account",
       "id": "456"
-    }
+    },
+    ...
   ]
 }
 ~~~
-{: #search-response-example title="Example Search Response"}
+{: #search-response-pagination example title="Example Search Response with non-numeric pagination offset"}
 
 ## Subject Search API {#subject-search-api}
 
@@ -1438,7 +1464,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
     }
   ],
   "page": {
-    "next_position": "alsehrq3495u8"
+    "next_offset": 80
   }
 }
 ~~~
@@ -1496,7 +1522,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
     }
   ],
   "page": {
-    "next_position": "alsehrq3495u8"
+    "next_offset": 80
   }
 }
 ~~~
@@ -1552,7 +1578,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
     }
   ],
   "page": {
-    "next_position": "alsehrq3495u8"
+    "next_offset": 80
   }
 }
 ~~~
