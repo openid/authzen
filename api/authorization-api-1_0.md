@@ -892,17 +892,34 @@ The following is a non-normative example of a response to an Access Evaluations 
 
 # Search APIs {#search}
 
-The Search APIs define the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all subjects, resources, or actions that match the search criteria.
+The Search APIs define the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning a set of subjects, resources, or actions that match specified search criteria.
 
 ## Search Semantics {#search-semantics}
 
-While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an Access Evaluation API call MUST result in a `"decision": true` response.
+While the evaluation of a search is implementation-specific, it is expected that any returned result that is then used in an Access Evaluation API call MUST result in a `"decision": true` response.
 
 In addition, it is RECOMMENDED that a search be performed transitively, traversing intermediate attributes and/or relationships. For example, if user U is a member of group G, and group G is designated as a viewer on a document D, then a search for all subjects that can view document D will include user U.
 
+## Search Pagination {#search-pagination}
+
+The set of results returned by Search APIs can be very large. Search APIs use `page` objects in requests and responses to navigate and return subsets of the larger result set.
+
+To facilitate this, a `position` value is used that indicates a specific starting point within the result set. The `position` value is considered opaque and can consist of any type of position indicator such as, but not limited to, cursors, tokens or numeric offsets.
+
+Clients of the Search APIs can paginate across a result set by:
+- issuing an initial request without a `position` value,
+- repeatedly passing the `next_position` value from a response as the `position` value of the next request,
+- until no `next_position` value is provided. 
+
+If a search request omits the `page` object, omits the `position` key, or if the `position` value is an empty string, then the first page of the result set MUST be returned.
+
+If a search response does not contain all remaining results from a given `position`, it MUST contain a `page` object with a non-empty `next_position` value that can be used in a subsequent request to retrieve the next page of search results. 
+
+If a search response contains all remaining results from a given `position` and includes a `page` object, that `page` object MUST NOT contain a non-empty `next_position` value.
+
 ## Search API Request {#search-request}
 
-A search request is constructed based on the Subject, Resource, Action and Context entities defined in the Information Model ({{information-model}}). For a search request, the unique identifier of the entity being searched for is omitted. Additionally, a `page` object as defined in {{search-request-pagination}} MAY be provided.
+A search request is constructed based on the Subject, Resource, Action and Context entities defined in the Information Model ({{information-model}}). For a search request, the unique identifier of the entity being searched for is omitted. Additionally, a `page` object, as defined in {{search-request-pagination}}, MAY be provided.
 
 The following is a non-normative example of a request to retrieve the resources that user `alice@example.com` can read:
 
@@ -922,17 +939,17 @@ The following is a non-normative example of a request to retrieve the resources 
 ~~~
 {: #search-request-example title="Example Search Request"}
 
-### Pagination Request {#search-request-pagination}
+### Search Request Pagination {#search-request-pagination}
 
 A search request MAY include a `page` object to control pagination. This object can contain the following keys:
 
-`next_token`: 
-: OPTIONAL. An opaque token consisting of a string value obtained from a previous response's `page` object to retrieve the next set of results.
+`position`: 
+: OPTIONAL. An opaque string value specifying a position in the result set, as described in {{search-pagination}}. 
 
 `limit`: 
 : OPTIONAL. An integer indicating a desired maximum number of results for the server to return. The server MAY implement this feature but is not required to do so and MAY ignore the value.
 
-The following is a non-normative example of a request to retrieve a subsequent page of results with a desired limit of 20 results:
+The following is a non-normative example of a request to retrieve a subsequent page of a result set with a desired limit of 20 results:
 
 ~~~ json
 {
@@ -947,47 +964,48 @@ The following is a non-normative example of a request to retrieve a subsequent p
     "type": "account"
   },
   "page": {
-    "next_token": "alsehrq3495u8",
+    "position": "alsehrq3495u8",
     "limit": 20
   }
 }
 ~~~
 {: #search-request-pagination-example title="Example Search Request with pagination"}
 
+
 ## Search API Response {#search-response}
 
 The response to a search request is a JSON object with the following keys:
 
 `page`:
-: OPTIONAL. An object providing pagination information as defined in {{search-response-pagination}}. It is RECOMMENDED that the page object be the first key in the response. This allows clients to provide progress indicators while processing large response bodies.
+: OPTIONAL. An object providing pagination information, as defined in {{search-response-pagination}}. It is RECOMMENDED that the page object be the first key in the response. This allows clients to provide progress indicators while processing large response bodies.
 
 `results`:
-: REQUIRED. An array that contains zero or more entities, as defined in the Information Model ({{information-model}}). It MUST contain only entities of the type being searched for (e.g., Subjects, Resources, or Actions).
+: REQUIRED. An array containing zero or more entities, as defined in the Information Model ({{information-model}}). It MUST contain only entities of the type being searched for (e.g., Subjects, Resources, or Actions).
 
 `context`:
 : OPTIONAL. An object that can convey additional information that can be used by the PEP, similar to its function in the Access Evaluation Response.
 
-### Pagination Response {#search-response-pagination}
+### Search Response Pagination {#search-response-pagination}
 
 A search response MAY contain a `page` object that provides pagination information with the following keys:
 
-`next_token`: 
-: OPTIONAL. An opaque string value to be used in a subsequent request to retrieve the next page of results.
+`next_position`: 
+: OPTIONAL. An opaque string value that can be used to retrieve the next page of the result set, as described in {{search-pagination}}. 
 
 `count`: 
 : OPTIONAL. An integer representing the number of results included in the current response.
 
 `total`:
-: OPTIONAL. An integer representing the total number of results available across all pages for the query.
+: OPTIONAL. An integer representing the total number of results available for the complete result set, across all pages.
 
 The following is a non-normative example of a search response:
 
 ~~~ json
 {
   "page": {
-    "next_token": "n0rzpr10ds0x6",
+    "next_position": "100",
     "count": 2,
-    "total": 1198
+    "total": 102
   },
   "context": {
     "query_execution_time_ms": 42
@@ -1418,7 +1436,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
     }
   ],
   "page": {
-    "next_token": "alsehrq3495u8"
+    "next_position": "alsehrq3495u8"
   }
 }
 ~~~
@@ -1476,7 +1494,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
     }
   ],
   "page": {
-    "next_token": "alsehrq3495u8"
+    "next_position": "alsehrq3495u8"
   }
 }
 ~~~
@@ -1532,7 +1550,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
     }
   ],
   "page": {
-    "next_token": "alsehrq3495u8"
+    "next_position": "alsehrq3495u8"
   }
 }
 ~~~
