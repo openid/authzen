@@ -911,6 +911,8 @@ Clients of the Search APIs can paginate across a result set by:
 - repeatedly passing the `next_position` value from a response as the `position` value of the next request,
 - until no `next_position` value is provided. 
 
+This pagination model does not guarantee an atomic snapshot of the result set. Consequently, if items are added or removed while paginating, clients SHOULD be prepared that results can be repeated or omitted between pages.
+
 If a search request omits the `page` object, omits the `position` key, or if the `position` value is an empty string, then the first page of the result set MUST be returned.
 
 If a search response does not contain all remaining results from a given `position`, it MUST contain a `page` object with a non-empty `next_position` value that can be used in a subsequent request to retrieve the next page of search results. 
