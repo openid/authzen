@@ -1,12 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function useIdTokenFromHash(): string | null {
-	const [idToken, setIdToken] = useState<string | null>(() => {
-		if (typeof window === "undefined") {
-			return null;
-		}
-		return extractIdToken(window.location.hash);
-	});
+	const [idToken, setIdToken] = useState<string | null>(null);
+	const hasPersistedToken = useRef(false);
 
 	useEffect(() => {
 		if (typeof window === "undefined") {
@@ -14,7 +10,15 @@ export function useIdTokenFromHash(): string | null {
 		}
 
 		const updateIdToken = () => {
-			setIdToken(extractIdToken(window.location.hash));
+			const token = extractIdToken(window.location.hash);
+			if (token) {
+				hasPersistedToken.current = true;
+				setIdToken(token);
+				const url = `${window.location.pathname}${window.location.search}`;
+				window.history.replaceState(null, "", url);
+			} else if (!hasPersistedToken.current) {
+				setIdToken(null);
+			}
 		};
 
 		window.addEventListener("hashchange", updateIdToken);
