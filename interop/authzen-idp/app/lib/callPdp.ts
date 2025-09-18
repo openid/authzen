@@ -21,6 +21,9 @@ export async function callPdp(
 		});
 	}
 
+	console.log("Calling PDP:", pdpId, "at", `${pdp.host}${endpoint}`);
+	console.log("Request payload:", JSON.stringify(payload, null, 2));
+
 	const authZENResponse = await fetch(`${pdp.host}${endpoint}`, {
 		method: "POST",
 		headers,
@@ -32,6 +35,7 @@ export async function callPdp(
 			idp: pdpId,
 			endpoint,
 			message: `PDP request failed: ${authZENResponse.statusText}`,
+			payload,
 			ok: authZENResponse.ok,
 		});
 		throw new Error(`PDP request failed: ${authZENResponse.statusText}`);

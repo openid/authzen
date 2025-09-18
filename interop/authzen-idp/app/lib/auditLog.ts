@@ -1,6 +1,7 @@
 export interface AuthenticationEntry {
 	idp: string;
 	message: string;
+	response?: object;
 }
 
 export interface AuthorizationEntry {

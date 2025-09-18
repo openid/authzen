@@ -1,10 +1,8 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: Init */
-import { generateCodeVerifier, OAuth2Client } from "@badgateway/oauth2-client";
+import { OAuth2Client } from "@badgateway/oauth2-client";
 import { redirect } from "react-router";
 import { AuditType, pushAuditLog } from "~/lib/auditLog";
 import type { Route } from "./+types/auth0";
-
-const codeVerifier = await generateCodeVerifier();
 
 const client = new OAuth2Client({
 	server: process.env.AUTH0_DOMAIN!,
@@ -22,7 +20,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 		});
 		const url = await client.authorizationCode.getAuthorizeUri({
 			redirectUri: callbackUrl,
-			codeVerifier,
 			scope: ["openid", "profile", "email"],
 			extraParams: {
 				prompt: "login",
@@ -41,7 +38,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 			const oauth2Token =
 				await client.authorizationCode.getTokenFromCodeRedirect(request.url, {
 					redirectUri: callbackUrl,
-					codeVerifier,
 				});
 
 			pushAuditLog(AuditType.AuthN, {
@@ -54,7 +50,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 				ok: true,
 			});
 
-			return redirect(`/`);
+			return redirect(`/#id_token=${oauth2Token.idToken}`);
 		} catch (error) {
 			pushAuditLog(AuditType.AuthN, {
 				message: `Error obtaining OAuth2 token: ${(error as Error).message}`,
