@@ -14,15 +14,15 @@ interface PDPPickerProps {
 
 export function PDPPicker({ pdpList, activePdp, setPdp }: PDPPickerProps) {
 	return (
-		<div className="flex  items-center gap-4 p-2 ">
+		<div className="flex items-center gap-4 p-2">
 			<div className="text-base">Policy Decision Point</div>
-			<Select onValueChange={setPdp} defaultValue={activePdp}>
+			<Select onValueChange={setPdp} value={activePdp}>
 				<SelectTrigger className="min-w-[200px]">
 					<SelectValue placeholder="Select a PDP" />
 				</SelectTrigger>
 				<SelectContent>
-					{pdpList.map((pdp, i) => (
-						<SelectItem key={`${pdp[i]}`} value={pdp}>
+					{pdpList.map((pdp) => (
+						<SelectItem key={pdp} value={pdp}>
 							{pdp}
 						</SelectItem>
 					))}

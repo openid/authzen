@@ -1,7 +1,8 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: Init */
 import { OAuth2Client } from "@badgateway/oauth2-client";
 import { redirect } from "react-router";
-import { AuditType, pushAuditLog } from "~/lib/auditLog";
+import { pushAuditLog } from "~/lib/auditLog";
+import { AuditType } from "~/types/audit";
 import type { Route } from "./+types/auth0";
 
 const client = new OAuth2Client({
@@ -44,8 +45,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 				message: "Successfully obtained OAuth2 token from Auth0",
 				idp: "auth0",
 				response: {
-					accessTokenIssued: !oauth2Token.accessToken,
-					idTokenIssued: !!oauth2Token.idToken,
+					accessTokenIssued: Boolean(oauth2Token.accessToken),
+					idTokenIssued: Boolean(oauth2Token.idToken),
 				},
 				ok: true,
 			});

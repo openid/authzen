@@ -1,5 +1,5 @@
-import { getActivePdp } from "~/lib/activePdp";
-import { callPdp } from "~/lib/callPdp";
+import { callPdp } from "~/lib/pdpClient";
+import { getActivePdp } from "~/lib/pdpState";
 import type { Route } from "./+types/authorize";
 
 export async function action({ params, request }: Route.ActionArgs) {
@@ -10,7 +10,11 @@ export async function action({ params, request }: Route.ActionArgs) {
 		return Response.json({ error: "Missing request body" }, { status: 400 });
 	}
 
-	const pdpResponse = await callPdp(pdpPath, body, getActivePdp());
+	const pdpResponse = await callPdp({
+		endpoint: pdpPath,
+		payload: body,
+		pdpId: getActivePdp(),
+	});
 
 	return Response.json(pdpResponse);
 }

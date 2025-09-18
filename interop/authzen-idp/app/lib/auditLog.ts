@@ -1,47 +1,23 @@
-export interface AuthenticationEntry {
-	idp: string;
-	message: string;
-	response?: object;
-}
+import type { AuditBody, AuditEntry, AuditType } from "~/types/audit";
 
-export interface AuthorizationEntry {
-	endpoint: string;
-	payload: object;
-	pdpId: string;
-	ok: boolean;
-	response?: object;
-}
-
-export enum AuditType {
-	AuthN = "AuthN",
-	AuthZ = "AuthZ",
-}
-
-export interface AuditEntry {
-	timestamp: Date;
-	type: AuditType;
-	body: AuthenticationEntry | AuthorizationEntry;
-}
-
+const MAX_ENTRIES = 100;
 const auditLog: AuditEntry[] = [];
 
-export function pushAuditLog(
-	type: AuditType,
-	entry: AuthenticationEntry | AuthorizationEntry,
-) {
+export function pushAuditLog(type: AuditType, body: AuditBody) {
 	auditLog.push({
-		timestamp: new Date(),
+		timestamp: new Date().toISOString(),
 		type,
-		body: entry,
+		body,
 	});
-	if (auditLog.length > 100) {
+	if (auditLog.length > MAX_ENTRIES) {
 		auditLog.shift();
 	}
 }
+
 export function clearAuditLog() {
 	auditLog.length = 0;
 }
 
-export function getAuditLog() {
+export function getAuditLog(): AuditEntry[] {
 	return [...auditLog].reverse();
 }
