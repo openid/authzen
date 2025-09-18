@@ -60,7 +60,6 @@ contributor: # Same structure as author list, but goes into contributors
 normative:
   RFC6749: # OAuth
   RFC8259: # JSON
-  RFC5785: # well-known
   RFC8615: # well-known URIs
   RFC3553: # URN namespace for parameters
   RFC9110: # HTTP Semantics
@@ -1247,7 +1246,7 @@ The following payload defines a request for the actions that the subject of type
 
 # Policy Decision Point Metadata {#pdp-metadata}
 
-Policy Decision Points can have metadata describing their configuration. 
+It is RECOMMENDED that Policy Decision Points provide metadata describing their configuration. 
 
 ## Data structure {#pdp-metadata-data}
 
@@ -1256,7 +1255,7 @@ The following Policy Decision Point metadata parameters are used by this specifi
 ### Endpoint Parameters {#pdp-metadata-data-endpoint}
 
 `policy_decision_point`:
-: REQUIRED. The Policy Decision Point's identifier, which is a URL that uses the "https" scheme and has no query or fragment components. Policy Decision Point metadata is published at a location that is ".well-known" according to {{RFC5785}} derived from this Policy Decision Point identifier, as described in {{pdp-metadata-access}}. The Policy Decision Point identifier is used to prevent Policy Decision Point mix-up attacks.
+: REQUIRED. The Policy Decision Point's identifier, which is a URL that uses the "https" scheme and has no query or fragment components. Policy Decision Point metadata is published at a location that is ".well-known" according to {{RFC8615}} derived from this Policy Decision Point identifier, as described in {{pdp-metadata-access}}. The Policy Decision Point identifier is used to prevent Policy Decision Point mix-up attacks.
 
 `access_evaluation_endpoint`:
 : REQUIRED. URL of Policy Decision Point Access Evaluation API endpoint
@@ -1294,6 +1293,12 @@ Consumers of the metadata MAY ignore the signed metadata if they do not support 
 Policy Decision Points supporting metadata MUST make a JSON document containing metadata as specified in {{pdp-metadata-data-endpoint}} available at a URL formed by inserting a well-known URI string between the host component and the path and/or query components, if any. The well-known URI string used is `/.well-known/authzen-configuration`.
 
 The syntax and semantics of .well-known are defined in {{RFC8615}}. The well-known URI path suffix used is registered in the IANA "Well-Known URIs" registry {{IANA.well-known-uris}}.
+
+An example of a Policy Decision Point service supporting multiple tenants will have a discovery endpoint as follows:
+
+~~~
+https://pdp.example.com/.well-known/authzen-configuration/tenant1
+~~~
 
 ### Policy Decision Point Metadata Request {#pdp-metadata-access-request}
 
