@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { FetcherWithComponents } from "react-router";
 
 const DEFAULT_POLL_INTERVAL_MS = 2000;
@@ -7,12 +7,15 @@ export function useAuditLogPolling(
 	fetcher: FetcherWithComponents<unknown>,
 	intervalMs = DEFAULT_POLL_INTERVAL_MS,
 ): void {
+	const hasLoadedRef = useRef(false);
+
 	useEffect(() => {
 		if (typeof window === "undefined") {
 			return;
 		}
 
-		if (fetcher.state === "idle") {
+		if (!hasLoadedRef.current && fetcher.state === "idle") {
+			hasLoadedRef.current = true;
 			fetcher.load("/audit-log");
 		}
 
@@ -23,5 +26,5 @@ export function useAuditLogPolling(
 		}, intervalMs);
 
 		return () => window.clearInterval(intervalId);
-	}, [fetcher, intervalMs]);
+	}, [fetcher, fetcher.state, intervalMs]);
 }
