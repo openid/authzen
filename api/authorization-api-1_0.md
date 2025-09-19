@@ -929,7 +929,7 @@ The `page` object in a Search Request consists of the following keys:
 A Search Response MAY include a `page` object with the following keys:
 
 `count`: 
-: OPTIONAL. The number of results included in this response.
+: OPTIONAL. The number of results included in this response. When included at the start of a response, as described in the Search API Response ({{search-response}}), this enables clients to display progress indicators when processing large or slow responses.
 
 `total`:
 : OPTIONAL. The total number of results in the result set.
@@ -1079,7 +1079,7 @@ The following is a non-normative example of a request-response cycle to retrieve
 The response to a Search API Request always follows the same structure. Each search response is a JSON object with the following keys:
 
 `page`:
-: OPTIONAL. An object providing pagination information, as defined in {{search-pagination}}. It is RECOMMENDED that the page object be the first key in the response. This allows clients to provide progress indicators while processing large response bodies.
+: OPTIONAL. An object providing pagination information, as defined in Paginated Responses ({{search-pagination-response}}). It is RECOMMENDED that the `page` object be the first key in the response, as this allows clients to use the `count` value to display progress indicators when processing large or slow responses.
 
 `results`:
 : REQUIRED. An array containing zero or more entities, as defined in the Information Model ({{information-model}}). It MUST contain only entities of the type being searched for (e.g., Subjects, Resources, or Actions).
