@@ -978,7 +978,7 @@ The following is a non-normative example of a request to retrieve the 81st to 10
 
 #### Response {#search-pagination-offset-response}
 
-A Search Response using offset-based pagination MAY include a `page` object as described in Paginated Response ({{search-pagination-response}}).
+A Search Response using offset-based pagination MAY include a `page` object, as defined in Paginated Response ({{search-pagination-response}}).
 
 ### Token-based pagination {#search-pagination-token}
 
@@ -1004,7 +1004,7 @@ A Search Request using token-based pagination MUST include a `page` object with 
 
 #### Response {#search-pagination-token-response}
 
-A Search Response MUST include a `page` object with the following additional keys:
+A Search Response using-token-based pagination MUST include a `page` object, as defined in Paginated Response ({{search-pagination-response}}), extended with the following keys:
 
 `next_token`: 
 : REQUIRED. An opaque string value indicating the next page of results to return. If there are no more results after this page, its value must be an empty string.
