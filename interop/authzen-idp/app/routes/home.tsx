@@ -13,6 +13,7 @@ import { decodeJwtPayload } from "~/lib/jwt";
 import { getActivePdp, listPdps, setActivePdp } from "~/lib/pdpState";
 import type { AuditEntry } from "~/types/audit";
 import type { Route } from "./+types/home";
+import { cn } from "~/lib/utils";
 
 export function meta(_: Route.MetaArgs) {
 	return [
@@ -155,12 +156,20 @@ function IdentityProviderSection({ idToken }: { idToken: string | null }) {
 								: "No ID token detected. Complete the login flow to request one from the IdP."
 						}
 						label="ID token"
+						className={cn(
+							!!hasIdToken && "bg-green-300",
+							!hasIdToken && "bg-red-100",
+						)}
 					/>
 					{levelStatus && (
 						<StatusItem
 							badge={levelStatus.badge}
 							description={levelStatus.description}
 							label="Level claim"
+							className={cn(
+								formattedLevelClaim === "silver" && "bg-stone-200",
+								formattedLevelClaim === "bronze" && "bg-orange-200",
+							)}
 						/>
 					)}
 				</CardContent>
@@ -174,13 +183,20 @@ function StatusItem({
 	label,
 	badge,
 	description,
+	className,
 }: {
 	label: string;
 	badge: ReactNode;
 	description: string;
+	className?: string;
 }) {
 	return (
-		<div className="rounded-md border border-border bg-muted/30 p-3">
+		<div
+			className={cn(
+				"rounded-md border border-border bg-muted/30 p-3",
+				className,
+			)}
+		>
 			<div className="flex items-center justify-between gap-3">
 				<span className="text-sm font-medium">{label}</span>
 				{badge}

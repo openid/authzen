@@ -106,7 +106,7 @@ function AuthorizationSummary({ body }: { body: AuditEntry["body"] }) {
 					className="uppercase tracking-wide"
 					variant={body.ok ? "secondary" : "destructive"}
 				>
-					{body.ok ? "Allowed" : "Denied"}
+					{body.ok ? "Success" : "Error"}
 				</Badge>
 				{body.message ? <span>• {body.message}</span> : null}
 			</div>
