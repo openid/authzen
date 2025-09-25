@@ -119,9 +119,9 @@ function AuditLogDetails({
 	body: AuditEntry["body"];
 	type: AuditType;
 }) {
-	if (type === AuditType.AuthN && isAuthenticationRecord(body)) {
-		return <AuthenticationDetails body={body} />;
-	}
+	// if (type === AuditType.AuthN && isAuthenticationRecord(body)) {
+	// 	return <AuthenticationDetails body={body} />;
+	// }
 	if (type === AuditType.AuthZ && isAuthorizationRecord(body)) {
 		return <AuthorizationDetails body={body} />;
 	}

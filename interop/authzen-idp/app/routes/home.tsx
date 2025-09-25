@@ -213,7 +213,7 @@ function AuditLogSection({ auditEntries, clearFetcher }: AuditLogSectionProps) {
 	return (
 		<Card>
 			<CardHeader className="flex flex-row items-center justify-between gap-2">
-				<CardTitle>Audit Log</CardTitle>
+				<CardTitle>{`IdP->PDP Request Log`}</CardTitle>
 				<clearFetcher.Form className="flex" method="post">
 					<input name="intent" type="hidden" value="clear-audit-log" />
 					<Button
