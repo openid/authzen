@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: Init */
 import { OAuth2Client } from "@badgateway/oauth2-client";
 import { redirect } from "react-router";
-import { pushAuditLog } from "~/lib/auditLog";
+import { clearAuditLog, pushAuditLog } from "~/lib/auditLog";
 import { AuditType } from "~/types/audit";
 import type { Route } from "./+types/auth0";
 
@@ -15,6 +15,7 @@ const callbackUrl = `${process.env.BASE_URL!}/idp/auth0/callback`;
 
 export async function loader({ request }: Route.LoaderArgs) {
 	if (request.url.includes("/login")) {
+		clearAuditLog();
 		pushAuditLog(AuditType.AuthN, {
 			message: "Initiating Auth0 login",
 			idp: "auth0",
