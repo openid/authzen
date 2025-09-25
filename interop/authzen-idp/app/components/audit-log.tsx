@@ -31,12 +31,14 @@ export function AuditLog({ entries }: AuditLogProps) {
 	return (
 		<ScrollArea className="max-h-[50rem] overflow-scroll">
 			<div className="space-y-2">
-				{entries.map((entry, index) => (
-					<AuditLogEntry
-						key={`${entry.timestamp}-${entry.type}-${index}`}
-						entry={entry}
-					/>
-				))}
+				{entries
+					.filter((e) => e.type === AuditType.AuthZ)
+					.map((entry, index) => (
+						<AuditLogEntry
+							key={`${entry.timestamp}-${entry.type}-${index}`}
+							entry={entry}
+						/>
+					))}
 			</div>
 		</ScrollArea>
 	);
@@ -119,9 +121,9 @@ function AuditLogDetails({
 	body: AuditEntry["body"];
 	type: AuditType;
 }) {
-	// if (type === AuditType.AuthN && isAuthenticationRecord(body)) {
-	// 	return <AuthenticationDetails body={body} />;
-	// }
+	if (type === AuditType.AuthN && isAuthenticationRecord(body)) {
+		return <AuthenticationDetails body={body} />;
+	}
 	if (type === AuditType.AuthZ && isAuthorizationRecord(body)) {
 		return <AuthorizationDetails body={body} />;
 	}
@@ -159,11 +161,10 @@ function JsonPreview({ data, label }: { data: unknown; label: string }) {
 			<p className="font-medium uppercase tracking-wide text-foreground">
 				{label}
 			</p>
-			{/* <pre className="mt-1 overflow-auto rounded-md bg-muted p-2 text-[11px] leading-tight"> */}
+
 			<SyntaxHighlighter language="json" style={docco}>
 				{formatJson(data)}
 			</SyntaxHighlighter>
-			{/* </pre> */}
 		</div>
 	);
 }
