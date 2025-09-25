@@ -75,7 +75,19 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 				pdps={loaderData.pdps}
 				onSelectPdp={handlePdpSelection}
 			/>
-			<div className="container mx-auto my-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+			<div className="container mx-auto my-4">
+				<Card>
+					<CardHeader>
+						<CardTitle>Identity Provider</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<Button asChild>
+							<a href="/idp/auth0/login">Login with Auth0</a>
+						</Button>
+					</CardContent>
+				</Card>
+			</div>
+			<div className="container mx-auto my-4 grid grid-cols-1 gap-4 md:grid-cols-3">
 				<IdentityProviderSection idToken={idToken} />
 				<div className="md:col-span-2">
 					<AuditLogSection
@@ -127,16 +139,6 @@ function IdentityProviderSection({ idToken }: { idToken: string | null }) {
 
 	return (
 		<div className="flex flex-col gap-4">
-			<Card>
-				<CardHeader>
-					<CardTitle>Identity Provider</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<Button asChild>
-						<a href="/idp/auth0/login">Login with Auth0</a>
-					</Button>
-				</CardContent>
-			</Card>
 			<Card>
 				<CardHeader>
 					<CardTitle>Token Status</CardTitle>
