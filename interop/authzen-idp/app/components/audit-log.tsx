@@ -20,7 +20,7 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 });
 
 export function AuditLog({ entries }: AuditLogProps) {
-	if (entries.length === 0) {
+	if (entries.filter((e) => e.type === AuditType.AuthZ).length === 0) {
 		return (
 			<p className="text-sm text-muted-foreground">
 				Audit events will appear here once activity is recorded.
