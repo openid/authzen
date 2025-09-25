@@ -11,9 +11,9 @@ import { useIdTokenFromHash } from "~/hooks/useIdTokenFromHash";
 import { clearAuditLog } from "~/lib/auditLog";
 import { decodeJwtPayload } from "~/lib/jwt";
 import { getActivePdp, listPdps, setActivePdp } from "~/lib/pdpState";
+import { cn } from "~/lib/utils";
 import type { AuditEntry } from "~/types/audit";
 import type { Route } from "./+types/home";
-import { cn } from "~/lib/utils";
 
 export function meta(_: Route.MetaArgs) {
 	return [

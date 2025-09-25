@@ -100,13 +100,8 @@ function AuthorizationSummary({ body }: { body: AuditEntry["body"] }) {
 		<div className="space-y-1">
 			<p className="text-sm font-medium text-foreground">{body.endpoint}</p>
 			<div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-				<span>PDP {body.pdpId}</span>
-				<span>•</span>
-				<Badge
-					className="uppercase tracking-wide"
-					variant={body.ok ? "secondary" : "destructive"}
-				>
-					{body.ok ? "Success" : "Error"}
+				<Badge className="uppercase tracking-wide" variant={"secondary"}>
+					PDP {body.pdpId}
 				</Badge>
 				{body.message ? <span>• {body.message}</span> : null}
 			</div>
