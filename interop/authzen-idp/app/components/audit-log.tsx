@@ -1,3 +1,6 @@
+import SyntaxHighlighter from "react-syntax-highlighter";
+import docco from "react-syntax-highlighter/dist/esm/styles/hljs/vs2015";
+
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import {
@@ -26,7 +29,7 @@ export function AuditLog({ entries }: AuditLogProps) {
 	}
 
 	return (
-		<ScrollArea className="max-h-[50rem]">
+		<ScrollArea className="max-h-[50rem] overflow-scroll">
 			<div className="space-y-2">
 				{entries.map((entry, index) => (
 					<AuditLogEntry
@@ -139,7 +142,7 @@ function AuthenticationDetails({ body }: { body: AuthenticationAuditRecord }) {
 
 function AuthorizationDetails({ body }: { body: AuthorizationAuditRecord }) {
 	return (
-		<div className="mt-3 grid gap-3 text-xs">
+		<div className="mt-3 grid grid-cols-2 gap-3 text-xs">
 			<JsonPreview data={body.payload} label="Request" />
 			<JsonPreview data={body.response} label="Response" />
 		</div>
@@ -156,9 +159,11 @@ function JsonPreview({ data, label }: { data: unknown; label: string }) {
 			<p className="font-medium uppercase tracking-wide text-foreground">
 				{label}
 			</p>
-			<pre className="mt-1 max-h-48 overflow-auto rounded-md bg-muted p-2 text-[11px] leading-tight">
+			{/* <pre className="mt-1 overflow-auto rounded-md bg-muted p-2 text-[11px] leading-tight"> */}
+			<SyntaxHighlighter language="json" style={docco}>
 				{formatJson(data)}
-			</pre>
+			</SyntaxHighlighter>
+			{/* </pre> */}
 		</div>
 	);
 }

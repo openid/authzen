@@ -1,12 +1,15 @@
+import { type ReactNode, useMemo } from "react";
 import { type FetcherWithComponents, redirect, useFetcher } from "react-router";
 import { AuditLog } from "~/components/audit-log";
 import { IdToken } from "~/components/id-token.client";
 import { PDPPicker } from "~/components/pdp-picker";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useAuditLogPolling } from "~/hooks/useAuditLogPolling";
 import { useIdTokenFromHash } from "~/hooks/useIdTokenFromHash";
 import { clearAuditLog } from "~/lib/auditLog";
+import { decodeJwtPayload } from "~/lib/jwt";
 import { getActivePdp, listPdps, setActivePdp } from "~/lib/pdpState";
 import type { AuditEntry } from "~/types/audit";
 import type { Route } from "./+types/home";
@@ -71,12 +74,14 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 				pdps={loaderData.pdps}
 				onSelectPdp={handlePdpSelection}
 			/>
-			<div className="container mx-auto my-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+			<div className="container mx-auto my-8 grid grid-cols-1 gap-4 md:grid-cols-3">
 				<IdentityProviderSection idToken={idToken} />
-				<AuditLogSection
-					auditEntries={auditEntries}
-					clearFetcher={clearFetcher}
-				/>
+				<div className="md:col-span-2">
+					<AuditLogSection
+						auditEntries={auditEntries}
+						clearFetcher={clearFetcher}
+					/>
+				</div>
 			</div>
 		</main>
 	);
@@ -100,6 +105,25 @@ function HomeHeader({ activePdp, pdps, onSelectPdp }: HomeHeaderProps) {
 }
 
 function IdentityProviderSection({ idToken }: { idToken: string | null }) {
+	const tokenPayload = useMemo(() => decodeJwtPayload(idToken), [idToken]);
+	const levelClaimValue =
+		tokenPayload && "level" in tokenPayload ? tokenPayload.level : undefined;
+	const formattedLevelClaim =
+		levelClaimValue !== undefined ? formatClaimValue(levelClaimValue) : null;
+	const hasIdToken = Boolean(idToken);
+
+	const levelStatus = hasIdToken
+		? levelClaimValue === undefined
+			? {
+					badge: <Badge variant="destructive">Missing</Badge>,
+					description: "The ID token did not include a `level` claim.",
+				}
+			: {
+					badge: <Badge>{formattedLevelClaim}</Badge>,
+					description: "Level claim returned by the IdP.",
+				}
+		: undefined;
+
 	return (
 		<div className="flex flex-col gap-4">
 			<Card>
@@ -112,9 +136,72 @@ function IdentityProviderSection({ idToken }: { idToken: string | null }) {
 					</Button>
 				</CardContent>
 			</Card>
+			<Card>
+				<CardHeader>
+					<CardTitle>Token Status</CardTitle>
+				</CardHeader>
+				<CardContent className="space-y-3">
+					<StatusItem
+						badge={
+							hasIdToken ? (
+								<Badge>Issued</Badge>
+							) : (
+								<Badge variant="destructive">Missing</Badge>
+							)
+						}
+						description={
+							hasIdToken
+								? "The IdP returned an ID token in the latest login response."
+								: "No ID token detected. Complete the login flow to request one from the IdP."
+						}
+						label="ID token"
+					/>
+					{levelStatus && (
+						<StatusItem
+							badge={levelStatus.badge}
+							description={levelStatus.description}
+							label="Level claim"
+						/>
+					)}
+				</CardContent>
+			</Card>
 			{idToken ? <IdToken idToken={idToken} /> : null}
 		</div>
 	);
+}
+
+function StatusItem({
+	label,
+	badge,
+	description,
+}: {
+	label: string;
+	badge: ReactNode;
+	description: string;
+}) {
+	return (
+		<div className="rounded-md border border-border bg-muted/30 p-3">
+			<div className="flex items-center justify-between gap-3">
+				<span className="text-sm font-medium">{label}</span>
+				{badge}
+			</div>
+			<p className="mt-1 text-xs text-muted-foreground">{description}</p>
+		</div>
+	);
+}
+
+function formatClaimValue(value: unknown): string {
+	if (value === null) {
+		return "null";
+	}
+	if (
+		typeof value === "string" ||
+		typeof value === "number" ||
+		typeof value === "boolean"
+	) {
+		return String(value);
+	}
+	return JSON.stringify(value);
 }
 
 interface AuditLogSectionProps {
