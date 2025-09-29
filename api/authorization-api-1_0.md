@@ -908,31 +908,38 @@ Search APIs can return large result sets. To manage this, a Policy Decision Poin
 
 Pagination does not guarantee an atomic snapshot of the result set. Consequently, if items are added or removed while paginating, results MAY be repeated or omitted between pages.
 
-Pagination is based on the use of opaque tokens. A client makes an initial request for data by sending a query that does not contain a token. In response, the PDP MAY initiate pagination by returning a partial result set instead of the complete one.
+Pagination is based on the use of opaque tokens. A client makes an initial request for data by sending a query that does not contain a token. If the PDP determines that the response contains too many results to fit in a single response, the PDP returns a partial result set and a token that the caller can use to retrieve the next page of results.
 
 A paginated response MUST be clearly identified by the inclusion of a `page` object containing a non-empty, opaque `next_token`. This token is the signal to the client that more results are available.
 
 To retrieve the next page, the client sends a subsequent request containing a `page` object with the `token` field set to the `next_token` value from the previous response. This process is repeated until the PDP returns a `page` object in which the value of the `next_token` field is an empty string, signaling the end of the result set.
 
-Additionally, a PDP MAY allow clients to influence pagination with parameters such as `limit` and `offset`. Support for these capabilities MUST be advertised in the PDP's `supported_capabilities` metadata (see {{pdp-metadata-data-capabilities}}).
+When a request contains a token, all entities (e.g., `subject`, `resource`, `action`, `context`) and pagination parameters (e.g., `limit`)  MUST be identical to the preceding request. PDPs SHOULD return an error when any entity or parameter has been changed.
+
+Clients of the search APIs that wish to sequentially iterate through the entire result set SHOULD use the core pagination mechanism described above, which is designed to work consistently across all PDPs that support the search APIs.
 
 ### Paginated Requests {#search-pagination-request}
 
-A Search Request MAY include a `page` object indicating which subset of the larger result set the client would like to receive.
+A Search API Request MAY include a `page` object indicating which subset of the larger result set the client would like to receive.
 
-The `page` object in a Search Request consists of the following keys:
+The `page` object in a Search API Request consists of the following keys:
 
 `token`:
 : OPTIONAL. An opaque string value from the `next_token` of a previous response.
 
+`limit`:
+: OPTIONAL. A non-negative integer indicating the maximum number of results to return in the response.
+
 `properties`:
 : OPTIONAL. An object containing additional pagination request attributes, such as, but not limited to, sorting and filtering.
+
+Apart from the `token`, all values from the initial request MUST remain identical for subsequent pages. If a different value is provided mid-pagination the PDP SHOULD return an error.
 
 Additional keys MAY be included in the `page` object. If they are, they MUST be defined in a specification referenced in the AuthZEN Policy Decision Point Capabilities Registry ({{iana-pdp-capabilities-registry}}). Furthermore, the PDP MUST declare support for the corresponding capability URN in its `supported_capabilities` metadata ({{pdp-metadata-data-capabilities}}).
 
 ### Paginated Responses {#search-pagination-response}
 
-Any Search Response MAY include a `page` object, but if a response does not contain the entire result set, it MUST include this object.
+Any Search API Response MAY include a `page` object, but if a response does not contain the entire result set, it MUST include this object.
 
 The `page` object contains the following keys:
 
@@ -943,39 +950,10 @@ The `page` object contains the following keys:
 : OPTIONAL. The number of results included in this response. When included at the start of a response, as described in the Search API Response ({{search-response}}), this enables clients to display progress indicators when processing large or slow responses.
 
 `total`:
-: OPTIONAL. The total number of results in the result set.
+: OPTIONAL. A non-negative integer indicating the total number of results matching the query criteria at the time of the request. This value is not guaranteed to equal the total number of items returned across all pages if the underlying data set changes during pagination.
 
 `properties`:
 : OPTIONAL. An object containing additional pagination response attributes. Examples include, but are not limited to, estimated totals or the number of remaining results.
-
-### Offset capability {#search-pagination-offset}
-
-Using the offset capability, clients can indicate the number of results to skip before starting to return results. This enables clients to interactively navigate result sets and, when combined with the Limit capability ({{search-pagination-limit}}), can support classic page-based navigation.
-
-A PDP MAY support the `offset` parameter as an override to the positional information encoded in the `next_token`. If a PDP does not support changing the `offset` value mid-pagination, it MAY return an error if a request provides both a `token` and an `offset`.
-
-Support for the offset capability is indicated by the presence of the URN `urn:ietf:params:authzen:capability:pagination:offset` in the `supported_capabilities` attribute of the Policy Decision Point Metadata, as defined in {{pdp-metadata-data-capabilities}}.
-
-When offset-based pagination is supported, the `page` object in a Search Request ({{search-pagination-request}}) is extended with the following key:
-
-`offset`: 
-: OPTIONAL. A non-negative integer indicating the number of results to skip before starting to return results.
-
-
-### Limit capability {#search-pagination-limit}
-
-Using the limit capability, clients can limit the number of results they receive. This allows clients to optimize throughput and, in combination with the offset capability ({{search-pagination-offset}}), to offer interactive page-based navigation.
-
-A PDP MAY treat the `limit` from the initial request as a default for subsequent pages (e.g., by encoding it in the `next_token`). If a PDP does not support changing the `limit` value mid-pagination, it MAY return an error if a subsequent paginated request (one that includes a `token`) provides a different `limit` value.
-
-Support for the limit capability is indicated by the presence of the URN `urn:ietf:params:authzen:capability:pagination:limit` in the `supported_capabilities` attribute of the Policy Decision Point Metadata, as defined in {{pdp-metadata-data-capabilities}}.
-
-When limit-based pagination is supported, the `page` object in a Search Request ({{search-pagination-request}}) is extended with the following key:
-
-`limit`: 
-: OPTIONAL. A non-negative integer indicating the maximum number of results to return in the response. The PDP MUST NOT return more results than specified by the limit.
-
-A `limit` of 0 is a request for zero results, which can be used to retrieve metadata, such as the total number of results, without returning any items.
 
 ### Examples (non-normative) {#search-pagination-examples}
 
@@ -998,7 +976,7 @@ The following is a non-normative example of a request-response cycle to retrieve
   }
 }
 ~~~
-{: #search-pagination-token-initial-request title="Example initial Search Request"}
+{: #search-pagination-token-initial-request title="Example initial Search API Request"}
 
 ~~~ json
 {
@@ -1019,7 +997,7 @@ The following is a non-normative example of a request-response cycle to retrieve
   ]
 }
 ~~~
-{: #search-pagination-token-initial-response title="Example initial Search Response"}
+{: #search-pagination-token-initial-response title="Example initial Search API Response"}
 
 ~~~ json
 {
@@ -1038,7 +1016,7 @@ The following is a non-normative example of a request-response cycle to retrieve
   }
 }
 ~~~
-{: #search-pagination-token-second-request title="Example second Search Request"}
+{: #search-pagination-token-second-request title="Example second Search API Request"}
 
 ~~~ json
 {
@@ -1055,9 +1033,22 @@ The following is a non-normative example of a request-response cycle to retrieve
   ]
 }
 ~~~
-{: #search-pagination-token-second-response title="Example second Search Response"}
+{: #search-pagination-token-second-response title="Example second Search API Response"}
 
-The following is a non-normative example of a request to retrieve the 81st to 100th result of a result set:
+### Offset capability {#search-pagination-offset}
+
+Using the offset capability, clients can provide an `offset` value to indicate the number of results to skip before starting to return results. This enables clients to jump to a specific page within the result set.
+
+Support for the offset capability MUST be indicated by the presence of the URN `urn:ietf:params:authzen:capability:pagination:offset` in the `supported_capabilities` attribute of the Policy Decision Point Metadata, as defined in {{pdp-metadata-data-capabilities}}.
+
+If both a `token` and an `offset` value are provided the PDP MUST return an error.
+
+When offset-based pagination is supported, the `page` object in a Search API Request ({{search-pagination-request}}) is extended with the following key:
+
+`offset`: 
+: OPTIONAL. A non-negative integer indicating the number of results to skip before starting to return results.
+
+The following is a non-normative example of a request to retrieve the 9th and 10th result of a result set containing 12 results:
 
 ~~~ json
 {
@@ -1072,25 +1063,46 @@ The following is a non-normative example of a request to retrieve the 81st to 10
     "type": "account"
   },
   "page": {
-    "offset": 80,
-    "limit": 20
+    "offset": 8,
+    "limit": 2
   }
 }
 ~~~
-{: #search-pagination-offset-request-example title="Example Search Request with offset- and limit-based pagination"}
+{: #search-pagination-offset-request-example title="Example Search API Request with offset-based pagination"}
+
+~~~ json
+{
+  "page": {
+    "next_token": "offset=10",
+    "count": 2,
+    "total": 12
+  },
+  "results": [
+    {
+      "type": "account",
+      "id": "456"
+    },
+    {
+      "type": "account",
+      "id": "789"
+    }
+  ]
+}
+~~~
+{: #search-pagination-offset-response-example title="Example Search API Response with offset-based pagination"}
 
 ## The Search API Response {#search-response}
 
-The response to a Search API Request always follows the same structure. Each search response is a JSON object with the following keys:
+The response to a Search API Request always follows the same structure. Each Search API Response is a JSON object with the following keys:
 
 `page`:
 : OPTIONAL. An object providing pagination information, as defined in Paginated Responses ({{search-pagination-response}}). It is RECOMMENDED that the `page` object be the first key in the response, as this allows clients to use the `count` value to display progress indicators when processing large or slow responses.
 
-`results`:
-: REQUIRED. An array containing zero or more entities, as defined in the Information Model ({{information-model}}). It MUST contain only entities of the type being searched for (e.g., Subjects, Resources, or Actions).
-
 `context`:
 : OPTIONAL. An object that can convey additional information that can be used by the PEP, similar to its function in the Access Evaluation Response (see {{access-evaluation-response}}).
+
+`results`:
+: REQUIRED. An array containing zero or more entities, as defined in the Information Model ({{information-model}}). It MUST contain only entities of the type being searched for (e.g., Subjects, Resources, or Actions).
 
 The following is a non-normative example of a search response:
 
@@ -1115,7 +1127,7 @@ The following is a non-normative example of a search response:
   ]
 }
 ~~~
-{: #search-response-example title="Example Search Response"}
+{: #search-response-example title="Example Search API Response"}
 
 ## Subject Search API {#subject-search-api}
 
@@ -1161,7 +1173,7 @@ The following payload defines a request for the subjects of type `user` that can
   }
 }
 ~~~
-{: #subject-search-request-example title="Example Subject Search Request"}
+{: #subject-search-request-example title="Example Subject Search API Request"}
 
 ## Resource Search API {#resource-search-api}
 
@@ -1204,7 +1216,7 @@ The following payload defines a request for the resources of type `account` on w
   }
 }
 ~~~
-{: #resource-search-request-example title="Example Resource Search Request"}
+{: #resource-search-request-example title="Example Resource Search API Request"}
 
 ## Action Search API {#action-search-api}
 
@@ -1247,7 +1259,7 @@ The following payload defines a request for the actions that the subject of type
   }
 }
 ~~~
-{: #action-search-request-example title="Example Action Search Request"}
+{: #action-search-request-example title="Example Action Search API Request"}
 
 # Policy Decision Point Metadata {#pdp-metadata}
 
@@ -1995,24 +2007,6 @@ Change Controller:
 Specification Document(s):
 : {{search-pagination-offset}} of \[This Document\]
 
-
-
-
-Capability Name:
-: `:pagination:limit`
-
-Capability URN:
-: `urn:ietf:params:authzen:capability:pagination:limit`
-
-Capability Description:
-: Support for specifying a limit on the number of results which can be returned.
-
-Change Controller:
-: OpenID Foundation AuthZEN Working Group
-: mailto:openid-specs-authzen@lists.openid.net
-
-Specification Document(s):
-: {{search-pagination-limit}} of \[This Document\]
 
 ## Registration of "authzen" URN Sub-namespace {#iana-urn-namespace}
 
