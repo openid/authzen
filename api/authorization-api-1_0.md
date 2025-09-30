@@ -83,6 +83,7 @@ informative:
   RFC7234: # HTTP caching
   RFC2617: # HTTP authentication
   NIST.SP.800-162: # ABAC
+  RFC7493: # I-JSON
 
 --- abstract
 
@@ -125,20 +126,20 @@ The information model for requests and responses include the following entities:
 ## Subject {#subject}
 A Subject is the user or machine principal about whom the Authorization API is being invoked. The Subject may be requesting access at the time the Authorization API is invoked.
 
-A Subject is a JSON object ({{Section 4 of RFC8259}}) that contains two REQUIRED keys, `type` and `id`, which have a `string` value, and an OPTIONAL key, `properties`, with a value of a JSON object.
+A Subject is an object that contains two REQUIRED keys, `type` and `id`, which have a string value, and an OPTIONAL key, `properties`, with a value of an object.
 
 `type`:
-: REQUIRED. A `string` value that specifies the type of the Subject.
+: REQUIRED. A string value that specifies the type of the Subject.
 
 `id`:
-: REQUIRED. A `string` value containing the unique identifier of the Subject, scoped to the `type`.
+: REQUIRED. A string value containing the unique identifier of the Subject, scoped to the `type`.
 
 `properties`:
-: OPTIONAL. A JSON object which can be used to express additional attributes of a Subject.
+: OPTIONAL. An object which can be used to express additional attributes of a Subject.
 
 
 ### Subject Properties {#subject-properties}
-Many authorization systems are stateless, and expect the client (PEP) to pass in all relevant attributes used in the evaluation of the authorization policy. To satisfy this requirement, Subjects MAY include additional attributes as key-value pairs, under the `properties` object. A property can contain any JSON value as described in {{Section 3 of RFC8259}}).
+Many authorization systems are stateless, and expect the client (PEP) to pass in all relevant attributes used in the evaluation of the authorization policy. To satisfy this requirement, Subjects MAY include additional attributes as key-value pairs, under the `properties` object. A property can contain both simple values, such as strings, numbers, booleans and nulls, and complex values, such as arrays and objects.
 
 Examples of subject attributes can include, but are not limited to:
 
@@ -187,16 +188,16 @@ The following is a non-normative example of a subject which adds IP address and 
 {: #subject-device-id-example title="Example Subject with IP Address and Device ID"}
 
 ## Resource {#resource}
-A Resource is the target of an access request. It is a JSON object ({{Section 4 of RFC8259}}) that is constructed similar to a Subject entity. It has the following keys:
+A Resource is the target of an access request. It is an object that is constructed similar to a Subject entity. It has the following keys:
 
 `type`:
-: REQUIRED. A `string` value that specifies the type of the Resource.
+: REQUIRED. A string value that specifies the type of the Resource.
 
 `id`:
-: REQUIRED. A `string` value containing the unique identifier of the Resource, scoped to the `type`.
+: REQUIRED. A string value containing the unique identifier of the Resource, scoped to the `type`.
 
 `properties`:
-: OPTIONAL. A JSON object which can be used to express additional attributes of a Resource.
+: OPTIONAL. An object which can be used to express additional attributes of a Resource.
 
 ### Resource Properties {#resource-properties}
 
@@ -216,7 +217,7 @@ The following is a non-normative example of a Resource with a `type` and a simpl
 ~~~
 {: #resource-example title="Example Resource"}
 
-The following is a non-normative example of a Resource containing a `library_record` property, that is itself a JSON object:
+The following is a non-normative example of a Resource containing a `library_record` property, that is itself an object:
 
 ~~~ json
 {
@@ -235,13 +236,13 @@ The following is a non-normative example of a Resource containing a `library_rec
 ## Action {#action}
 An Action is the type of access that the requester intends to perform.
 
-Action is a JSON object ({{Section 4 of RFC8259}}) that contains a REQUIRED `name` key with a `string` value, and an OPTIONAL `properties` key with a JSON object value.
+Action is an object that contains a REQUIRED `name` key with a string value, and an OPTIONAL `properties` key with an object value.
 
 `name`:
-: REQUIRED. The name of the Action.
+: REQUIRED. A string value containing the name of the Action.
 
 `properties`:
-: OPTIONAL. A JSON object which can be used to express additional attributes of an Action.
+: OPTIONAL. An object which can be used to express additional attributes of an Action.
 
 ### Action Properties {#action-properties}
 
@@ -275,7 +276,7 @@ The following is a non-normative example of an action with additional properties
 ## Context {#context}
 The Context represents the environment of the access evaluation request.
 
-Context is a JSON object ({{Section 4 of RFC8259}}) which can be used to express attributes of the environment. 
+Context is an object which can be used to express attributes of the environment. 
 
 Examples of context attributes can include, but are not limited to:
 
@@ -310,13 +311,13 @@ The following example of a Context provides a JSON Schema definition which can b
 ## Decision {#decision}
 A Decision is the result of the evaluation of an access request. It provides the information required for the PEP to enforce the decision.
 
-Decision is a JSON object ({{Section 4 of RFC8259}}) that contains a REQUIRED `decision` key with a `boolean` value, and an OPTIONAL `context` key with a JSON object value.
+Decision is an object that contains a REQUIRED `decision` key with a `boolean` value, and an OPTIONAL `context` key with an object value.
 
 `decision`:
 : REQUIRED. A boolean value that specifies whether the Decision is to allow or deny the operation.
 
 `context`:
-: OPTIONAL. A JSON object which can convey additional information that can be used by the PEP as part of the decision enforcement process.
+: OPTIONAL. An object which can convey additional information that can be used by the PEP as part of the decision enforcement process.
 
 In this specification, assuming the evaluation was successful, there are only two possible values for the `decision`:
 
@@ -333,7 +334,7 @@ The following is a non-normative example of a minimal Decision:
 {: #decision-example title="Example Decision"}
 
 ### Decision Context {#decision-context}
-In addition to a `decision`, a response MAY contain a `context` field which can be any JSON object. This context can convey additional information that can be used by the PEP as part of the decision enforcement process.
+In addition to a `decision`, a response MAY contain a `context` field which contains an object. This context can convey additional information that can be used by the PEP as part of the decision enforcement process.
 
 Examples include, but are not limited to:
 
@@ -456,7 +457,7 @@ The Access Evaluations API defines the message exchange pattern between a client
 
 The Access Evaluation API Request builds on the information model presented in {{information-model}} and the object defined in the Access Evaluation Request ({{access-evaluation-request}}).
 
-To send multiple access evaluation requests in a single message, the caller MAY add an `evaluations` key to the request. The `evaluations` key is an array which contains a list of JSON objects, each typed as the object as defined in the Access Evaluation Request ({{access-evaluation-request}}), and specifying a discrete request.
+To send multiple access evaluation requests in a single message, the caller MAY add an `evaluations` key to the request. The `evaluations` key is an array which contains a list of objects, each typed as the object as defined in the Access Evaluation Request ({{access-evaluation-request}}), and specifying a discrete request.
 
 If an `evaluations` array is NOT present or is empty, the Access Evaluations Request behaves in a backwards-compatible manner with the (single) Access Evaluation API Request ({{access-evaluation-request}}).
 
@@ -614,7 +615,7 @@ The following is a non-normative example for specifying three requests that refe
 
 ### Evaluations options
 
-The `evaluations` request payload includes an OPTIONAL `options` key, with a value that is a JSON object.
+The `evaluations` request payload includes an OPTIONAL `options` key, with a value that is an object.
 
 This provides a general-purpose mechanism for providing caller-supplied metadata on how the request is to be executed.
 
@@ -1314,7 +1315,9 @@ Host: pdp.example.com
 
 ### Policy Decision Point Metadata Response {#pdp-metadata-access-response}
 
-The response is a set of metadata parameters about the protected resource's configuration. A successful response MUST use the `200 OK HTTP` status code and return a JSON object using the `application/json` content type that contains a set of metadata parameters as its members that are a subset of the metadata parameters defined in {{pdp-metadata-data-endpoint}}. Additional metadata parameters MAY be defined and used; any metadata parameters that are not understood MUST be ignored.
+The response is a set of metadata parameters about the protected resource's configuration. A successful response MUST use the HTTP status code `200` and return a JSON object using the `application/json` content type that contains a set of metadata parameters as its members that are a subset of the metadata parameters defined in {{pdp-metadata-data-endpoint}}. 
+##TODO Should point to registry instead!
+Additional metadata parameters MAY be defined and used; any metadata parameters that are not understood MUST be ignored.
 
 Parameters with multiple values are represented as JSON arrays. Parameters with zero values MUST be omitted from the response.
 
@@ -1342,7 +1345,7 @@ The recipient MUST validate that any signed metadata was signed by a key belongi
 
 # Transport {#transport}
 
-This specification defines an HTTPS binding which MUST be implemented by a compliant PDP.
+This specification defines an HTTPS binding using JSON serialization which MUST be implemented by a compliant PDP.
 
 Additional transport bindings (e.g. gRPC) MAY be defined in the future in the form of profiles, and MAY be implemented by a PDP.
 
@@ -1350,7 +1353,7 @@ Additional transport bindings (e.g. gRPC) MAY be defined in the future in the fo
 
 All API requests within this binding are made via an HTTPS `POST` request. 
 
-Requests MUST include a `Content-Type` header with the value `application/json`, and the request body for each endpoint MUST be a JSON object that conforms to the corresponding request structure defined, as defined in {{table-api-endpoints}}.
+Requests MUST include a `Content-Type` header with the value `application/json`, and the request body for each endpoint MUST be a JSON object that conforms to the corresponding request structure, as defined in {{table-api-endpoints}}.
 
 A successful response is an HTTPS response with a status code of `200` and a `Content-Type` of `application/json`. Its body is a JSON object that conforms to the corresponding response structure, as defined in {{table-api-endpoints}}.
 
@@ -1366,6 +1369,27 @@ The following table provides an overview of the API endpoints defined in this bi
 | Resource Search    | /access/v1/search/resource | search_resource_endpoint    | {{resource-search-request}}    | {{resource-search-response}}    |
 | Action Search      | /access/v1/search/action   | search_action_endpoint      | {{action-search-request}}      | {{action-search-response}}      |
 {: #table-api-endpoints title="API Endpoint Overview"}      
+
+### JSON Serialization {#transport-https-json}
+
+This section specifies the serialization of the information model entities and API schemas defined in this document to the JSON format {{RFC8259}}. The top-level element of all request and response bodies MUST be a JSON object ({{Section 4 of RFC8259}}). Implementations SHOULD also adhere to the security recommendations in JSON Payload Considerations ({{security-json}}).
+
+The data types defined in this specification are mapped to JSON types as follows:
+
+Object:
+: Represented as a JSON object ({{Section 4 of RFC8259}}). The values of its members can be any valid JSON value as defined in {{Section 3 of RFC8259}}, including other objects and arrays, unless specified otherwise.
+
+Array:
+: Represented as a JSON array ({{Section 5 of RFC8259}}).
+
+String:
+: Represented as a JSON string ({{Section 7 of RFC8259}}).
+
+Integer:
+: Represented as a JSON number ({{Section 6 of RFC8259}}). Note the recommendation in {{security-json}} to not encode values that exceed IEEE 754 double-precision.
+
+Boolean:
+: Represented as the JSON literals `true` or `false` ({{Section 3 of RFC8259}}).
 
 ### Error Responses
 The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTPS status code ({{Section 15 of RFC9110}}) that indicates error.
@@ -1397,7 +1421,6 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #request-id-example title="Example HTTPS request with a Request Id Header"}
 
-### Request Identification in a Response
 When an Authorization API request contains a request identifier the PDP MUST include a request identifier in the response. It is RECOMMENDED to specify the request identifier using the HTTPS Response header `X-Request-ID`. If the PEP specified a request identifier in the request, the PDP MUST include the same identifier in the response to that request.
 
 The following is a non-normative example of an HTTPS Response with this header:
@@ -1716,7 +1739,17 @@ WWW-Authenticate: Bearer realm="https://as.example.com"
 
 In ABAC, there are occasionally conversations around the trust between PEP and PDP: how can the PDP trust that the PEP is sending the correct values? The architecture of this model assumes the PDP must trust the PEP, as the PEP is ultimately responsible for enforcing the decision the PDP produces. 
 
-## Authorization Response Integrity {#authorization-response-integrity}
+## JSON Payload Considerations {#security-json}
+
+To ensure the unambiguous interpretation of JSON payloads, implementations SHOULD process and generate JSON payloads in a manner consistent with the I-JSON profile ({{RFC7493}}). In particular, implementations SHOULD ensure that:
+
+- JSON text is encoded as UTF-8, and strings do not contain invalid Unicode sequences such as unpaired surrogates ({{Section 2.1 of RFC7493}}).
+- Numeric values do not exceed the magnitude or precision supported by IEEE 754 double-precision ({{Section 2.2 of RFC7493}}).  
+- Member names within a JSON object are unique after processing escape characters ({{Section 2.3 of RFC7493}}).
+
+To avoid ambiguity between a property that is absent and one that is present with a null value, properties with a value of null SHOULD be omitted from JSON objects.
+
+## Authorization Response Integrity {#security-authorization-response-integrity}
 
 The PDP MAY choose to sign its authorization response, ensuring the PEP can verify the integrity of the data it receives. This practice is valuable for maintaining trust in the authorization process.
 
