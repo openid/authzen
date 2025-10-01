@@ -7,7 +7,7 @@ wg: OpenID AuthZEN
 
 docname: authorization-api-1_0
 
-title: Authorization API 1.0 – draft 04
+title: Authorization API 1.0 – draft 05
 abbrev: azapi
 lang: en
 kw:
@@ -56,6 +56,9 @@ contributor: # Same structure as author list, but goes into contributors
 - name: Alex Olivier
   org: Cerbos
   email: alex@cerbos.dev
+- name: Michiel Trimpe
+  org: VNG Realisatie
+  email: michiel.trimpe@vng.nl
 
 normative:
   RFC6749: # OAuth
