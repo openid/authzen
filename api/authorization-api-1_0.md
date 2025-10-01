@@ -1340,18 +1340,76 @@ The `policy_decision_point` value returned MUST be identical to the Policy Decis
 
 The recipient MUST validate that any signed metadata was signed by a key belonging to the issuer and that the signature is valid. If the signature does not validate or the issuer is not trusted, the recipient SHOULD treat this as an error condition.
 
-# Transport
+# Transport {#transport}
 
 This specification defines an HTTPS binding which MUST be implemented by a compliant PDP.
 
 Additional transport bindings (e.g. gRPC) MAY be defined in the future in the form of profiles, and MAY be implemented by a PDP.
 
-## HTTPS Binding
+## HTTPS Binding {#transport-https}
 
-### HTTPS Access Evaluation Request
-The Access Evaluation Request is made via an HTTPS POST request. The request MUST include a `Content-Type` header with the value `application/json`. The request body MUST be a JSON object that conforms to the Access Evaluation Request structure, as defined in {{access-evaluation-request}}.
+All API requests within this binding are made via an HTTPS `POST` request. 
 
-The request URL MUST be the value of the `access_evaluation_endpoint` parameter if it is provided in the PDP Metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the relative path `/access/v1/evaluation` to the Policy Decision Point's base URL (which is the `policy_decision_point` value from the PDP Metadata, if available).
+Requests MUST include a `Content-Type` header with the value `application/json`, and the request body for each endpoint MUST be a JSON object that conforms to the corresponding request structure defined, as defined in {{table-api-endpoints}}.
+
+A successful response is an HTTPS response with a status code of `200` and a `Content-Type` of `application/json`. Its body is a JSON object that conforms to the corresponding response structure, as defined in {{table-api-endpoints}}.
+
+The request URL MUST be the value of the corresponding endpoint parameter, as defined in {{table-api-endpoints}}, if it is provided in the PDP Metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the default path, as defined in {{table-api-endpoints}}, to the Policy Decision Point's base URL (which is the `policy_decision_point` value from the PDP Metadata, if available.
+
+The following table provides an overview of the API endpoints defined in this binding:
+
+| API Endpoint       | Default Path               | Metadata Parameter          | Request Schema                 | Response Scema                  |
+|--------------------|----------------------------|-----------------------------|--------------------------------|---------------------------------|
+| Access Evaluation  | /access/v1/evaluation      | access_evaluation_endpoint  | {{access-evaluation-request}}  | {{access-evaluation-response}}  |
+| Access Evaluations | /access/v1/evaluations     | access_evaluations_endpoint | {{access-evaluations-request}} | {{access-evaluations-response}} |
+| Subject Search     | /access/v1/search/subject  | search_subject_endpoint     | {{subject-search-request}}     | {{subject-search-response}}     |
+| Resource Search    | /access/v1/search/resource | search_resource_endpoint    | {{resource-search-request}}    | {{resource-search-response}}    |
+| Action Search      | /access/v1/search/action   | search_action_endpoint      | {{action-search-request}}      | {{action-search-response}}      |
+{: #table-api-endpoints title="API Endpoint Overview"}      
+
+### Error Responses
+The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTPS status code ({{Section 15 of RFC9110}}) that indicates error.
+
+The following errors are indicated by the status codes defined below:
+
+| Code | Description  | HTTPS Body Content |
+|------|--------------|-------------------|
+| 400  | Bad Request  | An error message string |
+| 401  | Unauthorized | An error message string |
+| 403  | Forbidden    | An error message string |
+| 500  | Internal Error | An error message string |
+{: #table-error-status-codes title="HTTPS Error status codes"}
+
+Note: HTTPS errors are returned by the PDP to indicate an error condition relating to the request or its processing; they are unrelated to the outcome of an authorization decision and are distinct from it. A successful request that results in a "deny" is indicated by a 200 OK status code with a { "decision": false } payload.
+
+To make this concrete:
+
+- a `401` HTTPS status code indicates that the caller (Policy Enforcement Point) did not properly authenticate to the PDP - for example, by omitting a required `Authorization` header, or using an invalid access token.
+- the PDP indicates to the caller that the authorization request is denied by sending a response with a `200` HTTPS status code, along with a payload of `{ "decision": false }`.
+
+### Request Identification
+All requests to the API MAY have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. If present, it is RECOMMENDED to use the HTTPS Header `X-Request-ID` as the request identifier. The value of this header is an arbitrary string. The following non-normative example describes this header:
+
+~~~ http
+POST /access/v1/evaluation HTTP/1.1
+Authorization: Bearer mF_9.B5f-4.1JqM
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+~~~
+{: #request-id-example title="Example HTTPS request with a Request Id Header"}
+
+### Request Identification in a Response
+When an Authorization API request contains a request identifier the PDP MUST include a request identifier in the response. It is RECOMMENDED to specify the request identifier using the HTTPS Response header `X-Request-ID`. If the PEP specified a request identifier in the request, the PDP MUST include the same identifier in the response to that request.
+
+The following is a non-normative example of an HTTPS Response with this header:
+
+~~~ http
+HTTP/1.1 OK
+Content-Type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+~~~
+{: #example-response-request-id title="Example HTTPS response with a Request Id Header"}
+
+### Examples (non-normative)
 
 The following is a non-normative example of the HTTPS binding of the Access Evaluation Request:
 
@@ -1381,10 +1439,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-access-evaluation-request title="Example of an HTTPS Access Evaluation Request"}
 
-### HTTPS Access Evaluation Response
-The success response to an Access Evaluation Request is an Access Evaluation Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluation Response, as defined in {{access-evaluation-response}}.
-
-Following is a non-normative example of an HTTPS Access Evaluation Response:
+The following is a non-normative example of an HTTPS Access Evaluation Response:
 
 ~~~ http
 HTTP/1.1 OK
@@ -1396,11 +1451,6 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 }
 ~~~
 {: #example-access-evaluation-response title="Example of an HTTP Access Evaluation Response"}
-
-### HTTPS Access Evaluations Request
-The Access Evaluations Request is made via an HTTPS POST request. The request MUST include a `Content-Type` header with the value `application/json`. The request body MUST be a JSON object that conforms to the Access Evaluations Request structure, as defined in {{access-evaluations-request}}.
-
-The request URL MUST be the value of the `access_evaluations_endpoint` parameter if it is provided in the PDP Metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the relative path `/access/v1/evaluations` to the Policy Decision Point's base URL (which is the `policy_decision_point` value from the PDP Metadata, if available).
 
 The following is a non-normative example of a the HTTPS binding of the Access Evaluations Request:
 
@@ -1449,9 +1499,6 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-access-evaluations-request title="Example of an HTTPS Access Evaluations Request"}
 
-### HTTPS Access Evaluations Response
-The success response to an Access Evaluations Request is an Access Evaluations Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Access Evaluations Response, as defined in {{access-evaluations-response}}.
-
 The following is a non-normative example of an HTTPS Access Evaluations Response:
 
 ~~~ http
@@ -1484,11 +1531,6 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-access-evaluations-response title="Example of an HTTPS Access Evaluations Response"}
 
-### HTTPS Subject Search Request
-The Subject Search Request is made via an HTTPS POST request. The request MUST include a `Content-Type` header with the value `application/json`. The request body MUST be a JSON object that conforms to the Subject Search Request structure, as defined in {{subject-search-request}}.
-
-The request URL MUST be the value of the `search_subject_endpoint` parameter if it is provided in the PDP Metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the relative path `/access/v1/search/subject` to the Policy Decision Point's base URL (which is the `policy_decision_point` value from the PDP Metadata, if available).
-
 The following is a non-normative example of the HTTPS binding of the Subject Search Request:
 
 ~~~ http
@@ -1512,9 +1554,6 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 }
 ~~~
 {: #example-subject-search-request title="Example of an HTTPS Subject Search Request"}
-
-### HTTPS Subject Search Response
-The success response to a Subject Search Request is a Subject Search Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Subject Search Response, as defined in {{subject-search-response}}.
 
 The following is a non-normative example of an HTTPS Subject Search Response:
 
@@ -1541,12 +1580,6 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-subject-search-response title="Example of an HTTPS Subject Search Response"}
 
-### HTTPS Resource Search Request
-
-The Resource Search Request is made via an HTTPS POST request. The request MUST include a `Content-Type` header with the value `application/json`. The request body MUST be a JSON object that conforms to the Resource Search Request structure, as defined in {{resource-search-request}}.
-
-The request URL MUST be the value of the `search_resource_endpoint` parameter if it is provided in the PDP Metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the relative path `/access/v1/search/resource` to the Policy Decision Point's base URL (which is the `policy_decision_point` value from the PDP Metadata, if available).
-
 The following is a non-normative example of the HTTPS binding of the Resource Search Request:
 
 ~~~ http
@@ -1570,9 +1603,6 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 }
 ~~~
 {: #example-resource-search-request title="Example of an HTTPS Resource Search Request"}
-
-### HTTPS Resource Search Response
-The success response to a Resource Search Request is a Resource Search Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Resource Search Response, as defined in {{resource-search-response}}.
 
 The following is a non-normative example of an HTTPS Resource Search Response:
 
@@ -1599,11 +1629,6 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-resource-search-response title="Example of an HTTPS Resource Search Response"}
 
-### HTTPS Action Search Request
-The Action Search Request is made via an HTTPS POST request. The request MUST include a `Content-Type` header with the value `application/json`. The request body MUST be a JSON object that conforms to the Action Search Request structure, as defined in {{action-search-request}}.
-
-The request URL MUST be the value of the `search_action_endpoint` parameter if it is provided in the PDP Metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the relative path `/access/v1/search/action` to the Policy Decision Point's base URL (which is the `policy_decision_point` value from the PDP Metadata, if available).
-
 The following is a non-normative example of the HTTPS binding of the Action Search Request:
 
 ~~~ http
@@ -1629,9 +1654,6 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-action-search-request title="Example of an HTTPS Action Search Request"}
 
-### HTTPS Action Search Response
-The success response to an Action Search Request is an Action Search Response. It is an HTTPS response with a `status` code of `200`, and `content-type` of `application/json`. Its body is a JSON object that contains the Action Search Response, as defined in {{action-search-response}}.
-
 The following is a non-normative example of an HTTPS Action Search Response:
 
 ~~~ http
@@ -1655,47 +1677,6 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 ~~~
 {: #example-action-search-response title="Example of an HTTPS Action Search Response"}
 
-### Error Responses
-The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTPS status code ({{Section 15 of RFC9110}}) that indicates error.
-
-The following errors are indicated by the status codes defined below:
-
-| Code | Description  | HTTPS Body Content |
-|------|--------------|-------------------|
-| 400  | Bad Request  | An error message string |
-| 401  | Unauthorized | An error message string |
-| 403  | Forbidden    | An error message string |
-| 500  | Internal Error | An error message string |
-{: #table-error-status-codes title="HTTPS Error status codes"}
-
-Note: HTTPS errors are returned by the PDP to indicate an error condition relating to the request or its processing; they are unrelated to the outcome of an authorization decision and are distinct from it. A successful request that results in a "deny" is indicated by a 200 OK status code with a { "decision": false } payload.
-
-To make this concrete:
-
-- a `401` HTTPS status code indicates that the caller (Policy Enforcement Point) did not properly authenticate to the PDP - for example, by omitting a required `Authorization` header, or using an invalid access token.
-- the PDP indicates to the caller that the authorization request is denied by sending a response with a `200` HTTPS status code, along with a payload of `{ "decision": false }`.
-
-### Request Identification
-All requests to the API MAY have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. If present, it is RECOMMENDED to use the HTTPS Header `X-Request-ID` as the request identifier. The value of this header is an arbitrary string. The following non-normative example describes this header:
-
-~~~ http
-POST /access/v1/evaluation HTTP/1.1
-Authorization: Bearer mF_9.B5f-4.1JqM
-X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
-~~~
-{: #request-id-example title="Example HTTPS request with a Request Id Header"}
-
-### Request Identification in a Response
-When an Authorization API request contains a request identifier the PDP MUST include a request identifier in the response. It is RECOMMENDED to specify the request identifier using the HTTPS Response header `X-Request-ID`. If the PEP specified a request identifier in the request, the PDP MUST include the same identifier in the response to that request.
-
-The following is a non-normative example of an HTTPS Response with this header:
-
-~~~ http
-HTTP/1.1 OK
-Content-Type: application/json
-X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
-~~~
-{: #example-response-request-id title="Example HTTPS response with a Request Id Header"}
 
 # Security Considerations {#Security}
 
