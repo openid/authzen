@@ -947,7 +947,7 @@ The `page` object contains the following keys:
 : REQUIRED. An opaque string value indicating the next page of results to return. If there are no more results after this page, its value MUST be an empty string.
 
 `count`: 
-: OPTIONAL. The number of results included in this response. When included at the start of a response, as described in the Search API Response ({{search-response}}), this enables clients to display progress indicators when processing large or slow responses.
+: OPTIONAL. A non-negative integer indicating the number of results included in this response. When included at the start of a response, as described in the Search API Response ({{search-response}}), this enables clients to display progress indicators when processing large or slow responses.
 
 `total`:
 : OPTIONAL. A non-negative integer indicating the total number of results matching the query criteria at the time of the request. This value is not guaranteed to equal the total number of items returned across all pages if the underlying data set changes during pagination.
@@ -1482,6 +1482,9 @@ Content-Type: application/json
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
+  "page": {
+    "next_token": "a3M9NDU2O3N6PTI="
+  },
   "results": [
     {
       "type": "user",
@@ -1491,10 +1494,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
       "type": "user",
       "id": "bob@example.com"
     }
-  ],
-  "page": {
-    "next_token": "a3M9NDU2O3N6PTI="
-  }
+  ]
 }
 ~~~
 {: #example-subject-search-response title="Example of an HTTPS Subject Search Response"}
@@ -1540,6 +1540,9 @@ Content-Type: application/json
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
+  "page": {
+    "next_token": "a3M9NDU2O3N6PTI="
+  },
   "results": [
     {
       "type": "account",
@@ -1549,10 +1552,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
       "type": "account",
       "id": "456"
     }
-  ],
-  "page": {
-    "next_token": "a3M9NDU2O3N6PTI="
-  }
+  ]
 }
 ~~~
 {: #example-resource-search-response title="Example of an HTTPS Resource Search Response"}
@@ -1598,6 +1598,9 @@ Content-Type: application/json
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
+  "page": {
+    "next_token": "a3M9NDU2O3N6PTI="
+  },
   "results": [
     {
       "name": "can_read"
@@ -1605,10 +1608,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
     {
       "name": "can_write"
     }
-  ],
-  "page": {
-    "next_token": "a3M9NDU2O3N6PTI="
-  }
+  ]
 }
 ~~~
 {: #example-action-search-response title="Example of an HTTPS Action Search Response"}
