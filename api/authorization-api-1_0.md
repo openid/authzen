@@ -1052,7 +1052,7 @@ The response to a Search API Request always follows the same structure. Each Sea
 `results`:
 : REQUIRED. An array containing zero or more entities, as defined in the Information Model ({{information-model}}). It MUST contain only entities of the type being searched for (e.g., Subjects, Resources, or Actions).
 
-The following is a non-normative example of a search response:
+The following is a non-normative example of a search response returning resources:
 
 ~~~ json
 {
@@ -1075,7 +1075,7 @@ The following is a non-normative example of a search response:
   ]
 }
 ~~~
-{: #search-response-example title="Example Search API Response"}
+{: #search-response-example title="Example Resource Search API Response"}
 
 ## Subject Search API {#subject-search-api}
 
@@ -1277,7 +1277,9 @@ Host: pdp.example.com
 ### Policy Decision Point Metadata Response {#pdp-metadata-access-response}
 
 The response is a set of metadata parameters about the protected resource's configuration. A successful response MUST use the HTTP status code `200` and return a JSON object using the `application/json` content type that contains a set of metadata parameters as its members that are a subset of the metadata parameters defined in the AuthZEN Policy Decision Point Metadata Registry ({{iana-pdp-metadata-registry}}).
+
 ##TODO These two lines conflict. We first state only a subset of the registry parameters can be used and then that additional parameters may be used.
+
 Additional metadata parameters MAY be defined and used; any metadata parameters that are not understood MUST be ignored.
 
 Parameters with multiple values are represented as JSON arrays. Parameters with zero values MUST be omitted from the response.
@@ -1326,9 +1328,9 @@ The following table provides an overview of the API endpoints defined in this bi
 |--------------------|----------------------------|-----------------------------|--------------------------------|---------------------------------|
 | Access Evaluation  | /access/v1/evaluation      | access_evaluation_endpoint  | {{access-evaluation-request}}  | {{access-evaluation-response}}  |
 | Access Evaluations | /access/v1/evaluations     | access_evaluations_endpoint | {{access-evaluations-request}} | {{access-evaluations-response}} |
-| Subject Search     | /access/v1/search/subject  | search_subject_endpoint     | {{subject-search-request}}     | {{subject-search-response}}     |
-| Resource Search    | /access/v1/search/resource | search_resource_endpoint    | {{resource-search-request}}    | {{resource-search-response}}    |
-| Action Search      | /access/v1/search/action   | search_action_endpoint      | {{action-search-request}}      | {{action-search-response}}      |
+| Subject Search     | /access/v1/search/subject  | search_subject_endpoint     | {{subject-search-request}}     | {{search-response}}     |
+| Resource Search    | /access/v1/search/resource | search_resource_endpoint    | {{resource-search-request}}    | {{search-response}}    |
+| Action Search      | /access/v1/search/action   | search_action_endpoint      | {{action-search-request}}      | {{search-response}}      |
 {: #table-api-endpoints title="API Endpoint Overview"}      
 
 ### JSON Serialization {#transport-https-json}
