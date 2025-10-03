@@ -1324,7 +1324,7 @@ The request URL MUST be the value of the corresponding endpoint parameter, as de
 
 The following table provides an overview of the API endpoints defined in this binding:
 
-| API Endpoint       | Default Path               | Metadata Parameter          | Request Schema                 | Response Schema                  |
+| API Endpoint       | Default Path               | Metadata Parameter          | Request Schema                 | Response Schema                 |
 |--------------------|----------------------------|-----------------------------|--------------------------------|---------------------------------|
 | Access Evaluation  | /access/v1/evaluation      | access_evaluation_endpoint  | {{access-evaluation-request}}  | {{access-evaluation-response}}  |
 | Access Evaluations | /access/v1/evaluations     | access_evaluations_endpoint | {{access-evaluations-request}} | {{access-evaluations-response}} |
