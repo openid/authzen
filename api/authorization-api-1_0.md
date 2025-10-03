@@ -7,7 +7,7 @@ wg: OpenID AuthZEN
 
 docname: authorization-api-1_0
 
-title: Authorization API 1.0 – draft 05
+title: Authorization API 1.0 – draft 04
 abbrev: azapi
 lang: en
 kw:
@@ -26,7 +26,7 @@ author:
   ins: O. Gazitt
   name: Omri Gazitt
   org: Aserto
-  email: omri@aserto.com  
+  email: ogazitt@gmail.com
 - role: editor # remove if not true
   ins: D. Brossard
   name: David Brossard
@@ -1324,7 +1324,7 @@ The request URL MUST be the value of the corresponding endpoint parameter, as de
 
 The following table provides an overview of the API endpoints defined in this binding:
 
-| API Endpoint       | Default Path               | Metadata Parameter          | Request Schema                 | Response Scema                  |
+| API Endpoint       | Default Path               | Metadata Parameter          | Request Schema                 | Response Schema                  |
 |--------------------|----------------------------|-----------------------------|--------------------------------|---------------------------------|
 | Access Evaluation  | /access/v1/evaluation      | access_evaluation_endpoint  | {{access-evaluation-request}}  | {{access-evaluation-response}}  |
 | Access Evaluations | /access/v1/evaluations     | access_evaluations_endpoint | {{access-evaluations-request}} | {{access-evaluations-response}} |
