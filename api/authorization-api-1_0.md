@@ -64,6 +64,7 @@ normative:
   RFC6749: # OAuth
   RFC8259: # JSON
   RFC8615: # well-known URIs
+  RFC3553: # URN namespace for parameters
   RFC9110: # HTTP Semantics
   XACML:
     title: eXtensible Access Control Markup Language (XACML) Version 1.1
@@ -529,7 +530,7 @@ The following is a non-normative example for specifying three requests, with no 
 
 While the example above provides the most flexibility in specifying distinct values in each request for every evaluation, it is common for boxcarred requests to share one or more values of the evaluation request. For example, evaluations MAY all refer to a single subject, and/or have the same contextual (environmental) attributes.
 
-Default values offer a more compact syntax that avoids over-duplication of request data.
+Default values offer a more compact syntax that avoids unnecessary duplication of request data.
 
 The top-level `subject`, `action`, `resource`, and `context` keys provide default values for each object in the evaluations array. Any of these keys specified within an individual evaluation object overrides the corresponding top-level default. Because `subject`, `action`, and `resource` are required for a valid evaluation, any of these keys omitted from an evaluation object MUST be provided as a top-level key.
 
@@ -825,7 +826,7 @@ Response:
 }
 ~~~
 
-## Access Evaluations API Response {#access-evaluations-response}
+## The Access Evaluations API Response {#access-evaluations-response}
 
 Like the request format, the Access Evaluations Response format for an Access Evaluations Request adds an `evaluations` array that lists the decisions in the same order they were provided in the `evaluations` array in the request. Each value of the evaluations array is typed as a Decision as defined in the Information Model ({{information-model}}).
 
@@ -892,24 +893,200 @@ The following is a non-normative example of a response to an Access Evaluations 
 }
 ~~~
 
-# Subject Search API {#subject-search-api}
 
-The Subject Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the subjects that match the search criteria.
+# Search APIs {#search}
 
-The Subject Search API is based on the Access Evaluation information model, but omits the Subject ID.
+The Search APIs enable a client (PEP) to discover the set of subjects, resources, or actions that are permitted within a specific authorization context. Their purpose is to return a list of authorized entities, rather than verify a single access request.
 
-## Subject Search Semantics
+To perform a search, the client provides the Subject, Resource, Action, and Context entities defined in the Information Model ({{information-model}}), but omits the unique identifier of the entity being queried. The authorization service (PDP) then responds with the set of authorized entities for the queried entity type which would be authorized according to the provided criteria.
 
-While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `"decision": true` response.
+## Semantics {#search-semantics}
 
-In addition, it is RECOMMENDED that a subject search is performed transitively, traversing intermediate attributes and/or relationships. For example, if the members of group G are designated as viewers on a document D, then a search for all users that are viewers of document D will include all the members of group G.
+A search is designed to return entities that would correspond to a permitted decision. Therefore, any result from a Search API, when subsequently used in an Access Evaluation API call, SHOULD result in a `"decision": true` response. However, because the evaluation is implementation-specific and may depend on other variables (such as time), this outcome is not guaranteed.
 
-## The Subject Search API Request {#subject-search-request}
+In addition, it is RECOMMENDED that a search be performed transitively, traversing intermediate attributes and/or relationships. For example, if user U is a member of group G, and group G is designated as a viewer on a document D, then a search for all subjects of type user that can view document D will include user U.
+
+## Pagination {#search-pagination}
+
+Search APIs can return large result sets. To manage this, a Policy Decision Point (PDP) MAY support pagination, allowing clients to navigate and retrieve subsets of the total result set. 
+
+Pagination does not guarantee an atomic snapshot of the result set. Consequently, if items are added or removed while paginating, results MAY be repeated or omitted between pages.
+
+Pagination is based on the use of opaque tokens. A client makes an initial request for data by sending a query that does not contain a token. If the PDP determines that the result set contains too many results to fit in a single response, the PDP returns a partial result set and a token that the caller can use to retrieve the next page of results.
+
+A paginated response MUST be clearly identified by the inclusion of a `page` object containing a non-empty, opaque `next_token`. This token is the signal to the client that more results are available.
+
+To retrieve the next page, the client sends a subsequent request containing a `page` object with the `token` field set to the `next_token` value from the previous response. This process is repeated until the PDP returns a `page` object in which the value of the `next_token` field is an empty string, signaling the end of the result set.
+
+When a request contains a token, all entities (e.g., `subject`, `resource`, `action`, `context`) and pagination parameters (e.g., `limit`)  MUST be identical to the preceding request. PDPs SHOULD return an error when any entity or parameter has been changed.
+
+Clients of the search APIs that wish to sequentially iterate through the entire result set SHOULD use the core pagination mechanism described above, which is designed to work consistently across all PDPs that support the search APIs.
+
+### Paginated Requests {#search-pagination-request}
+
+A Search API Request MAY include a `page` object indicating which subset of the larger result set the client would like to receive.
+
+The `page` object in a Search API Request consists of the following keys:
+
+`token`:
+: OPTIONAL. An opaque string value from the `next_token` of a previous response.
+
+`limit`:
+: OPTIONAL. A non-negative integer indicating the maximum number of results to return in the response.
+
+`properties`:
+: OPTIONAL. An object containing additional implementation-specific pagination request attributes, such as, but not limited to, sorting and filtering.
+
+Apart from the `token`, all values from the initial request MUST remain identical for subsequent pages. If a different value is provided mid-pagination the PDP SHOULD return an error.
+
+Additional keys MAY be included in the `page` object. If they are, they MUST be defined in a specification referenced in the AuthZEN Policy Decision Point Capabilities Registry ({{iana-pdp-capabilities-registry}}). Furthermore, the PDP MUST declare support for the corresponding capability URN in its `supported_capabilities` metadata ({{pdp-metadata-data-capabilities}}).
+
+### Paginated Responses {#search-pagination-response}
+
+Any Search API Response MAY include a `page` object, but if a response does not contain the entire result set, it MUST include this object.
+
+The `page` object contains the following keys:
+
+`next_token`: 
+: REQUIRED. An opaque string value indicating the next page of results to return. If there are no more results after this page, its value MUST be an empty string.
+
+`count`: 
+: OPTIONAL. A non-negative integer indicating the number of results included in this response. When included at the start of a response, as described in the Search API Response ({{search-response}}), this enables clients to display progress indicators when processing large or slow responses.
+
+`total`:
+: OPTIONAL. A non-negative integer indicating the total number of results matching the query criteria at the time of the request. This value is not guaranteed to equal the total number of items returned across all pages if the underlying data set changes during pagination.
+
+`properties`:
+: OPTIONAL. An object containing additional pagination response attributes. Examples include, but are not limited to, estimated totals or the number of remaining results.
+
+### Examples (non-normative) {#search-pagination-examples}
+
+The following is a non-normative example of a request-response cycle to retrieve a total of three results with a page size limit of two.
+
+~~~ json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "action": {
+    "name": "can_read"
+  },
+  "resource": {
+    "type": "account"
+  },
+  "page": {
+    "limit": 2
+  }
+}
+~~~
+{: #search-pagination-token-initial-request title="Example initial Search API Request"}
+
+~~~ json
+{
+  "page": {
+    "next_token": "a3M9NDU2O3N6PTI=",
+    "count": 2,
+    "total": 3
+  },
+  "results": [
+    {
+      "type": "account",
+      "id": "123"
+    },
+    {
+      "type": "account",
+      "id": "456"
+    }
+  ]
+}
+~~~
+{: #search-pagination-token-initial-response title="Example initial Search API Response"}
+
+~~~ json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "action": {
+    "name": "can_read"
+  },
+  "resource": {
+    "type": "account"
+  },
+  "page": {
+    "token": "a3M9NDU2O3N6PTI="
+  }
+}
+~~~
+{: #search-pagination-token-second-request title="Example second Search API Request"}
+
+~~~ json
+{
+  "page": {
+    "next_token": "",
+    "count": 1,
+    "total": 3
+  },
+  "results": [
+    {
+      "type": "account",
+      "id": "789"
+    }
+  ]
+}
+~~~
+{: #search-pagination-token-second-response title="Example second Search API Response"}
+
+## The Search API Response {#search-response}
+
+The response to a Search API Request always follows the same structure. Each Search API Response is a JSON object with the following keys:
+
+`page`:
+: OPTIONAL. An object providing pagination information, as defined in Paginated Responses ({{search-pagination-response}}). It is RECOMMENDED that the `page` object be the first key in the response, as this allows clients to use the `count` value to display progress indicators when processing large or slow responses.
+
+`context`:
+: OPTIONAL. An object that can convey additional information that can be used by the PEP, similar to its function in the Access Evaluation Response (see {{access-evaluation-response}}).
+
+`results`:
+: REQUIRED. An array containing zero or more entities, as defined in the Information Model ({{information-model}}). It MUST contain only entities of the type being searched for (e.g., Subjects, Resources, or Actions).
+
+The following is a non-normative example of a search response returning resources:
+
+~~~ json
+{
+  "page": {
+    "count": 2,
+    "total": 102
+  },
+  "context": {
+    "query_execution_time_ms": 42
+  },
+  "results": [
+    {
+      "type": "account",
+      "id": "123"
+    },
+    {
+      "type": "account",
+      "id": "456"
+    }
+  ]
+}
+~~~
+{: #search-response-example title="Example Resource Search API Response"}
+
+## Subject Search API {#subject-search-api}
+
+The Subject Search API returns all subjects of a given type that are permitted according to the provided Action ({{action}}), Resource ({{resource}}), and Context ({{context}}).
+
+### The Subject Search API Request {#subject-search-request}
 
 The Subject Search request is an object consisting of the following entities:
 
 `subject`:
-: REQUIRED. The subject (or principal) of type Subject.  NOTE that the Subject type is REQUIRED but the Subject ID can be omitted, and if present, is IGNORED.
+: REQUIRED. The subject (or principal) of type Subject. The Subject MUST contain a `type`, but the Subject `id` SHOULD be omitted, and if present, MUST be ignored.
 
 `action`:
 : REQUIRED. The action (or verb) of type Action.
@@ -921,7 +1098,7 @@ The Subject Search request is an object consisting of the following entities:
 : OPTIONAL. Contextual data about the request.
 
 `page`:
-: OPTIONAL. A page token for paged requests.
+: OPTIONAL. A page object for paginated requests.
 
 ### Example (non-normative)
 
@@ -944,92 +1121,13 @@ The following payload defines a request for the subjects of type `user` that can
   }
 }
 ~~~
-{: #subject-search-request-example title="Example Request"}
+{: #subject-search-request-example title="Example Subject Search API Request"}
 
-## The Subject Search API Response {#subject-search-response}
+## Resource Search API {#resource-search-api}
 
-The response is a paged array of Subjects.
+The Resource Search API returns all resources of a given type that are permitted according to the provided Action ({{action}}), Subject ({{subject}}), and Context ({{context}}).
 
-~~~ json
-{
-  "results": [
-    {
-      "type": "user",
-      "id": "alice@example.com"
-    },
-    {
-      "type": "user",
-      "id": "bob@example.com"
-    }
-  ],
-  "page": {
-    "next_token": ""
-  }
-}
-~~~
-
-### Paged requests
-
-A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
-
-#### Example
-
-~~~ json
-{
-  "results": [
-    {
-      "type": "user",
-      "id": "alice@example.com"
-    },
-    {
-      "type": "user",
-      "id": "bob@example.com"
-    }
-  ],
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
-}
-~~~
-
-To retrieve the next page, provide `page.next_token` in the next request:
-
-~~~ json
-{
-  "subject": {
-    "type": "user"
-  },
-  "action": {
-    "name": "can_read"
-  },
-  "resource": {
-    "type": "account",
-    "id": "123"
-  },
-  "context": {
-    "time": "2024-10-26T01:22-07:00"
-  },
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
-}
-~~~
-
-Note: page size is implementation-dependent.
-
-# Resource Search API {#resource-search-api}
-
-The Resource Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the resources that match the search criteria.
-
-The Resource Search API is based on the Access Evaluation information model, but omits the Resource ID.
-
-## Resource Search Semantics
-
-While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
-
-In addition, it is RECOMMENDED that a resource search is performed transitively, traversing intermediate attributes and/or relationships. For example, if user U is a viewer of folder F that contains a set of documents, then a search for all documents that user U can view will include all of the documents in folder F.
-
-## The Resource Search API Request {#resource-search-request}
+### The Resource Search API Request {#resource-search-request}
 
 The Resource Search request is an object consisting of the following entities:
 
@@ -1040,13 +1138,13 @@ The Resource Search request is an object consisting of the following entities:
 : REQUIRED. The action (or verb) of type Action.
 
 `resource`:
-: REQUIRED. The resource of type Resource. NOTE that the Resource type is REQUIRED but the Resource ID is omitted, and if present, is IGNORED.
+: REQUIRED. The resource of type Resource. The Resource MUST contain a `type`, but the Resource `id` SHOULD be omitted, and if present, MUST be ignored.
 
 `context`:
 : OPTIONAL. Contextual data about the request.
 
 `page`:
-: OPTIONAL. A page token for paged requests.
+: OPTIONAL. A page object for paginated requests.
 
 ### Example (non-normative)
 
@@ -1066,87 +1164,13 @@ The following payload defines a request for the resources of type `account` on w
   }
 }
 ~~~
-{: #resource-search-request-example title="Example Request"}
+{: #resource-search-request-example title="Example Resource Search API Request"}
 
-## The Resource Search API Response {#resource-search-response}
+## Action Search API {#action-search-api}
 
-The response is a paged array of Resources.
+The Action Search API returns all actions that are permitted according to the provided Subject ({{subject}}), Resource ({{resource}}), and Context ({{context}}).
 
-~~~ json
-{
-  "results": [
-    {
-      "type": "account",
-      "id": "123"
-    },
-    {
-      "type": "account",
-      "id": "456"
-    }
-  ],
-  "page": {
-    "next_token": ""
-  }
-}
-~~~
-
-### Paged requests
-
-A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
-
-#### Example
-
-~~~ json
-{
-  "results": [
-    {
-      "type": "account",
-      "id": "123"
-    },
-    {
-      "type": "account",
-      "id": "456"
-    }
-  ],
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
-}
-~~~
-
-To retrieve the next page, provide `page.next_token` in the next request:
-
-~~~ json
-{
-  "subject": {
-    "type": "user",
-    "id": "alice@example.com"
-  },
-  "action": {
-    "name": "can_read"
-  },
-  "resource": {
-    "type": "account"
-  },
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
-}
-~~~
-
-Note: page size is implementation-dependent.
-
-# Action Search API {#action-search-api}
-
-The Action Search API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for returning all of the actions that match the search criteria.
-
-The Action Search API is based on the Access Evaluation information model, but omits the Action.
-
-## Action Search Semantics
-
-While the evaluation of a search is implementation-specific, it is expected that any returned results that are then fed into an `evaluation` call MUST result in a `decision: true` response.
-
-## The Action Search API Request {#action-search-request}
+### The Action Search API Request {#action-search-request}
 
 The Action Search request is an object consisting of the following entities:
 
@@ -1160,13 +1184,13 @@ The Action Search request is an object consisting of the following entities:
 : OPTIONAL. Contextual data about the request.
 
 `page`:
-: OPTIONAL. A page token for paged requests.
+: OPTIONAL. A page object for paginated requests.
 
 Note: Unlike the Subject and Resource Search APIs, the `action` key is omitted from the Action Search request payload.
 
 ### Example (non-normative)
 
-The following payload defines a request for the actions that the subject of type `user` with ID `123` may perform on the resource of type account and ID 123 at 01:22 AM.
+The following payload defines a request for the actions that the subject of type `user` with ID `123` may perform on the resource of type `account` and ID `123` at 01:22 AM.
 
 ~~~ json
 {
@@ -1183,75 +1207,7 @@ The following payload defines a request for the actions that the subject of type
   }
 }
 ~~~
-{: #action-search-request-example title="Example Request"}
-
-## The Action Search API Response {#action-search-response}
-
-The response is a paged array of Actions.
-
-~~~ json
-{
-  "results": [
-    {
-      "name": "can_read"
-    },
-    {
-      "name": "can_write"
-    }
-  ],
-  "page": {
-    "next_token": ""
-  }
-}
-~~~
-{: #action-search-response-example title="Example Response"}
-
-### Paged requests
-
-A response that needs to be split across page boundaries returns a non-empty `page.next_token`.
-
-#### Example
-
-~~~ json
-{
-  "results": [
-    {
-      "name": "can_read"
-    },
-    {
-      "name": "can_write"
-    }
-  ],
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
-}
-~~~
-{: #action-search-response-paged-example title="Example Paged Response"}
-
-To retrieve the next page, provide `page.next_token` in the next request:
-
-~~~ json
-{
-  "subject": {
-    "type": "user",
-    "id": "123"
-  },
-  "resource": {
-    "type": "account",
-    "id": "123"
-  },
-  "context": {
-    "time": "2024-10-26T01:22-07:00"
-  },
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
-}
-~~~
-{: #action-search-request-paged-example title="Example Paged Request"}
-
-Note: page size is implementation-dependent.
+{: #action-search-request-example title="Example Action Search API Request"}
 
 # Policy Decision Point Metadata {#pdp-metadata}
 
@@ -1259,7 +1215,7 @@ It is RECOMMENDED that Policy Decision Points provide metadata describing their 
 
 ## Data structure {#pdp-metadata-data}
 
-The following Policy Decision Point metadata parameters are used by this specification and are registered in the IANA "AuthZEN PDP Metadata" registry established in {{iana-pdp-registry}}.
+The following Policy Decision Point metadata parameters are used by this specification and are registered in the IANA "AuthZEN PDP Metadata" registry established in {{iana-pdp-metadata-registry}}.
 
 ### Endpoint Parameters {#pdp-metadata-data-endpoint}
 
@@ -1281,10 +1237,12 @@ The following Policy Decision Point metadata parameters are used by this specifi
 `search_resource_endpoint`:
 : OPTIONAL. URL of Policy Decision Point Search API endpoint for resource element
 
+Note: the absence of any of these parameters is sufficient for the Policy Enforcement Point to determine that the Policy Decision Point is not capable and therefore will not return a result for the associated API.
+
+### Capabilities Parameters {#pdp-metadata-data-capabilities}
+
 `capabilities`:
 : OPTIONAL. JSON array containing a list of registered IANA URNs referencing PDP specific capabilities.
-
-Note: the absence of any of these parameters is sufficient for the Policy Enforcement Point to determine that the Policy Decision Point is not capable and therefore will not return a result for the associated API.
 
 ### Signature Parameter {#pdp-metadata-data-sig}
 
@@ -1297,7 +1255,7 @@ Consumers of the metadata MAY ignore the signed metadata if they do not support 
 
 ## Obtaining Policy Decision Point Metadata {#pdp-metadata-access}
 
-Policy Decision Points supporting metadata MUST make a JSON document containing metadata as specified in {{pdp-metadata-data-endpoint}} available at a URL formed by inserting a well-known URI string between the host component and the path and/or query components, if any. The well-known URI string used is `/.well-known/authzen-configuration`.
+Policy Decision Points supporting metadata MUST make a JSON document containing metadata as specified in the AuthZEN Policy Decision Point Metadata Registry ({{iana-pdp-metadata-registry}}) available at a URL formed by inserting a well-known URI string between the host component and the path and/or query components, if any. The well-known URI string used is `/.well-known/authzen-configuration`.
 
 The syntax and semantics of .well-known are defined in {{RFC8615}}. The well-known URI path suffix used is registered in the IANA "Well-Known URIs" registry {{IANA.well-known-uris}}.
 
@@ -1318,11 +1276,13 @@ Host: pdp.example.com
 
 ### Policy Decision Point Metadata Response {#pdp-metadata-access-response}
 
-The response is a set of metadata parameters about the protected resource's configuration. A successful response MUST use the HTTP status code `200` and return a JSON object using the `application/json` content type that contains a set of metadata parameters as its members that are a subset of the metadata parameters defined in {{pdp-metadata-data-endpoint}}. 
-##TODO Should point to registry instead!
-Additional metadata parameters MAY be defined and used; any metadata parameters that are not understood MUST be ignored.
+The response is a set of metadata parameters about the protected resource's configuration. 
 
-Parameters with multiple values are represented as JSON arrays. Parameters with zero values MUST be omitted from the response.
+A successful response MUST use the HTTP status code `200` and a `Content-Type` of `application/json`. Its body MUST be a JSON object that contains a set of metadata parameters as defined in the AuthZEN Policy Decision Point Metadata Registry ({{iana-pdp-metadata-registry}}). 
+
+Any metadata parameters in the response that are not understood by the PEP MUST be ignored.
+
+Parameters that have multiple values are represented as JSON arrays. Parameters that have no values MUST be omitted from the response.
 
 An error response uses the applicable HTTP status code value.
 
@@ -1368,9 +1328,9 @@ The following table provides an overview of the API endpoints defined in this bi
 |--------------------|----------------------------|-----------------------------|--------------------------------|---------------------------------|
 | Access Evaluation  | /access/v1/evaluation      | access_evaluation_endpoint  | {{access-evaluation-request}}  | {{access-evaluation-response}}  |
 | Access Evaluations | /access/v1/evaluations     | access_evaluations_endpoint | {{access-evaluations-request}} | {{access-evaluations-response}} |
-| Subject Search     | /access/v1/search/subject  | search_subject_endpoint     | {{subject-search-request}}     | {{subject-search-response}}     |
-| Resource Search    | /access/v1/search/resource | search_resource_endpoint    | {{resource-search-request}}    | {{resource-search-response}}    |
-| Action Search      | /access/v1/search/action   | search_action_endpoint      | {{action-search-request}}      | {{action-search-response}}      |
+| Subject Search     | /access/v1/search/subject  | search_subject_endpoint     | {{subject-search-request}}     | {{search-response}}     |
+| Resource Search    | /access/v1/search/resource | search_resource_endpoint    | {{resource-search-request}}    | {{search-response}}    |
+| Action Search      | /access/v1/search/action   | search_action_endpoint      | {{action-search-request}}      | {{search-response}}      |
 {: #table-api-endpoints title="API Endpoint Overview"}      
 
 ### JSON Serialization {#transport-https-json}
@@ -1589,6 +1549,9 @@ Content-Type: application/json
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
+  "page": {
+    "next_token": "a3M9NDU2O3N6PTI="
+  },
   "results": [
     {
       "type": "user",
@@ -1598,10 +1561,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
       "type": "user",
       "id": "bob@example.com"
     }
-  ],
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
+  ]
 }
 ~~~
 {: #example-subject-search-response title="Example of an HTTPS Subject Search Response"}
@@ -1638,6 +1598,9 @@ Content-Type: application/json
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
+  "page": {
+    "next_token": "a3M9NDU2O3N6PTI="
+  },
   "results": [
     {
       "type": "account",
@@ -1647,10 +1610,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
       "type": "account",
       "id": "456"
     }
-  ],
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
+  ]
 }
 ~~~
 {: #example-resource-search-response title="Example of an HTTPS Resource Search Response"}
@@ -1688,6 +1648,9 @@ Content-Type: application/json
 X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
 
 {
+  "page": {
+    "next_token": "a3M9NDU2O3N6PTI="
+  },
   "results": [
     {
       "name": "can_read"
@@ -1695,10 +1658,7 @@ X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
     {
       "name": "can_write"
     }
-  ],
-  "page": {
-    "next_token": "alsehrq3495u8"
-  }
+  ]
 }
 ~~~
 {: #example-action-search-response title="Example of an HTTPS Action Search Response"}
@@ -1756,7 +1716,7 @@ To avoid ambiguity between a property that is absent and one that is present wit
 
 The PDP MAY choose to sign its authorization response, ensuring the PEP can verify the integrity of the data it receives. This practice is valuable for maintaining trust in the authorization process.
 
-The PEP can ensure that the authorization response is not tampered with by verifying the signature of the authorization decision if it is signed. It ensures response accurracy and completeness. 
+The PEP can ensure that the authorization response is not tampered with by verifying the signature of the authorization decision if it is signed. It ensures response accuracy and completeness. 
 
 TLS effectively protects data in transit for a direct, point-to-point connection but does not guarantee data integrity for the full connection path between the PEP and the PDP if there are intermediaries, such as proxies or gateways. 
 
@@ -1777,9 +1737,11 @@ Policy decision point metadata is retrieved using an HTTP GET request, as specif
 
 # IANA Considerations {#iana}
 
-The following registration procedure is used for the registry established by this specification.
+This specification requests IANA to take four actions: the creation of a new protocol registry group named 'AuthZEN', the establishment of two new registries within this group ('AuthZEN Policy Decision Point Metadata' and 'AuthZEN Policy Decision Point Capabilities'), the registration of a new Well-Known URI ('authzen-configuration'), and the registration of a new URN sub-namespace ('authzen').
 
-Values are registered on a Specification Required {{RFC8126}} basis after a two-week review period on the openid-specs-authzen@lists.openid.net mailing list, on the advice of one or more Designated Experts. However, to allow for the allocation of values prior to publication of the final version of a specification, the Designated Experts may approve registration once they are satisfied that the specification will be completed and published. However, if the specification is not completed and published in a timely manner, as determined by the Designated Experts, the Designated Experts may request that IANA withdraw the registration.
+The following registration procedure is used for the registries established by this specification.
+
+Values are registered on a Specification Required {{RFC8126}} basis after a two-week review period on the openid-specs-authzen@lists.openid.net mailing list, following review and approval by one or more Designated Experts. However, to allow for the allocation of values prior to publication of the final version of a specification, the Designated Experts may approve registration once they are satisfied that the specification will be completed and published. However, if the specification is not completed and published in a timely manner, as determined by the Designated Experts, the Designated Experts may request that IANA withdraw the registration.
 
 Registration requests sent to the mailing list for review should use an appropriate subject (e.g., "Request to register AuthZEN Policy Decision Point Metadata: example").
 
@@ -1793,11 +1755,19 @@ It is suggested that multiple Designated Experts be appointed who are able to re
 
 The reason for the use of the mailing list is to enable public review of registration requests, enabling both Designated Experts and other interested parties to provide feedback on proposed registrations. The reason to allow the Designated Experts to allocate values prior to publication as a final specification is to enable giving authors of specifications proposing registrations the benefit of review by the Designated Experts before the specification is completely done, so that if problems are identified, the authors can iterate and fix them before publication of the final specification.
 
-## AuthZEN Policy Decision Point Metadata Registry {#iana-pdp-registry}
+## AuthZEN Policy Decision Point Metadata Registry {#iana-pdp-metadata-registry}
 
-This specification establishes the IANA "AuthZEN Policy Decision Point Metadata" registry for AuthZEN Policy Decision Point metadata names. The registry records the Policy Decision Point metadata parameter and a reference to the specification that defines it.
+This specification asks IANA to establish the "AuthZEN Policy Decision Point Metadata" registry under the registry group "AuthZEN Parameters". The registry records the Policy Decision Point metadata parameter and a reference to the specification that defines it.
 
-### Registration Template {#iana-pdp-registry-template}
+### Registry Definition
+
+Registry Name: AuthZEN Policy Decision Point Metadata
+
+Registration Policy: Specification Required per {{RFC8126}}
+
+Reference: \[This Document\]
+
+### Registration Template {#iana-pdp-metadata-template}
 
 Metadata Name:
 : The name requested (e.g., "resource"). This name is case-sensitive. Names may not match other registered names in a case-insensitive manner unless the Designated Experts state that there is a compelling reason to allow an exception.
@@ -1811,156 +1781,188 @@ Change Controller:
 Specification Document(s):
 : Reference to the document or documents that specify the parameter, preferably including URIs that can be used to retrieve copies of the documents. An indication of the relevant sections may also be included but is not required.
 
-### Initial Registry Contents {#iana-pdp-registry-content}
+### Initial Registrations {#iana-pdp-metadata-initial}
 
-Metadata name:
+Metadata Name:
 : `policy_decision_point`
 
-Metadata description:
+Metadata Description:
 : Base URL of the Policy Decision Point
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Group
+: OpenID Foundation AuthZEN Working Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section {{pdp-metadata-data-endpoint}}
+: {{pdp-metadata-data-endpoint}} of \[This Document\]
 
 
 
-Metadata name:
+Metadata Name:
 : `access_evaluation_endpoint`
 
-Metadata description:
-: URL of Policy Decision Point Access Evaluation API endpoint
+Metadata Description:
+: URL of the Policy Decision Point's Access Evaluation API endpoint
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Group
+: OpenID Foundation AuthZEN Working Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section {{pdp-metadata-data-endpoint}}
+: {{pdp-metadata-data-endpoint}} of \[This Document\]
 
 
 
-Metadata name:
+Metadata Name:
 : `access_evaluations_endpoint`
 
-Metadata description:
-: URL of Policy Decision Point Access Evaluations API endpoint
+Metadata Description:
+: URL of the Policy Decision Point's Access Evaluations API endpoint
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Group
+: OpenID Foundation AuthZEN Working Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section {{pdp-metadata-data-endpoint}}
+: {{pdp-metadata-data-endpoint}} of \[This Document\]
 
 
 
-Metadata name:
+Metadata Name:
 : `search_subject_endpoint`
 
-Metadata description:
-: URL of the Search Endpoint based on Subject element
+Metadata Description:
+: URL of the Policy Decision Point's Search API endpoint based on Subject element
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Group
+: OpenID Foundation AuthZEN Working Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section {{pdp-metadata-data-endpoint}}
+: {{pdp-metadata-data-endpoint}} of \[This Document\]
 
 
 
-Metadata name:
+Metadata Name:
 : `search_resource_endpoint`
 
-Metadata description:
-: URL of the Search Endpoint based on Resource element
+Metadata Description:
+: URL of the Policy Decision Point's Search API endpoint based on Resource element
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Group
+: OpenID Foundation AuthZEN Working Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section {{pdp-metadata-data-endpoint}}
+: {{pdp-metadata-data-endpoint}} of \[This Document\]
 
 
 
-Metadata name:
+Metadata Name:
 : `search_action_endpoint`
 
-Metadata description:
-: URL of the Search Endpoint based on Action element
+Metadata Description:
+: URL of the Policy Decision Point's Search API endpoint based on Action element
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Group
+: OpenID Foundation AuthZEN Working Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section {{pdp-metadata-data-endpoint}}
+: {{pdp-metadata-data-endpoint}} of \[This Document\]
 
 
 
-Metadata name:
+Metadata Name:
 : `capabilities`
 
-Metadata description:
+Metadata Description:
 : Array of URNs describing specific PDP capabilities
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Group
+: OpenID Foundation AuthZEN Working Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section {{pdp-metadata-data-endpoint}}
+: {{pdp-metadata-data-capabilities}} of \[This Document\]
 
 
-
-Metadata name:
+Metadata Name:
 : `signed_metadata`
 
-Metadata description:
+Metadata Description:
 : JWT containing metadata parameters about the protected resource as claims.
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Group
+: OpenID Foundation AuthZEN Working Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Specification Document(s):
-: Section {{pdp-metadata-data-endpoint}}
+: {{pdp-metadata-data-sig}} of \[This Document\]
 
 
 ## Well-Known URI Registry {#iana-wk-registry}
 
-This specification registers the well-known URI defined in Section 3 in the IANA "Well-Known URIs" registry {{IANA.well-known-uris}}.
+This specification asks IANA to register the well-known URI defined in {{pdp-metadata-access}} in the IANA "Well-Known URIs" registry {{IANA.well-known-uris}}.
 
-### Registry Contents {#iana-wk-registry-content}
+### Registry Contents {#iana-wk-contents}
 
 URI Suffix:
 : authzen-configuration
 
 Reference:
-: Section {{pdp-metadata-data-endpoint}}
+: \[This Document\]
 
 Status:
 : permanent
 
 Change Controller:
-: OpenID_Foundation_AuthZEN_Working_Group
+: OpenID Foundation AuthZEN Working Group
 : mailto:openid-specs-authzen@lists.openid.net
 
 Related Information:
 : (none)
 
+## AuthZEN Policy Decision Point Capabilities Registry {#iana-pdp-capabilities-registry}
 
+This specification asks IANA to establish the "AuthZEN Policy Decision Point Capabilities" registry under the registry group "AuthZEN Parameters". The registry contains AuthZEN Policy Decision Point specific capabilities or features. These URNs are intended to be used in PDP metadata discovery documents (as described in {{pdp-metadata}}) to allow clients to determine the supported functionality of a given PDP instance. The content of this registry will be specified by AuthZEN-compliant PDP vendors that want to declare interoperable capabilities.
 
-## AuthZEN PDP capabilities Registry {#iana-wk-registry-pdp}
+### Registry Definition {#iana-pdp-capabilities-definition}
 
-This specification establishes the IANA "AuthZEN Policy Decision Point Capabilities" registry for AuthZEN Policy Decision Point specific capabilities or features. The content of this registry will be specified by AuthZEN compliance PDP vendors that want to declare interoperable capabilities.
+Registry Name: AuthZEN Policy Decision Point Capabilities
 
+Registration Policy: Specification Required per {{RFC8126}}
 
+Reference: \[This Document\]
+
+### Registration Template {#iana-pdp-capabilities-template}
+
+Capability Name:
+: The name of the capability. This name MUST begin with the colon (":") character. This name is case-sensitive. Names may not match other registered names in a case-insensitive manner unless the Designated Experts state that there is a compelling reason to allow an exception.
+
+Capability URN: The URN of the AuthZEN PDP Capability.
+
+Capability Description:
+: Brief description of the capability.
+
+Change Controller:
+: OpenID Foundation AuthZEN Working Group
+: mailto:openid-specs-authzen@lists.openid.net
+
+Specification Document(s):
+: Reference to the document or documents that specify the parameter, preferably including URIs that can be used to retrieve copies of the documents. An indication of the relevant sections may also be included but is not required.
+
+## Registration of "authzen" URN Sub-namespace {#iana-urn-namespace}
+
+This specification asks IANA to register a new URN sub-namespace within the "IETF URN Sub-namespace for Registered Protocol Parameter Identifiers" registry defined in {{RFC3553}}.
+
+Registry Name: authzen
+
+Specification: \[This Document\]
+
+Repository: "AuthZEN Policy Decision Point Capabilities" registry ({{iana-pdp-capabilities-registry}} of \[This Document\])
+
+Index value: Sub-parameters MUST be specified in UTF-8, using standard URI encoding where necessary.
 
 --- back
 
@@ -1997,7 +1999,7 @@ This template uses extracts from templates written by
 ** To be removed from the final specification **
 
 * 00 - Initial version.
-* 01 - First Implementers Draft. Refactored the optional fields of Subject, Action, and Resource into a `properties` sub-object, making it easier to design meaningful JSON-schema and protobuf contracts for the API.
+* 01 - First Implementers Draft. Refactored the optional fields of Subject, Action, and Resource into a `properties` sub-object, making it easier to design meaningful JSON Schema and protobuf contracts for the API.
 * 02 - Added the evaluations API.
 * 03 - Added the search (subject, resource, action) APIs.
 * 04 - Added metadata discovery.
