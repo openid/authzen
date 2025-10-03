@@ -1255,7 +1255,7 @@ Consumers of the metadata MAY ignore the signed metadata if they do not support 
 
 ## Obtaining Policy Decision Point Metadata {#pdp-metadata-access}
 
-Policy Decision Points supporting metadata MUST make a JSON document containing metadata as specified in {{pdp-metadata-data-endpoint}} available at a URL formed by inserting a well-known URI string between the host component and the path and/or query components, if any. The well-known URI string used is `/.well-known/authzen-configuration`.
+Policy Decision Points supporting metadata MUST make a JSON document containing metadata as specified in the AuthZEN Policy Decision Point Metadata Registry ({{iana-pdp-metadata-registry}}) available at a URL formed by inserting a well-known URI string between the host component and the path and/or query components, if any. The well-known URI string used is `/.well-known/authzen-configuration`.
 
 The syntax and semantics of .well-known are defined in {{RFC8615}}. The well-known URI path suffix used is registered in the IANA "Well-Known URIs" registry {{IANA.well-known-uris}}.
 
@@ -1276,13 +1276,13 @@ Host: pdp.example.com
 
 ### Policy Decision Point Metadata Response {#pdp-metadata-access-response}
 
-The response is a set of metadata parameters about the protected resource's configuration. A successful response MUST use the HTTP status code `200` and return a JSON object using the `application/json` content type that contains a set of metadata parameters as its members that are a subset of the metadata parameters defined in the AuthZEN Policy Decision Point Metadata Registry ({{iana-pdp-metadata-registry}}).
+The response is a set of metadata parameters about the protected resource's configuration. 
 
-##TODO These two lines conflict. We first state only a subset of the registry parameters can be used and then that additional parameters may be used.
+A successful response MUST use the HTTP status code `200` and a `Content-Type` of `application/json`. Its body MUST be a JSON object that contains a set of metadata parameters as defined in the AuthZEN Policy Decision Point Metadata Registry ({{iana-pdp-metadata-registry}}). 
 
-Additional metadata parameters MAY be defined and used; any metadata parameters that are not understood MUST be ignored.
+Any metadata parameters in the response that are not understood by the PEP MUST be ignored.
 
-Parameters with multiple values are represented as JSON arrays. Parameters with zero values MUST be omitted from the response.
+Parameters that have multiple values are represented as JSON arrays. Parameters that have no values MUST be omitted from the response.
 
 An error response uses the applicable HTTP status code value.
 
