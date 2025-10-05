@@ -99,7 +99,7 @@ The Authorization API enables Policy Decision Points (PDPs) and Policy Enforceme
 Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML ({{XACML}}) and NIST's ABAC SP 800-162 ({{NIST.SP.800-162}}). Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
 
 # Model
-The Authorization API is a transport-agnostic API published by the PDP, to which the PEP acts as a client. Possible bindings of this specification, such as HTTPS or gRPC, are described in Transport ({{transport}}).
+The Authorization API is a transport-agnostic API published by the PDP, to which the PEP acts as a client. Possible bindings of this specification, such as HTTPS, gRPC or CoAP, are described in Transport ({{transport}}).
 
 Authentication for the Authorization API itself is out of scope for this document, since authentication for APIs is well-documented elsewhere. Support for OAuth 2.0 ({{RFC6749}}) is RECOMMENDED.
 
@@ -122,7 +122,7 @@ The Search APIs provide lists of resources, subjects or actions that would be al
 - What actions can Alice perform on document 123 on Tuesday, June 11, 2024?
 
 # API Version
-This document describes the API version 1.0. Any updates to this API through subsequent revisions of this document or other documents MAY augment this API, but MUST NOT modify the API described here. Augmentation MAY include additional API methods or additional parameters to existing API methods, additional authorization mechanisms, or additional optional headers in API requests. All API methods for version 1.0 MUST be immediately preceded by the relative URL path `/v1/`.
+This document describes the API version 1.0. Any updates to this API through subsequent revisions of this document or other documents MAY augment this API, but MUST NOT modify the API described here. Augmentation MAY include additional API methods or additional parameters to existing API methods, additional authorization mechanisms, or additional optional headers in HTTPS transport bindings. Endpoints for version 1.0 SHOULD include `v1` in the endpoint identifier (e.g. `https://pdp.example.com/access/v1/`).
 
 # Information Model {#information-model}
 The information model for requests and responses include the following entities: Subject, Action, Resource, Context, and Decision. These are all defined below.
@@ -143,7 +143,7 @@ A Subject is an object that contains two REQUIRED keys, `type` and `id`, which h
 
 
 ### Subject Properties {#subject-properties}
-Many authorization systems are stateless, and expect the client (PEP) to pass in all relevant attributes used in the evaluation of the authorization policy. To satisfy this requirement, Subjects MAY include additional attributes as key-value pairs, under the `properties` object. A property can contain both simple values, such as strings, numbers, booleans and nulls, and complex values, such as arrays and objects.
+Many authorization systems are stateless, and expect the PEP to pass in all relevant attributes used in the evaluation of the authorization policy. To satisfy this requirement, Subjects MAY include additional attributes as key-value pairs, under the `properties` object. A property can contain both simple values, such as strings, numbers, booleans and nulls, and complex values, such as arrays and objects.
 
 Examples of subject attributes can include, but are not limited to:
 
@@ -407,7 +407,7 @@ In the following non-normative example, the PDP requests a step-up authenticatio
 
 # Access Evaluation API {#access-evaluation-api}
 
-The Access Evaluation API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for executing a single access evaluation.
+The Access Evaluation API defines the message exchange pattern between a PEP and a PDP for executing a single access evaluation.
 
 ## The Access Evaluation API Request {#access-evaluation-request}
 The Access Evaluation request is an object consisting of four entities previously defined in the Information Model ({{information-model}}):
@@ -455,13 +455,13 @@ The response of the Access Evaluation API consists of the Decision entity as def
 
 # Access Evaluations API {#access-evaluations-api}
 
-The Access Evaluations API defines the message exchange pattern between a client (PEP) and an authorization service (PDP) for evaluating multiple access evaluations within the scope of a single message exchange (also known as "boxcarring" requests).
+The Access Evaluations API defines the message exchange pattern between a PEP and a PDP for evaluating multiple access evaluations within the scope of a single message exchange (also known as "boxcarring" requests).
 
 ## The Access Evaluations API Request {#access-evaluations-request}
 
 The Access Evaluation API Request builds on the information model presented in {{information-model}} and the object defined in the Access Evaluation Request ({{access-evaluation-request}}).
 
-To send multiple access evaluation requests in a single message, the caller MAY add an `evaluations` key to the request. The `evaluations` key is an array which contains a list of objects, each typed as the object as defined in the Access Evaluation Request ({{access-evaluation-request}}), and specifying a discrete request.
+To send multiple access evaluation requests in a single message, the PEP MAY add an `evaluations` key to the request. The `evaluations` key is an array which contains a list of objects, each typed as the object as defined in the Access Evaluation Request ({{access-evaluation-request}}), and specifying a discrete request.
 
 If an `evaluations` array is NOT present or is empty, the Access Evaluations Request behaves in a backwards-compatible manner with the (single) Access Evaluation API Request ({{access-evaluation-request}}).
 
@@ -621,7 +621,7 @@ The following is a non-normative example for specifying three requests that refe
 
 The `evaluations` request payload includes an OPTIONAL `options` key, with a value that is an object.
 
-This provides a general-purpose mechanism for providing caller-supplied metadata on how the request is to be executed.
+This provides a general-purpose mechanism for providing PEP-supplied metadata on how the request is to be executed.
 
 One such option controls *evaluation semantics*, and is described in {{evaluations-semantics}}.
 
@@ -656,7 +656,7 @@ This specification supports three evaluation semantics:
 2. *Deny on first denial (or failure).* This semantic could be desired if a PEP wants to issue a few requests in a particular order, with any denial (error, or `"decision": false`) "short-circuiting" the evaluations call and returning on the first denial. This essentially works like the `&&` operator in programming languages.
 3. *Permit on first permit.* This is the converse "short-circuiting" semantic, working like the `||` operator in programming languages.
 
-To select the desired evaluation semantic, a caller can pass in `options.evaluations_semantic` with exactly one of the following values:
+To select the desired evaluation semantic, a PEP can pass in `options.evaluations_semantic` with exactly one of the following values:
 
   * `execute_all`
   * `deny_on_first_deny`
@@ -830,7 +830,7 @@ Response:
 
 Like the request format, the Access Evaluations Response format for an Access Evaluations Request adds an `evaluations` array that lists the decisions in the same order they were provided in the `evaluations` array in the request. Each value of the evaluations array is typed as a Decision as defined in the Information Model ({{information-model}}).
 
-In case the `evaluations` array is present, it is RECOMMENDED that the `decision` key of the response be omitted. If present, it can be ignored by the caller.
+In case the `evaluations` array is present, it is RECOMMENDED that the `decision` key of the response be omitted. If present, it can be ignored by the PEP.
 
 The following is a non-normative example of a Access Evaluations Response to an Access Evaluations Request containing three evaluation objects:
 
@@ -896,9 +896,9 @@ The following is a non-normative example of a response to an Access Evaluations 
 
 # Search APIs {#search}
 
-The Search APIs enable a client (PEP) to discover the set of subjects, resources, or actions that are permitted within a specific authorization context. Their purpose is to return a list of authorized entities, rather than verify a single access request.
+The Search APIs enable a PEP to discover the set of subjects, resources, or actions that are permitted within a specific authorization context. Their purpose is to return a list of authorized entities, rather than verify a single access request.
 
-To perform a search, the client provides the Subject, Resource, Action, and Context entities defined in the Information Model ({{information-model}}), but omits the unique identifier of the entity being queried. The authorization service (PDP) then responds with the set of authorized entities for the queried entity type which would be authorized according to the provided criteria.
+To perform a search, the PEP provides the Subject, Resource, Action, and Context entities defined in the Information Model ({{information-model}}), but omits the unique identifier of the entity being queried. The PDP then responds with the set of authorized entities for the queried entity type which would be authorized according to the provided criteria.
 
 ## Semantics {#search-semantics}
 
@@ -908,23 +908,23 @@ In addition, it is RECOMMENDED that a search be performed transitively, traversi
 
 ## Pagination {#search-pagination}
 
-Search APIs can return large result sets. To manage this, a Policy Decision Point (PDP) MAY support pagination, allowing clients to navigate and retrieve subsets of the total result set. 
+Search APIs can return large result sets. To manage this, a PDP MAY support pagination, allowing a PEP to navigate and retrieve subsets of the total result set.
 
 Pagination does not guarantee an atomic snapshot of the result set. Consequently, if items are added or removed while paginating, results MAY be repeated or omitted between pages.
 
-Pagination is based on the use of opaque tokens. A client makes an initial request for data by sending a query that does not contain a token. If the PDP determines that the result set contains too many results to fit in a single response, the PDP returns a partial result set and a token that the caller can use to retrieve the next page of results.
+Pagination is based on the use of opaque tokens. A PEP makes an initial request for data by sending a query that does not contain a token. If the PDP determines that the result set contains too many results to fit in a single response, the PDP returns a partial result set and a token that the PEP can use to retrieve the next page of results.
 
-A paginated response MUST be clearly identified by the inclusion of a `page` object containing a non-empty, opaque `next_token`. This token is the signal to the client that more results are available.
+A paginated response MUST be clearly identified by the inclusion of a `page` object containing a non-empty, opaque `next_token`. This token is the signal to the PEP that more results are available.
 
-To retrieve the next page, the client sends a subsequent request containing a `page` object with the `token` field set to the `next_token` value from the previous response. This process is repeated until the PDP returns a `page` object in which the value of the `next_token` field is an empty string, signaling the end of the result set.
+To retrieve the next page, the PEP sends a subsequent request containing a `page` object with the `token` field set to the `next_token` value from the previous response. This process is repeated until the PDP returns a `page` object in which the value of the `next_token` field is an empty string, signaling the end of the result set.
 
 When a request contains a token, all entities (e.g., `subject`, `resource`, `action`, `context`) and pagination parameters (e.g., `limit`)  MUST be identical to the preceding request. PDPs SHOULD return an error when any entity or parameter has been changed.
 
-Clients of the search APIs that wish to sequentially iterate through the entire result set SHOULD use the core pagination mechanism described above, which is designed to work consistently across all PDPs that support the search APIs.
+PEPs that wish to sequentially iterate through the entire result set SHOULD use the core pagination mechanism described above, which is designed to work consistently across all PDPs that support the search APIs.
 
 ### Paginated Requests {#search-pagination-request}
 
-A Search API Request MAY include a `page` object indicating which subset of the larger result set the client would like to receive.
+A Search API Request MAY include a `page` object indicating which subset of the larger result set the PEP would like to receive.
 
 The `page` object in a Search API Request consists of the following keys:
 
@@ -951,7 +951,7 @@ The `page` object contains the following keys:
 : REQUIRED. An opaque string value indicating the next page of results to return. If there are no more results after this page, its value MUST be an empty string.
 
 `count`: 
-: OPTIONAL. A non-negative integer indicating the number of results included in this response. When included at the start of a response, as described in the Search API Response ({{search-response}}), this enables clients to display progress indicators when processing large or slow responses.
+: OPTIONAL. A non-negative integer indicating the number of results included in this response. When included at the start of a response, as described in the Search API Response ({{search-response}}), this enables a PEP to display a progress indicator when processing large or slow responses.
 
 `total`:
 : OPTIONAL. A non-negative integer indicating the total number of results matching the query criteria at the time of the request. This value is not guaranteed to equal the total number of items returned across all pages if the underlying data set changes during pagination.
@@ -1044,7 +1044,7 @@ The following is a non-normative example of a request-response cycle to retrieve
 The response to a Search API Request always follows the same structure. Each Search API Response is a JSON object with the following keys:
 
 `page`:
-: OPTIONAL. An object providing pagination information, as defined in Paginated Responses ({{search-pagination-response}}). It is RECOMMENDED that the `page` object be the first key in the response, as this allows clients to use the `count` value to display progress indicators when processing large or slow responses.
+: OPTIONAL. An object providing pagination information, as defined in Paginated Responses ({{search-pagination-response}}). It is RECOMMENDED that the `page` object be the first key in the response, as this allows a PEP to use the `count` value to display a progress indicator when processing large or slow responses.
 
 `context`:
 : OPTIONAL. An object that can convey additional information that can be used by the PEP, similar to its function in the Access Evaluation Response (see {{access-evaluation-response}}).
@@ -1211,33 +1211,33 @@ The following payload defines a request for the actions that the subject of type
 
 # Policy Decision Point Metadata {#pdp-metadata}
 
-It is RECOMMENDED that Policy Decision Points provide metadata describing their configuration. 
+It is RECOMMENDED that PDPs provide metadata describing their configuration.
 
 ## Data structure {#pdp-metadata-data}
 
-The following Policy Decision Point metadata parameters are used by this specification and are registered in the IANA "AuthZEN PDP Metadata" registry established in {{iana-pdp-metadata-registry}}.
+The following Policy Decision Point metadata parameters are used by this specification and are registered in the IANA "AuthZEN Policy Decision Point Metadata" registry established in {{iana-pdp-metadata-registry}}.
 
 ### Endpoint Parameters {#pdp-metadata-data-endpoint}
 
 `policy_decision_point`:
-: REQUIRED. The Policy Decision Point's identifier, which is a URL that uses the "https" scheme and has no query or fragment components. Policy Decision Point metadata is published at a location that is ".well-known" according to {{RFC8615}} derived from this Policy Decision Point identifier, as described in {{pdp-metadata-access}}. The Policy Decision Point identifier is used to prevent Policy Decision Point mix-up attacks.
+: REQUIRED. The Policy Decision Point identifier, which is a URL that uses the "https" scheme and has no query or fragment components. Policy Decision Point metadata is published at a location that is ".well-known" according to {{RFC8615}} derived from this Policy Decision Point identifier, as described in {{pdp-metadata-access}}. The Policy Decision Point identifier is used to prevent Policy Decision Point mix-up attacks.
 
 `access_evaluation_endpoint`:
-: REQUIRED. URL of Policy Decision Point Access Evaluation API endpoint
+: REQUIRED. URL of Access Evaluation API endpoint
 
 `access_evaluations_endpoint`:
-: OPTIONAL. URL of Policy Decision Point Access Evaluations API endpoint
+: OPTIONAL. URL of Access Evaluations API endpoint
 
 `search_subject_endpoint`:
-: OPTIONAL. URL of Policy Decision Point Search API endpoint for subject element
+: OPTIONAL. URL of Search API endpoint for subject entities
 
 `search_action_endpoint`:
-: OPTIONAL. URL of Policy Decision Point Search API endpoint for action element
+: OPTIONAL. URL of Search API endpoint for action entities
 
 `search_resource_endpoint`:
-: OPTIONAL. URL of Policy Decision Point Search API endpoint for resource element
+: OPTIONAL. URL of Search API endpoint for resource entities
 
-Note: the absence of any of these parameters is sufficient for the Policy Enforcement Point to determine that the Policy Decision Point is not capable and therefore will not return a result for the associated API.
+Note: the absence of any of these parameters is sufficient for the PEP to determine that the PDP is not capable and therefore will not return a result for the associated API.
 
 ### Capabilities Parameters {#pdp-metadata-data-capabilities}
 
@@ -1246,20 +1246,20 @@ Note: the absence of any of these parameters is sufficient for the Policy Enforc
 
 ### Signature Parameter {#pdp-metadata-data-sig}
 
-In addition to JSON elements, metadata values MAY also be provided as a `signed_metadata` value, which is a JSON Web Token {{RFC7519}} that asserts metadata values about the Policy Decision Point as a bundle. A set of metadata parameters that can be used in signed metadata as claims are defined in {{pdp-metadata-data-endpoint}}. The signed metadata MUST be digitally signed or MACed using JSON Web Signature {{RFC7515}} and MUST contain an `iss` (issuer) claim denoting the party attesting to the claims in the signed metadata.
+In addition to JSON elements, metadata parameters MAY also be provided as a `signed_metadata` value, which is a JSON Web Token {{RFC7519}} that asserts metadata values about the PDP as a bundle. A set of metadata parameters that can be used in signed metadata as claims are defined in {{pdp-metadata-data-endpoint}}. The signed metadata MUST be digitally signed or MACed using JSON Web Signature {{RFC7515}} and MUST contain an `iss` (issuer) claim denoting the party attesting to the claims in the signed metadata.
 
-Consumers of the metadata MAY ignore the signed metadata if they do not support this feature. If the consumer of the metadata supports signed metadata, metadata values conveyed in the signed metadata MUST take precedence over the corresponding values conveyed using plain JSON elements. Signed metadata is included in the Policy Decision Point metadata JSON object using this OPTIONAL metadata parameter:
+A PEP MAY ignore the signed metadata if they do not support this feature. If the PEP supports signed metadata, metadata values conveyed in the signed metadata MUST take precedence over the corresponding values conveyed using plain JSON elements. Signed metadata is included in the Policy Decision Point metadata JSON object using this OPTIONAL metadata parameter:
 
 `signed_metadata`:
 : A JWT containing metadata parameters about the protected resource as claims. This is a string value consisting of the entire signed JWT. A `signed_metadata` parameter SHOULD NOT appear as a claim in the JWT; it is RECOMMENDED to reject any metadata in which this occurs.
 
 ## Obtaining Policy Decision Point Metadata {#pdp-metadata-access}
 
-Policy Decision Points supporting metadata MUST make a JSON document containing metadata as specified in the AuthZEN Policy Decision Point Metadata Registry ({{iana-pdp-metadata-registry}}) available at a URL formed by inserting a well-known URI string between the host component and the path and/or query components, if any. The well-known URI string used is `/.well-known/authzen-configuration`.
+PDPs supporting metadata MUST make a JSON document containing metadata as specified in the AuthZEN Policy Decision Point Metadata Registry ({{iana-pdp-metadata-registry}}) available at a URL formed by inserting a well-known URI string between the host component and the path and/or query components, if any. The well-known URI string used is `/.well-known/authzen-configuration`.
 
 The syntax and semantics of .well-known are defined in {{RFC8615}}. The well-known URI path suffix used is registered in the IANA "Well-Known URIs" registry {{IANA.well-known-uris}}.
 
-An example of a Policy Decision Point service supporting multiple tenants will have a discovery endpoint as follows:
+An example of a PDP supporting multiple tenants will have a discovery endpoint as follows:
 
 ~~~
 https://pdp.example.com/.well-known/authzen-configuration/tenant1
@@ -1310,9 +1310,9 @@ The recipient MUST validate that any signed metadata was signed by a key belongi
 
 This specification defines an HTTPS binding using JSON serialization which MUST be implemented by a compliant PDP.
 
-Additional transport bindings (e.g. gRPC) MAY be defined in the future in the form of profiles, and MAY be implemented by a PDP.
+Additional transport bindings (e.g. gRPC or CoAP) MAY be defined in the future in the form of profiles, and MAY be implemented by a PDP.
 
-## HTTPS Binding {#transport-https}
+## HTTPS JSON Binding {#transport-https-json}
 
 All API requests within this binding are made via an HTTPS `POST` request. 
 
@@ -1320,7 +1320,7 @@ Requests MUST include a `Content-Type` header with the value `application/json`,
 
 A successful response is an HTTPS response with a status code of `200` and a `Content-Type` of `application/json`. Its body is a JSON object that conforms to the corresponding response structure, as defined in {{table-api-endpoints}}.
 
-The request URL MUST be the value of the corresponding endpoint parameter, as defined in {{table-api-endpoints}}, if it is provided in the PDP Metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the default path, as defined in {{table-api-endpoints}}, to the Policy Decision Point's base URL (which is the `policy_decision_point` value from the PDP Metadata, if available.
+The request URL MUST be the value of the corresponding endpoint parameter, as defined in {{table-api-endpoints}}, if it is provided in the Policy Decision Point metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the default path, as defined in {{table-api-endpoints}}, to the PDP's base URL (which is the `policy_decision_point` value from the Policy Decision Point metadata, if available.
 
 The following table provides an overview of the API endpoints defined in this binding:
 
@@ -1333,7 +1333,7 @@ The following table provides an overview of the API endpoints defined in this bi
 | Action Search      | /access/v1/search/action   | search_action_endpoint      | {{action-search-request}}      | {{search-response}}      |
 {: #table-api-endpoints title="API Endpoint Overview"}      
 
-### JSON Serialization {#transport-https-json}
+### JSON Serialization {#transport-https-json-serialization}
 
 This section specifies the serialization of the information model entities and API schemas defined in this document to the JSON format {{RFC8259}}. The top-level element of all request and response bodies MUST be a JSON object ({{Section 4 of RFC8259}}). Implementations SHOULD also adhere to the security recommendations in JSON Payload Considerations ({{security-json}}).
 
@@ -1371,11 +1371,11 @@ Note: HTTPS errors are returned by the PDP to indicate an error condition relati
 
 To make this concrete:
 
-- a `401` HTTPS status code indicates that the caller (Policy Enforcement Point) did not properly authenticate to the PDP - for example, by omitting a required `Authorization` header, or using an invalid access token.
-- the PDP indicates to the caller that the authorization request is denied by sending a response with a `200` HTTPS status code, along with a payload of `{ "decision": false }`.
+- a `401` HTTPS status code indicates that the PEP did not properly authenticate to the PDP - for example, by omitting a required `Authorization` header, or using an invalid access token.
+- the PDP indicates to the PEP that the authorization request is denied by sending a response with a `200` HTTPS status code, along with a payload of `{ "decision": false }`.
 
 ### Request Identification
-All requests to the API MAY have request identifiers to uniquely identify them. The API client (PEP) is responsible for generating the request identifier. If present, it is RECOMMENDED to use the HTTPS Header `X-Request-ID` as the request identifier. The value of this header is an arbitrary string. The following non-normative example describes this header:
+All requests to the API MAY have request identifiers to uniquely identify them. The PEP is responsible for generating the request identifier. If present, it is RECOMMENDED to use the HTTPS Header `X-Request-ID` as the request identifier. The value of this header is an arbitrary string. The following non-normative example describes this header:
 
 ~~~ http
 POST /access/v1/evaluation HTTP/1.1
@@ -1685,7 +1685,7 @@ Additionally, the PDP SHOULD authenticate the calling PEP. There are several way
 
 The choice and strength of either mechanism is not in scope.
 
-Authenticating the PEP allows the PDP to avoid common attacks (such as DoS - see below) and/or reveal its internal policies. A malicious actor could craft a large number of requests to try and understand what policies the PDP is configured with. Requesting a client (PEP) be authenticated mitigates that risk.
+Authenticating the PEP allows the PDP to avoid common attacks (such as DoS - see below) and/or reveal its internal policies. A malicious actor could craft a large number of requests to try and understand what policies the PDP is configured with. Requesting a PEP be authenticated mitigates that risk.
 
 ## Sender Authentication Failure {#security-sender-authentn-fail}
 
@@ -1729,11 +1729,11 @@ The PDP SHOULD apply reasonable protections to avoid common attacks tied to requ
 ## Differences between Unsigned and Signed Metadata {#security-metadata-sig}
 
 Unsigned metadata is integrity protected by use of TLS at the site where it is hosted. This means that its security is dependent upon the Internet Public Key Infrastructure (PKI) {{RFC9525}}. Signed metadata is additionally integrity protected by the JWS signature applied by the issuer, which is not dependent upon the Internet PKI.
-When using unsigned metadata, the party issuing the metadata is the Policy Decision Point itself. Whereas, when using signed metadata, the party issuing the metadata is represented by the `iss` (issuer) claim in the signed metadata. When using signed metadata, applications can make trust decisions based on the issuer that performed the signing -- information that is not available when using unsigned metadata. How these trust decisions are made is out of scope for this specification.
+When using unsigned metadata, the party issuing the metadata is the PDP itself. Whereas, when using signed metadata, the party issuing the metadata is represented by the `iss` (issuer) claim in the signed metadata. When using signed metadata, applications can make trust decisions based on the issuer that performed the signing -- information that is not available when using unsigned metadata. How these trust decisions are made is out of scope for this specification.
 
 ## Metadata Caching {#security-metadata-caching}
 
-Policy decision point metadata is retrieved using an HTTP GET request, as specified in {{pdp-metadata-access-request}}. Normal HTTP caching behaviors apply, meaning that the GET may retrieve a cached copy of the content, rather than the latest copy. Implementations should utilize HTTP caching directives such as Cache-Control with max-age, as defined in {{RFC7234}}, to enable caching of retrieved metadata for appropriate time periods.
+Policy Decision Point metadata is retrieved using an HTTP GET request, as specified in {{pdp-metadata-access-request}}. Normal HTTP caching behaviors apply, meaning that the GET may retrieve a cached copy of the content, rather than the latest copy. Implementations should utilize HTTP caching directives such as Cache-Control with max-age, as defined in {{RFC7234}}, to enable caching of retrieved metadata for appropriate time periods.
 
 # IANA Considerations {#iana}
 
@@ -1832,7 +1832,7 @@ Metadata Name:
 : `search_subject_endpoint`
 
 Metadata Description:
-: URL of the Policy Decision Point's Search API endpoint based on Subject element
+: URL of the Policy Decision Point's Search API endpoint for Subject entities
 
 Change Controller:
 : OpenID Foundation AuthZEN Working Group
@@ -1847,7 +1847,7 @@ Metadata Name:
 : `search_resource_endpoint`
 
 Metadata Description:
-: URL of the Policy Decision Point's Search API endpoint based on Resource element
+: URL of the Policy Decision Point's Search API endpoint for Resource entities
 
 Change Controller:
 : OpenID Foundation AuthZEN Working Group
@@ -1862,7 +1862,7 @@ Metadata Name:
 : `search_action_endpoint`
 
 Metadata Description:
-: URL of the Policy Decision Point's Search API endpoint based on Action element
+: URL of the Policy Decision Point's Search API endpoint for Action entities
 
 Change Controller:
 : OpenID Foundation AuthZEN Working Group
@@ -1877,7 +1877,7 @@ Metadata Name:
 : `capabilities`
 
 Metadata Description:
-: Array of URNs describing specific PDP capabilities
+: Array of URNs describing specific Policy Decision Point capabilities
 
 Change Controller:
 : OpenID Foundation AuthZEN Working Group
@@ -1925,7 +1925,7 @@ Related Information:
 
 ## AuthZEN Policy Decision Point Capabilities Registry {#iana-pdp-capabilities-registry}
 
-This specification asks IANA to establish the "AuthZEN Policy Decision Point Capabilities" registry under the registry group "AuthZEN Parameters". The registry contains AuthZEN Policy Decision Point specific capabilities or features. These URNs are intended to be used in PDP metadata discovery documents (as described in {{pdp-metadata}}) to allow clients to determine the supported functionality of a given PDP instance. The content of this registry will be specified by AuthZEN-compliant PDP vendors that want to declare interoperable capabilities.
+This specification asks IANA to establish the "AuthZEN Policy Decision Point Capabilities" registry under the registry group "AuthZEN Parameters". The registry contains PDP-specific capabilities or features. These URNs are intended to be used in Policy Decision Point metadata discovery documents (as described in {{pdp-metadata}}) to allow a PEP to determine the supported functionality of a given PDP instance. The content of this registry will be specified by AuthZEN-compliant PDP vendors that want to declare interoperable capabilities.
 
 ### Registry Definition {#iana-pdp-capabilities-definition}
 
@@ -1940,7 +1940,7 @@ Reference: \[This Document\]
 Capability Name:
 : The name of the capability. This name MUST begin with the colon (":") character. This name is case-sensitive. Names may not match other registered names in a case-insensitive manner unless the Designated Experts state that there is a compelling reason to allow an exception.
 
-Capability URN: The URN of the AuthZEN PDP Capability.
+Capability URN: The URN of the AuthZEN Policy Decision Point Capability.
 
 Capability Description:
 : Brief description of the capability.
