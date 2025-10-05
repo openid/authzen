@@ -99,23 +99,27 @@ The Authorization API enables Policy Decision Points (PDPs) and Policy Enforceme
 Computational services often implement access control within their components by separating Policy Decision Points (PDPs) from Policy Enforcement Points (PEPs). PDPs and PEPs are defined in XACML ({{XACML}}) and NIST's ABAC SP 800-162 ({{NIST.SP.800-162}}). Communication between PDPs and PEPs follows similar patterns across different software and services that require or provide authorization information. The Authorization API described in this document enables different providers to offer PDP and PEP capabilities without having to bind themselves to one particular implementation of a PDP or PEP.
 
 # Model
-The Authorization API is a transport-agnostic API published by the PDP, to which the PEP acts as a client. Possible bindings of this specification, such as HTTPS, gRPC or CoAP, are described in Transport ({{transport}}).
+By convention, we refer to a service that implements this API as a Policy Decision Point, or PDP. The policy language, architecture, and state management aspects of a PDP are beyond the scope of this specification.
+
+By convention, we refer to a client of the Authorization API as a Policy Enforcement Point, or PEP. Clients may consume the Authorization API for use cases that go beyond  enforcement of authorization decisions; for example, the Resource Search API ({{resource-search-api}}) allows a caller to discover the resources on which a subject can perform an action. For consistency, we use the term PEP to describe a client of the API, regardless of the use case.
+
+The Authorization API is defined in a transport-agnostic manner. A normative HTTPS binding is described in Transport ({{transport}}). Other bindings, such as gRPC, may be defined in other profiles of this specification.
 
 Authentication for the Authorization API itself is out of scope for this document, since authentication for APIs is well-documented elsewhere. Support for OAuth 2.0 ({{RFC6749}}) is RECOMMENDED.
 
 # Features
-The core feature of the Authorization API is the Access Evaluation API, which enables a PEP to determine whether a specific request can be permitted to access a specific resource. The following are non-normative examples:
+The core feature of the Authorization API is the Access Evaluation API ({{access-evaluation-api}}), which enables a PEP to determine whether a specific request can be permitted to access a specific resource. The following are non-normative examples:
 
 - Can Alice view document #123?
 - Can Alice view document #123 at 16:30 on Tuesday, June 11, 2024?
 - Can a manager print?
 
-The Access Evaluations API enables execution of multiple evaluations in a single request. The following are non-normative examples:
+The Access Evaluations API ({{access-evaluations-api}}) enables execution of multiple evaluations in a single request. The following are non-normative examples:
 
 - Can Alice view documents 123, 234 and 345 on Tuesday, June 11, 2024?
 - Can document 123 be viewed by Alice and Bob?
 
-The Search APIs provide lists of resources, subjects or actions that would be allowed access. The following are non-normative examples:
+The Search APIs ({{search}}) provide lists of resources, subjects or actions that would be allowed access. The following are non-normative examples:
 
 - Which documents can Alice view?
 - Who can view document 123?
@@ -1123,6 +1127,24 @@ The following payload defines a request for the subjects of type `user` that can
 ~~~
 {: #subject-search-request-example title="Example Subject Search API Request"}
 
+The following payload defines a valid response to this request.
+
+~~~ json
+{
+  "results": [
+    {
+      "type": "user",
+      "id": "alice@example.com"
+    },
+    {
+      "type": "user",
+      "id": "bob@example.com"
+    }
+  ]
+}
+~~~
+{: #subject-search-response-example title="Example Subject Search API Response"}
+
 ## Resource Search API {#resource-search-api}
 
 The Resource Search API returns all resources of a given type that are permitted according to the provided Action ({{action}}), Subject ({{subject}}), and Context ({{context}}).
@@ -1166,6 +1188,24 @@ The following payload defines a request for the resources of type `account` on w
 ~~~
 {: #resource-search-request-example title="Example Resource Search API Request"}
 
+The following payload defines a valid response to this request.
+
+~~~ json
+{
+  "results": [
+    {
+      "type": "account",
+      "id": "123"
+    },
+    {
+      "type": "account",
+      "id": "456"
+    }
+  ]
+}
+~~~
+{: #resource-search-response-example title="Example Resource Search API Response"}
+
 ## Action Search API {#action-search-api}
 
 The Action Search API returns all actions that are permitted according to the provided Subject ({{subject}}), Resource ({{resource}}), and Context ({{context}}).
@@ -1196,7 +1236,7 @@ The following payload defines a request for the actions that the subject of type
 {
   "subject": {
     "type": "user",
-    "id": "123"
+    "id": "alice@example.com"
   },
   "resource": {
     "type": "account",
@@ -1208,6 +1248,22 @@ The following payload defines a request for the actions that the subject of type
 }
 ~~~
 {: #action-search-request-example title="Example Action Search API Request"}
+
+The following payload defines a valid response to this request.
+
+~~~ json
+{
+  "results": [
+    {
+      "name": "can_read"
+    },
+    {
+      "name": "can_write"
+    }
+  ]
+}
+~~~
+{: #action-search-response-example title="Example Action Search API Response"}
 
 # Policy Decision Point Metadata {#pdp-metadata}
 
