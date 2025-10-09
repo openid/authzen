@@ -23,10 +23,10 @@ AuthZEN IdP Interop is a full-stack React Router v7 application that showcases h
 ## Adding an Additional Identity Provider
 
 1. **Create a new route module** under `app/routes/idp/<provider>.ts` that mirrors `app/routes/idp/auth0.ts`. Import route types as `import type { Route } from "./+types/<provider>";` and implement a loader that handles both the `/login` kickoff and the `/callback` return.
-2. **Register the route** in `app/routes.ts`, e.g. `route("/idp/okta/*", "routes/idp/okta.ts")`. Run `pnpm typecheck` to generate the new `./+types/okta` module.
+2. **Register the route** in `app/routes.ts`, e.g. `route("/idp/okta/*", "routes/idp/okta.ts")`. Run `pnpm typecheck` to generate the new `./+types/<route>` module.
 3. **Instrument audit logging** via `pushAuditLog(AuditType.AuthN, …)` to keep the Authentication log consistent.
 4. **Expose a login entry point** by adding a button or link in `app/routes/home.tsx` that points to `/idp/<provider>/login`.
-5. **Configure provider-specific secrets** (e.g., `OKTA_DOMAIN`, `OKTA_CLIENT_ID`, etc.) and document them in your environment management system.
+5. **Configure provider-specific secrets** (e.g., `OKTA_DOMAIN`, `OKTA_CLIENT_ID`, etc.) and send them to Alex Olivier to update the production deployment.
 
 ## Adding a Policy Decision Point
 
@@ -71,7 +71,7 @@ Example JSON payload (before encoding):
 
 ```json
 {
-  "cerbos-cloud": {
+  "cerbos": {
     "host": "https://demo-pdp.cerbos.cloud",
     "headers": {
       "Authorization": "Bearer <token-from-cerbos>"
@@ -86,7 +86,7 @@ Example JSON payload (before encoding):
 Encode and export it (macOS/Linux):
 
 ```bash
-export PDP_CONFIG=$(printf '%s' '{"cerbos-cloud":{"host":"https://demo-pdp.cerbos.cloud","headers":{"Authorization":"Bearer <token>"}},"local":{"host":"http://localhost:3593"}}' | base64)
+export PDP_CONFIG=$(printf '%s' '{"cerbos":{"host":"https://demo-pdp.cerbos.cloud","headers":{"Authorization":"Bearer <token>"}},"local":{"host":"http://localhost:3593"}}' | base64)
 ```
 
 On Windows PowerShell:
@@ -109,21 +109,6 @@ The UI lists all keys in this object and makes the first entry the default PDP.
   ```
   `pnpm start` serves the SSR build from `build/`.
 - **Docker:** Use the provided `Dockerfile` (`docker build -t authzen-idp .` followed by `docker run -p 3000:3000 authzen-idp`).
-
-## Working with the Authorization Proxy
-
-`POST /access/*` requests mirror the downstream PDP API. For example, with `PDP_CONFIG` containing a PDP key `cerbos-cloud` whose host exposes `/access/check`, the UI will POST to `/access/check` and forward the body and headers defined in the configuration.
-
-Manual test with curl while the dev server runs:
-
-```bash
-curl \
-  -X POST http://localhost:5173/access/check \
-  -H 'Content-Type: application/json' \
-  -d '{"inputs":[{"resource":{"kind":"document","id":"1"},"principal":{"id":"demo","roles":["admin"]},"actions":["view"]}]}'
-```
-
-Responses and errors are emitted into the Authorization audit log panel.
 
 ## Observability and Troubleshooting
 
