@@ -1,0 +1,32 @@
+[
+  {
+    "id": "alice",
+    "role": "manager",
+    "balance": 110
+  },
+  {
+    "id": "bob",
+    "role": "editor",
+    "balance": 60
+  },
+  {
+    "id": "carol",
+    "role": "contractor",
+    "balance": 0
+  },
+  {
+    "id": "dan",
+    "role": "manager",
+    "balance": 60
+  },
+  {
+    "id": "erin",
+    "role": "editor",
+    "balance": 110
+  },
+  {
+    "id": "felix",
+    "role": "contractor",
+    "balance": 100
+  }
+]

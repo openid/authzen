@@ -1,0 +1,136 @@
+{
+  "evaluation": [
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice",
+          "properties": {
+            "role": "manager",
+            "balance": 110
+          }
+        },
+        "resource": {
+          "type": "application",
+          "id": "DemoApp"
+        },
+        "action": {
+          "name": "issue"
+        }
+      },
+      "expected": {
+        "decision": true
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob",
+          "properties": {
+            "role": "editor",
+            "balance": 60
+          }
+        },
+        "resource": {
+          "type": "application",
+          "id": "DemoApp"
+        },
+        "action": {
+          "name": "issue"
+        }
+      },
+      "expected": {
+        "decision": true
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol",
+          "properties": {
+            "role": "contractor",
+            "balance": 0
+          }
+        },
+        "resource": {
+          "type": "application",
+          "id": "DemoApp"
+        },
+        "action": {
+          "name": "issue"
+        }
+      },
+      "expected": {
+        "decision": false
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan",
+          "properties": {
+            "role": "manager",
+            "balance": 60
+          }
+        },
+        "resource": {
+          "type": "application",
+          "id": "DemoApp"
+        },
+        "action": {
+          "name": "issue"
+        }
+      },
+      "expected": {
+        "decision": true
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin",
+          "properties": {
+            "role": "editor",
+            "balance": 110
+          }
+        },
+        "resource": {
+          "type": "application",
+          "id": "DemoApp"
+        },
+        "action": {
+          "name": "issue"
+        }
+      },
+      "expected": {
+        "decision": true
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix",
+          "properties": {
+            "role": "contractor",
+            "balance": 100
+          }
+        },
+        "resource": {
+          "type": "application",
+          "id": "DemoApp"
+        },
+        "action": {
+          "name": "issue"
+        }
+      },
+      "expected": {
+        "decision": false
+      }
+    }
+  ]
+}
