@@ -1,0 +1,95 @@
+{
+  "evaluation": [
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice"
+        },
+        "action": {
+          "name": "delete"
+        },
+        "resource": {
+          "type": "record"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "101"
+          },
+          {
+            "type": "record",
+            "id": "107"
+          },
+          {
+            "type": "record",
+            "id": "113"
+          },
+          {
+            "type": "record",
+            "id": "119"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "bob"
+        },
+        "action": {
+          "name": "delete"
+        },
+        "resource": {
+          "type": "record"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "102"
+          },
+          {
+            "type": "record",
+            "id": "108"
+          },
+          {
+            "type": "record",
+            "id": "114"
+          },
+          {
+            "type": "record",
+            "id": "120"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "carol"
+        },
+        "action": {
+          "name": "delete"
+        },
+        "resource": {
+          "type": "record"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "103"
+          },
+          {
+            "type": "record",
+            "id": "109"
+          },
+          {
+            "type": "record",
