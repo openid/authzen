@@ -1,32 +1,26 @@
 [
   {
     "id": "alice",
-    "role": "manager",
-    "balance": 110
+    "password": "VerySecret123!"
   },
   {
     "id": "bob",
-    "role": "editor",
-    "balance": 60
+    "password": "VerySecret123!"
   },
   {
     "id": "carol",
-    "role": "contractor",
-    "balance": 0
+    "password": "VerySecret123!"
   },
   {
     "id": "dan",
-    "role": "manager",
-    "balance": 60
+    "password": "VerySecret123!"
   },
   {
     "id": "erin",
-    "role": "editor",
-    "balance": 110
+    "password": "VerySecret123!"
   },
   {
     "id": "felix",
-    "role": "contractor",
-    "balance": 100
+    "password": "VerySecret123!"
   }
 ]
