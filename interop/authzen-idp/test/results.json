@@ -93,3 +93,100 @@
           },
           {
             "type": "record",
+            "id": "115"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "dan"
+        },
+        "action": {
+          "name": "delete"
+        },
+        "resource": {
+          "type": "record"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "104"
+          },
+          {
+            "type": "record",
+            "id": "110"
+          },
+          {
+            "type": "record",
+            "id": "116"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "erin"
+        },
+        "action": {
+          "name": "delete"
+        },
+        "resource": {
+          "type": "record"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "105"
+          },
+          {
+            "type": "record",
+            "id": "111"
+          },
+          {
+            "type": "record",
+            "id": "117"
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "felix"
+        },
+        "action": {
+          "name": "delete"
+        },
+        "resource": {
+          "type": "record"
+        }
+      },
+      "expected": {
+        "results": [
+          {
+            "type": "record",
+            "id": "106"
+          },
+          {
+            "type": "record",
+            "id": "112"
+          },
+          {
+            "type": "record",
+            "id": "118"
+          }
+        ]
+      }
+    }
+  ]
+}
