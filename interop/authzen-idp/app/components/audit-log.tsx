@@ -146,7 +146,7 @@ function AuthorizationDetails({ body }: { body: AuthorizationAuditRecord }) {
 	);
 }
 
-function JsonPreview({ data, label }: { data: unknown; label: string }) {
+export function JsonPreview({ data, label }: { data: unknown; label: string }) {
 	if (data === undefined || data === null) {
 		return null;
 	}

@@ -1,6 +1,6 @@
 import { type ReactNode, useMemo } from "react";
 import { type FetcherWithComponents, redirect, useFetcher } from "react-router";
-import { AuditLog } from "~/components/audit-log";
+import { AuditLog, JsonPreview } from "~/components/audit-log";
 import { IdToken } from "~/components/id-token.client";
 import { PDPPicker } from "~/components/pdp-picker";
 import { Badge } from "~/components/ui/badge";
@@ -119,23 +119,12 @@ function HomeHeader({ activePdp, pdps, onSelectPdp }: HomeHeaderProps) {
 
 function IdentityProviderSection({ idToken }: { idToken: string | null }) {
 	const tokenPayload = useMemo(() => decodeJwtPayload(idToken), [idToken]);
-	const levelClaimValue =
-		tokenPayload && "level" in tokenPayload ? tokenPayload.level : undefined;
-	const formattedLevelClaim =
-		levelClaimValue !== undefined ? formatClaimValue(levelClaimValue) : null;
+	const recordClaimValue =
+		tokenPayload && "record" in tokenPayload ? tokenPayload.record : undefined;
+
 	const hasIdToken = Boolean(idToken);
 
-	const levelStatus = hasIdToken
-		? levelClaimValue === undefined
-			? {
-					badge: <Badge variant="destructive">Missing</Badge>,
-					description: "The ID token did not include a `level` claim.",
-				}
-			: {
-					badge: <Badge>{formattedLevelClaim}</Badge>,
-					description: "Level claim returned by the IdP.",
-				}
-		: undefined;
+
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -163,16 +152,28 @@ function IdentityProviderSection({ idToken }: { idToken: string | null }) {
 							!hasIdToken && "bg-red-100",
 						)}
 					/>
-					{levelStatus && (
-						<StatusItem
-							badge={levelStatus.badge}
-							description={levelStatus.description}
-							label="Level claim"
-							className={cn(
-								formattedLevelClaim === "silver" && "bg-stone-200",
-								formattedLevelClaim === "bronze" && "bg-orange-200",
-							)}
-						/>
+					<StatusItem
+						badge={
+							recordClaimValue ? (
+								<Badge>Claim set</Badge>
+							) : (
+								<Badge variant="destructive">Missing</Badge>
+							)
+						}
+						label="Record claim"
+						description={
+							!!recordClaimValue
+								? "Record claim returned by the IdP."
+								: "No record claim detected."
+						}
+						
+						className={cn(
+							!!recordClaimValue && "bg-green-300",
+							!recordClaimValue && "bg-red-100",
+						)}
+					/>
+					{!!recordClaimValue && (
+						<JsonPreview data={recordClaimValue} label="Record claim value" />
 					)}
 				</CardContent>
 			</Card>
