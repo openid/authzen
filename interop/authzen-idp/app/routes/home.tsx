@@ -173,7 +173,9 @@ function IdentityProviderSection({ idToken }: { idToken: string | null }) {
 						)}
 					/>
 					{!!recordClaimValue && (
+						<div className="text-xs">
 						<JsonPreview data={recordClaimValue} label="Record claim value" />
+						</div>
 					)}
 				</CardContent>
 			</Card>
@@ -207,20 +209,6 @@ function StatusItem({
 			<p className="mt-1 text-xs text-muted-foreground">{description}</p>
 		</div>
 	);
-}
-
-function formatClaimValue(value: unknown): string {
-	if (value === null) {
-		return "null";
-	}
-	if (
-		typeof value === "string" ||
-		typeof value === "number" ||
-		typeof value === "boolean"
-	) {
-		return String(value);
-	}
-	return JSON.stringify(value);
 }
 
 interface AuditLogSectionProps {

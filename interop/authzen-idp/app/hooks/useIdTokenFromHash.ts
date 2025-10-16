@@ -41,6 +41,7 @@ function extractIdToken(hash: string): string | null {
 		const params = new URLSearchParams(
 			hash.startsWith("#") ? hash.slice(1) : hash,
 		);
+		console.log(params)
 		return params.get("id_token");
 	} catch {
 		return null;

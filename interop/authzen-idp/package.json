@@ -10,7 +10,6 @@
 		"lint:fix": "biome check --write"
 	},
 	"dependencies": {
-		"@badgateway/oauth2-client": "^3.3.1",
 		"@hookform/resolvers": "^5.2.2",
 		"@radix-ui/react-dialog": "^1.1.15",
 		"@radix-ui/react-dropdown-menu": "^2.1.16",
@@ -30,6 +29,7 @@
 		"clsx": "^2.1.1",
 		"isbot": "^5.1.27",
 		"lucide-react": "^0.544.0",
+		"openid-client": "^6.8.1",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0",
 		"react-hook-form": "^7.62.0",

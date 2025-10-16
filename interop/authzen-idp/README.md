@@ -7,7 +7,7 @@ AuthZEN IdP Interop is a full-stack React Router v7 application that showcases h
 ## Architecture at a Glance
 
 - **Framework** – React Router v7 in framework mode provides loaders/actions, SSR, and file-based hydration. Component code lives in `app/`, with routes configured in `app/routes.ts`.
-- **Identity Provider flow** – The default IdP integration is Auth0 (`app/routes/idp/auth0.ts`). The route loader handles both `/login` initiation and `/callback` response handling via `@badgateway/oauth2-client`.
+- **Identity Provider flow** – The default IdP integration is Auth0 (`app/routes/idp/auth0.ts`). The route loader handles both `/login` initiation and `/callback` response handling via `openid-client`.
 - **PDP proxy** – `app/routes/authorize.ts` receives `POST /access/*` requests, forwards them to the active PDP using `app/lib/pdpClient.ts`, and streams the PDP JSON back to the client.
 - **State & telemetry** – `app/lib/pdpState.ts` tracks the active PDP sourced from environment configuration, and `app/lib/auditLog.ts` records structured authentication (`AuthN`) and authorization (`AuthZ`) events for display in the UI (`app/components/audit-log.tsx`).
 
