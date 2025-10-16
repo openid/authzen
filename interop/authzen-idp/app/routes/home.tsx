@@ -1,5 +1,5 @@
-import { type ReactNode, useMemo } from "react";
-import { type FetcherWithComponents, redirect, useFetcher } from "react-router";
+import { type ReactNode, useCallback, useMemo } from "react";
+import { redirect, useFetcher } from "react-router";
 import { AuditLog, JsonPreview } from "~/components/audit-log";
 import { IdToken } from "~/components/id-token.client";
 import { PDPPicker } from "~/components/pdp-picker";
@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useAuditLogPolling } from "~/hooks/useAuditLogPolling";
 import { useIdTokenFromHash } from "~/hooks/useIdTokenFromHash";
 import { clearAuditLog } from "~/lib/auditLog";
-import { decodeJwtPayload } from "~/lib/jwt";
+import { decodeJwtPayload, type JwtPayload } from "~/lib/jwt";
 import { getActivePdp, listPdps, setActivePdp } from "~/lib/pdpState";
 import { cn } from "~/lib/utils";
 import type { AuditEntry } from "~/types/audit";
@@ -47,32 +47,53 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-	const pdpFetcher = useFetcher();
+	const { activePdp, pdps } = loaderData;
+	const setPdpFetcher = useFetcher();
 	const clearFetcher = useFetcher();
 	const auditFetcher = useFetcher<{ auditLog: AuditEntry[] }>();
 
 	useAuditLogPolling(auditFetcher);
-	const idToken = useIdTokenFromHash();
-	const auditEntries = auditFetcher.data?.auditLog ?? [];
 
-	const handlePdpSelection = (pdp: string) => {
-		const returnTo =
-			typeof window === "undefined" ? "/" : window.location.pathname;
-		pdpFetcher.submit(
-			{
-				intent: "set-active-pdp",
-				pdp,
-				returnTo,
-			},
-			{ method: "post" },
-		);
-	};
+	const idToken = useIdTokenFromHash();
+	const tokenPayload = useMemo(() => decodeJwtPayload(idToken), [idToken]);
+	const auditEntries = auditFetcher.data?.auditLog ?? [];
+	const isClearingAuditLog = clearFetcher.state !== "idle";
+	const isUpdatingPdp = setPdpFetcher.state !== "idle";
+
+	const handlePdpSelection = useCallback(
+		(pdp: string) => {
+			if (!pdp || pdp === activePdp) {
+				return;
+			}
+
+			const returnTo = getCurrentPathname();
+
+			setPdpFetcher.submit(
+				{
+					intent: "set-active-pdp",
+					pdp,
+					returnTo,
+				},
+				{ method: "post" },
+			);
+		},
+		[activePdp, setPdpFetcher],
+	);
+
+	const handleClearAuditLog = useCallback(() => {
+		if (clearFetcher.state !== "idle") {
+			return;
+		}
+
+		clearFetcher.submit({ intent: "clear-audit-log" }, { method: "post" });
+	}, [clearFetcher]);
 
 	return (
 		<main className="flex-1 bg-background">
 			<HomeHeader
-				activePdp={loaderData.activePdp}
-				pdps={loaderData.pdps}
+				activePdp={activePdp}
+				isUpdatingPdp={isUpdatingPdp}
+				pdps={pdps}
 				onSelectPdp={handlePdpSelection}
 			/>
 			<div className="container mx-auto my-4">
@@ -88,11 +109,15 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 				</Card>
 			</div>
 			<div className="container mx-auto my-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-				<IdentityProviderSection idToken={idToken} />
+				<IdentityProviderSection
+					idToken={idToken}
+					tokenPayload={tokenPayload}
+				/>
 				<div className="md:col-span-2">
 					<AuditLogSection
 						auditEntries={auditEntries}
-						clearFetcher={clearFetcher}
+						isClearing={isClearingAuditLog}
+						onClear={handleClearAuditLog}
 					/>
 				</div>
 			</div>
@@ -103,22 +128,38 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 interface HomeHeaderProps {
 	activePdp: string;
 	pdps: string[];
+	isUpdatingPdp: boolean;
 	onSelectPdp: (pdp: string) => void;
 }
 
-function HomeHeader({ activePdp, pdps, onSelectPdp }: HomeHeaderProps) {
+function HomeHeader({
+	activePdp,
+	pdps,
+	isUpdatingPdp,
+	onSelectPdp,
+}: HomeHeaderProps) {
 	return (
 		<div className="bg-sidebar-primary-foreground border-b border-b-border">
 			<div className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:gap-6">
 				<h1 className="text-2xl font-bold">OpenID AuthZEN IdP Interop</h1>
-				<PDPPicker activePdp={activePdp} pdpList={pdps} setPdp={onSelectPdp} />
+				<PDPPicker
+					activePdp={activePdp}
+					disabled={!pdps.length || isUpdatingPdp}
+					pdpList={pdps}
+					setPdp={onSelectPdp}
+				/>
 			</div>
 		</div>
 	);
 }
 
-function IdentityProviderSection({ idToken }: { idToken: string | null }) {
-	const tokenPayload = useMemo(() => decodeJwtPayload(idToken), [idToken]);
+function IdentityProviderSection({
+	idToken,
+	tokenPayload,
+}: {
+	idToken: string | null;
+	tokenPayload: JwtPayload | null;
+}) {
 	const recordClaimValue =
 		tokenPayload && "record" in tokenPayload ? tokenPayload.record : undefined;
 
@@ -210,29 +251,39 @@ function StatusItem({
 
 interface AuditLogSectionProps {
 	auditEntries: AuditEntry[];
-	clearFetcher: FetcherWithComponents<unknown>;
+	isClearing: boolean;
+	onClear: () => void;
 }
 
-function AuditLogSection({ auditEntries, clearFetcher }: AuditLogSectionProps) {
+function AuditLogSection({
+	auditEntries,
+	isClearing,
+	onClear,
+}: AuditLogSectionProps) {
 	return (
 		<Card>
 			<CardHeader className="flex flex-row items-center justify-between gap-2">
 				<CardTitle>{`IdP->PDP Request Log`}</CardTitle>
-				<clearFetcher.Form className="flex" method="post">
-					<input name="intent" type="hidden" value="clear-audit-log" />
-					<Button
-						disabled={clearFetcher.state !== "idle"}
-						size="sm"
-						type="submit"
-						variant="outline"
-					>
-						Clear
-					</Button>
-				</clearFetcher.Form>
+				<Button
+					disabled={isClearing}
+					onClick={onClear}
+					size="sm"
+					type="button"
+					variant="outline"
+				>
+					Clear
+				</Button>
 			</CardHeader>
 			<CardContent className="space-y-4">
 				<AuditLog entries={auditEntries} />
 			</CardContent>
 		</Card>
 	);
+}
+
+function getCurrentPathname(): string {
+	if (typeof window === "undefined") {
+		return "/";
+	}
+	return window.location.pathname || "/";
 }

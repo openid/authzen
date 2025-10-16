@@ -7,34 +7,31 @@ export async function callPdp({ endpoint, payload, pdpId }: PdpRequestArgs) {
 	const pdp = getPdpConfig(pdpId);
 	const url = buildPdpUrl(pdp.host, endpoint);
 	const headers = buildHeaders(pdp.headers);
+	const body = JSON.stringify(payload);
 
 	let response: Response;
 	try {
 		response = await fetch(url, {
 			method: "POST",
 			headers,
-			body: JSON.stringify(payload),
+			body,
 		});
 	} catch (error) {
-		pushAuditLog(AuditType.AuthZ, {
-			endpoint,
-			payload,
-			pdpId,
-			ok: false,
-			message: error instanceof Error ? error.message : "Failed to reach PDP",
-		});
+		pushAuditLog(
+			AuditType.AuthZ,
+			createFailureRecord(endpoint, payload, pdpId, error),
+		);
 		throw error;
 	}
 
 	const responseBody = await parseJson(response);
-	const auditRecord: AuthorizationAuditRecord = {
+	const auditRecord = createAuditRecord({
 		endpoint,
 		payload,
 		pdpId,
-		ok: response.ok,
-		response: responseBody,
-		message: !response.ok ? response.statusText : undefined,
-	};
+		response,
+		responseBody,
+	});
 
 	pushAuditLog(AuditType.AuthZ, auditRecord);
 
@@ -46,6 +43,44 @@ export async function callPdp({ endpoint, payload, pdpId }: PdpRequestArgs) {
 	}
 
 	return responseBody;
+}
+
+function createFailureRecord(
+	endpoint: string,
+	payload: unknown,
+	pdpId: string,
+	error: unknown,
+): AuthorizationAuditRecord {
+	return {
+		endpoint,
+		payload,
+		pdpId,
+		ok: false,
+		message: error instanceof Error ? error.message : "Failed to reach PDP",
+	};
+}
+
+function createAuditRecord({
+	endpoint,
+	payload,
+	pdpId,
+	response,
+	responseBody,
+}: {
+	endpoint: string;
+	payload: unknown;
+	pdpId: string;
+	response: Response;
+	responseBody: unknown;
+}): AuthorizationAuditRecord {
+	return {
+		endpoint,
+		payload,
+		pdpId,
+		ok: response.ok,
+		response: responseBody,
+		message: response.ok ? undefined : response.statusText || "Unknown error",
+	};
 }
 
 function buildHeaders(customHeaders?: Record<string, string>): Headers {

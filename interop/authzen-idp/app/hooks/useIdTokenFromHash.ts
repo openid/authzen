@@ -13,11 +13,15 @@ export function useIdTokenFromHash(): string | null {
 			const token = extractIdToken(window.location.hash);
 			if (token) {
 				hasPersistedToken.current = true;
-				setIdToken(token);
+				setIdToken((currentToken) =>
+					currentToken === token ? currentToken : token,
+				);
 				const url = `${window.location.pathname}${window.location.search}`;
 				window.history.replaceState(null, "", url);
 			} else if (!hasPersistedToken.current) {
-				setIdToken(null);
+				setIdToken((currentToken) =>
+					currentToken === null ? currentToken : null,
+				);
 			}
 		};
 
@@ -41,8 +45,7 @@ function extractIdToken(hash: string): string | null {
 		const params = new URLSearchParams(
 			hash.startsWith("#") ? hash.slice(1) : hash,
 		);
-		console.log(params);
-		return params.get("id_token");
+		return params.get("id_token") ?? null;
 	} catch {
 		return null;
 	}

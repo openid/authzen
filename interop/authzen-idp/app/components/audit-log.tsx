@@ -20,7 +20,11 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 });
 
 export function AuditLog({ entries }: AuditLogProps) {
-	if (entries.filter((e) => e.type === AuditType.AuthZ).length === 0) {
+	const authorizationEntries = entries.filter(
+		(entry) => entry.type === AuditType.AuthZ,
+	);
+
+	if (authorizationEntries.length === 0) {
 		return (
 			<p className="text-sm text-muted-foreground">
 				Audit events will appear here once activity is recorded.
@@ -31,14 +35,12 @@ export function AuditLog({ entries }: AuditLogProps) {
 	return (
 		<ScrollArea className="max-h-[50rem] overflow-scroll">
 			<div className="space-y-2">
-				{entries
-					.filter((e) => e.type === AuditType.AuthZ)
-					.map((entry, index) => (
-						<AuditLogEntry
-							key={`${entry.timestamp}-${entry.type}-${index}`}
-							entry={entry}
-						/>
-					))}
+				{authorizationEntries.map((entry, index) => (
+					<AuditLogEntry
+						key={`${entry.timestamp}-${entry.type}-${index}`}
+						entry={entry}
+					/>
+				))}
 			</div>
 		</ScrollArea>
 	);
@@ -73,7 +75,10 @@ function AuditLogSummary({
 	if (type === AuditType.AuthN) {
 		return <AuthenticationSummary body={body} />;
 	}
-	return <AuthorizationSummary body={body} />;
+	if (type === AuditType.AuthZ) {
+		return <AuthorizationSummary body={body} />;
+	}
+	return null;
 }
 
 function AuthenticationSummary({ body }: { body: AuditEntry["body"] }) {
@@ -151,6 +156,8 @@ export function JsonPreview({ data, label }: { data: unknown; label: string }) {
 		return null;
 	}
 
+	const formatted = formatJson(data);
+
 	return (
 		<div>
 			<p className="font-medium uppercase tracking-wide text-foreground">
@@ -158,7 +165,7 @@ export function JsonPreview({ data, label }: { data: unknown; label: string }) {
 			</p>
 
 			<SyntaxHighlighter language="json" style={docco}>
-				{formatJson(data)}
+				{formatted}
 			</SyntaxHighlighter>
 		</div>
 	);

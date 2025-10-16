@@ -8,23 +8,28 @@ export function useAuditLogPolling(
 	intervalMs = DEFAULT_POLL_INTERVAL_MS,
 ): void {
 	const hasLoadedRef = useRef(false);
+	const intervalRef = useRef<number | undefined>(undefined);
 
 	useEffect(() => {
 		if (typeof window === "undefined") {
 			return;
 		}
 
-		if (!hasLoadedRef.current && fetcher.state === "idle") {
+		if (!hasLoadedRef.current) {
 			hasLoadedRef.current = true;
 			fetcher.load("/audit-log");
 		}
 
-		const intervalId = window.setInterval(() => {
+		intervalRef.current = window.setInterval(() => {
 			if (fetcher.state === "idle") {
 				fetcher.load("/audit-log");
 			}
 		}, intervalMs);
 
-		return () => window.clearInterval(intervalId);
-	}, [fetcher, fetcher.state, intervalMs]);
+		return () => {
+			if (intervalRef.current !== undefined) {
+				window.clearInterval(intervalRef.current);
+			}
+		};
+	}, [fetcher, intervalMs]);
 }

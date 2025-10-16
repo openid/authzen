@@ -4,7 +4,7 @@ import type { PdpConfig } from "~/types/pdp";
 let activePdp = getInitialActivePdp();
 
 function getInitialActivePdp(): string {
-	const [firstPdp] = Object.keys(pdps);
+	const [firstPdp] = listPdps();
 	if (!firstPdp) {
 		throw new Error(
 			"Unable to determine initial PDP. Ensure PDP_CONFIG is set.",
@@ -25,16 +25,17 @@ export function getActivePdp(): string {
 }
 
 export function setActivePdp(pdpId: string): void {
-	if (!pdps[pdpId]) {
-		throw new Error(`PDP with ID ${pdpId} not found`);
-	}
+	assertPdpExists(pdpId);
 	activePdp = pdpId;
 }
 
 export function getPdpConfig(pdpId: string): PdpConfig {
-	const config = pdps[pdpId];
-	if (!config) {
+	assertPdpExists(pdpId);
+	return pdps[pdpId];
+}
+
+function assertPdpExists(pdpId: string): void {
+	if (!pdps[pdpId]) {
 		throw new Error(`PDP with ID ${pdpId} not found`);
 	}
-	return config;
 }

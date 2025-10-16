@@ -37,8 +37,12 @@ export function decodeJwtPayload(token: string | null): JwtPayload | null {
 		return null;
 	}
 
+	return parseJson(decoded);
+}
+
+function parseJson(value: string): JwtPayload | null {
 	try {
-		return JSON.parse(decoded) as JwtPayload;
+		return JSON.parse(value) as JwtPayload;
 	} catch {
 		return null;
 	}
