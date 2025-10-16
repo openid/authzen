@@ -1,7 +1,6 @@
 import { decodeJwtPayload } from "~/lib/jwt";
-
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { JsonPreview } from "./audit-log";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 export function IdToken({ idToken }: { idToken: string | null }) {
 	if (!idToken) {
@@ -16,11 +15,9 @@ export function IdToken({ idToken }: { idToken: string | null }) {
 				<CardTitle>ID Token Details</CardTitle>
 			</CardHeader>
 			<CardContent className="space-y-4 text-xs">
-
-				
-					<JsonPreview data={idToken} label="Raw token" />
+				<JsonPreview data={idToken} label="Raw token" />
 				<JsonPreview data={payload} label="Decoded payload" />
-				
+
 				{/* <div>
 					<p className="mb-2 text-sm font-semibold">Decoded payload</p>
 					{payload ? (

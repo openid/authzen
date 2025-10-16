@@ -124,8 +124,6 @@ function IdentityProviderSection({ idToken }: { idToken: string | null }) {
 
 	const hasIdToken = Boolean(idToken);
 
-
-
 	return (
 		<div className="flex flex-col gap-4">
 			<Card>
@@ -162,11 +160,10 @@ function IdentityProviderSection({ idToken }: { idToken: string | null }) {
 						}
 						label="Record claim"
 						description={
-							!!recordClaimValue
+							recordClaimValue
 								? "Record claim returned by the IdP."
 								: "No record claim detected."
 						}
-						
 						className={cn(
 							!!recordClaimValue && "bg-green-300",
 							!recordClaimValue && "bg-red-100",
@@ -174,7 +171,7 @@ function IdentityProviderSection({ idToken }: { idToken: string | null }) {
 					/>
 					{!!recordClaimValue && (
 						<div className="text-xs">
-						<JsonPreview data={recordClaimValue} label="Record claim value" />
+							<JsonPreview data={recordClaimValue} label="Record claim value" />
 						</div>
 					)}
 				</CardContent>

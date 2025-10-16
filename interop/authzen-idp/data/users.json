@@ -1,26 +1,26 @@
 [
-  {
-    "id": "alice",
-    "password": "VerySecret123!"
-  },
-  {
-    "id": "bob",
-    "password": "VerySecret123!"
-  },
-  {
-    "id": "carol",
-    "password": "VerySecret123!"
-  },
-  {
-    "id": "dan",
-    "password": "VerySecret123!"
-  },
-  {
-    "id": "erin",
-    "password": "VerySecret123!"
-  },
-  {
-    "id": "felix",
-    "password": "VerySecret123!"
-  }
+	{
+		"id": "alice",
+		"password": "VerySecret123!"
+	},
+	{
+		"id": "bob",
+		"password": "VerySecret123!"
+	},
+	{
+		"id": "carol",
+		"password": "VerySecret123!"
+	},
+	{
+		"id": "dan",
+		"password": "VerySecret123!"
+	},
+	{
+		"id": "erin",
+		"password": "VerySecret123!"
+	},
+	{
+		"id": "felix",
+		"password": "VerySecret123!"
+	}
 ]

@@ -22,7 +22,6 @@ const pkceCookie = createCookie("authzen:auth0:pkce", {
 	maxAge: 300,
 });
 
-
 export async function loader({ request }: Route.LoaderArgs) {
 	if (request.url.includes("/login")) {
 		clearAuditLog();
@@ -30,15 +29,14 @@ export async function loader({ request }: Route.LoaderArgs) {
 			message: "Initiating Auth0 login",
 			idp: "auth0",
 		});
-		const codeVerifier = await	generateCodeVerifier();
-		
+		const codeVerifier = await generateCodeVerifier();
+
 		const url = await client.authorizationCode.getAuthorizeUri({
 			redirectUri: callbackUrl,
 			scope: ["openid", "profile", "email"],
 			codeVerifier,
 			extraParams: {
 				prompt: "login",
-				
 			},
 		});
 		return redirect(url, {
@@ -74,13 +72,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 		try {
 			const oauth2Token =
-				await client.authorizationCode.getTokenFromCodeRedirect(
-					request.url,
-					{
-						redirectUri: callbackUrl,
-						codeVerifier,
-					} as any,
-				);
+				await client.authorizationCode.getTokenFromCodeRedirect(request.url, {
+					redirectUri: callbackUrl,
+					codeVerifier,
+				} as any);
 
 			pushAuditLog(AuditType.AuthN, {
 				message: "Successfully obtained OAuth2 token from Auth0",
