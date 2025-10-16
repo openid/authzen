@@ -1,30 +1,18 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: Init */
-import * as client from "openid-client";
+import { generateCodeVerifier, OAuth2Client } from "@badgateway/oauth2-client";
+
 import { createCookie, redirect } from "react-router";
 import { clearAuditLog, pushAuditLog } from "~/lib/auditLog";
 import { AuditType } from "~/types/audit";
 import type { Route } from "./+types/auth0";
 
+const client = new OAuth2Client({
+	server: process.env.AUTH0_DOMAIN!,
+	clientId: process.env.AUTH0_CLIENT_ID!,
+	clientSecret: process.env.AUTH0_CLIENT_SECRET!,
+});
+
 const callbackUrl = `${process.env.BASE_URL!}/idp/auth0/callback`;
-
-const issuerIdentifier = process.env.AUTH0_DOMAIN!.startsWith("http")
-	? process.env.AUTH0_DOMAIN!
-	: `https://${process.env.AUTH0_DOMAIN!}`;
-
-const issuerUrl = new URL(issuerIdentifier);
-
-let configurationPromise: Promise<client.Configuration> | null = null;
-
-const getAuth0Configuration = () => {
-	if (!configurationPromise) {
-		configurationPromise = client.discovery(
-			issuerUrl,
-			process.env.AUTH0_CLIENT_ID!,
-			process.env.AUTH0_CLIENT_SECRET!,
-		);
-	}
-	return configurationPromise;
-};
 
 const pkceCookie = createCookie("authzen:auth0:pkce", {
 	httpOnly: true,
@@ -34,127 +22,79 @@ const pkceCookie = createCookie("authzen:auth0:pkce", {
 	maxAge: 300,
 });
 
-const parseSession = async (cookieHeader: string | null) => {
-	if (!cookieHeader) {
-		return null;
-	}
-	const raw = await pkceCookie.parse(cookieHeader);
-	if (!raw || typeof raw !== "string") {
-		return null;
-	}
-	try {
-		const parsed = JSON.parse(raw) as {
-			codeVerifier?: unknown;
-			nonce?: unknown;
-		};
-		if (typeof parsed.codeVerifier !== "string") {
-			return null;
-		}
-		return {
-			codeVerifier: parsed.codeVerifier,
-			nonce: typeof parsed.nonce === "string" ? parsed.nonce : undefined,
-		};
-	} catch {
-		// ignore parse errors and treat as missing PKCE session
-	}
-	return null;
-};
-
-const setSessionCookie = (session: {
-	codeVerifier: string;
-	nonce?: string;
-}) => pkceCookie.serialize(JSON.stringify(session));
-
-const clearSessionCookie = () => pkceCookie.serialize("", { maxAge: 0 });
 
 export async function loader({ request }: Route.LoaderArgs) {
-	const url = new URL(request.url);
-
-	if (url.pathname.endsWith("/login")) {
+	if (request.url.includes("/login")) {
 		clearAuditLog();
 		pushAuditLog(AuditType.AuthN, {
 			message: "Initiating Auth0 login",
 			idp: "auth0",
 		});
-
-		const config = await getAuth0Configuration();
-		const codeVerifier = client.randomPKCECodeVerifier();
-		const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);
-
-		const parameters: Record<string, string> = {
-			redirect_uri: callbackUrl,
-			scope: "openid profile email",
-			code_challenge: codeChallenge,
-			code_challenge_method: "S256",
-			prompt: "login",
-		};
-
-		let nonce: string | undefined;
-		if (!config.serverMetadata().supportsPKCE()) {
-			nonce = client.randomNonce();
-			parameters.nonce = nonce;
-		}
-
-		const authorizationUrl = client.buildAuthorizationUrl(config, parameters);
-
-		return redirect(authorizationUrl.href, {
+		const codeVerifier = await	generateCodeVerifier();
+		
+		const url = await client.authorizationCode.getAuthorizeUri({
+			redirectUri: callbackUrl,
+			scope: ["openid", "profile", "email"],
+			codeVerifier,
+			extraParams: {
+				prompt: "login",
+				
+			},
+		});
+		return redirect(url, {
 			headers: {
-				"Set-Cookie": await setSessionCookie({ codeVerifier, nonce }),
+				"Set-Cookie": await pkceCookie.serialize(codeVerifier),
 			},
 		});
 	}
 
-	if (url.pathname.endsWith("/callback")) {
+	if (request.url.includes("/callback")) {
 		pushAuditLog(AuditType.AuthN, {
 			message: "Handling Auth0 callback",
 			idp: "auth0",
 		});
 
-		const pkceSession = await parseSession(request.headers.get("Cookie"));
+		const cookieHeader = request.headers.get("Cookie");
+		const codeVerifier = cookieHeader
+			? await pkceCookie.parse(cookieHeader)
+			: undefined;
 
-		if (!pkceSession) {
+		if (!codeVerifier || typeof codeVerifier !== "string") {
 			pushAuditLog(AuditType.AuthN, {
-				message: "Missing PKCE verifier data during Auth0 callback",
+				message: "Missing PKCE code verifier cookie during Auth0 callback",
 				idp: "auth0",
 				ok: false,
 			});
 			return redirect("/", {
 				headers: {
-					"Set-Cookie": await clearSessionCookie(),
+					"Set-Cookie": await pkceCookie.serialize("", { maxAge: 0 }),
 				},
 			});
 		}
 
 		try {
-			const config = await getAuth0Configuration();
-			const checks: client.AuthorizationCodeGrantChecks = {
-				pkceCodeVerifier: pkceSession.codeVerifier,
-				idTokenExpected: true,
-			};
-
-			if (pkceSession.nonce) {
-				checks.expectedNonce = pkceSession.nonce;
-			}
-
-			const tokens = await client.authorizationCodeGrant(config, url, checks);
-
-			if (!tokens.id_token) {
-				throw new Error("Auth0 response did not include an ID token");
-			}
+			const oauth2Token =
+				await client.authorizationCode.getTokenFromCodeRedirect(
+					request.url,
+					{
+						redirectUri: callbackUrl,
+						codeVerifier,
+					} as any,
+				);
 
 			pushAuditLog(AuditType.AuthN, {
 				message: "Successfully obtained OAuth2 token from Auth0",
 				idp: "auth0",
 				response: {
-					accessTokenIssued: Boolean(tokens.access_token),
-					idTokenIssued: true,
+					accessTokenIssued: Boolean(oauth2Token.accessToken),
+					idTokenIssued: Boolean(oauth2Token.idToken),
 				},
 				ok: true,
 			});
 
-			return redirect(`/#id_token=${tokens.id_token}`, {
+			return redirect(`/#id_token=${oauth2Token.idToken}`, {
 				headers: {
-					"Set-Cookie": await clearSessionCookie(),
+					"Set-Cookie": await pkceCookie.serialize("", { maxAge: 0 }),
 				},
 			});
 		} catch (error) {
@@ -163,13 +103,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 				idp: "auth0",
 				ok: false,
 			});
-			return redirect("/", {
+			return redirect(`/`, {
 				headers: {
-					"Set-Cookie": await clearSessionCookie(),
+					"Set-Cookie": await pkceCookie.serialize("", { maxAge: 0 }),
 				},
 			});
 		}
 	}
-
 	return redirect("/");
 }
