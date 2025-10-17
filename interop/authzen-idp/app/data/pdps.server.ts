@@ -7,30 +7,30 @@ const pdps = loadPdpsFromEnv();
 export { pdps };
 
 function loadPdpsFromEnv(): PdpMap {
-	const encodedConfig = process.env.PDP_CONFIG ?? "e30="; // "{}" when unset
-	const decodedConfig = decodePdpConfig(encodedConfig);
+  const encodedConfig = process.env.PDP_CONFIG ?? "e30="; // "{}" when unset
+  const decodedConfig = decodePdpConfig(encodedConfig);
 
-	if (!Object.keys(decodedConfig).length) {
-		throw new Error("No PDPs configured. Please set PDP_CONFIG.");
-	}
+  if (!Object.keys(decodedConfig).length) {
+    throw new Error("No PDPs configured. Please set PDP_CONFIG.");
+  }
 
-	return decodedConfig;
+  return decodedConfig;
 }
 
 function decodePdpConfig(config: string): PdpMap {
-	try {
-		const json = Buffer.from(config, "base64").toString("utf-8");
-		const parsed = JSON.parse(json);
-		return isPdpMap(parsed) ? parsed : {};
-	} catch (error) {
-		console.error(
-			"Failed to decode PDP_CONFIG, falling back to empty config",
-			error,
-		);
-		return {};
-	}
+  try {
+    const json = Buffer.from(config, "base64").toString("utf-8");
+    const parsed = JSON.parse(json);
+    return isPdpMap(parsed) ? parsed : {};
+  } catch (error) {
+    console.error(
+      "Failed to decode PDP_CONFIG, falling back to empty config",
+      error,
+    );
+    return {};
+  }
 }
 
 function isPdpMap(value: unknown): value is PdpMap {
-	return typeof value === "object" && value !== null;
+  return typeof value === "object" && value !== null;
 }
