@@ -101,14 +101,14 @@ We are reusing the users from the Search Demo App as defined [here](https://hack
 
 There are 6 users in the demo:
 
-| ID   | Password        |
-|--------|-------------|
-| alice  | VerySecret123!     |
-| bob    | VerySecret123!    |
-| carol  | VerySecret123!  |
-| dan    | VerySecret123!     |
-| erin   | VerySecret123!    |
-| felix  | VerySecret123!  |
+| ID     | Password       |
+|--------|----------------|
+| alice  | VerySecret123! |
+| bob    | VerySecret123! |
+| carol  | VerySecret123! |
+| dan    | VerySecret123! |
+| erin   | VerySecret123! |
+| felix  | VerySecret123! |
 
 
 The full dataset is stored in `interop/authzen-idp/data/users.json`.
@@ -147,4 +147,4 @@ Sample data for the demo records is stored in Github as well in the same locatio
 
 ## Sample Payloads
 
-The entire payloads for the interop can be found in `interop/authzen-idp/test`.
+The request and response payloads for the interop can be found in `interop/authzen-idp/test-harness/src/results.json`.
