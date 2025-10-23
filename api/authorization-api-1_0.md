@@ -59,6 +59,9 @@ contributor: # Same structure as author list, but goes into contributors
 - name: Michiel Trimpe
   org: VNG Realisatie
   email: michiel.trimpe@vng.nl
+- name: Elie Azerad
+  org: Independent Contributor
+  email: elie.azerad@gmail.com
 
 normative:
   RFC6749: # OAuth
@@ -1778,7 +1781,7 @@ TLS effectively protects data in transit for a direct, point-to-point connection
 
 Digital signatures offer important advantages in this context. They provide non-repudiation, allowing verification that the response genuinely originated from the PDP. Moreover, digital signatures ensure the integrity of the authorization response, confirming that its contents have not been altered in transit.
 
-## Availability & Denial of Service {#security-avail-dos}}
+## Availability & Denial of Service {#security-avail-dos}
 
 The PDP SHOULD apply reasonable protections to avoid common attacks tied to request payload size, the number of requests, invalid JSON, nested JSON attacks, or memory consumption. Rate limiting is one such way to address such issues.
 
@@ -2027,13 +2030,13 @@ Subject:
 : The user or machine principal for whom an authorization decision is being requested.
 
 Resource:
-: The target of the request; the resource about which the Authorization API is being made.
+: The target of the request; the resource about which the authorization decision is being made.
 
 Action:
-: The operation the Subject has attempted on the Resource in an Authorization API call.
+: The operation the Subject is attempting on the Resource, in the context an authorization decision.
 
 Context:
-: The environmental or contextual attributes for this request.
+: When present in a request, the environmental or contextual attributes for this request. When present in a response, additional contextual information associated with a decision or search result.
 
 Decision:
 : The value of the evaluation decision made by the PDP: `true` for "allow", `false` for "deny".
@@ -2042,7 +2045,7 @@ PDP:
 : Policy Decision Point. The component or system that provides authorization decisions over the network interface defined here as the Authorization API.
 
 PEP:
-: Policy Enforcement Point. The component or system that requests decisions from the PDP and enforces access to specific requests based on the decisions obtained from the PDP.
+: Policy Enforcement Point. The component or system that acts as a client to the PDP. The most common use case for a PEP is to request decisions and enforce access based on the decisions obtained from the PDP. It can also request decisions or search results for other purposes, such as determining which resources a subject may have access to.
 
 # Acknowledgements {#Acknowledgements}
 
