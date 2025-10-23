@@ -6,6 +6,7 @@ import { PDPPicker } from "~/components/pdp-picker";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { idps } from "~/data/idps.server";
 import { useAuditLogPolling } from "~/hooks/useAuditLogPolling";
 import { useIdTokenFromHash } from "~/hooks/useIdTokenFromHash";
 import { clearAuditLog } from "~/lib/auditLog";
@@ -26,6 +27,13 @@ export async function loader(_: Route.LoaderArgs) {
   return {
     pdps: listPdps(),
     activePdp: getActivePdp(),
+    idps: idps.map((idp) => {
+      return {
+        url: `/idp/${idp.slug}/login`,
+        idpLabel: idp.label,
+        idpSlug: idp.slug,
+      };
+    }),
   };
 }
 
@@ -47,7 +55,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { activePdp, pdps } = loaderData;
+  const { activePdp, pdps, idps } = loaderData;
   const setPdpFetcher = useFetcher();
   const clearFetcher = useFetcher();
   const auditFetcher = useFetcher<{ auditLog: AuditEntry[] }>();
@@ -102,9 +110,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             <CardTitle>Identity Provider</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button asChild>
-              <a href="/idp/auth0/login">Login with Auth0</a>
-            </Button>
+            <div className="flex gap-2">
+              {idps.map((idp) => (
+                <Button key={idp.idpSlug} variant="default" size="sm">
+                  <a href={idp.url}>Login with {idp.idpLabel}</a>
+                </Button>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
