@@ -1,8 +1,14 @@
-# Use Cases for AuthZEN Integration with Identity Providers
+---
+sidebar_position: 1
+---
+
+# Payload Spec
 
 **Note:** the Demo App is hosted at https://sts.authzen-interop.net/.
 
-# Initial Concept 
+> Note: These payloads and corresponding interop results are for the [AuthZEN 1.0 Draft 04](https://openid.net/specs/authorization-api-1_0-04.html) version of the spec.
+
+## Context 
 Identity Providers (IdPs) are a key control point in the identity infrastructure of most enterprises. IdPs, among other functions, manage the authentication ceremony and issue tokens for use in accessing various types of resources. 
 
 The AuthZEN Working Group has defined standard APIs whereby an IdP can call to any compliant Policy Decision Point (PDP) during IDP processing. The following section defines a data flow to determine the contents of a token. 
@@ -69,32 +75,6 @@ The PDP returns all the records the user can delete (in this example, 101, 107, 
 
 As a result, the JWT token minted for Alice contains a claim called `record` where the value is an array of record identifiers. The name for the claim comes from the `type` field.
 
----
-
-# Demonstration Plan
-
-## Target Identity Providers (IdPs)
-
-Possible IdP participants are listed here: https://hackmd.io/@oidf-wg-authzen/idp-demo-participants. We welcome participation from as many IdPs as possible.
-
-## Demonstration Application Flow
-
-1.  A user navigates to the demo application, which acts as a central gateway.
-2.  The user selects a Policy Decision Point (PDP) to be used for the session.
-3.  The user selects an Identity Provider (IdP) to log in with.
-4.  The IdP's authentication flow is initiated. During this flow, the IdP calls the demo application's API.
-5.  The demo application proxies the authorization request to the active PDP.
-6.  The PDP evaluates the request against its policies and returns a decision.
-7.  The decision is passed back to the IdP.
-8.  The IdP issues a token enriched with claims according to the PDP's decision based on the call to its Search API.
-9.  The user is redirected back to the demo application, which displays the final claims from the token.
-
-## Demonstration Policies
-
-We are using the same policies as in the Search Demo App. These policies are defined [here](https://hackmd.io/@oidf-wg-authzen/identiverse-2025-interop#Authorization-Use-Cases). The only relevant policy here is the one that relates to deleting records:
-
- - a user can delete any record they own
-
 ## Demo Users
 
 We are reusing the users from the Search Demo App as defined [here](https://hackmd.io/@oidf-wg-authzen/identiverse-2025-interop). Because the policy is based on ownership, we do not need `role` or `department`. However, we do need a password for the user accounts to be created in the IdPs.
@@ -110,11 +90,9 @@ There are 6 users in the demo:
 | erin   | VerySecret123! |
 | felix  | VerySecret123! |
 
+The full dataset is stored in https://github.com/openid/authzen/blob/main/interop/authzen-idp/data/users.json.
 
-The full dataset is stored in `interop/authzen-idp/data/users.json`.
-
-
-#### Resources
+## Demo Resources
 
 In this demo, we also use the same metadata as for the Search API Interop Demo defined here. Because we only use the `delete` policy, only record ownership matters.
 
@@ -143,8 +121,75 @@ There are 20 records in the demo:
 | 119  | alice  |
 | 120  | bob    |
 
-Sample data for the demo records is stored in Github as well in the same location as user data: `interop/authzen-idp/data/records.json`
+Sample data for the demo records is stored in Github as well in the same location as user data: https://github.com/openid/authzen/blob/main/interop/authzen-idp/data/records.json
 
 ## Sample Payloads
 
-The request and response payloads for the interop can be found in `interop/authzen-idp/test-harness/src/results.json`.
+The request and response payloads for the interop can be found in https://github.com/openid/authzen/blob/main/interop/authzen-idp/test-harness/src/results.json, along with the test harness.
+
+The test harness runs through the test cases and reports success or failure. See the README on details for how to run it against your PDP.
+
+### Request Payload
+
+The following is the HTTP/JSON request payload for the demo:
+
+```js
+POST /access/v1/search/resource HTTP/1.1
+Host: pdp.mycompany.com
+Authorization: Bearer <myoauthtoken>
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+{
+  "subject": {
+    "type": "user",
+    "id": "<user_id>"
+  },
+  "action": {
+    "name": "delete"
+  },
+  "resource": {
+    "type": "record"
+  }
+}
+```
+
+The value of `<user_id>` must be one of `alice`, `bob`, `carol`, `dan`, `erin`, or `felix` to conform with the sample dataset. Any other value should lead to a valid empty response from the PDP.
+
+The presence of the resource `type` field is required per the specification. All other attributes in the `resource` object will be ignored.
+
+#### Response Payload
+
+The following table summarizes the valid responses.
+
+| User ID  | Action | Records                  |
+|--------|--------|--------------------------|
+| alice | delete   | [101, 107, 113, 119] |
+| bob | delete   | [102, 108, 114, 120] |
+| carol | delete   | [103, 109, 115] |
+| dan | delete   | [104, 110, 116] |
+| erin | delete   | [105, 111, 117] |
+| felix | delete   | [106, 112, 118] |
+
+The following is the HTTP/JSON response payload to the question: `which records can Erin delete?`
+
+```js
+HTTP/1.1 OK
+Content-type: application/json
+X-Request-ID: bfe9eb29-ab87-4ca3-be83-a1d5d8305716
+{
+  "results": [
+    {
+      "type": "record",
+      "id": "105"
+    },
+    {
+      "type": "record",
+      "id": "111"
+    },
+    {
+      "type": "record",
+      "id": "117"
+    }
+  ]
+}
+```
+
