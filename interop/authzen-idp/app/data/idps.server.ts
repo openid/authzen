@@ -1,4 +1,4 @@
-// PDP_CONFIG should be a base64 encoded JSON string that maps PDP names to
+// IDP_CONFIG should be a base64 encoded JSON string that maps PDP names to
 // their configuration (host and optional headers). See README for an example.
 import {
   type CreateIdpHandlerOptions,
