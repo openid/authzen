@@ -62,7 +62,8 @@ IdPs are configured via the `IDP_CONFIG` env variable which is a base64-encoded 
       // OAuth client settings
       "server": "https://authzen-idp-demo.eu.auth0.com",
       "clientId": "....",
-      "clientSecret": "..."
+      "clientSecret": "...",
+      "discoveryEndpoint": "/.well-known/openid-configuration"
     }, // Optional extra params to send during OAuth request
     "extraParams": {
       "prompt": "login"

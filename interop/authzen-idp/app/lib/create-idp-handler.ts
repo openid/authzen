@@ -13,13 +13,19 @@ export interface CreateIdpHandlerOptions {
   extraParams?: Record<string, string>;
 }
 
+type OidcDiscovery = {
+  issuer: string;
+  authorization_endpoint: string;
+  token_endpoint: string;
+  end_session_endpoint?: string;
+};
+
 export function createIdpHandler({
   slug,
   label,
   oauthClient,
   extraParams,
 }: CreateIdpHandlerOptions) {
-  const client = new OAuth2Client(oauthClient);
   const callbackUrl = buildCallbackUrl(slug);
   const scopes = ["openid", "profile", "email"];
 
@@ -56,8 +62,23 @@ export function createIdpHandler({
     slug,
     label,
     loader: async function loader(request: Request) {
+      let client: OAuth2Client;
+      try {
+        client = await getOAuthClient(oauthClient, slug);
+      } catch (error) {
+        return Response.json(
+          {
+            message: `Failed to initialize OAuth client for IDP ${slug}: ${(error as Error).message}`,
+          },
+          {
+            status: 500,
+          },
+        );
+      }
+
       const url = new URL(request.url);
       const cookieHeader = request.headers.get("Cookie");
+
       if (url.pathname.endsWith("/login")) {
         clearAuditLog();
         pushAuditLog(AuditType.AuthN, {
@@ -140,8 +161,82 @@ export function createIdpHandler({
   };
 }
 
+async function getOAuthClient(
+  oauthClient: ClientSettings,
+  slug: string,
+): Promise<OAuth2Client> {
+  if (!oauthClient.server) {
+    throw new Error(`OAuth client for IDP ${slug} is missing issuer`);
+  }
+
+  if (oauthClient.tokenEndpoint && oauthClient.authorizationEndpoint) {
+    return new OAuth2Client({
+      server: oauthClient.server,
+      clientId: oauthClient.clientId,
+      clientSecret: oauthClient.clientSecret,
+      tokenEndpoint: oauthClient.tokenEndpoint,
+      authorizationEndpoint: oauthClient.authorizationEndpoint,
+    });
+  } else if (oauthClient.discoveryEndpoint) {
+    let discoveryPromise: Promise<OidcDiscovery> | null = null;
+
+    async function discover(): Promise<OidcDiscovery> {
+      if (!oauthClient.server) {
+        throw new Error(`OAuth client for IDP ${slug} is missing issuer`);
+      }
+      if (!discoveryPromise) {
+        const wellKnown = buildWellKnownUrl(
+          oauthClient.server,
+          oauthClient.discoveryEndpoint || "/.well-known/openid-configuration",
+        );
+        discoveryPromise = (async () => {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 8000);
+          try {
+            const res = await fetch(wellKnown, { signal: controller.signal });
+            if (!res.ok)
+              throw new Error(
+                `OIDC discovery failed (${res.status}) at ${wellKnown}`,
+              );
+            const data = (await res.json()) as OidcDiscovery;
+            if (!data.authorization_endpoint || !data.token_endpoint) {
+              throw new Error("OIDC discovery missing required endpoints.");
+            }
+            return data;
+          } finally {
+            clearTimeout(timeout);
+          }
+        })();
+      }
+      return discoveryPromise;
+    }
+
+    const discovery = await discover();
+
+    return new OAuth2Client({
+      server: oauthClient.server,
+      clientId: oauthClient.clientId,
+      clientSecret: oauthClient.clientSecret,
+      tokenEndpoint: discovery.token_endpoint,
+      authorizationEndpoint: discovery.authorization_endpoint,
+    });
+  } else {
+    throw new Error(`OAuth client for IDP ${slug} is missing endpoints`);
+  }
+}
+
 function buildCallbackUrl(slug: string): string {
   const baseUrl = getRequiredEnv("BASE_URL");
   const normalizedBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
   return new URL(`idp/${slug}/callback`, normalizedBase).toString();
+}
+
+function buildWellKnownUrl(
+  issuerBase: string,
+  discoveryEndpoint: string,
+): string {
+  const trimmed = issuerBase.endsWith("/")
+    ? issuerBase.slice(0, -1)
+    : issuerBase;
+  return `${trimmed}${discoveryEndpoint}`;
 }
