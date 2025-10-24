@@ -62,7 +62,20 @@ export function createIdpHandler({
     slug,
     label,
     loader: async function loader(request: Request) {
-      const client = await getOAuthClient(oauthClient, slug);
+      let client: OAuth2Client;
+      try {
+        client = await getOAuthClient(oauthClient, slug);
+      } catch (error) {
+        return Response.json(
+          {
+            message: `Failed to initialize OAuth client for IDP ${slug}: ${(error as Error).message}`,
+          },
+          {
+            status: 500,
+          },
+        );
+      }
+
       const url = new URL(request.url);
       const cookieHeader = request.headers.get("Cookie");
 
@@ -156,48 +169,60 @@ async function getOAuthClient(
     throw new Error(`OAuth client for IDP ${slug} is missing issuer`);
   }
 
-  let discoveryPromise: Promise<OidcDiscovery> | null = null;
+  if (oauthClient.tokenEndpoint && oauthClient.authorizationEndpoint) {
+    return new OAuth2Client({
+      server: oauthClient.server,
+      clientId: oauthClient.clientId,
+      clientSecret: oauthClient.clientSecret,
+      tokenEndpoint: oauthClient.tokenEndpoint,
+      authorizationEndpoint: oauthClient.authorizationEndpoint,
+    });
+  } else if (oauthClient.discoveryEndpoint) {
+    let discoveryPromise: Promise<OidcDiscovery> | null = null;
 
-  async function discover(): Promise<OidcDiscovery> {
-    if (!oauthClient.server) {
-      throw new Error(`OAuth client for IDP ${slug} is missing issuer`);
-    }
-    if (!discoveryPromise) {
-      const wellKnown = buildWellKnownUrl(
-        oauthClient.server,
-        oauthClient.discoveryEndpoint || "/.well-known/openid-configuration",
-      );
-      discoveryPromise = (async () => {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 8000);
-        try {
-          const res = await fetch(wellKnown, { signal: controller.signal });
-          if (!res.ok)
-            throw new Error(
-              `OIDC discovery failed (${res.status}) at ${wellKnown}`,
-            );
-          const data = (await res.json()) as OidcDiscovery;
-          if (!data.authorization_endpoint || !data.token_endpoint) {
-            throw new Error("OIDC discovery missing required endpoints.");
+    async function discover(): Promise<OidcDiscovery> {
+      if (!oauthClient.server) {
+        throw new Error(`OAuth client for IDP ${slug} is missing issuer`);
+      }
+      if (!discoveryPromise) {
+        const wellKnown = buildWellKnownUrl(
+          oauthClient.server,
+          oauthClient.discoveryEndpoint || "/.well-known/openid-configuration",
+        );
+        discoveryPromise = (async () => {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 8000);
+          try {
+            const res = await fetch(wellKnown, { signal: controller.signal });
+            if (!res.ok)
+              throw new Error(
+                `OIDC discovery failed (${res.status}) at ${wellKnown}`,
+              );
+            const data = (await res.json()) as OidcDiscovery;
+            if (!data.authorization_endpoint || !data.token_endpoint) {
+              throw new Error("OIDC discovery missing required endpoints.");
+            }
+            return data;
+          } finally {
+            clearTimeout(timeout);
           }
-          return data;
-        } finally {
-          clearTimeout(timeout);
-        }
-      })();
+        })();
+      }
+      return discoveryPromise;
     }
-    return discoveryPromise;
+
+    const discovery = await discover();
+
+    return new OAuth2Client({
+      server: oauthClient.server,
+      clientId: oauthClient.clientId,
+      clientSecret: oauthClient.clientSecret,
+      tokenEndpoint: discovery.token_endpoint,
+      authorizationEndpoint: discovery.authorization_endpoint,
+    });
+  } else {
+    throw new Error(`OAuth client for IDP ${slug} is missing endpoints`);
   }
-
-  const discovery = await discover();
-
-  return new OAuth2Client({
-    server: oauthClient.server,
-    clientId: oauthClient.clientId,
-    clientSecret: oauthClient.clientSecret,
-    tokenEndpoint: discovery.token_endpoint,
-    authorizationEndpoint: discovery.authorization_endpoint,
-  });
 }
 
 function buildCallbackUrl(slug: string): string {
