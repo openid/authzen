@@ -26,80 +26,68 @@ AuthZEN IdP Interop demonstrates how an OpenID Connect identity provider (IdP) c
 
 ## Architecture
 
-- **Framework:** React Router v7 in framework mode (loaders/actions, SSR, hydrated SPA). Source lives under `app/`; the route tree is defined in `app/routes.ts`.
-- **Identity provider flow:** Default integration is Auth0 at `app/routes/idp/auth0.ts`. One loader handles `/login` initiation and `/callback` processing via `openid-client`.
-- **PDP proxy:** `app/routes/authorize.ts` receives `POST /access/*`, forwards the request via `app/lib/pdpClient.ts`, and streams the PDP JSON response to the browser.
-- **State & telemetry:** `app/lib/pdpState.ts` tracks the active PDP derived from configuration. `app/lib/auditLog.ts` publishes AuthN/AuthZ events rendered by `app/components/audit-log.tsx`.
+- Framework: React Router v7 in framework mode (loaders/actions, SSR, hydrated SPA). Source lives under `app/`; the route tree is defined in `app/routes.ts`.
+- Identity provider flow: Route `app/routes/idp/handler.ts` dispatches to provider handlers created from `IDP_CONFIG` by `app/data/idps.server.ts` using `app/lib/create-idp-handler.ts`. Each handler drives `/login` and `/callback` using `@badgateway/oauth2-client`.
+- PDP proxy: `app/routes/authorize.ts` receives `POST /access/*`, forwards the request via `app/lib/pdpClient.ts`, and streams the PDP JSON response to the browser.
+- State & telemetry: `app/lib/pdpState.ts` tracks the active PDP derived from configuration. `app/lib/auditLog.ts` publishes AuthN/AuthZ events rendered by `app/components/audit-log.tsx`.
 
 ### Key Files
 
 - `app/routes/home.tsx` – main UI: login controls, ID token viewer, PDP selector, audit log.
-- `app/routes/idp/` – IdP modules; each must import types with `import type { Route } from "./+types/<file>";`.
-- `app/lib/` – PDP client, JWT helpers, audit log store.
+- `app/routes/idp/handler.ts` – generic IdP route that dispatches `/idp/:idp/*` to a provider handler created from env config.
+- `app/data/idps.server.ts` – loads `IDP_CONFIG` and instantiates provider handlers via `create-idp-handler`.
+- `app/lib/` – PDP client, JWT helpers, audit log store, IdP handler factory.
 - `app/data/` – server-only loaders including PDP configuration ingestion.
 - `public/` – static assets.
 - `build/` – generated output from `pnpm build` (never edit by hand).
+
+## Configuration
+
+- `BASE_URL` – public origin of the app (e.g. `http://localhost:5173` in local dev).
+- `IDP_CONFIG` – base64-encoded JSON array of IdP configurations (see example below). Used by `app/data/idps.server.ts`.
+- `PDP_CONFIG` – base64-encoded JSON object mapping PDP names to config (see example below). Used by `app/data/pdps.server.ts`.
 
 ## Extending the App
 
 ### Add an Identity Provider
 
-1. Copy `app/routes/idp/auth0.ts` to `app/routes/idp/<provider>.ts` and adapt it. Keep the combined `/login` + `/callback` loader structure.
-2. Register the route in `app/routes.ts`, e.g. `route("/idp/okta/*", "routes/idp/okta.ts")`, then run `pnpm typecheck` to generate `./+types/<provider>`.
-3. Emit authentication audit entries with `pushAuditLog(AuditType.AuthN, …)` to remain consistent with the home view.
-4. Surface a login trigger in `app/routes/home.tsx` that points to `/idp/<provider>/login`.
-5. Share any new secrets (e.g. `OKTA_DOMAIN`, `OKTA_CLIENT_ID`) with Alex Olivier for production rotation.
+IdPs are configured via the `IDP_CONFIG` env variable which is a base64-encoded array of IdP configurations:
 
-### Add a Policy Decision Point
+```json
+[
+  {
+    "slug": "auth0", //used in the callback slug
+    "label": "Auth0", //used in the UI
+    "oauthClient": {
+      // OAuth client settings
+      "server": "https://authzen-idp-demo.eu.auth0.com",
+      "clientId": "....",
+      "clientSecret": "..."
+    }, // Optional extra params to send during OAuth request
+    "extraParams": {
+      "prompt": "login"
+    }
+  }
+]
+```
 
-1. Extend `PDP_CONFIG` with a new key that contains the PDP name, `host`, and optional static headers.
-2. Base64-encode the updated JSON and redeploy. The config is read at startup, so restart the server after updating it.
-3. Confirm the PDP appears in the UI picker rendered by `PDPPicker`. Selecting it updates the active PDP through the home route action.
-4. Exercise the PDP via the UI or `curl /access/*` and confirm entries in the authorization audit log.
+- `server` should point to the IdP issuer/domain.
+- The callback URL is derived automatically as `${BASE_URL}/idp/<slug>/callback`. (The production `BASE_URL` is `https://sts.authzen-interop.net`). Ensure the redirect URI `${BASE_URL}/idp/<slug>/callback` is registered with the IdP OAuth Client.
 
-## Configuration
+Once your client is set up, send it to alex@cerbos.dev for deployment to the demo application.
 
-### Identity Provider (Auth0 example)
+### Adding a PDP
 
-- `BASE_URL` – public origin of the app (`http://localhost:5173` in local dev).
-- `AUTH0_DOMAIN` – issuer URL with `https://` (e.g. `https://your-tenant.us.auth0.com`).
-- `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` – Auth0 application credentials.
-
-### PDP Configuration (`PDP_CONFIG`)
-
-`PDP_CONFIG` is a base64-encoded JSON object consumed by `app/data/pdps.server.ts`. Each entry declares a PDP identifier, required `host`, and optional static headers.
+Example `PDP_CONFIG` (before base64-encoding):
 
 ```json
 {
   "cerbos": {
-    "host": "https://demo-pdp.cerbos.cloud",
-    "headers": {
-      "Authorization": "Bearer <token-from-cerbos>"
-    }
+    "host": "https://pdp.example.com",
+    "headers": { "Authorization": "Bearer <token>" }
   },
-  "local": {
-    "host": "http://localhost:3593"
-  }
+  "opa": { "host": "http://localhost:8181" }
 }
 ```
 
-Encode on macOS/Linux:
-
-```bash
-export PDP_CONFIG=$(printf '%s' '{"cerbos":{"host":"https://demo-pdp.cerbos.cloud","headers":{"Authorization":"Bearer <token>"}},"local":{"host":"http://localhost:3593"}}' | base64)
-```
-
-Encode on Windows PowerShell:
-
-```powershell
-$env:PDP_CONFIG = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes('{"local":{"host":"http://localhost:3593"}}'))
-```
-
-The UI surfaces each key and defaults to the first entry.
-
-## Observability & Troubleshooting
-
-- The authentication log tracks IdP milestones (login initiation, callback, token exchange success/failure).
-- The authorization log captures every PDP call, including request and response payloads; capped at 100 entries with a manual clear action.
-- The ID token inspector decodes JWT payloads, including the AuthZEN `level` claim when present.
-- Missing `./+types/...` modules indicate type generation hasn’t run; fix by running `pnpm typecheck` rather than changing import paths.
+Once your PDP is set up, send the details to alex@cerbos.dev for deployment to the demo application.
