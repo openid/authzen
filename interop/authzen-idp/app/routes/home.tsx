@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useMemo } from "react";
+import { type ReactNode, useCallback, useMemo, useState, useEffect } from "react";
 import { redirect, useFetcher } from "react-router";
 import { AuditLog, JsonPreview } from "~/components/audit-log";
 import { IdToken } from "~/components/id-token.client";
@@ -14,6 +14,13 @@ import { getActivePdp, listPdps, setActivePdp } from "~/lib/pdpState";
 import { cn } from "~/lib/utils";
 import type { AuditEntry } from "~/types/audit";
 import type { Route } from "./+types/home";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "~/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 export function meta(_: Route.MetaArgs) {
   return [
@@ -87,6 +94,33 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
     clearFetcher.submit({ intent: "clear-audit-log" }, { method: "post" });
   }, [clearFetcher]);
+  
+  const [selectedIdp, setSelectedIdp] = useState<"auth0" | "curity" | null>(null);
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem("selectedIdp");
+    if (stored === "auth0" || stored === "curity") {
+      setSelectedIdp(stored);
+    }
+  }, []);
+  
+  const handleSelect = (idp: "auth0" | "curity") => {
+    setSelectedIdp(idp);
+    sessionStorage.setItem("selectedIdp", idp);
+  };
+
+  const handleLogin = () => {
+    if (selectedIdp) {
+      window.location.href = `/idp/${selectedIdp}/login`;
+    }
+  };
+
+const label =
+    selectedIdp === "auth0"
+      ? "Auth0"
+      : selectedIdp === "curity"
+      ? "Curity"
+      : "Select Identity Provider";
 
   return (
     <main className="flex-1 bg-background">
@@ -97,16 +131,41 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         onSelectPdp={handlePdpSelection}
       />
       <div className="container mx-auto my-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Identity Provider</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button asChild>
-              <a href="/idp/auth0/login">Login with Auth0</a>
+    <Card>
+      <CardHeader>
+        <CardTitle>Identity Provider</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col sm:flex-row items-center gap-3">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="min-w-[200px] justify-between"
+            >
+              {label}
+              <ChevronDown className="h-4 w-4 opacity-60" />
             </Button>
-          </CardContent>
-        </Card>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onClick={() => handleSelect("auth0")}>
+              Auth0
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleSelect("curity")}>
+              Curity
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <Button
+          onClick={handleLogin}
+          disabled={!selectedIdp}
+          className="w-full sm:w-auto"
+        >
+          Login
+        </Button>
+      </CardContent>
+    </Card>
+
       </div>
       <div className="container mx-auto my-4 grid grid-cols-1 gap-4 md:grid-cols-3">
         <IdentityProviderSection
