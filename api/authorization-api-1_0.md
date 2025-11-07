@@ -7,7 +7,7 @@ wg: OpenID AuthZEN
 
 docname: authorization-api-1_0
 
-title: Authorization API 1.0 – draft 04
+title: Authorization API 1.0 – draft 05
 abbrev: azapi
 lang: en
 kw:
@@ -385,12 +385,12 @@ In the following non-normative example, the PDP justifies its decision by includ
   "decision": false,
   "context": {
     "metadata": {
-      "response-time": 60,
-      "response-time-unit": "ms"
+      "response_time": 60,
+      "response_time_unit": "ms"
     },
     "environment": {
       "ip": "10.10.0.1",
-      "datetime": "2025-06-27T18:03:07Z",
+      "datetime": "2025-06-27T18:03-07:00",
       "os": "ubuntu24.04.2LTS-AMDx64"
     }
   }
@@ -1413,7 +1413,11 @@ Integer:
 Boolean:
 : Represented as the JSON literals `true` or `false` ({{Section 3 of RFC8259}}).
 
-### Error Responses
+If a required attribute in the information model is omitted, the server MUST return a "Bad Request" error, as defined in {{error-responses}}.
+
+To ensure forward compatibility, receivers MUST ignore unknown fields present in request or response bodies. Implementations MUST NOT assume a particular ordering of JSON object members.
+
+### Error Responses {#error-responses}
 The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTPS status code ({{Section 15 of RFC9110}}) that indicates error.
 
 The following errors are indicated by the status codes defined below:
@@ -2062,6 +2066,7 @@ This template uses extracts from templates written by
 * 02 - Added the evaluations API.
 * 03 - Added the search (subject, resource, action) APIs.
 * 04 - Added metadata discovery.
+* 05 - Consistency edits and preparation for Final Specification.
 
 # Notices {#Notices}
 Copyright (c) 2025 The OpenID Foundation.
