@@ -76,6 +76,7 @@ The latest scenario defines a defense-in-depth architecture, consisting of API g
 | --------------------------- | ---------------------------------------------------------- |
 | Axiomatics                  | ✅ [Results](/docs/scenarios/idp/results/axiomatics)       |
 | Cerbos                      | ✅ [Results](/docs/scenarios/idp/results/cerbos)           |
+| SGNL                        | ✅ [Results](/docs/scenarios/idp/results/SGNL)             |
 | Topaz                       | ✅ [Results](/docs/scenarios/idp/results/topaz)            |
 | WSO2                        | ✅ [Results](/docs/scenarios/idp/results/wso2)             |
 

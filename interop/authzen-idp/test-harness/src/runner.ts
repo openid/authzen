@@ -114,13 +114,23 @@ function status(response: Expected, expected: Expected) {
     });
   };
 
-  const sortedActualResults = sortResults(response.results || []);
-  const sortedExpectedResults = sortResults(expected.results || []);
+  // sort results based on type, then id, to support string comparison
+  let sortedActualResults = sortResults(response.results || []);
+  let sortedExpectedResults = sortResults(expected.results || []);
 
-  const actualJson = JSON.stringify(sortedActualResults, (_, value) => value === null ? undefined : value);
-  const expectedjson = JSON.stringify(sortedExpectedResults, (_, value) => value === null ? undefined : value);
+  // ensure keys are serialized in alpha order, to support string comparison
+  let actualJson = JSON.stringify(sortedActualResults, Object.keys(sortedActualResults).sort());
+  let expectedJson = JSON.stringify(sortedExpectedResults, Object.keys(sortedExpectedResults).sort());
 
-  return actualJson === expectedjson ? "PASS" : "FAIL"
+  // re-parse, to prepare for second JSON.stringify
+  sortedActualResults = JSON.parse(actualJson);
+  sortedExpectedResults = JSON.parse(expectedJson);
+
+  // ensure keys with a null value are not serialized, to support string comparison
+  actualJson = JSON.stringify(sortedActualResults, (_, value) => value === null ? undefined : value);
+  expectedJson = JSON.stringify(sortedExpectedResults, (_, value) => value === null ? undefined : value);
+
+  return actualJson === expectedJson ? "PASS" : "FAIL"
 }
 
 function logResult(result: Result) {
