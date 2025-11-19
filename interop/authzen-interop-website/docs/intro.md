@@ -77,6 +77,7 @@ The latest scenario defines a defense-in-depth architecture, consisting of API g
 | Axiomatics                  | ✅ [Results](/docs/scenarios/idp/results/axiomatics)       |
 | Cerbos                      | ✅ [Results](/docs/scenarios/idp/results/cerbos)           |
 | Topaz                       | ✅ [Results](/docs/scenarios/idp/results/topaz)            |
+| WSO2                        | ✅ [Results](/docs/scenarios/idp/results/wso2)             |
 
 ### API Gateways
 
@@ -91,3 +92,13 @@ API Gateways that support the [Gateway scenario](/docs/scenarios/api-gateway/).
 | Layer7               | https://authzen-interop-gw.layer7.broadcom.com                |
 | WSO2                 | https://authzen-interop-demo.wso2.com/api/identity            |
 | Zuplo                | https://authzen-todo-main-4df5ceb.d2.zuplo.dev                |
+
+### Identity Providers 
+
+Identity Providers that support the [IdP scenario](/docs/scenarios/idp/).
+
+| Implementation       | Hosted at                                                     |
+| -------------------- | ------------------------------------------------------------- |
+| Auth0                | https://authzen-idp-demo.eu.auth0.com                         |
+| Duende               | https://demo-authzen-idsrv.duendesoftware.com                 |
+| Gluu / Janssen       | https://test-jans5.gluu.info/                                 |
