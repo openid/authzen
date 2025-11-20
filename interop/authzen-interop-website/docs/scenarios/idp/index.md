@@ -32,7 +32,7 @@ we are using the [same policy](https://hackmd.io/@oidf-wg-authzen/identiverse-20
 ## Request Payload
 The IdP sends the user's details along with an action (`delete`), and the type of resources (`record`) to be returned.
 
-```json
+```js
 {
   "subject": {
     "type": "user",
@@ -50,7 +50,7 @@ The IdP sends the user's details along with an action (`delete`), and the type o
 ## Expected Response
 The PDP returns all the records the user can delete (in this example, 101, 107, 113, and 119) that Alice can delete. 
 
-```json
+```js
 {
   "results": [
     {
@@ -73,7 +73,39 @@ The PDP returns all the records the user can delete (in this example, 101, 107, 
 }
 ```
 
-As a result, the JWT token minted for Alice contains a claim called `record` where the value is an array of record identifiers. The name for the claim comes from the `type` field.
+The JWT that the IdP issues contains an additional `record` key with the array value from the `results` key of the AuthZEN search response.
+
+For this example, the decoded JWT would look something like this:
+
+```js
+{
+  "name": "alice",
+  "iss": "...",
+  "aud": "...",
+  "sub": "...",
+  "iat": 1763664127,
+  "exp": 1763700127,
+  "sid": "...",
+  "record": [
+    {
+      "id": "101",
+      "type": "record"
+    },
+    {
+      "id": "107",
+      "type": "record"
+    },
+    {
+      "id": "113",
+      "type": "record"
+    },
+    {
+      "id": "119",
+      "type": "record"
+    }
+  ]
+}
+```
 
 ## Demo Users
 
