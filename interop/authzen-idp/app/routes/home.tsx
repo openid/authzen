@@ -104,13 +104,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         pdps={pdps}
         onSelectPdp={handlePdpSelection}
       />
-      <div className="container mx-auto my-4">
+      <div className="container mx-auto my-4 px-2">
         <Card>
           <CardHeader>
             <CardTitle>Identity Provider</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {idps.map((idp) => (
                 <Button key={idp.idpSlug} variant="default" size="sm">
                   <a href={idp.url}>Login with {idp.idpLabel}</a>
@@ -120,7 +120,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           </CardContent>
         </Card>
       </div>
-      <div className="container mx-auto my-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="container mx-auto px-2 my-4 grid grid-cols-1 gap-4 md:grid-cols-3">
         <IdentityProviderSection
           idToken={idToken}
           tokenPayload={tokenPayload}
