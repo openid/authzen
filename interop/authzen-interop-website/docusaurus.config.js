@@ -81,6 +81,11 @@ const config = {
             label: 'Search Application',
             postion: 'left',
           },
+          {
+            href: 'https://sts.authzen-interop.net',
+            label: 'IdP/PDP Scenario',
+            postion: 'left',
+          },
           // {to: '/blog', label: 'Blog', position: 'left'},
           {
             href: 'https://github.com/openid/authzen',

@@ -6,8 +6,8 @@ sidebar_position: 1
 
 The [OpenID AuthZEN working group](https://openid.net/wg/authzen) has defined a set of interop scenarios. These all are layered around a Todo application as a Policy Enforcement Point.
 
-:::tip New in February 2025!
-For the fourth AuthZEN interop event at Gartner IAM Summit in London (March 25 2025), we have added various [API Gateways](#architecture) as Policy Enforcement Points.
+:::tip New in December 2025!
+For the seventh AuthZEN interop event at Gartner IAM Summit in Grapevine (Dec 8 2025), we have added various [Identity Providers](#architecture) as Policy Enforcement Points.
 :::
 
 ## What you'll find here
@@ -24,15 +24,34 @@ The following video demonstrates the Todo interop scenario and the structure of 
 
 ## Architecture
 
-The latest scenario defines a defense-in-depth architecture, consisting of API gateways as an initial policy enforcement point performing functional / medium-grained authorization at the HTTP route level, and the relying party (Todo app) as another enforcement point, performing fine-grained authorization at the Todo level.
+AuthZEN is built around a defense-in-depth approach to IAM:
+* coarse-grained authorization can be performed during authentication, with the IdP functioning as a policy enforcement point
+* medium-grained authorization can be enforced by API gateways, performing functional authorization at the HTTP route level
+* the relying party (in our case, a Todo app) is the final enforcement point, performing fine-grained authorization at the Todo level
 
 ![enforcement points](/img/enforcement-points.png)
+
+## Interoperability events
+
+The AuthZEN working group sponsored seven formal interoperability events since June 2024, focusing on various scenarios:
+
+| Scenario          | Event                   | Draft | Endpoints                 |
+| ----------------- | ----------------------- | ----- | ------------------------- |
+| App Code          | Identiverse 2024        | 00    | `/evaluation`             |
+| App Code          | EIC 2024                | 01    | `/evaluation`             |
+| App Code          | Authenticate 2024       | 02    | + `/evaluations`          |
+| App Code          | Gartner IAM US 2024     | 02    | + `/evaluations`          |
+| API Gateway       | Gartner IAM London 2025 | 02    | + `/evaluations`          |
+| Search            | Identiverse 2025        | 03    | `/search`, `/.well-known` |
+| Identity Provider | Gartner IAM US 2025     | 04    | `/search`                 |
 
 ## Results summary
 
 ### Policy Decision Points
 
-#### Todo (evaluation) scenarios
+#### Todo (App Code & API Gateway `evaluation` / `evaluations` API) scenarios
+
+Policy Decision Points that participated in the various App Code and [API Gateway](/docs/scenarios/api-gateway/) scenarios.
 
 | Implementation       | [Todo PEP 00](/docs/scenarios/todo/)                          | [Todo PEP 01](/docs/scenarios/todo-1.0-id)                           | [Todo PEP 02](/docs/scenarios/todo-1.1/)                          | [Gateway PEP 02](/docs/scenarios/api-gateway/)                         |
 | -------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------- |
@@ -56,7 +75,9 @@ The latest scenario defines a defense-in-depth architecture, consisting of API g
 | WSO2                 | Did not participate                                           | Did not participate                                                  | ✅ [Results](/docs/scenarios/todo-1.1/results/wso2)               | ✅ [Results](/docs/scenarios/api-gateway/results/wso2)                 |
 | 3Edges               | ✅ [Results](/docs/scenarios/todo/results/3edges)             | Replaced by Indykite                                                 | Replaced by Indykite                                              | Did not participate                                                    |
 
-#### Search scenario
+#### Search API scenario
+
+Policy Decision Points that participated in the [Search](/docs/scenarios/search/) scenario.
 
 | Implementation              | [Search PEP 03](/docs/scenarios/search/)                      |
 | --------------------------- | ------------------------------------------------------------- |
@@ -70,7 +91,9 @@ The latest scenario defines a defense-in-depth architecture, consisting of API g
 | Topaz                       | ✅ [Results](/docs/scenarios/search/results/topaz)            |
 | WSO2                        | ✅ [Results](/docs/scenarios/search/results/wso2 )            |
 
-#### IdP interop scenario
+#### Identity Provider interop scenario (`search` API)
+
+Policy Decision Points that participated in the [IdP](/docs/scenarios/idp/) scenario.
 
 | Implementation              | [IdP PEP 04](/docs/scenarios/idp/)                         |
 | --------------------------- | ---------------------------------------------------------- |
@@ -82,7 +105,7 @@ The latest scenario defines a defense-in-depth architecture, consisting of API g
 
 ### API Gateways
 
-API Gateways that support the [Gateway scenario](/docs/scenarios/api-gateway/).
+API Gateways that participated in the [Gateway](/docs/scenarios/api-gateway/) scenario.
 
 | Implementation       | Hosted at                                                     |
 | -------------------- | ------------------------------------------------------------- |
@@ -96,7 +119,7 @@ API Gateways that support the [Gateway scenario](/docs/scenarios/api-gateway/).
 
 ### Identity Providers 
 
-Identity Providers that support the [IdP scenario](/docs/scenarios/idp/).
+Identity Providers that support the [IdP](/docs/scenarios/idp/) scenario.
 
 | Implementation       | Hosted at                                                     |
 | -------------------- | ------------------------------------------------------------- |
