@@ -97,8 +97,11 @@ Policy Decision Points that participated in the [IdP](/docs/scenarios/idp/) scen
 
 | Implementation              | [IdP PEP 04](/docs/scenarios/idp/)                         |
 | --------------------------- | ---------------------------------------------------------- |
+| Apache KIE                  | ✅ [Results](/docs/scenarios/idp/results/apachekie)        |
 | Axiomatics                  | ✅ [Results](/docs/scenarios/idp/results/axiomatics)       |
 | Cerbos                      | ✅ [Results](/docs/scenarios/idp/results/cerbos)           |
+| PingAuthorize (ID Partners) | ✅ [Results](/docs/scenarios/idp/results/ping)             |
+| PlainID                     | ✅ [Results](/docs/scenarios/idp/results/plainid)          |
 | SGNL                        | ✅ [Results](/docs/scenarios/idp/results/SGNL)             |
 | Topaz                       | ✅ [Results](/docs/scenarios/idp/results/topaz)            |
 | WSO2                        | ✅ [Results](/docs/scenarios/idp/results/wso2)             |
