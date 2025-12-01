@@ -124,8 +124,12 @@ API Gateways that participated in the [Gateway](/docs/scenarios/api-gateway/) sc
 
 Identity Providers that support the [IdP](/docs/scenarios/idp/) scenario.
 
-| Implementation       | Hosted at                                                     |
-| -------------------- | ------------------------------------------------------------- |
-| Auth0                | https://authzen-idp-demo.eu.auth0.com                         |
-| Duende               | https://demo-authzen-idsrv.duendesoftware.com                 |
-| Gluu / Janssen       | https://test-jans5.gluu.info/                                 |
+| Implementation              | Hosted at                                                                      |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| Auth0                       | https://authzen-idp-demo.eu.auth0.com                                          |
+| Curity                      | https://login-demo.curity.io/                                                  |
+| Duende                      | https://demo-authzen-idsrv.duendesoftware.com                                  |
+| Gluu / Janssen              | https://test-jans5.gluu.info/                                                  |
+| Keycloak                    | https://kc-interop-authzen.happyisland-d2af5d5e.westus2.azurecontainerapps.io/ |
+| Ping Federate (ID Partners) | https://pingfed.idpartners.au/                                                 |
+| PingOne (ID Partners)       | https://apps.pingone.asia/709b8f55-bc83-48ae-b965-89f616b7d124                 |
