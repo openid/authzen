@@ -89,7 +89,7 @@ Policy Decision Points that participated in the [Search](/docs/scenarios/search/
 | PingAuthorize (ID Partners) | ✅ [Results](/docs/scenarios/search/results/ping)             |
 | PlainID                     | ✅ [Results](/docs/scenarios/search/results/plainid)          |
 | Topaz                       | ✅ [Results](/docs/scenarios/search/results/topaz)            |
-| WSO2                        | ✅ [Results](/docs/scenarios/search/results/wso2 )            |
+| WSO2                        | ✅ [Results](/docs/scenarios/search/results/wso2)             |
 
 #### Identity Provider interop scenario (`search` API)
 
@@ -100,6 +100,7 @@ Policy Decision Points that participated in the [IdP](/docs/scenarios/idp/) scen
 | Apache KIE                  | ✅ [Results](/docs/scenarios/idp/results/apachekie)        |
 | Axiomatics                  | ✅ [Results](/docs/scenarios/idp/results/axiomatics)       |
 | Cerbos                      | ✅ [Results](/docs/scenarios/idp/results/cerbos)           |
+| EmpowerID                   | ✅ [Results](/docs/scenarios/idp/results/empowerid)        |
 | PingAuthorize (ID Partners) | ✅ [Results](/docs/scenarios/idp/results/ping)             |
 | PlainID                     | ✅ [Results](/docs/scenarios/idp/results/plainid)          |
 | SGNL                        | ✅ [Results](/docs/scenarios/idp/results/SGNL)             |
@@ -129,6 +130,7 @@ Identity Providers that support the [IdP](/docs/scenarios/idp/) scenario.
 | Auth0                       | https://authzen-idp-demo.eu.auth0.com                                          |
 | Curity                      | https://login-demo.curity.io/                                                  |
 | Duende                      | https://demo-authzen-idsrv.duendesoftware.com                                  |
+| EmpowerID                   | https://idp.authzen-demo.eidlabs.net                                           |
 | Gluu / Janssen              | https://test-jans5.gluu.info/                                                  |
 | Keycloak                    | https://kc-interop-authzen.happyisland-d2af5d5e.westus2.azurecontainerapps.io/ |
 | Ping Federate (ID Partners) | https://pingfed.idpartners.au/                                                 |
