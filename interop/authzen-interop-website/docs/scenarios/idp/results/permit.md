@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 11
 ---
 
 # Permit.io
@@ -9,8 +9,12 @@ Interop results for the [Permit.io](https://www.permit.io/) implementation hoste
 Note that as of Permit.io PDP >0.9.0, the AuthZEN APIs are provided natively (no need for a proxy).
 
 ## Test results
+
+```bash
+yarn test https://permit-authzen-interop.up.railway.app
 yarn run v1.22.19
 $ node build/runner.js https://permit-authzen-interop.up.railway.app markdown
+```
 <table>
   <tr>
     <th>result</th>
@@ -143,4 +147,3 @@ $ node build/runner.js https://permit-authzen-interop.up.railway.app markdown
   </td>
   </tr>
 </table>
-Done in 5.11s.

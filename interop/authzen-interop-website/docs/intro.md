@@ -102,6 +102,7 @@ Policy Decision Points that participated in the [IdP](/docs/scenarios/idp/) scen
 | Cerbos                      | ✅ [Results](/docs/scenarios/idp/results/cerbos)           |
 | EmpowerID                   | ✅ [Results](/docs/scenarios/idp/results/empowerid)        |
 | Indykite                    | ✅ [Results](/docs/scenarios/idp/results/indykite)         |
+| Permit                      | ✅ [Results](/docs/scenarios/idp/results/permit)           |
 | PingAuthorize (ID Partners) | ✅ [Results](/docs/scenarios/idp/results/ping)             |
 | PlainID                     | ✅ [Results](/docs/scenarios/idp/results/plainid)          |
 | SGNL                        | ✅ [Results](/docs/scenarios/idp/results/SGNL)             |
@@ -136,3 +137,4 @@ Identity Providers that support the [IdP](/docs/scenarios/idp/) scenario.
 | Keycloak                    | https://kc-interop-authzen.happyisland-d2af5d5e.westus2.azurecontainerapps.io/ |
 | Ping Federate (ID Partners) | https://pingfed.idpartners.au/                                                 |
 | PingOne (ID Partners)       | https://apps.pingone.asia/709b8f55-bc83-48ae-b965-89f616b7d124                 |
+| Thales                      | https://productpod-bfsi-deployment.in.tryciam.onewelcome.net/                  |
