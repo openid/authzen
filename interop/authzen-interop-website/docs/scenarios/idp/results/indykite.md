@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 10
 ---
 
 # Indykite
@@ -144,4 +144,3 @@ node build/runner.js https://us.api.indykite.com markdown
   </td>
   </tr>
 </table>
-Done in 2.04s.
