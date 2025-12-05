@@ -101,6 +101,7 @@ Policy Decision Points that participated in the [IdP](/docs/scenarios/idp/) scen
 | Axiomatics                  | ✅ [Results](/docs/scenarios/idp/results/axiomatics)       |
 | Cerbos                      | ✅ [Results](/docs/scenarios/idp/results/cerbos)           |
 | EmpowerID                   | ✅ [Results](/docs/scenarios/idp/results/empowerid)        |
+| Indykite                    | ✅ [Results](/docs/scenarios/idp/results/indykite)         |
 | PingAuthorize (ID Partners) | ✅ [Results](/docs/scenarios/idp/results/ping)             |
 | PlainID                     | ✅ [Results](/docs/scenarios/idp/results/plainid)          |
 | SGNL                        | ✅ [Results](/docs/scenarios/idp/results/SGNL)             |
