@@ -133,7 +133,7 @@ Identity Providers that support the [IdP](/docs/scenarios/idp/) scenario.
 | Curity                      | https://login-demo.curity.io/                                                  |
 | Duende                      | https://demo-authzen-idsrv.duendesoftware.com                                  |
 | EmpowerID                   | https://idp.authzen-demo.eidlabs.net                                           |
-| Gluu / Janssen              | https://test-jans5.gluu.info/                                                  |
+| Gluu / Janssen              | https://test-jans5dev.gluu.info/                                               |
 | Keycloak                    | https://kc-interop-authzen.happyisland-d2af5d5e.westus2.azurecontainerapps.io/ |
 | Ping Federate (ID Partners) | https://pingfed.idpartners.au/                                                 |
 | PingOne (ID Partners)       | https://apps.pingone.asia/709b8f55-bc83-48ae-b965-89f616b7d124                 |
