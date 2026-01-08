@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "authzen-action-base",
+  "title": "Base model for Authzen action",
+  "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#name-action",
+  "type": "object",
+  "required": [
+    "name"
+  ],
+  "properties": {
+    "name": {
+      "description": "A string value containing the name of the Action.",
+      "type": "string"
+    },
+    "properties": {
+      "description": "An object which can be used to express additional attributes of an Action.",
+      "type": "object",
+      "examples": [
+        {
+          "period": "2W"
+        }
+      ]
+    }
+  }
+}
