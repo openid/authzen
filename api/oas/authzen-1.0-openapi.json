@@ -10,8 +10,8 @@
   "paths": {
     "/access/v1/evaluation": {
       "post": {
-        "summary": "access_evaluation_endpoint",
-        "description": "https://openid.net/specs/authorization-api-1_0-05.html#name-access-evaluation-api",
+        "summary": "Access Evaluation",
+        "description": "The Access Evaluation API defines the message exchange pattern between a PEP and a PDP for executing a single access evaluation. see: https://openid.net/specs/authorization-api-1_0-05.html#name-access-evaluation-api",
         "operationId": "access_evaluation_endpoint",
         "requestBody": {
           "content": {
