@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "authzen-paginated-request",
+  "title": "Authzen paginated request",
+  "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#name-paginated-requests",
+  "type": "object",
+  "required": [],
+  "properties": {
+    "token": {
+      "description": "An opaque string value from the next_token of a previous response.",
+      "type": "string"
+    },
+    "limit": {
+      "description": "A non-negative integer indicating the maximum number of results to return in the response.",
+      "type": "number"
+    },
+    "properties": {
+      "description": "An object containing additional implementation-specific pagination request attributes, such as, but not limited to, sorting and filtering.",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "additionalProperties": false
+  }
+}

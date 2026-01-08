@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "authzen-search-resource-api-response",
+  "title": "Search Resource API - Response",
+  "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#name-the-search-api-response",
+  "type": "object",
+  "required": [
+    "results"
+  ],
+  "properties": {
+    "page": {
+      "$ref": "./paginated-response.json"
+    },
+    "context": {
+      "description": "The context (or environment) of type Context.",
+      "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#name-context",
+      "type": "object",
+      "examples": [
+        {
+          "time": "1985-10-26T01:22-07:00"
+        }
+      ]
+    },
+    "results": {
+      "description": "An array containing zero or more resources.",
+      "type": "array",
+      "items": {
+        "$ref": "./resource-base.json"
+      }
+    }
+  },
+  "additionalProperties": false
+}
