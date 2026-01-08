@@ -1,0 +1,40 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Authzen HTTP-json",
+    "description": "Authzen HTTP-json specs: https://openid.net/specs/authorization-api-1_0-05.html#name-https-json-binding",
+    "version": "1.0.0"
+  },
+  "servers": [
+  ],
+  "paths": {
+    "/access/v1/evaluation": {
+      "post": {
+        "summary": "access_evaluation_endpoint",
+        "description": "https://openid.net/specs/authorization-api-1_0-05.html#name-access-evaluation-api",
+        "operationId": "access_evaluation_endpoint",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../schemas/access-evaluation-request.json"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDP has successfully generated the decision",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../schemas/access-evaluation-response.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
