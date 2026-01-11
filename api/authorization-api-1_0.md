@@ -7,7 +7,7 @@ wg: OpenID AuthZEN
 
 docname: authorization-api-1_0
 
-title: Authorization API 1.0 – draft 05
+title: Authorization API 1.0
 abbrev: azapi
 lang: en
 kw:
@@ -2057,19 +2057,8 @@ This template uses extracts from templates written by
 {{{Pekka Savola}}}, {{{Elwyn Davies}}} and
 {{{Henrik Levkowetz}}}.
 
-# Document History
-
-** To be removed from the final specification **
-
-* 00 - Initial version.
-* 01 - First Implementers Draft. Refactored the optional fields of Subject, Action, and Resource into a `properties` sub-object, making it easier to design meaningful JSON Schema and protobuf contracts for the API.
-* 02 - Added the evaluations API.
-* 03 - Added the search (subject, resource, action) APIs.
-* 04 - Added metadata discovery.
-* 05 - Consistency edits and preparation for Final Specification.
-
 # Notices {#Notices}
-Copyright (c) 2025 The OpenID Foundation.
+Copyright (c) 2026 The OpenID Foundation.
 
 The OpenID Foundation (OIDF) grants to any Contributor, developer, implementer,
 or other interested party a non-exclusive, royalty free, worldwide copyright license to
