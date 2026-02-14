@@ -1,0 +1,35 @@
+require 'kramdown'
+require 'kramdown-mermaid'
+
+# COAZ Architecture
+
+sequenceDiagram
+      participant C as MCP Client
+
+      participant G as (Optional)<br/>MCP Gateway
+
+      participant M as MCP Server
+
+      participant P as AuthZen PDP
+
+      C->>G: 1. List Tools
+      G->>M: 1. List Tools
+
+      M->>G: Tools list including COAZ mapping
+      G->>C: Tools list including COAZ mapping
+
+      Note over C, M: Client determines tool(s) to call.
+
+      C->>G: Tool call
+
+      G-->>P: Verify permissions
+      P-->>G: Permit Tool
+
+      G->>M: Tool call
+
+      M-->>P: Verify permissions
+      P-->>M: Permit Tool
+
+      M->>G: Tool response
+      G->>C: Tool response
+
