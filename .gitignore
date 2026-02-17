@@ -18,6 +18,9 @@ api/authorization-api-*.xml
 api/authorization-api-*.txt
 authorization-api-*.html
 index.html
+profiles/*xml
+profiles/*txt
+profiles/*html
 
 # Misc
 .DS_Store
