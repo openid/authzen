@@ -49,10 +49,10 @@ importers:
         version: 1.2.8(@types/react-dom@19.1.9(@types/react@19.1.13))(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@react-router/node':
         specifier: ^7.7.1
-        version: 7.9.1(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
+        version: 7.9.1(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
       '@react-router/serve':
         specifier: ^7.7.1
-        version: 7.9.1(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
+        version: 7.9.1(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
       '@types/react-syntax-highlighter':
         specifier: ^15.5.13
         version: 15.5.13
@@ -78,8 +78,8 @@ importers:
         specifier: ^7.62.0
         version: 7.62.0(react@19.1.1)
       react-router:
-        specifier: ^7.7.1
-        version: 7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+        specifier: ^7.12.0
+        version: 7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       react-syntax-highlighter:
         specifier: ^15.6.6
         version: 15.6.6(react@19.1.1)
@@ -95,7 +95,7 @@ importers:
         version: 2.2.4
       '@react-router/dev':
         specifier: ^7.7.1
-        version: 7.9.1(@react-router/serve@7.9.1(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2))(@types/node@20.19.17)(jiti@2.5.1)(lightningcss@1.30.1)(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)(vite@6.4.1(@types/node@20.19.17)(jiti@2.5.1)(lightningcss@1.30.1))
+        version: 7.9.1(@react-router/serve@7.9.1(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2))(@types/node@20.19.17)(jiti@2.5.1)(lightningcss@1.30.1)(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)(vite@6.4.1(@types/node@20.19.17)(jiti@2.5.1)(lightningcss@1.30.1))
       '@tailwindcss/vite':
         specifier: ^4.1.4
         version: 4.1.13(vite@6.4.1(@types/node@20.19.17)(jiti@2.5.1)(lightningcss@1.30.1))
@@ -1356,8 +1356,8 @@ packages:
     resolution: {integrity: sha512-6DnInpx7SJ2AK3+CTUE/ZM0vWTUboZCegxhC2xiIydHR9jNuTAASBrfEpHhiGOZw/nX51bHt6YQl8jsGo4y/0w==}
     engines: {node: '>= 0.6'}
 
-  cookie@1.0.2:
-    resolution: {integrity: sha512-9Kr/j4O16ISv8zBBhJoi4bXOYNTkFLOqSL3UDB0njXxCXNezjeyVrJyGOWtgfs/q2km1gwBcfH8q1yEGoMYunA==}
+  cookie@1.1.1:
+    resolution: {integrity: sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==}
     engines: {node: '>=18'}
 
   cross-spawn@7.0.6:
@@ -1964,8 +1964,8 @@ packages:
       '@types/react':
         optional: true
 
-  react-router@7.9.1:
-    resolution: {integrity: sha512-pfAByjcTpX55mqSDGwGnY9vDCpxqBLASg0BMNAuMmpSGESo/TaOUG6BllhAtAkCGx8Rnohik/XtaqiYUJtgW2g==}
+  react-router@7.12.0:
+    resolution: {integrity: sha512-kTPDYPFzDVGIIGNLS5VJykK0HfHLY5MF3b+xj0/tTyNYL1gF1qs7u67Z9jEhQk2sQ98SUaHxlG31g1JtF7IfVw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
@@ -2040,6 +2040,9 @@ packages:
 
   set-cookie-parser@2.7.1:
     resolution: {integrity: sha512-IOc8uWeOZgnb3ptbCURJWNjWUPcO3ZnTTdzsurqERrP6nPyv+paC55vJM0LpOlT2ne+Ix+9+CRG1MNLlyZ4GjQ==}
+
+  set-cookie-parser@2.7.2:
+    resolution: {integrity: sha512-oeM1lpU/UvhTxw+g3cIfxXHyJRc/uidd3yK1P242gzHds0udQBYzs3y8j4gCCW+ZJ7ad0yctld8RYO+bdurlvw==}
 
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
@@ -3113,7 +3116,7 @@ snapshots:
 
   '@radix-ui/rect@1.1.1': {}
 
-  '@react-router/dev@7.9.1(@react-router/serve@7.9.1(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2))(@types/node@20.19.17)(jiti@2.5.1)(lightningcss@1.30.1)(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)(vite@6.4.1(@types/node@20.19.17)(jiti@2.5.1)(lightningcss@1.30.1))':
+  '@react-router/dev@7.9.1(@react-router/serve@7.9.1(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2))(@types/node@20.19.17)(jiti@2.5.1)(lightningcss@1.30.1)(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)(vite@6.4.1(@types/node@20.19.17)(jiti@2.5.1)(lightningcss@1.30.1))':
     dependencies:
       '@babel/core': 7.28.4
       '@babel/generator': 7.28.3
@@ -3123,7 +3126,7 @@ snapshots:
       '@babel/traverse': 7.28.4
       '@babel/types': 7.28.4
       '@npmcli/package-json': 4.0.1
-      '@react-router/node': 7.9.1(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
+      '@react-router/node': 7.9.1(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
       arg: 5.0.2
       babel-dead-code-elimination: 1.0.10
       chokidar: 4.0.3
@@ -3137,7 +3140,7 @@ snapshots:
       picocolors: 1.1.1
       prettier: 3.6.2
       react-refresh: 0.14.2
-      react-router: 7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      react-router: 7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       semver: 7.7.2
       set-cookie-parser: 2.7.1
       tinyglobby: 0.2.15
@@ -3145,7 +3148,7 @@ snapshots:
       vite: 6.4.1(@types/node@20.19.17)(jiti@2.5.1)(lightningcss@1.30.1)
       vite-node: 3.2.4(@types/node@20.19.17)(jiti@2.5.1)(lightningcss@1.30.1)
     optionalDependencies:
-      '@react-router/serve': 7.9.1(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
+      '@react-router/serve': 7.9.1(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
       typescript: 5.9.2
     transitivePeerDependencies:
       - '@types/node'
@@ -3163,30 +3166,30 @@ snapshots:
       - tsx
       - yaml
 
-  '@react-router/express@7.9.1(express@4.21.2)(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)':
+  '@react-router/express@7.9.1(express@4.21.2)(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)':
     dependencies:
-      '@react-router/node': 7.9.1(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
+      '@react-router/node': 7.9.1(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
       express: 4.21.2
-      react-router: 7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      react-router: 7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
     optionalDependencies:
       typescript: 5.9.2
 
-  '@react-router/node@7.9.1(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)':
+  '@react-router/node@7.9.1(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)':
     dependencies:
       '@mjackson/node-fetch-server': 0.2.0
-      react-router: 7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      react-router: 7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
     optionalDependencies:
       typescript: 5.9.2
 
-  '@react-router/serve@7.9.1(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)':
+  '@react-router/serve@7.9.1(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)':
     dependencies:
-      '@react-router/express': 7.9.1(express@4.21.2)(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
-      '@react-router/node': 7.9.1(react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
+      '@react-router/express': 7.9.1(express@4.21.2)(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
+      '@react-router/node': 7.9.1(react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
       compression: 1.8.1
       express: 4.21.2
       get-port: 5.1.1
       morgan: 1.10.1
-      react-router: 7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      react-router: 7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       source-map-support: 0.5.21
     transitivePeerDependencies:
       - supports-color
@@ -3496,7 +3499,7 @@ snapshots:
 
   cookie@0.7.1: {}
 
-  cookie@1.0.2: {}
+  cookie@1.1.1: {}
 
   cross-spawn@7.0.6:
     dependencies:
@@ -4048,11 +4051,11 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.1.13
 
-  react-router@7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
+  react-router@7.12.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
     dependencies:
-      cookie: 1.0.2
+      cookie: 1.1.1
       react: 19.1.1
-      set-cookie-parser: 2.7.1
+      set-cookie-parser: 2.7.2
     optionalDependencies:
       react-dom: 19.1.1(react@19.1.1)
 
@@ -4154,6 +4157,8 @@ snapshots:
       - supports-color
 
   set-cookie-parser@2.7.1: {}
+
+  set-cookie-parser@2.7.2: {}
 
   setprototypeof@1.2.0: {}
 
