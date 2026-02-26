@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "authzen-paginated-response",
+  "title": "Authzen paginated response",
+  "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#name-paginated-responses",
+  "type": "object",
+  "required": [
+    "next_token"
+  ],
+  "properties": {
+    "next_token": {
+      "description": "An opaque string value indicating the next page of results to return. If there are no more results after this page, its value MUST be an empty string.",
+      "type": "string"
+    },
+    "count": {
+      "description": "A non-negative integer indicating the number of results included in this response.",
+      "type": "number"
+    },
+    "total": {
+      "description": "A non-negative integer indicating the total number of results matching the query criteria at the time of the request. This value is not guaranteed to equal the total number of items returned across all pages if the underlying data set changes during pagination.",
+      "type": "number"
+    },
+    "properties": {
+      "description": "An object containing additional pagination response attributes.",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "additionalProperties": false
+  }
+}
