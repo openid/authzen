@@ -1,0 +1,2274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>AuthZen Profile for Model Context Protocol Tool Authorization</title>
+<meta content="Atul Tulshibagwale" name="author">
+<meta content="
+       This specification defines a profile of the OpenID AuthZen Authorization API for use with the Model Context Protocol (MCP). It introduces COAZ (Compatible
+with OpenID AuthZen), a standardized mapping from MCP tool definitions and
+their invocation parameters to the AuthZen Subject-Action-Resource-Context
+(SARC) model. This enables MCP gateways and servers to perform
+fine-grained, parameter-level authorization checks via an AuthZen Policy
+Decision Point (PDP) before executing MCP tools. It also helps MCP Clients understand how authorization will be performed by the server, so that it can provide appropriate parameters to the MCP server tools it invokes. 
+    " name="description">
+<meta content="xml2rfc 3.31.0" name="generator">
+<meta content="authorization" name="keyword">
+<meta content="MCP" name="keyword">
+<meta content="AuthZen" name="keyword">
+<meta content="fine-grained authorization" name="keyword">
+<meta content="AI agents" name="keyword">
+<meta content="authzen-mcp-profile-1_0" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.31.0
+    Python 3.14.3
+    ConfigArgParse 1.7.1
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.0.2
+    platformdirs 4.5.1
+    pycountry 24.6.1
+    PyYAML 6.0.3
+    requests 2.32.5
+    wcwidth 0.2.14
+-->
+<link href="authzen-mcp-profile-1_0.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">/*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necessary during the development of the v3
+  formatters.
+
+*/
+
+/* fonts */
+@import url('https://static.ietf.org/fonts/noto-sans/import.css'); /* Sans-serif */
+@import url('https://static.ietf.org/fonts/noto-serif/import.css'); /* Serif (print) */
+@import url('https://static.ietf.org/fonts/roboto-mono/import.css'); /* Monospace */
+
+:root {
+  --font-sans: 'Noto Sans', Arial, Helvetica, sans-serif;
+  --font-serif: 'Noto Serif', 'Times', 'Times New Roman', serif;
+  --font-mono: 'Roboto Mono', Courier, 'Courier New', monospace;
+}
+
+@viewport {
+  zoom: 1.0;
+}
+@-ms-viewport {
+  width: extend-to-zoom;
+  zoom: 1.0;
+}
+/* general and mobile first */
+html {
+}
+body {
+  max-width: 90%;
+  margin: 1.5em auto;
+  color: #222;
+  background-color: #fff;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  overflow-wrap: break-word;
+}
+.ears {
+  display: none;
+}
+
+/* headings */
+#title, h1, h2, h3, h4, h5, h6 {
+  margin: 1em 0 0.5em;
+  font-weight: bold;
+  line-height: 1.3;
+}
+#title {
+  clear: both;
+  border-bottom: 1px solid #ddd;
+  margin: 0 0 0.5em 0;
+  padding: 1em 0 0.5em;
+}
+.author {
+  padding-bottom: 4px;
+}
+h1 {
+  font-size: 26px;
+  margin: 1em 0;
+}
+h2 {
+  font-size: 22px;
+  margin-top: -20px;  /* provide offset for in-page anchors */
+  padding-top: 33px;
+}
+h3 {
+  font-size: 18px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h4 {
+  font-size: 16px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h5, h6 {
+  font-size: 14px;
+}
+#n-copyright-notice {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+}
+/* general structure */
+p {
+  padding: 0;
+  margin: 0 0 1em 0;
+  text-align: left;
+}
+div, span {
+  position: relative;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+@media print {
+  svg {
+    max-height: 850px;
+    max-width: 660px;
+  }
+}
+svg[font-family~="serif" i], svg [font-family~="serif" i] {
+  font-family: var(--font-serif);
+}
+svg[font-family~="sans-serif" i], svg [font-family~="sans-serif" i] {
+  font-family: var(--font-sans);
+}
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  display: table;
+  border: none;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 1em 2em;
+}
+ol ol, ul ul, ol ul, ul ol {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+ul.ulBare, li.ulBare {
+  margin-left: 0em !important;
+}
+ul.compact, .ulCompact,
+ol.compact, .olCompact {
+  line-height: 100%;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+}
+dl > dt {
+  float: left;
+  margin-right: 1em;
+}
+/* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+dl > dd {
+  margin-bottom: .8em;
+  min-height: 1.3em;
+}
+dl.compact > dd, .dlCompact > dd {
+  margin-bottom: 0em;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0em;
+}
+
+/* links */
+a {
+  text-decoration: none;
+}
+a[href] {
+  color: #22e; /* Arlen: WCAG 2019 */
+}
+a[href]:hover {
+  background-color: #f2f2f2;
+}
+figcaption a[href],
+a[href].selfRef {
+  color: #222;
+}
+/* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+/* Figures */
+tt, code, pre {
+  background-color: #f9f9f9;
+  font-family: var(--font-mono);
+}
+pre {
+  border: 1px solid #eee;
+  margin: 0;
+  padding: 1em;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption {
+  font-style: italic;
+  margin: 0 0 1em 0;
+}
+@media screen {
+  pre {
+    overflow-x: auto;
+    max-width: 100%;
+    max-width: calc(100% - 22px);
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 1.2em 2em;
+}
+blockquote {
+  background-color: #f9f9f9;
+  color: #111; /* Arlen: WCAG 2019 */
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  margin: 1em 0;
+}
+blockquote > *:last-child {
+  margin-bottom: 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+.xref {
+  overflow-wrap: normal;
+}
+
+/* tables */
+table {
+  width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  border: 1px solid #eee;
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.5em 0.75em;
+}
+th {
+  text-align: left;
+  background-color: #e9e9e9;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f5f5f5;
+}
+table caption {
+  font-style: italic;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+table p {
+  /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  color: #666; /* Arlen: AHDJ 2019 */
+  text-decoration: none;
+  visibility: hidden;
+  user-select: none;
+  -ms-user-select: none;
+  -o-user-select:none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+@media screen {
+  aside:hover > a.pilcrow,
+  p:hover > a.pilcrow,
+  blockquote:hover > a.pilcrow,
+  div:hover > a.pilcrow,
+  li:hover > a.pilcrow,
+  pre:hover > a.pilcrow {
+    visibility: visible;
+  }
+  a.pilcrow:hover {
+    background-color: transparent;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+}
+.bcp14 {
+  font-variant: small-caps;
+}
+
+.role {
+  font-variant: all-small-caps;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: 0.9em;
+}
+#identifiers dt {
+  width: 3em;
+  clear: left;
+}
+#identifiers dd {
+  float: left;
+  margin-bottom: 0;
+}
+/* Fix PDF info block run off issue */
+@media print {
+  #identifiers dd {
+    max-width: 100%;
+  }
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #666; /* Arlen: WCAG 2019 */
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc  {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+nav.toc ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+nav.toc li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 7em;
+}
+.references dd {
+  margin-left: 8em;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.refSubseries {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+.index ul {
+  margin: 0 0 0 1em;
+  padding: 0;
+  list-style: none;
+}
+.index ul ul {
+  margin: 0;
+}
+.index li {
+  margin: 0;
+  text-indent: -2em;
+  padding-left: 2em;
+  padding-bottom: 5px;
+}
+.indexIndex {
+  margin: 0.5em 0 1em;
+}
+.index a {
+  font-weight: 700;
+}
+/* make the index two-column on all but the smallest screens */
+@media (min-width: 600px) {
+  .index ul {
+    -moz-column-count: 2;
+    -moz-column-gap: 20px;
+  }
+  .index ul ul {
+    -moz-column-count: 1;
+    -moz-column-gap: 0;
+  }
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  font-family: var(--font-sans);
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+
+/* temporary notes */
+.rfcEditorRemove::before {
+  position: absolute;
+  top: 0.2em;
+  right: 0.2em;
+  padding: 0.2em;
+  content: "The RFC Editor will remove this note";
+  color: #9e2a00; /* Arlen: WCAG 2019 */
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+}
+.rfcEditorRemove {
+  position: relative;
+  padding-top: 1.8em;
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  border-radius: 3px;
+}
+.cref {
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 1023px) {
+  body {
+    padding-top: 2em;
+  }
+  #title {
+    padding: 1em 0;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  h2 {
+    font-size: 20px;
+    margin-top: -18px;  /* provide offset for in-page anchors */
+    padding-top: 38px;
+  }
+  #identifiers dd {
+    max-width: 60%;
+  }
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    background-color: inherit;
+    border-bottom: 1px solid #ccc;
+  }
+  #toc h2 {
+    margin: -1px 0 0 0;
+    padding: 4px 0 4px 6px;
+    padding-right: 1em;
+    min-width: 190px;
+    font-size: 1.1em;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 6px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 1024px) {
+  body {
+    max-width: 724px;
+    margin: 42px auto;
+    padding-left: 1.5em;
+    padding-right: 29em;
+  }
+  #toc {
+    position: fixed;
+    top: 42px;
+    right: 42px;
+    width: 25%;
+    margin: 0;
+    padding: 0 1em;
+    z-index: 1;
+  }
+  #toc h2 {
+    border-top: none;
+    border-bottom: 1px solid #ddd;
+    font-size: 1em;
+    font-weight: normal;
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 0;
+    overflow: auto;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  .breakable pre {
+    break-inside: auto;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+/* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+/*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+  /* The following is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+  /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+}
+
+/* Changes introduced to fix issues found during implementation */
+/* Make sure links are clickable even if overlapped by following H* */
+a {
+  z-index: 2;
+}
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Leave room in document info to show Internet-Draft on one line */
+#identifiers dt {
+  width: 8em;
+}
+
+/* Don't waste quite as much whitespace between label and value in doc info */
+#identifiers dd {
+  margin-left: 1em;
+}
+
+/* Give floating toc a background color (needed when it's a div inside section */
+#toc {
+  background-color: white;
+}
+
+/* Make the collapsed ToC header render white on gray also when it's a link */
+@media screen and (max-width: 1023px) {
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+}
+
+/* Give the bottom of the ToC some whitespace */
+@media screen and (min-width: 1024px) {
+  #toc {
+    padding: 0 0 1em 1em;
+  }
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* prevent monospace from becoming overly large */
+tt, code, pre {
+  font-size: 95%;
+}
+
+/* Fix the height/width aspect for ascii art*/
+.sourcecode pre,
+.art-text pre {
+  line-height: 1.12;
+}
+
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin-right: 0.5em;
+}
+
+/* Fix the dl styling to match the RFC 7992 attributes */
+dl > dt,
+dl.dlParallel > dt {
+  float: left;
+  margin-right: 1em;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+
+/* Provide styling for table cell text alignment */
+table td.text-left,
+table th.text-left {
+  text-align: left;
+}
+table td.text-center,
+table th.text-center {
+  text-align: center;
+}
+table td.text-right,
+table th.text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 30em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+table.right {
+ margin-left: auto;
+ margin-right: 0;
+}
+table.center {
+ margin-left: auto;
+ margin-right: auto;
+}
+table.left {
+ margin-left: 0;
+ margin-right: auto;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+caption a[href] {
+  color: #222;
+}
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+/* Tweak the bcp14 keyword presentation */
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+/* Tweak the invisible space above H* in order not to overlay links in text above */
+ h2 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 31px;
+ }
+ h3 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+ h4 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+/* Float artwork pilcrow to the right */
+@media screen {
+  .artwork a.pilcrow {
+    display: block;
+    line-height: 0.7;
+    margin-top: 0.15em;
+  }
+}
+/* Make pilcrows on dd visible */
+@media screen {
+  dd:hover > a.pilcrow {
+    visibility: visible;
+  }
+}
+/* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+.alignLeft.art-text,
+.alignCenter.art-text,
+.alignRight.art-text {
+   margin-bottom: 0;
+}
+.alignLeft,
+.alignCenter,
+.alignRight {
+  margin: 1em 0 0 0;
+}
+/* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+/* Styling for the external metadata */
+div#external-metadata {
+  background-color: #eee;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+  display: none;
+}
+div#internal-metadata {
+  padding: 0.5em;                       /* to match the external-metadata padding */
+}
+/* Styling for title RFC Number */
+h1#rfcnum {
+  clear: both;
+  margin: 0 0 -1em;
+  padding: 1em 0 0 0;
+}
+/* Make .olPercent look the same as <ol><li> */
+dl.olPercent > dd {
+  margin-bottom: 0.25em;
+  min-height: initial;
+}
+/* Give aside some styling to set it apart */
+aside {
+  border-left: 1px solid #ddd;
+  margin: 1em 0 1em 2em;
+  padding: 0.2em 2em;
+}
+aside > dl,
+aside > ol,
+aside > ul,
+aside > table,
+aside > p {
+  margin-bottom: 0.5em;
+}
+/* Additional page break settings */
+@media print {
+  figcaption, table caption {
+    page-break-before: avoid;
+  }
+}
+/* Font size adjustments for print */
+@media print {
+  body  { font-size: 10pt;      line-height: normal; max-width: 96%; }
+  h1    { font-size: 1.72em;    padding-top: 1.5em; } /* 1*1.2*1.2*1.2 */
+  h2    { font-size: 1.44em;    padding-top: 1.5em; } /* 1*1.2*1.2 */
+  h3    { font-size: 1.2em;     padding-top: 1.5em; } /* 1*1.2 */
+  h4    { font-size: 1em;       padding-top: 1.5em; }
+  h5, h6 { font-size: 1em;      margin: initial; padding: 0.5em 0 0.3em; }
+}
+/* Sourcecode margin in print, when there's no pilcrow */
+@media print {
+  .artwork,
+  .artwork > pre,
+  .sourcecode {
+    margin-bottom: 1em;
+  }
+}
+/* Avoid narrow tables forcing too narrow table captions, which may render badly */
+table {
+  min-width: 20em;
+}
+/* ol type a */
+ol.type-a { list-style-type: lower-alpha; }
+ol.type-A { list-style-type: upper-alpha; }
+ol.type-i { list-style-type: lower-roman; }
+ol.type-I { list-style-type: upper-roman; }
+/* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background slightly */
+table {
+  border: 1px solid #ddd;
+}
+td {
+  border-top: 1px solid #ddd;
+}
+tr {
+  break-inside: avoid;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f8f8f8;
+}
+/* Use style rules to govern display of the TOC. */
+@media screen and (max-width: 1023px) {
+  #toc nav { display: none; }
+  #toc.active nav { display: block; }
+}
+/* Add support for keepWithNext */
+.keepWithNext {
+  break-after: avoid-page;
+  break-after: avoid-page;
+}
+/* Add support for keepWithPrevious */
+.keepWithPrevious {
+  break-before: avoid-page;
+}
+/* Change the approach to avoiding breaks inside artwork etc. */
+figure, pre, table, .artwork, .sourcecode  {
+  break-before: auto;
+  break-after: auto;
+}
+/* Avoid breaks between <dt> and <dd> */
+dl {
+  break-before: auto;
+  break-inside: auto;
+}
+dt {
+  break-before: auto;
+  break-after: avoid-page;
+}
+dd {
+  break-before: avoid-page;
+  break-after: auto;
+  orphans: 3;
+  widows: 3
+}
+span.break, dd.break {
+  margin-bottom: 0;
+  min-height: 0;
+  break-before: auto;
+  break-inside: auto;
+  break-after: auto;
+}
+/* Undo break-before ToC */
+@media print {
+  #toc {
+    break-before: auto;
+  }
+}
+/* Text in compact lists should not get extra bottom margin space,
+   since that would makes the list not compact */
+ul.compact p, .ulCompact p,
+ol.compact p, .olCompact p {
+ margin: 0;
+}
+/* But the list as a whole needs the extra space at the end */
+section ul.compact,
+section .ulCompact,
+section ol.compact,
+section .olCompact {
+  margin-bottom: 1em;                    /* same as p not within ul.compact etc. */
+}
+/* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+tt, code {
+  background-color: transparent;
+}
+p tt, p code, li tt, li code, dt tt, dt code {
+  background-color: #f8f8f8;
+}
+/* Tweak the pre margin -- 0px doesn't come out well */
+pre {
+   margin-top: 0.5px;
+}
+/* Tweak the compact list text */
+ul.compact, .ulCompact,
+ol.compact, .olCompact,
+dl.compact, .dlCompact {
+  line-height: normal;
+}
+/* Don't add top margin for nested lists */
+li > ul, li > ol, li > dl,
+dd > ul, dd > ol, dd > dl,
+dl > dd > dl {
+  margin-top: initial;
+}
+/* Elements that should not be rendered on the same line as a <dt> */
+/* This should match the element list in writer.text.TextWriter.render_dl() */
+dd > div.artwork:first-child,
+dd > aside:first-child,
+dd > blockquote:first-child,
+dd > figure:first-child,
+dd > ol:first-child,
+dd > div.sourcecode:first-child,
+dd > table:first-child,
+dd > ul:first-child {
+  clear: left;
+}
+/* fix for weird browser behaviour when <dd/> is empty */
+dt+dd:empty::before{
+  content: "\00a0";
+}
+/* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+li > p {
+  margin-bottom: 0.5em
+}
+/* Don't let p margin spill out from inside list items */
+li > p:last-of-type:only-child {
+  margin-bottom: 0;
+}
+</style>
+<link href="rfc-local.css" rel="stylesheet" type="text/css">
+<script type="application/javascript">async function addMetadata(){try{const e=document.styleSheets[0].cssRules;for(let t=0;t<e.length;t++)if(/#identifiers/.exec(e[t].selectorText)){const a=e[t].cssText.replace("#identifiers","#external-updates");document.styleSheets[0].insertRule(a,document.styleSheets[0].cssRules.length)}}catch(e){console.log(e)}const e=document.getElementById("external-metadata");if(e)try{var t,a="",o=function(e){const t=document.getElementsByTagName("meta");for(let a=0;a<t.length;a++)if(t[a].getAttribute("name")===e)return t[a].getAttribute("content");return""}("rfc.number");if(o){t="https://www.rfc-editor.org/rfc/rfc"+o+".json";try{const e=await fetch(t);a=await e.json()}catch(e){t=document.URL.indexOf("html")>=0?document.URL.replace(/html$/,"json"):document.URL+".json";const o=await fetch(t);a=await o.json()}}if(!a)return;e.style.display="block";const s="",d="https://datatracker.ietf.org/doc",n="https://datatracker.ietf.org/ipr/search",c="https://www.rfc-editor.org/info",l=a.doc_id.toLowerCase(),i=a.doc_id.slice(0,3).toLowerCase(),f=a.doc_id.slice(3).replace(/^0+/,""),u={status:"Status",obsoletes:"Obsoletes",obsoleted_by:"Obsoleted By",updates:"Updates",updated_by:"Updated By",see_also:"See Also",errata_url:"Errata"};let h="<dl style='overflow:hidden' id='external-updates'>";["status","obsoletes","obsoleted_by","updates","updated_by","see_also","errata_url"].forEach(e=>{if("status"==e){a[e]=a[e].toLowerCase();var t=a[e].split(" "),o=t.length,w="",p=1;for(let e=0;e<o;e++)p<o?w=w+r(t[e])+" ":w+=r(t[e]),p++;a[e]=w}else if("obsoletes"==e||"obsoleted_by"==e||"updates"==e||"updated_by"==e){var g,m="",b=1;g=a[e].length;for(let t=0;t<g;t++)a[e][t]&&(a[e][t]=String(a[e][t]).toLowerCase(),m=b<g?m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>, ":m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>",b++);a[e]=m}else if("see_also"==e){var y,L="",C=1;y=a[e].length;for(let t=0;t<y;t++)if(a[e][t]){a[e][t]=String(a[e][t]);var _=a[e][t].slice(0,3),v=a[e][t].slice(3).replace(/^0+/,"");L=C<y?"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>, ":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>, ":"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>",C++}a[e]=L}else if("errata_url"==e){var R="";R=a[e]?R+"<a href='"+a[e]+"'>Errata exist</a> | <a href='"+d+"/"+l+"'>Datatracker</a>| <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>":"<a href='"+d+"/"+l+"'>Datatracker</a> | <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>",a[e]=R}""!=a[e]?"Errata"==u[e]?h+=`<dt>More info:</dt><dd>${a[e]}</dd>`:h+=`<dt>${u[e]}:</dt><dd>${a[e]}</dd>`:"Errata"==u[e]&&(h+=`<dt>More info:</dt><dd>${a[e]}</dd>`)}),h+="</dl>",e.innerHTML=h}catch(e){console.log(e)}else console.log("Could not locate metadata <div> element");function r(e){return e.charAt(0).toUpperCase()+e.slice(1)}}window.removeEventListener("load",addMetadata),window.addEventListener("load",addMetadata);</script>
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left"></td>
+<td class="center">coaz</td>
+<td class="right">February 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Tulshibagwale</td>
+<td class="center">Standards Track</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">OpenID AuthZEN</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-02-13" class="published">13 February 2026</time>
+    </dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">A. Tulshibagwale</div>
+<div class="org">SGNL</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">AuthZen Profile for Model Context Protocol Tool Authorization</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This specification defines a profile of the OpenID AuthZen Authorization API for use with the Model Context Protocol (MCP). It introduces COAZ (Compatible
+with OpenID AuthZen), a standardized mapping from MCP tool definitions and
+their invocation parameters to the AuthZen Subject-Action-Resource-Context
+(SARC) model. This enables MCP gateways and servers to perform
+fine-grained, parameter-level authorization checks via an AuthZen Policy
+Decision Point (PDP) before executing MCP tools. It also helps MCP Clients understand how authorization will be performed by the server, so that it can provide appropriate parameters to the MCP server tools it invokes.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-requirements-notation-and-c" class="internal xref">Requirements Notation and Conventions</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
+                <p id="section-toc.1-1.1.2.2.1" class="keepWithNext"><a href="#section-1.2" class="auto internal xref">1.2</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-authorization-requirements-" class="internal xref">Authorization Requirements for MCP Tools</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-architecture" class="internal xref">Architecture</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-declaring-authzen-compatibi" class="internal xref">Declaring AuthZen Compatibility</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-the-coaz-mapping" class="internal xref">The COAZ Mapping</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-overview" class="internal xref">Overview</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-mapping-variables" class="internal xref">Mapping Variables</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-mapping-object-schema" class="internal xref">Mapping Object Schema</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-schema" class="internal xref">Schema</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5">
+                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-example" class="internal xref">Example</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-pep-behavior" class="internal xref">PEP Behavior</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-constructing-the-authzen-re" class="internal xref">Constructing the AuthZen Request</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-handling-the-authzen-respon" class="internal xref">Handling the AuthZen Response</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-error-handling" class="internal xref">Error Handling</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-externalized-authorization" class="internal xref">Externalized Authorization</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-zero-trust-for-ai-agents" class="internal xref">Zero-Trust for AI Agents</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-token-integrity" class="internal xref">Token Integrity</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-transport-security" class="internal xref">Transport Security</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-mapping-integrity" class="internal xref">Mapping Integrity</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-relationship-to-other-speci" class="internal xref">Relationship to Other Specifications</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-openid-authzen-authorizatio" class="internal xref">OpenID AuthZen Authorization API</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-model-context-protocol" class="internal xref">Model Context Protocol</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3">
+                <p id="section-toc.1-1.10.2.3.1"><a href="#appendix-A.3" class="auto internal xref">A.3</a>.  <a href="#name-oauth-21" class="internal xref">OAuth 2.1</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-design-considerations" class="internal xref">Design Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                <p id="section-toc.1-1.11.2.1.1"><a href="#appendix-B.1" class="auto internal xref">B.1</a>.  <a href="#name-opt-in-complexity" class="internal xref">Opt-in Complexity</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
+                <p id="section-toc.1-1.11.2.2.1"><a href="#appendix-B.2" class="auto internal xref">B.2</a>.  <a href="#name-leveraging-standards" class="internal xref">Leveraging Standards</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3">
+                <p id="section-toc.1-1.11.2.3.1"><a href="#appendix-B.3" class="auto internal xref">B.3</a>.  <a href="#name-declarative-mapping" class="internal xref">Declarative Mapping</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-C" class="auto internal xref">Appendix C</a>.  <a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#appendix-D" class="auto internal xref">Appendix D</a>.  <a href="#name-notices" class="internal xref">Notices</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#appendix-E" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">The Model Context Protocol <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> enables AI agents (MCP clients) to discover
+and invoke tools offered by MCP servers. Tools are described in the response
+to the <code>tools/list</code> method, where each tool definition includes an <code>inputSchema</code> field
+containing a JSON Schema object that describes the required input parameters.
+MCP clients invoke tools by providing arguments conforming to this schema.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Authorization in MCP relies on OAuth 2.1 <span>[<a href="#OAUTH21" class="cite xref">OAUTH21</a>]</span>. However, OAuth alone
+leaves some concerns unaddressed:<a href="#section-1-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-1-3.1">
+          <p id="section-1-3.1.1">The OAuth access token is issued to the agent, which may be acting either
+autonomously on behalf of a human user who might not be present, or with a
+"human user in the loop". If the token is issued with the agent identity as
+the principal, there is no standard mechanism to capture the identity of the
+user on whose behalf the tool is being invoked.<a href="#section-1-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-3.2">
+          <p id="section-1-3.2.1">The OAuth access token may carry scopes that limit what the agent can do.
+However, depending on the user on whose behalf the agent is acting and what
+that user is currently authorized to access, the actual set of permitted
+resources in a specific call may be further constrained. Scopes alone cannot
+express this.<a href="#section-1-3.2.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-1-4">The OpenID AuthZen Authorization API <span>[<a href="#AUTHZEN" class="cite xref">AUTHZEN</a>]</span> provides a standardized
+interface for dynamic, fine-grained authorization decisions using the
+Subject-Action-Resource-Context (SARC) model. This specification defines a
+profile of AuthZen for MCP tool invocations, enabling MCP participants to
+leverage AuthZen PDPs for access control decisions that go beyond what OAuth
+alone can express.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<div id="requirements-notation-and-conventions">
+<section id="section-1.1">
+        <h3 id="name-requirements-notation-and-c">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-requirements-notation-and-c" class="section-name selfRef">Requirements Notation and Conventions</a>
+        </h3>
+<p id="section-1.1-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span>
+when, and only when, they appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="terminology">
+<section id="section-1.2">
+        <h3 id="name-terminology">
+<a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+        </h3>
+<p id="section-1.2-1">This specification uses the following terms:<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-1.2-2">
+          <dt id="section-1.2-2.1">MCP:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.2">
+            <p id="section-1.2-2.2.1">The Model Context Protocol, which enables AI agents integrate with independent services.<a href="#section-1.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.3">MCP Client:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.4">
+            <p id="section-1.2-2.4.1">An AI agent or application that connects to MCP servers and invokes tools.
+The MCP Client acts as the caller in MCP.<a href="#section-1.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.5">MCP Server:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.6">
+            <p id="section-1.2-2.6.1">A service that exposes tools, resources, and prompts to MCP clients via
+the Model Context Protocol.<a href="#section-1.2-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.7">MCP Gateway:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.8">
+            <p id="section-1.2-2.8.1">An intermediary that sits between an MCP client and one or more MCP
+servers. A gateway MAY perform authorization checks on behalf of the
+MCP server.<a href="#section-1.2-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.9">Tool:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.10">
+            <p id="section-1.2-2.10.1">A callable function exposed by an MCP server, described by a name,
+description, and input schema.<a href="#section-1.2-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.11">PDP:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.12">
+            <p id="section-1.2-2.12.1">Policy Decision Point, as defined in <span>[<a href="#AUTHZEN" class="cite xref">AUTHZEN</a>]</span>. A service that evaluates
+authorization requests and returns access decisions.<a href="#section-1.2-2.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.13">PEP:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.14">
+            <p id="section-1.2-2.14.1">Policy Enforcement Point, as defined in <span>[<a href="#AUTHZEN" class="cite xref">AUTHZEN</a>]</span>. In the context of this specification, the PEP
+is typically the MCP gateway or MCP server that calls the AuthZen PDP and enforces
+the resulting decision.<a href="#section-1.2-2.14.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-1.2-2.15">COAZ:</dt>
+          <dd style="margin-left: 1.5em" id="section-1.2-2.16">
+            <p id="section-1.2-2.16.1">Compatible with OpenID AuthZen (pronounced "cozy"). A marker indicating that an MCP tool
+supports the AuthZen mapping defined in this specification.<a href="#section-1.2-2.16.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="authorization-requirements-for-mcp-tools">
+<section id="section-2">
+      <h2 id="name-authorization-requirements-">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-authorization-requirements-" class="section-name selfRef">Authorization Requirements for MCP Tools</a>
+      </h2>
+<p id="section-2-1">In order to achieve dynamic, fine-grained authorization for MCP tool
+invocations, the following capabilities are needed beyond what OAuth provides:<a href="#section-2-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-2-2">
+<li id="section-2-2.1">
+          <p id="section-2-2.1.1">Verification of both the agent identity and the user identity on whose
+behalf the agent is acting, for each tool call the agent makes.<a href="#section-2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-2-2.2">
+          <p id="section-2-2.2.1">Determination of the specific resources that each tool call operates on.<a href="#section-2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-2-2.3">
+          <p id="section-2-2.3.1">Capture of additional context relevant to each tool call, such as tool specific parameters.<a href="#section-2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+<p id="section-2-3">The AuthZen API is designed to provide exactly this kind of dynamic,
+fine-grained authorization, but it requires specific parameters structured
+according to its information model. The purpose of this profile is therefore
+to:<a href="#section-2-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2-4.1">
+          <p id="section-2-4.1.1">Declare whether a given MCP tool is AuthZen compatible, and<a href="#section-2-4.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-2-4.2">
+          <p id="section-2-4.2.1">If a tool is AuthZen compatible, define how its input parameters and
+session tokens map to the AuthZen SARC model.<a href="#section-2-4.2.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<div id="architecture">
+<section id="section-2.1">
+        <h3 id="name-architecture">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-architecture" class="section-name selfRef">Architecture</a>
+        </h3>
+<p id="section-2.1-1">The response to the <code>tools/list</code> call of MCP has the <code>inputSchema</code> in it. The <code>inputSchema</code> declares whether the tool is COAZ or not.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+<p id="section-2.1-2">If a tool is COAZ, then the <code>inputSchema</code> includes a mapping of how the tool parameters are mapped to the AuthZen PDP.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+<p id="section-2.1-3">By including it in the response of the <code>tools/list</code> call, the COAZ mapping is made available to the MCP Client. This is so that the LLM (or the MCP Client) can determine the values for the tool parameters appropriately when calling the tool.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
+<p id="section-2.1-4">The authorization flow proceeds as follows: When the tool is called, a PEP (either an MCP gateway or the MCP
+server itself) calls the AuthZen PDP. The PEP uses the mapping defined in this
+specification to construct the AuthZen request parameters from the tool call
+arguments and the associated access token.<a href="#section-2.1-4" class="pilcrow">¶</a></p>
+<p id="section-2.1-5">It is also possible for the MCP client to call the AuthZen PDP before making
+the tool call. However, since the MCP client may not be trusted by the MCP
+server, this does not preclude the MCP server from performing its own
+authorization check.<a href="#section-2.1-5" class="pilcrow">¶</a></p>
+<p id="section-2.1-6">The architecture is described below:<a href="#section-2.1-6" class="pilcrow">¶</a></p>
+<span id="name-coaz-architecture"></span><div id="fig-coaz-architecture">
+<figure id="figure-1">
+          <div class="alignLeft art-ascii-art art-text artwork" id="section-2.1-7.1">
+<pre>
++-------------+        +-------------+           +-------------+       +-------------+
+|             |        |             |           |             |       |             |
+| MCP Client  |        | MCP Gateway |           | MCP Server  |       | AuthZen PDP |
+|             |        |             |           |             |       |             |
++-------------+        +-------------+           +-------------+       +-------------+
+       |                      |                         |                     |
+       |     1. List Tools    |                         |                     |
+       |                      |                         |                     |
+       +---------------------&gt;|      1. List Tools      |                     |
+       |                      |                         |                     |
+       |                      |------------------------&gt;|                     |
+       |                      |                         |                     |
+       |                      |                         |                     |
+       |                      |                         |                     |
+       |                      |&lt;------------------------+                     |
+       |                      |   Tools list including  |                     |
+       |&lt;---------------------+       COAZ mapping      |                     |
+       | Tools list including |                         |                     |
+       |     COAZ mapping     |                         |                     |
+       |                      |                         |                     |
+       |                      |                         |                     |
+       |     2. Tool call     |                         |                     |
+       |                      |                         |      3. Verify      |
+       +---------------------&gt;|                         |     permissions     |
+       |                      |                         |                     |
+       |                      +-------------------------+--------------------&gt;|
+       |                      |                         |                     |
+       |                      |                         |                     |
+       |                      &lt;-------------------------+---------------------+
+       |                      |                         |    Permit tool      |
+       |                      |                         |                     |
+       |                      |                         |                     |
+       |                      |       4. Tool call      |                     |
+       |                      |                         |                     |
+       |                      |------------------------&gt;|                     |
+       |                      |                         |      5. Verify      |
+       |                      |                         |     permissions     |
+       |                      |                         |                     |
+       |                      |                         +--------------------&gt;|
+       |                      |                         |                     |
+       |                      |                         |                     |
+       |                      |                         |&lt;--------------------+
+       |                      |&lt;------------------------+    Permit tool      |
+       |                      |                         |                     |
+       |&lt;---------------------+    6. Tool response     |                     |
+       |                      |                         |                     |
+       |   6. Tool response   |                         |                     |
+       |                      |                         |                     |
+       v                      v                         v                     v
++-------------+        +-------------+           +-------------+       +-------------+
+|             |        |             |           |             |       |             |
+| MCP Client  |        | MCP Gateway |           | MCP Server  |       | AuthZen PDP |
+|             |        |             |           |             |       |             |
++-------------+        +-------------+           +-------------+       +-------------+
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-coaz-architecture" class="selfRef">COAZ Architecture</a>
+          </figcaption></figure>
+</div>
+<p id="section-2.1-8">In the above diagram, the arrows 3 and 5 are alternatives to each other. If a Gateway exists, then it calls the AuthZen PDP, but if it doesn't exist, then the Server calls the AuthZen PDP. It is possible, but redundant for both these components to call the AuthZen PDP.<a href="#section-2.1-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="declaring-support">
+<section id="section-3">
+      <h2 id="name-declaring-authzen-compatibi">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-declaring-authzen-compatibi" class="section-name selfRef">Declaring AuthZen Compatibility</a>
+      </h2>
+<p id="section-3-1">MCP servers advertise that specific tools support AuthZen-based authorization
+by including a field named <code>coaz</code> in the tool object returned in the response
+to the <code>tools/list</code> method. The value of this field MUST be the boolean value
+<code>true</code> to indicate support for AuthZen.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">When MCP Server Cards become available, this field SHOULD also be included in the
+tool object within the server card.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">The following is a non-normative example of a <code>tools/list</code> response containing
+both a COAZ-compatible tool and a non-compatible tool:<a href="#section-3-3" class="pilcrow">¶</a></p>
+<span id="name-example-tools-list-response"></span><div id="fig-tools-list">
+<figure id="figure-2">
+        <div class="lang-json sourcecode" id="section-3-4.1">
+<pre>
+{
+  "tools": [
+    {
+      "name": "get_weather",
+      "coaz": true,
+      "title": "Weather Information Provider",
+      // more response fields.
+    },
+    {
+      "name": "get_local_weather",
+      "title": "Get local area weather",
+      // more response fields, not including a "coaz" field.
+    }
+  ]
+}
+</pre>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-example-tools-list-response" class="selfRef">Example tools/list response with COAZ declaration</a>
+        </figcaption></figure>
+</div>
+<p id="section-3-5">In this example, the <code>get_weather</code> tool is AuthZen compatible because it
+includes the <code>coaz</code> field set to <code>true</code>. The <code>get_local_weather</code> tool is not
+AuthZen compatible because it does not include a <code>coaz</code> field.<a href="#section-3-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="coaz-mapping">
+<section id="section-4">
+      <h2 id="name-the-coaz-mapping">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-the-coaz-mapping" class="section-name selfRef">The COAZ Mapping</a>
+      </h2>
+<div id="overview">
+<section id="section-4.1">
+        <h3 id="name-overview">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
+        </h3>
+<p id="section-4.1-1">For COAZ tools, the <code>inputSchema</code> object MUST include
+an <code>x-coaz-mapping</code> field. This field contains a JSON object that defines how
+the tool's input parameters and the caller's access token map to the AuthZen
+information model entities: Subject, Action, Resource, and Context.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="mapping-variables">
+<section id="section-4.2">
+        <h3 id="name-mapping-variables">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-mapping-variables" class="section-name selfRef">Mapping Variables</a>
+        </h3>
+<p id="section-4.2-1">Values within the <code>x-coaz-mapping</code> object MAY reference elements from the
+tool invocation using the following variables:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-4.2-2">
+          <dt id="section-4.2-2.1">
+<code>$properties</code>:</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-2.2">
+            <p id="section-4.2-2.2.1">Refers to the <code>properties</code> field of the <code>inputSchema</code> of the tool object.
+Individual properties within this variable are referenced using JSON
+Pointer <span>[<a href="#RFC6901" class="cite xref">RFC6901</a>]</span> notation adapted for JSONPath.<a href="#section-4.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-2.3">
+<code>$token</code>:</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-2.4">
+            <p id="section-4.2-2.4.1">Refers to the JWT-formatted <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span> OAuth access token used to authorize
+the tool call. Claims within the token are referenced using JSONPath
+notation.<a href="#section-4.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-4.2-3">Fields within these variables MUST be referred to using JSONPath expressions.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="mapping-schema">
+<section id="section-4.3">
+        <h3 id="name-mapping-object-schema">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-mapping-object-schema" class="section-name selfRef">Mapping Object Schema</a>
+        </h3>
+<p id="section-4.3-1">The <code>x-coaz-mapping</code> object MUST contain the following fields:<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-4.3-2">
+          <dt id="section-4.3-2.1">
+<code>resource</code>:</dt>
+          <dd style="margin-left: 1.5em" id="section-4.3-2.2">
+            <p id="section-4.3-2.2.1">REQUIRED. A JSON object describing how to construct the <code>resource</code>
+parameter of the AuthZen Access Evaluation API request. The object MAY
+contain static values and/or JSONPath references to tool input properties
+and token claims.<a href="#section-4.3-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.3-2.3">
+<code>subject</code>:</dt>
+          <dd style="margin-left: 1.5em" id="section-4.3-2.4">
+            <p id="section-4.3-2.4.1">REQUIRED. A JSON object describing how to construct the <code>subject</code>
+parameter of the AuthZen Access Evaluation API request. At least one field
+of the <code>subject</code> MUST be derived from the <code>$.token</code> variable.<a href="#section-4.3-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.3-2.5">
+<code>context</code>:</dt>
+          <dd style="margin-left: 1.5em" id="section-4.3-2.6">
+            <p id="section-4.3-2.6.1">REQUIRED. A JSON object describing how to construct the <code>context</code>
+parameter of the AuthZen Access Evaluation API request. For autonomous
+agent use cases, the <code>context</code> MUST include the identity of the agent.
+At least one field of either the <code>subject</code> or the <code>context</code> MUST be
+derived from the <code>$.token</code> variable.<a href="#section-4.3-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.3-2.7">
+<code>action</code>:</dt>
+          <dd style="margin-left: 1.5em" id="section-4.3-2.8">
+            <p id="section-4.3-2.8.1">OPTIONAL. A JSON object describing how to construct the <code>action</code>
+parameter of the AuthZen Access Evaluation API request. If this field is
+absent, the PEP MUST construct an Action object containing a single field
+named <code>name</code> whose value is the tool name from the MCP tool definition.<a href="#section-4.3-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-4.3-3">At least one field across the <code>subject</code> and <code>context</code> parameters MUST be
+derived from the <code>$token</code> variable.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="schema">
+<section id="section-4.4">
+        <h3 id="name-schema">
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-schema" class="section-name selfRef">Schema</a>
+        </h3>
+<p id="section-4.4-1">The schema of the <code>x-coaz-mapping</code> object is as follows:<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<div class="lang-typescript sourcecode" id="section-4.4-2">
+<pre>
+interface CoazMapping {
+  resource: object;
+  subject: object;
+  context: object;
+  action?: object;
+}
+</pre><a href="#section-4.4-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="mapping-example">
+<section id="section-4.5">
+        <h3 id="name-example">
+<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-example" class="section-name selfRef">Example</a>
+        </h3>
+<p id="section-4.5-1">The following is a non-normative example of a complete tool definition with
+a COAZ mapping:<a href="#section-4.5-1" class="pilcrow">¶</a></p>
+<span id="name-example-coaz-tool-definitio"></span><div id="fig-coaz-example">
+<figure id="figure-3">
+          <div class="lang-json sourcecode" id="section-4.5-2.1">
+<pre>
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "tools": [
+      {
+        "name": "get_customer",
+        "coaz": true,
+        "description": "Get customer details",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The customer identifier"
+            },
+            "case": {
+              "type": "string",
+              "description": "The case being worked on by the agent"
+            }
+          },
+          "x-coaz-mapping": {
+            "resource": {
+              "id": "$properties['id']",
+              "type": "customer"
+            },
+            "subject": {
+              "type": "user",
+              "id": "$token['sub']"
+            },
+            "context": {
+              "agent": "$token['client_id']",
+              "case": "$properties['case']"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+</pre>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-example-coaz-tool-definitio" class="selfRef">Example COAZ tool definition with mapping</a>
+          </figcaption></figure>
+</div>
+<p id="section-4.5-3">In this example:<a href="#section-4.5-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.5-4.1">
+            <p id="section-4.5-4.1.1">The <code>resource</code> is constructed with a static <code>type</code> value of <code>"customer"</code> and the <code>id</code> taken from the tool's <code>id</code>
+input property.<a href="#section-4.5-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.5-4.2">
+            <p id="section-4.5-4.2.1">The <code>subject</code> is constructed with a static <code>type</code> value of <code>"user"</code> and the
+<code>id</code> taken from the <code>sub</code> claim of the access token.<a href="#section-4.5-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.5-4.3">
+            <p id="section-4.5-4.3.1">The <code>context</code> includes the <code>client_id</code> claim from the access token as
+the agent identifier, and the <code>case</code> input property from the tool
+invocation.<a href="#section-4.5-4.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.5-4.4">
+            <p id="section-4.5-4.4.1">The <code>action</code> is not specified in the mapping, so the PEP constructs it
+as <code>{"name": "get_customer"}</code> using the tool name.<a href="#section-4.5-4.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-4.5-5">The resulting AuthZen Access Evaluation API request would be:<a href="#section-4.5-5" class="pilcrow">¶</a></p>
+<span id="name-resulting-authzen-access-ev"></span><div id="fig-authzen-request">
+<figure id="figure-4">
+          <div class="lang-json sourcecode" id="section-4.5-6.1">
+<pre>
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "action": {
+    "name": "get_customer"
+  },
+  "resource": {
+    "type": "customer",
+    "id": "cust-12345"
+  },
+  "context": {
+    "agent": "http://agentprovider.com/agent-app-id",
+    "case": "case-67890"
+  }
+}
+</pre>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-resulting-authzen-access-ev" class="selfRef">Resulting AuthZen Access Evaluation request</a>
+          </figcaption></figure>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="pep-behavior">
+<section id="section-5">
+      <h2 id="name-pep-behavior">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-pep-behavior" class="section-name selfRef">PEP Behavior</a>
+      </h2>
+<div id="constructing-the-authzen-request">
+<section id="section-5.1">
+        <h3 id="name-constructing-the-authzen-re">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-constructing-the-authzen-re" class="section-name selfRef">Constructing the AuthZen Request</a>
+        </h3>
+<p id="section-5.1-1">When a COAZ tool is invoked, the PEP MUST:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-5.1-2">
+<li id="section-5.1-2.1">
+            <p id="section-5.1-2.1.1">Parse the <code>x-coaz-mapping</code> from the tool's <code>inputSchema</code>.<a href="#section-5.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-5.1-2.2">
+            <p id="section-5.1-2.2.1">Resolve all JSONPath references against the tool call's input arguments
+(for <code>$.properties</code> references) and the access token (for <code>$.token</code>
+references).<a href="#section-5.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-5.1-2.3">
+            <p id="section-5.1-2.3.1">Construct the AuthZen Access Evaluation API request using the resolved
+values.<a href="#section-5.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-5.1-2.4">
+            <p id="section-5.1-2.4.1">Send the request to the configured AuthZen PDP.<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+</section>
+</div>
+<div id="handling-the-authzen-response">
+<section id="section-5.2">
+        <h3 id="name-handling-the-authzen-respon">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-handling-the-authzen-respon" class="section-name selfRef">Handling the AuthZen Response</a>
+        </h3>
+<p id="section-5.2-1">If the AuthZen PDP returns a <code>decision</code> value of <code>true</code> (permit), the PEP
+MUST allow the tool call to proceed.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">If the AuthZen PDP returns a <code>decision</code> value of <code>false</code> (deny), the PEP
+MUST NOT execute the tool and MUST return a JSON-RPC error response to
+the MCP client.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="error-handling">
+<section id="section-6">
+      <h2 id="name-error-handling">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-error-handling" class="section-name selfRef">Error Handling</a>
+      </h2>
+<p id="section-6-1">When the PEP receives a deny decision from the AuthZen PDP, it MUST respond
+to the MCP client with a JSON-RPC 2.0 <span>[<a href="#JSONRPC" class="cite xref">JSONRPC</a>]</span> error response.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">This specification defines the following error code for authorization failures
+in JSON-RPC:<a href="#section-6-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-6-3">
+        <dt id="section-6-3.1">Error Code:</dt>
+        <dd style="margin-left: 1.5em" id="section-6-3.2">
+          <p id="section-6-3.2.1"><code>-32401</code><a href="#section-6-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-6-3.3">Meaning:</dt>
+        <dd style="margin-left: 1.5em" id="section-6-3.4">
+          <p id="section-6-3.4.1">Unauthorized. The authorization check performed by the AuthZen PDP resulted
+in a deny decision for the requested tool invocation.<a href="#section-6-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-6-4">The <code>message</code> field of the JSON-RPC error object MAY be populated from the
+<code>context.reason</code> field of the AuthZen Access Evaluation API response, if
+present.<a href="#section-6-4" class="pilcrow">¶</a></p>
+<p id="section-6-5">The following is a non-normative example of an error response:<a href="#section-6-5" class="pilcrow">¶</a></p>
+<span id="name-example-json-rpc-error-resp"></span><div id="fig-error-response">
+<figure id="figure-5">
+        <div class="lang-json sourcecode" id="section-6-6.1">
+<pre>
+{
+  "jsonrpc": "2.0",
+  "id": 789,
+  "error": {
+    "code": -32401,
+    "message": "Access denied: insufficient permissions for customer record"
+  }
+}
+</pre>
+</div>
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<a href="#name-example-json-rpc-error-resp" class="selfRef">Example JSON-RPC error response for authorization denial</a>
+        </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-7">
+      <h2 id="name-security-considerations">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<div id="externalized-authorization">
+<section id="section-7.1">
+        <h3 id="name-externalized-authorization">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-externalized-authorization" class="section-name selfRef">Externalized Authorization</a>
+        </h3>
+<p id="section-7.1-1">This profile promotes the externalization of authorization logic from MCP
+tool implementations. By delegating authorization decisions to an AuthZen PDP,
+tool developers can separate security logic from business logic, enabling
+centralized policy management and consistent enforcement across tools.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="zero-trust-for-ai-agents">
+<section id="section-7.2">
+        <h3 id="name-zero-trust-for-ai-agents">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-zero-trust-for-ai-agents" class="section-name selfRef">Zero-Trust for AI Agents</a>
+        </h3>
+<p id="section-7.2-1">A critical security consideration for MCP deployments is the distinction
+between the human user (represented as the AuthZen Subject) and the AI agent
+(represented in the AuthZen Context). This separation enables policies that
+can independently evaluate the trust level of both the user and the agent,
+supporting zero-trust architectures for AI agent interactions.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="token-integrity">
+<section id="section-7.3">
+        <h3 id="name-token-integrity">
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-token-integrity" class="section-name selfRef">Token Integrity</a>
+        </h3>
+<p id="section-7.3-1">The access token referenced by <code>$token</code> MUST be validated by the PEP before
+extracting claims for the AuthZen request. The PEP MUST verify the token
+signature, issuer, audience, and expiration in accordance with <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span>
+and the OAuth framework in use.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="transport-security">
+<section id="section-7.4">
+        <h3 id="name-transport-security">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-transport-security" class="section-name selfRef">Transport Security</a>
+        </h3>
+<p id="section-7.4-1">All communication between the PEP and the AuthZen PDP MUST use TLS as
+specified in the transport requirements of <span>[<a href="#AUTHZEN" class="cite xref">AUTHZEN</a>]</span>.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="mapping-integrity">
+<section id="section-7.5">
+        <h3 id="name-mapping-integrity">
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-mapping-integrity" class="section-name selfRef">Mapping Integrity</a>
+        </h3>
+<p id="section-7.5-1">The <code>x-coaz-mapping</code> is provided by the MCP server as part of the tool
+definition. MCP clients and gateways that act as PEPs SHOULD validate that
+the mapping is well-formed and that all referenced properties exist in the
+tool's <code>inputSchema</code> before constructing the AuthZen request.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="iana-considerations">
+<section id="section-8">
+      <h2 id="name-iana-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-8-1">This document has no IANA actions.<a href="#section-8-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-9">
+      <h2 id="name-references">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-9.1">
+        <h3 id="name-normative-references">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="AUTHZEN">[AUTHZEN]</dt>
+        <dd>
+<span class="refAuthor">Gazitt, O.</span>, <span class="refAuthor">Brossard, D.</span>, and <span class="refAuthor">A. Tulshibagwale</span>, <span class="refTitle">"Authorization API 1.0"</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://openid.net/specs/authorization-api-1_0.html">https://openid.net/specs/authorization-api-1_0.html</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="JSONRPC">[JSONRPC]</dt>
+        <dd>
+<span class="refTitle">"JSON-RPC 2.0 Specification"</span>, <time datetime="2013" class="refDate">2013</time>, <span>&lt;<a href="https://www.jsonrpc.org/specification">https://www.jsonrpc.org/specification</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="MCP">[MCP]</dt>
+        <dd>
+<span class="refAuthor">Anthropic</span>, <span class="refTitle">"Model Context Protocol Specification"</span>, <time datetime="2025" class="refDate">2025</time>, <span>&lt;<a href="https://spec.modelcontextprotocol.io/">https://spec.modelcontextprotocol.io/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6749">[RFC6749]</dt>
+        <dd>
+<span class="refAuthor">Hardt, D., Ed.</span>, <span class="refTitle">"The OAuth 2.0 Authorization Framework"</span>, <span class="seriesInfo">RFC 6749</span>, <span class="seriesInfo">DOI 10.17487/RFC6749</span>, <time datetime="2012-10" class="refDate">October 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6749">https://www.rfc-editor.org/rfc/rfc6749</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6901">[RFC6901]</dt>
+        <dd>
+<span class="refAuthor">Bryan, P., Ed.</span>, <span class="refAuthor">Zyp, K.</span>, and <span class="refAuthor">M. Nottingham, Ed.</span>, <span class="refTitle">"JavaScript Object Notation (JSON) Pointer"</span>, <span class="seriesInfo">RFC 6901</span>, <span class="seriesInfo">DOI 10.17487/RFC6901</span>, <time datetime="2013-04" class="refDate">April 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6901">https://www.rfc-editor.org/rfc/rfc6901</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9110">[RFC9110]</dt>
+      <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <span class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI 10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-9.2">
+        <h3 id="name-informative-references">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="OAUTH21">[OAUTH21]</dt>
+        <dd>
+<span class="refTitle">"The OAuth 2.1 Authorization Framework"</span>, <time datetime="2024" class="refDate">2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-12">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-12</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7519">[RFC7519]</dt>
+        <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">N. Sakimura</span>, <span class="refTitle">"JSON Web Token (JWT)"</span>, <span class="seriesInfo">RFC 7519</span>, <span class="seriesInfo">DOI 10.17487/RFC7519</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7519">https://www.rfc-editor.org/rfc/rfc7519</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8259">[RFC8259]</dt>
+        <dd>
+<span class="refAuthor">Bray, T., Ed.</span>, <span class="refTitle">"The JavaScript Object Notation (JSON) Data Interchange Format"</span>, <span class="seriesInfo">STD 90</span>, <span class="seriesInfo">RFC 8259</span>, <span class="seriesInfo">DOI 10.17487/RFC8259</span>, <time datetime="2017-12" class="refDate">December 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8259">https://www.rfc-editor.org/rfc/rfc8259</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9396">[RFC9396]</dt>
+      <dd>
+<span class="refAuthor">Lodderstedt, T.</span>, <span class="refAuthor">Richer, J.</span>, and <span class="refAuthor">B. Campbell</span>, <span class="refTitle">"OAuth 2.0 Rich Authorization Requests"</span>, <span class="seriesInfo">RFC 9396</span>, <span class="seriesInfo">DOI 10.17487/RFC9396</span>, <time datetime="2023-05" class="refDate">May 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9396">https://www.rfc-editor.org/rfc/rfc9396</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="relationship-to-other-specifications">
+<section id="appendix-A">
+      <h2 id="name-relationship-to-other-speci">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-relationship-to-other-speci" class="section-name selfRef">Relationship to Other Specifications</a>
+      </h2>
+<div id="openid-authzen-authorization-api">
+<section id="appendix-A.1">
+        <h3 id="name-openid-authzen-authorizatio">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-openid-authzen-authorizatio" class="section-name selfRef">OpenID AuthZen Authorization API</a>
+        </h3>
+<p id="appendix-A.1-1">This specification is a profile of the OpenID AuthZen Authorization API
+<span>[<a href="#AUTHZEN" class="cite xref">AUTHZEN</a>]</span>. It defines a specific usage pattern for the Access Evaluation
+API endpoint in the context of MCP tool invocations, including how to
+construct the Subject, Action, Resource, and Context parameters from MCP
+tool definitions and OAuth access tokens.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="model-context-protocol">
+<section id="appendix-A.2">
+        <h3 id="name-model-context-protocol">
+<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-model-context-protocol" class="section-name selfRef">Model Context Protocol</a>
+        </h3>
+<p id="appendix-A.2-1">This specification extends the MCP <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> tool definition schema by
+introducing the <code>coaz</code> field and the <code>x-coaz-mapping</code> extension to the
+<code>inputSchema</code> object. These extensions are designed to be backward compatible
+with existing MCP implementations; servers and clients that do not understand
+COAZ will simply ignore these fields.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="oauth-21">
+<section id="appendix-A.3">
+        <h3 id="name-oauth-21">
+<a href="#appendix-A.3" class="section-number selfRef">A.3. </a><a href="#name-oauth-21" class="section-name selfRef">OAuth 2.1</a>
+        </h3>
+<p id="appendix-A.3-1">This specification complements the OAuth 2.1 <span>[<a href="#OAUTH21" class="cite xref">OAUTH21</a>]</span> authorization
+framework used by MCP. While OAuth provides authentication and coarse-grained
+authorization via scopes, this profile enables fine-grained, parameter-level
+authorization decisions that consider the specific resources and context of
+each tool invocation.<a href="#appendix-A.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="design-considerations">
+<section id="appendix-B">
+      <h2 id="name-design-considerations">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-design-considerations" class="section-name selfRef">Design Considerations</a>
+      </h2>
+<div id="opt-in-complexity">
+<section id="appendix-B.1">
+        <h3 id="name-opt-in-complexity">
+<a href="#appendix-B.1" class="section-number selfRef">B.1. </a><a href="#name-opt-in-complexity" class="section-name selfRef">Opt-in Complexity</a>
+        </h3>
+<p id="appendix-B.1-1">The COAZ mapping is entirely optional. MCP servers that do not require
+fine-grained authorization are not required to implement or understand the
+<code>x-coaz-mapping</code> schema. This ensures that the profile does not impose
+unnecessary complexity on simple deployments.<a href="#appendix-B.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="leveraging-standards">
+<section id="appendix-B.2">
+        <h3 id="name-leveraging-standards">
+<a href="#appendix-B.2" class="section-number selfRef">B.2. </a><a href="#name-leveraging-standards" class="section-name selfRef">Leveraging Standards</a>
+        </h3>
+<p id="appendix-B.2-1">Rather than defining an MCP-specific authorization language, this profile
+leverages the OpenID AuthZen Authorization API <span>[<a href="#AUTHZEN" class="cite xref">AUTHZEN</a>]</span>, a ratified
+standard designed for interoperable authorization. This allows the MCP
+ecosystem to remain authorization-implementation neutral by deferring
+policy evaluation to external, purpose-built policy engines.<a href="#appendix-B.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="declarative-mapping">
+<section id="appendix-B.3">
+        <h3 id="name-declarative-mapping">
+<a href="#appendix-B.3" class="section-number selfRef">B.3. </a><a href="#name-declarative-mapping" class="section-name selfRef">Declarative Mapping</a>
+        </h3>
+<p id="appendix-B.3-1">The <code>x-coaz-mapping</code> replaces ad-hoc, implementation-specific authorization
+code that developers would otherwise embed in tool handlers. By formalizing
+the mapping as a declarative schema, authorization intent becomes
+machine-readable and can be processed by gateways and proxies without
+requiring knowledge of the tool's internal implementation.<a href="#appendix-B.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgements">
+<section id="appendix-C">
+      <h2 id="name-acknowledgements">
+<a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
+      </h2>
+<p id="appendix-C-1">The author would like to thank Martin Besozzi for the original proposal on
+OpenID AuthZen integration for fine-grained authorization in MCP, which
+inspired the development of this specification. Thanks also to the members
+of the OpenID AuthZen Working Group for their ongoing work on the
+Authorization API standard.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="notices">
+<section id="appendix-D">
+      <h2 id="name-notices">
+<a href="#appendix-D" class="section-number selfRef">Appendix D. </a><a href="#name-notices" class="section-name selfRef">Notices</a>
+      </h2>
+<p id="appendix-D-1">Copyright (c) 2025 The OpenID Foundation.<a href="#appendix-D-1" class="pilcrow">¶</a></p>
+<p id="appendix-D-2">The OpenID Foundation (OIDF) grants to any Contributor, developer, implementer,
+or other interested party a non-exclusive, royalty free, worldwide copyright license to
+reproduce, prepare derivative works from, distribute, perform and display, this
+Implementers Draft, Final Specification, or Final Specification Incorporating Errata
+Corrections solely for the purposes of (i) developing specifications, and (ii)
+implementing Implementers Drafts, Final Specifications, and Final Specification
+Incorporating Errata Corrections based on such documents, provided that attribution
+be made to the OIDF as the source of the material, but that such attribution does not
+indicate an endorsement by the OIDF.<a href="#appendix-D-2" class="pilcrow">¶</a></p>
+<p id="appendix-D-3">The technology described in this specification was made available from contributions
+from various sources, including members of the OpenID Foundation and others.
+Although the OpenID Foundation has taken steps to help ensure that the technology
+is available for distribution, it takes no position regarding the validity or scope of any
+intellectual property or other rights that might be claimed to pertain to the
+implementation or use of the technology described in this specification or the extent
+to which any license under such rights might or might not be available; neither does it
+represent that it has made any independent effort to identify any such rights. The
+OpenID Foundation and the contributors to this specification make no (and hereby
+expressly disclaim any) warranties (express, implied, or otherwise), including implied
+warranties of merchantability, non-infringement, fitness for a particular purpose, or
+title, related to this specification, and the entire risk as to implementing this
+specification is assumed by the implementer. The OpenID Intellectual Property
+Rights policy (found at openid.net) requires contributors to offer a patent promise not
+to assert certain patent claims against other contributors and against implementers.
+OpenID invites any interested party to bring to its attention any copyrights, patents,
+patent applications, or other proprietary rights that may cover technology that may be
+required to practice this specification.<a href="#appendix-D-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-E">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Atul Tulshibagwale</span></div>
+<div dir="auto" class="left"><span class="org">SGNL</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:atul@sgnl.ai" class="email">atul@sgnl.ai</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
