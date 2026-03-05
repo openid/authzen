@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "authzen-evaluations-api-request",
+  "title": "Access Evaluations API - Request",
+  "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#name-the-access-evaluations-api-",
+  "type": "object",
+  "required": [
+    "evaluations"
+  ],
+  "properties": {
+    "subject": {
+      "description": "The subject (or principal) of type Subject to override in `evaluations`.",
+      "$ref": "./subject-base.json",
+      "required": []
+    },
+    "resource": {
+      "description": "The resource of type Resource to override in `evaluations`.",
+      "$ref": "./resource-base.json",
+      "required": []
+    },
+    "action": {
+      "description": "The action (or verb) of type Action to override in `evaluations`.",
+      "$ref": "./action-base.json",
+      "required": []
+    },
+    "evaluations": {
+      "description": "Array which contains a list of objects, each typed as the object as defined in the Access Evaluation Request",
+      "type": "array",
+      "$comment": "how to make sub each not required, maybe keep base schema requirement agnostic and put requirement at each request/response",
+      "items": {
+        "$ref": "./access-evaluation-request.json",
+        "required": []
+      }
+    },
+    "options": {
+      "description": "This provides a general-purpose mechanism for providing PEP-supplied metadata on how the request is to be executed.",
+      "type": "object",
+      "properties": {
+        "evaluations_semantic": {
+          "description": "(`execute_all`|`deny_on_first_deny`|`permit_on_first_permit`)",
+          "type": "string",
+          "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#name-evaluations-semantics"
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

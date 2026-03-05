@@ -1,0 +1,166 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Authzen HTTP-json",
+    "description": "Authzen HTTP-json specs: https://openid.net/specs/authorization-api-1_0-05.html#name-https-json-binding",
+    "version": "1.0.0"
+  },
+  "servers": [
+  ],
+  "paths": {
+    "/access/v1/evaluation": {
+      "post": {
+        "summary": "Access Evaluation",
+        "description": "The Access Evaluation API defines the message exchange pattern between a PEP and a PDP for executing a single access evaluation. see: https://openid.net/specs/authorization-api-1_0-05.html#name-access-evaluation-api",
+        "operationId": "accessEvaluationEndpoint",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../schemas/access-evaluation-request.json"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDP has successfully generated the decision",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../schemas/access-evaluation-response.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/access/v1/evaluations": {
+      "post": {
+        "summary": "Access Evaluations",
+        "description": "The Access Evaluation API defines the message exchange pattern between a PEP and a PDP for executing a single access evaluation. see: https://openid.net/specs/authorization-api-1_0-05.html#name-access-evaluations-api",
+        "operationId": "accessEvaluationsEndpoint",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "../schemas/access-evaluation-request.json"
+                  },
+                  {
+                    "$ref": "../schemas/access-evaluations-request.json"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDP has successfully generated the decision",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "../schemas/access-evaluation-response.json"
+                    },
+                    {
+                      "$ref": "../schemas/access-evaluations-response.json"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/access/v1/search/subject": {
+      "post": {
+        "summary": "Subject Search",
+        "description": "The Subject Search API returns all subjects of a given type that are permitted according to the provided Action, Resource and Context. see: https://openid.net/specs/authorization-api-1_0-05.html#name-subject-search-api",
+        "operationId": "searchSubjectEndpoint",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../schemas/search-subject-request.json"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDP has successfully process the subject search",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../schemas/search-subject-response.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/access/v1/search/resource": {
+      "post": {
+        "summary": "Resource Search",
+        "description": "The Resource Search API returns all resources of a given type that are permitted according to the provided Action, Subject and Context. see: https://openid.net/specs/authorization-api-1_0-05.html#name-resource-search-api",
+        "operationId": "searchResourceEndpoint",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../schemas/search-resource-request.json"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDP has successfully process the resource search",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../schemas/search-resource-response.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/access/v1/search/action": {
+      "post": {
+        "summary": "Action Search",
+        "description": "The Action Search API returns all actions that are permitted according to the provided Subject, Resource and Context. see: https://openid.net/specs/authorization-api-1_0-05.html#name-action-search-api",
+        "operationId": "searchActionEndpoint",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../schemas/search-action-request.json"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDP has successfully process the action search",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../schemas/search-action-response.json"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
