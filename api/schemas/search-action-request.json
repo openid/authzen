@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "authzen-search-action-api-request",
+  "title": "Search Action API - Request",
+  "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#name-the-action-search-api-reque",
+  "type": "object",
+  "required": [
+    "subject",
+    "resource"
+  ],
+  "properties": {
+    "subject": {
+      "description": "The subject (or principal) of type Subject.",
+      "$ref": "./subject-base.json"
+    },
+    "resource": {
+      "description": "The resource of type Resource.",
+      "$ref": "./resource-base.json"
+    },
+    "context": {
+      "description": "The context (or environment) of type Context.",
+      "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#name-context",
+      "type": "object",
+      "examples": [
+        {
+          "time": "1985-10-26T01:22-07:00"
+        }
+      ]
+    },
+    "page": {
+      "description": "A page object for paginated requests.",
+      "$ref": "./paginated-request.json"
+    }
+  },
+  "additionalProperties": false
+}

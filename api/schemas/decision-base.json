@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "authzen-decision-base",
+  "title": "Base model for Authzen decision",
+  "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#name-decision",
+  "type": "object",
+  "required": [
+    "decision"
+  ],
+  "properties": {
+    "decision": {
+      "description": "A boolean value that specifies whether the Decision is to allow or deny the operation.",
+      "type": "boolean"
+    },
+    "context": {
+      "description": "An object which can convey additional information that can be used by the PEP as part of the decision enforcement process.",
+      "type": "object",
+      "additionalProperties": false,
+      "examples": [
+        {
+          "reason_admin": {
+            "403": "Request failed policy C076E82F"
+          },
+          "reason_user": {
+            "403": "Insufficient privileges. Contact your administrator"
+          }
+        },
+        {
+          "metadata": {
+            "response_time": 60,
+            "response_time_unit": "ms"
+          },
+          "environment": {
+            "ip": "10.10.0.1",
+            "datetime": "2025-06-27T18:03-07:00",
+            "os": "ubuntu24.04.2LTS-AMDx64"
+          }
+        },
+        {
+          "acr_values": "urn:com:example:loa:3",
+          "amr_values": "mfa hwk"
+        }
+      ]
+    }
+  }
+}
