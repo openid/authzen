@@ -350,11 +350,100 @@ In addition to a `decision`, a response MAY contain a `context` field which cont
 Examples include, but are not limited to:
 
 - Reason(s) a decision was made,
-- "Advices" and/or "Obligations" tied to the access decision,
+- "Obligations" tied to the access decision,
 - Hints for rendering UI state,
 - Instructions for step-up authentication,
 - Environmental information,
 - etc.
+
+#### Obligation context field
+OPTIONAL - Obligations are a set of operations that the PEP MUST perform in conjunction with an authorization decision. They serve as mandatory instructions that extend the simple "Permit" or "Deny" outcome.
+
+The PEP is responsible for implementing and enforcing the obligations received with an authorization decision. If the PEP fails to fulfill an obligation that was part of a Permit decision, it must then deny access to the requested resource. This ensures that the stipulated actions are indeed carried out.
+
+Common Use Cases: 
+- _Logging and Accountability_: Recording access attempts, especially for sensitive data (e.g., logging that a doctor accessed a patient's medical record under emergency conditions).
+
+- _Notifications_: Triggering alerts or sending emails (e.g., notifying a manager if an unauthorized access attempt occurs).
+
+- _Multi-Factor Authentication/Trust Elevation_: Redirecting a user to an additional authentication step after an initial decision (e.g., requiring a higher assurance authentication method).
+
+- _"Break-the-Glass" Scenarios_: Allowing override of a denial under specific, monitored circumstances, with an obligation to log the override.
+
+- _Data Transformation_ : Watermarking a document before it is returned to the user.
+
+When used, the `obligations` context field MUST be an array of JSON objects. Each obligation MUST be uniquely identified within the object array by an identifier, which can then be used by the PEP to refer the the obligation in  logs for example. The obligation Ids are implementation-specific strings or identifiers.
+
+If an obligation object is provided in the PDP response, then the PEP MUST understand and perform all associated obligations. 
+
+The following non-normative example depicts a decision response with a single context obligation to notify a manager about a denied attempt, identified here using URI identifers:
+
+~~~ json
+{
+  "decision": false,
+  "context": {
+    "obligations": [
+      {
+        "id": "urn:example:obligation:notifyManager",
+        "emailNotification": [
+          {
+            "attributeId": "urn:example:attribute:managerEmail",
+            "value": "manager@example.com",
+            "dataType": "string"
+          },
+          {
+            "attributeId": "urn:example:attribute:deniedUser",
+            "value": "bob.jones",
+            "dataType": "string"
+          },
+          {
+            "attributeId": "urn:example:attribute:reasonForDenial",
+            "value": "InsufficientPrivileges",
+            "dataType": "string"
+          }
+        ]
+      }
+    ]
+  }
+}
+
+~~~
+{: #properties-example title="Non-normative Example obligation requiring an Email notification"}
+
+The following non-normative example depicts a decision response with two obligations, requiring the PEP to seek the specified `acr` and `amr` claim values for the user's `access_token` (in-effect requesting a higher level of assurance for the user's authentication; i.e., a step-up authentication), and also to email a manager about the access attempt:
+
+~~~ json
+{
+  "decision": false,
+  "context": {
+    "obligations": [
+      {
+        "id": "OBL-01",
+        "step-up": {
+          "acr_values": "urn:com:example:loa:3",
+          "amr_values": "mfa hwk"
+          "reason_user": {
+            "en-403": "Insufficient privileges. Contact your administrator",
+            "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
+          }
+        }
+      },
+      {
+        "id": "OBL-02",
+        "action": {
+          "type": "email",
+          "parameters": {
+            "to": "manager@example.com",
+            "subject": "Insufficient Assurance Level in Access Request",
+            "body": "<userid>"
+          }
+        }
+      }
+    ]
+  }
+}
+
+~~~
 
 ### Examples (non-normative) {#decision-examples}
 The following are all non-normative examples of possible and valid contexts, provided to illustrate possible usages. The actual semantics and format of the `context` object are an implementation concern and outside the scope of this specification. For example, implementations MAY use keys that correspond to concepts from other standards, such as HTTP status codes, to convey common reasons in an interoperable manner.
@@ -397,20 +486,6 @@ In the following non-normative example, the PDP justifies its decision by includ
 }
 ~~~
 {: #response-with-environment-context-example title="Non-normative Example Response with Environment and Metadata Context"}
-
-#### Non-normative Example 3: requesting step-up authentication
-In the following non-normative example, the PDP requests a step-up authentication of the requesting subject, by signalling the required `acr` and `amr` access token claim values it expects to see in order to approve the request:
-
-~~~ json
-{
-  "decision": false,
-  "context": {
-    "acr_values": "urn:com:example:loa:3",
-    "amr_values": "mfa hwk"
-  }
-}
-~~~
-{: #response-with-step-up-example title="Non-normative Example Response with a step-up request Context"}
 
 # Access Evaluation API {#access-evaluation-api}
 
