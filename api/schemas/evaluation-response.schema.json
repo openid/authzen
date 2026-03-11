@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "authzen-evaluation-request",
-  "title": "Access Evaluation API Request",
+  "$id": "authzen-evaluation-response",
+  "title": "Access Evaluation API Response",
   "$comment": "https://openid.net/specs/authorization-api-1_0-01.html#name-the-access-evaluation-api-re",
   "type": "object",
   "required": [
