@@ -1301,10 +1301,16 @@ Decision Point (PDP) before executing MCP tools. It also helps MCP Clients under
                 <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-mapping-object-schema" class="internal xref">Mapping Object Schema</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
-                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-schema" class="internal xref">Schema</a></p>
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-processing-rules" class="internal xref">Processing Rules</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5">
-                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-example" class="internal xref">Example</a></p>
+                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-schema" class="internal xref">Schema</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.6">
+                <p id="section-toc.1-1.4.2.6.1"><a href="#section-4.6" class="auto internal xref">4.6</a>.  <a href="#name-single-valued-example" class="internal xref">Single-valued Example</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.7">
+                <p id="section-toc.1-1.4.2.7.1"><a href="#section-4.7" class="auto internal xref">4.7</a>.  <a href="#name-multi-valued-example" class="internal xref">Multi-valued Example</a></p>
 </li>
             </ul>
 </li>
@@ -1316,6 +1322,14 @@ Decision Point (PDP) before executing MCP tools. It also helps MCP Clients under
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
                 <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-handling-the-authzen-respon" class="internal xref">Handling the AuthZen Response</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.1">
+                    <p id="section-toc.1-1.5.2.2.2.1.1"><a href="#section-5.2.1" class="auto internal xref">5.2.1</a>.  <a href="#name-evaluation-api" class="internal xref">Evaluation API</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.2">
+                    <p id="section-toc.1-1.5.2.2.2.2.1"><a href="#section-5.2.2" class="auto internal xref">5.2.2</a>.  <a href="#name-evaluations-api" class="internal xref">Evaluations API</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
@@ -1451,7 +1465,7 @@ when, and only when, they appear in all capitals, as shown here.<a href="#sectio
 <span class="break"></span><dl class="dlParallel" id="section-1.2-2">
           <dt id="section-1.2-2.1">MCP:</dt>
           <dd style="margin-left: 1.5em" id="section-1.2-2.2">
-            <p id="section-1.2-2.2.1">The Model Context Protocol, which enables AI agents integrate with independent services.<a href="#section-1.2-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-1.2-2.2.1">The Model Context Protocol, which enables AI agents to integrate with independent services.<a href="#section-1.2-2.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-1.2-2.3">MCP Client:</dt>
@@ -1644,12 +1658,12 @@ both a COAZ-compatible tool and a non-compatible tool:<a href="#section-3-3" cla
       "name": "get_weather",
       "coaz": true,
       "title": "Weather Information Provider",
-      // more response fields.
+      ... more response fields.
     },
     {
       "name": "get_local_weather",
       "title": "Get local area weather",
-      // more response fields, not including a "coaz" field.
+      ... more response fields, not including a "coaz" field.
     }
   ]
 }
@@ -1675,7 +1689,7 @@ AuthZen compatible because it does not include a <code>coaz</code> field.<a href
 <a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
         </h3>
 <p id="section-4.1-1">For COAZ tools, the <code>inputSchema</code> object MUST include
-an <code>x-coaz-mapping</code> field. This field contains a JSON object that defines how
+an <code>x-coaz-mapping</code> field. This field contains a JSON object whose fields are arrays that define how
 the tool's input parameters and the caller's access token map to the AuthZen
 information model entities: Subject, Action, Resource, and Context.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 </section>
@@ -1716,39 +1730,38 @@ notation.<a href="#section-4.2-2.4.1" class="pilcrow">¶</a></p>
 <p id="section-4.3-1">The <code>x-coaz-mapping</code> object MUST contain the following fields:<a href="#section-4.3-1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-4.3-2">
           <dt id="section-4.3-2.1">
-<code>resource</code>:</dt>
+<code>subject</code>:</dt>
           <dd style="margin-left: 1.5em" id="section-4.3-2.2">
-            <p id="section-4.3-2.2.1">REQUIRED. A JSON object describing how to construct the <code>resource</code>
-parameter of the AuthZen Access Evaluation API request. The object MAY
-contain static values and/or JSONPath references to tool input properties
-and token claims.<a href="#section-4.3-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-4.3-2.2.1">REQUIRED. An array of JSON objects describing how to construct the <code>subject</code>
+parameter of the AuthZen Access Evaluation API request. At least one field
+of the <code>subject</code> MUST be derived from the <code>$.token</code> variable.<a href="#section-4.3-2.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-4.3-2.3">
-<code>subject</code>:</dt>
+<code>action</code>:</dt>
           <dd style="margin-left: 1.5em" id="section-4.3-2.4">
-            <p id="section-4.3-2.4.1">REQUIRED. A JSON object describing how to construct the <code>subject</code>
-parameter of the AuthZen Access Evaluation API request. At least one field
-of the <code>subject</code> MUST be derived from the <code>$.token</code> variable.<a href="#section-4.3-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-4.3-2.4.1">OPTIONAL. An array of JSON objects describing how to construct the <code>action</code>
+parameter of the AuthZen Access Evaluation API request. If this field is
+absent, the PEP MUST use a single-element array containing <code>{"name": "&lt;tool name&gt;"}</code>, where <code>&lt;tool name&gt;</code> is the name of the MCP tool.<a href="#section-4.3-2.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-4.3-2.5">
-<code>context</code>:</dt>
+<code>resource</code>:</dt>
           <dd style="margin-left: 1.5em" id="section-4.3-2.6">
-            <p id="section-4.3-2.6.1">REQUIRED. A JSON object describing how to construct the <code>context</code>
-parameter of the AuthZen Access Evaluation API request. For autonomous
-agent use cases, the <code>context</code> MUST include the identity of the agent.
-At least one field of either the <code>subject</code> or the <code>context</code> MUST be
-derived from the <code>$.token</code> variable.<a href="#section-4.3-2.6.1" class="pilcrow">¶</a></p>
+            <p id="section-4.3-2.6.1">REQUIRED. An array of JSON objects describing how to construct the <code>resource</code>
+parameter of the AuthZen Access Evaluation API request. The object MAY
+contain static values and/or JSONPath references to tool input properties
+and token claims.<a href="#section-4.3-2.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-4.3-2.7">
-<code>action</code>:</dt>
+<code>context</code>:</dt>
           <dd style="margin-left: 1.5em" id="section-4.3-2.8">
-            <p id="section-4.3-2.8.1">OPTIONAL. A JSON object describing how to construct the <code>action</code>
-parameter of the AuthZen Access Evaluation API request. If this field is
-absent, the PEP MUST construct an Action object containing a single field
-named <code>name</code> whose value is the tool name from the MCP tool definition.<a href="#section-4.3-2.8.1" class="pilcrow">¶</a></p>
+            <p id="section-4.3-2.8.1">REQUIRED. An array of JSON objects describing how to construct the <code>context</code>
+parameter of the AuthZen Access Evaluation API request. For autonomous
+agent use cases, the <code>context</code> MUST include the identity of the agent.
+At least one field of either the <code>subject</code> or the <code>context</code> MUST be
+derived from the <code>$.token</code> variable.<a href="#section-4.3-2.8.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
@@ -1756,34 +1769,97 @@ named <code>name</code> whose value is the tool name from the MCP tool definitio
 derived from the <code>$token</code> variable.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="schema">
+<div id="processing-rules">
 <section id="section-4.4">
-        <h3 id="name-schema">
-<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-schema" class="section-name selfRef">Schema</a>
+        <h3 id="name-processing-rules">
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-processing-rules" class="section-name selfRef">Processing Rules</a>
         </h3>
-<p id="section-4.4-1">The schema of the <code>x-coaz-mapping</code> object is as follows:<a href="#section-4.4-1" class="pilcrow">¶</a></p>
-<div class="lang-typescript sourcecode" id="section-4.4-2">
+<p id="section-4.4-1">The following rules MUST be used to construct the Authorization API request from the above mapping object:<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.4-2.1">
+            <p id="section-4.4-2.1.1">If all fields specified in a mapping have arrays with a single element in them, then the <code>evaluation</code> API is called.<a href="#section-4.4-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.4-2.2">
+            <p id="section-4.4-2.2.1">If any field has an array with more than one element, then the <code>evaluations</code> API is called.<a href="#section-4.4-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.4-2.3">
+            <p id="section-4.4-2.3.1">If the PDP does not support the <code>evaluations</code> API and there is at least one field with more than one element in the COAZ mapping, then the PEP MUST give an error when it discovers the tool descriptions. This can be at initialization or in response to the <code>tools/list</code> call, depending on when it can access the description.<a href="#section-4.4-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.4-2.4">
+            <p id="section-4.4-2.4.1">All fields with single element arrays are specified outside of the <code>evaluations</code> array in the <code>evaluations</code> API request.<a href="#section-4.4-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.4-2.5">
+            <p id="section-4.4-2.5.1">If the <code>action</code> field is missing, it is assumed to be a single-element array containing <code>{"name": "&lt;tool name&gt;"}</code>, where <code>&lt;tool name&gt;</code> is the MCP tool name.<a href="#section-4.4-2.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.4-2.6">
+            <p id="section-4.4-2.6.1">All fields that have more than one element in the array values MUST have the same number of elements. A PEP MUST give an error if this is not the case.<a href="#section-4.4-2.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.4-2.7">
+            <p id="section-4.4-2.7.1">All fields with more than one element are specified inside the <code>evaluations</code> array in the <code>evaluations</code> API request. Each successive element of the <code>evaluations</code> array contains the successive value from each multi-valued field.<a href="#section-4.4-2.7.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="schema">
+<section id="section-4.5">
+        <h3 id="name-schema">
+<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-schema" class="section-name selfRef">Schema</a>
+        </h3>
+<p id="section-4.5-1">The schema of the <code>x-coaz-mapping</code> object is as follows:<a href="#section-4.5-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-4.5-2">
 <pre>
-interface CoazMapping {
-  resource: object;
-  subject: object;
-  context: object;
-  action?: object;
+{
+  "type": "object",
+  "required": ["subject", "resource", "context"],
+  "properties": {
+    "subject": {
+      "type": "array",
+      "description": "Array of subjects requesting access, as defined in {{AUTHZEN}}",
+      "items": {
+        "type": "object",
+        "description": "Subject object as specified in Section 3.2 of {{AUTHZEN}}"
+      }
+    },
+    "action": {
+      "type": "array",
+      "description": "Array of actions to be performed on the resources (optional)",
+      "items": {
+        "type": "object",
+        "description": "Action object as specified in Section 3.3 of {{AUTHZEN}}"
+      }
+    },
+    "resource": {
+      "type": "array",
+      "description": "Array of resources to be accessed, as defined in {{AUTHZEN}}",
+      "items": {
+        "type": "object",
+        "description": "Resource object as specified in Section 3.1 of {{AUTHZEN}}"
+      }
+    },
+    "context": {
+      "type": "array",
+      "description": "Array of contextual information relevant to the authorization decision",
+      "items": {
+        "type": "object",
+        "description": "Context object as specified in Section 3.4 of {{AUTHZEN}}"
+      }
+    }
+  }
 }
-</pre><a href="#section-4.4-2" class="pilcrow">¶</a>
+</pre><a href="#section-4.5-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
-<div id="mapping-example">
-<section id="section-4.5">
-        <h3 id="name-example">
-<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-example" class="section-name selfRef">Example</a>
+<div id="mapping-single-example">
+<section id="section-4.6">
+        <h3 id="name-single-valued-example">
+<a href="#section-4.6" class="section-number selfRef">4.6. </a><a href="#name-single-valued-example" class="section-name selfRef">Single-valued Example</a>
         </h3>
-<p id="section-4.5-1">The following is a non-normative example of a complete tool definition with
-a COAZ mapping:<a href="#section-4.5-1" class="pilcrow">¶</a></p>
+<p id="section-4.6-1">The following is a non-normative example of a complete tool definition with
+a COAZ mapping:<a href="#section-4.6-1" class="pilcrow">¶</a></p>
 <span id="name-example-coaz-tool-definitio"></span><div id="fig-coaz-example">
 <figure id="figure-3">
-          <div class="lang-json sourcecode" id="section-4.5-2.1">
+          <div class="lang-json sourcecode" id="section-4.6-2.1">
 <pre>
 {
   "jsonrpc": "2.0",
@@ -1807,18 +1883,18 @@ a COAZ mapping:<a href="#section-4.5-1" class="pilcrow">¶</a></p>
             }
           },
           "x-coaz-mapping": {
-            "resource": {
+            "resource": [{
               "id": "$properties['id']",
               "type": "customer"
-            },
-            "subject": {
+            }],
+            "subject": [{
               "type": "user",
               "id": "$token['sub']"
-            },
-            "context": {
+            }],
+            "context": [{
               "agent": "$token['client_id']",
               "case": "$properties['case']"
-            }
+            }]
           }
         }
       }
@@ -1831,30 +1907,30 @@ a COAZ mapping:<a href="#section-4.5-1" class="pilcrow">¶</a></p>
 <a href="#name-example-coaz-tool-definitio" class="selfRef">Example COAZ tool definition with mapping</a>
           </figcaption></figure>
 </div>
-<p id="section-4.5-3">In this example:<a href="#section-4.5-3" class="pilcrow">¶</a></p>
+<p id="section-4.6-3">In this example:<a href="#section-4.6-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4.5-4.1">
-            <p id="section-4.5-4.1.1">The <code>resource</code> is constructed with a static <code>type</code> value of <code>"customer"</code> and the <code>id</code> taken from the tool's <code>id</code>
-input property.<a href="#section-4.5-4.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-4.6-4.1">
+            <p id="section-4.6-4.1.1">The <code>resource</code> is constructed with a static <code>type</code> value of <code>"customer"</code> and the <code>id</code> taken from the tool's <code>id</code>
+input property.<a href="#section-4.6-4.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-4.5-4.2">
-            <p id="section-4.5-4.2.1">The <code>subject</code> is constructed with a static <code>type</code> value of <code>"user"</code> and the
-<code>id</code> taken from the <code>sub</code> claim of the access token.<a href="#section-4.5-4.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-4.6-4.2">
+            <p id="section-4.6-4.2.1">The <code>subject</code> is constructed with a static <code>type</code> value of <code>"user"</code> and the
+<code>id</code> taken from the <code>sub</code> claim of the access token.<a href="#section-4.6-4.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-4.5-4.3">
-            <p id="section-4.5-4.3.1">The <code>context</code> includes the <code>client_id</code> claim from the access token as
+          <li class="normal" id="section-4.6-4.3">
+            <p id="section-4.6-4.3.1">The <code>context</code> includes the <code>client_id</code> claim from the access token as
 the agent identifier, and the <code>case</code> input property from the tool
-invocation.<a href="#section-4.5-4.3.1" class="pilcrow">¶</a></p>
+invocation.<a href="#section-4.6-4.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-4.5-4.4">
-            <p id="section-4.5-4.4.1">The <code>action</code> is not specified in the mapping, so the PEP constructs it
-as <code>{"name": "get_customer"}</code> using the tool name.<a href="#section-4.5-4.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-4.6-4.4">
+            <p id="section-4.6-4.4.1">The <code>action</code> is not specified in the mapping, so the PEP constructs it
+as <code>{"name": "get_customer"}</code> using the tool name.<a href="#section-4.6-4.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-4.5-5">The resulting AuthZen Access Evaluation API request would be:<a href="#section-4.5-5" class="pilcrow">¶</a></p>
+<p id="section-4.6-5">The resulting AuthZen Access Evaluation API request would be:<a href="#section-4.6-5" class="pilcrow">¶</a></p>
 <span id="name-resulting-authzen-access-ev"></span><div id="fig-authzen-request">
 <figure id="figure-4">
-          <div class="lang-json sourcecode" id="section-4.5-6.1">
+          <div class="lang-json sourcecode" id="section-4.6-6.1">
 <pre>
 {
   "subject": {
@@ -1877,6 +1953,120 @@ as <code>{"name": "get_customer"}</code> using the tool name.<a href="#section-4
 </div>
 <figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
 <a href="#name-resulting-authzen-access-ev" class="selfRef">Resulting AuthZen Access Evaluation request</a>
+          </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="mapping-multi-example">
+<section id="section-4.7">
+        <h3 id="name-multi-valued-example">
+<a href="#section-4.7" class="section-number selfRef">4.7. </a><a href="#name-multi-valued-example" class="section-name selfRef">Multi-valued Example</a>
+        </h3>
+<p id="section-4.7-1">The following is a non-normative example of a tool that copies an object from
+one storage location to another. The operation requires two distinct privileges:
+<code>read</code> access on the source location and <code>write</code> access on the destination
+location. These are expressed as two entries in the action and resource arrays of
+the x-coaz-mapping object. The <code>subject</code> and <code>context</code> are the same for both checks and are therefore each a single-element array:<a href="#section-4.7-1" class="pilcrow">¶</a></p>
+<span id="name-example-coaz-tool-definition"></span><div id="fig-coaz-multi-example">
+<figure id="figure-5">
+          <div class="lang-json sourcecode" id="section-4.7-2.1">
+<pre>
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "tools": [
+      {
+        "name": "copy_object",
+        "coaz": true,
+        "description": "Copy a storage object from one location to another",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "description": "The source object location"
+            },
+            "destination": {
+              "type": "string",
+              "description": "The destination object location"
+            }
+          },
+          "x-coaz-mapping": {
+            "action": [
+              { "name": "read" },
+              { "name": "write" }
+            ],
+            "resource": [
+              { "type": "storage_object", "id": "$properties['source']" },
+              { "type": "storage_object", "id": "$properties['destination']" }
+            ],
+            "subject": [{
+              "type": "user",
+              "id": "$token['sub']"
+            }],
+            "context": [{
+              "agent": "$token['client_id']"
+            }]
+          }
+        }
+      }
+    ]
+  }
+}
+</pre>
+</div>
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<a href="#name-example-coaz-tool-definition" class="selfRef">Example COAZ tool definition with multi-valued mapping</a>
+          </figcaption></figure>
+</div>
+<p id="section-4.7-3">In this example:<a href="#section-4.7-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.7-4.1">
+            <p id="section-4.7-4.1.1">The <code>action</code> array has two elements: <code>read</code> for the source and <code>write</code> for
+the destination.<a href="#section-4.7-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.7-4.2">
+            <p id="section-4.7-4.2.1">The <code>resource</code> array has two elements: the source location and the
+destination location, each taken from the corresponding tool input property.<a href="#section-4.7-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.7-4.3">
+            <p id="section-4.7-4.3.1">The <code>subject</code> and <code>context</code> arrays each have a single element, as the same
+caller identity and agent context apply to both privilege checks.<a href="#section-4.7-4.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-4.7-5">Because <code>action</code> and <code>resource</code> each contain more than one element, the
+Processing Rules require the PEP to call the AuthZen Access Evaluations API.
+The single-element <code>subject</code> and <code>context</code> values are placed at the top level
+of the request as defaults. The resulting AuthZen Access Evaluations API
+request would be:<a href="#section-4.7-5" class="pilcrow">¶</a></p>
+<span id="name-resulting-authzen-access-eva"></span><div id="fig-authzen-multi-request">
+<figure id="figure-6">
+          <div class="lang-json sourcecode" id="section-4.7-6.1">
+<pre>
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "context": {
+    "agent": "http://agentprovider.com/agent-app-id"
+  },
+  "evaluations": [
+    {
+      "action": { "name": "read" },
+      "resource": { "type": "storage_object", "id": "/bucket/reports/q1.pdf" }
+    },
+    {
+      "action": { "name": "write" },
+      "resource": { "type": "storage_object", "id": "/bucket/archive/q1.pdf" }
+    }
+  ]
+}
+</pre>
+</div>
+<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
+<a href="#name-resulting-authzen-access-eva" class="selfRef">Resulting AuthZen Access Evaluations request for multi-valued mapping</a>
           </figcaption></figure>
 </div>
 </section>
@@ -1904,8 +2094,7 @@ as <code>{"name": "get_customer"}</code> using the tool name.<a href="#section-4
 references).<a href="#section-5.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-5.1-2.3">
-            <p id="section-5.1-2.3.1">Construct the AuthZen Access Evaluation API request using the resolved
-values.<a href="#section-5.1-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-2.3.1">Construct the AuthZen Access Evaluation or Evaluations API request according to the processing rules described in <a href="#processing-rules" class="auto internal xref">Section 4.4</a> using the resolved values.<a href="#section-5.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-5.1-2.4">
             <p id="section-5.1-2.4.1">Send the request to the configured AuthZen PDP.<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
@@ -1918,11 +2107,27 @@ values.<a href="#section-5.1-2.3.1" class="pilcrow">¶</a></p>
         <h3 id="name-handling-the-authzen-respon">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-handling-the-authzen-respon" class="section-name selfRef">Handling the AuthZen Response</a>
         </h3>
-<p id="section-5.2-1">If the AuthZen PDP returns a <code>decision</code> value of <code>true</code> (permit), the PEP
-MUST allow the tool call to proceed.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2">If the AuthZen PDP returns a <code>decision</code> value of <code>false</code> (deny), the PEP
+<div id="evaluation-api">
+<section id="section-5.2.1">
+          <h4 id="name-evaluation-api">
+<a href="#section-5.2.1" class="section-number selfRef">5.2.1. </a><a href="#name-evaluation-api" class="section-name selfRef">Evaluation API</a>
+          </h4>
+<p id="section-5.2.1-1">If the AuthZen PDP returns a <code>decision</code> value of <code>true</code> (permit), the PEP
+MUST allow the tool call to proceed.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-2">If the AuthZen PDP returns a <code>decision</code> value of <code>false</code> (deny), the PEP
 MUST NOT execute the tool and MUST return a JSON-RPC error response to
-the MCP client.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+the MCP client.<a href="#section-5.2.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="evaluations-api">
+<section id="section-5.2.2">
+          <h4 id="name-evaluations-api">
+<a href="#section-5.2.2" class="section-number selfRef">5.2.2. </a><a href="#name-evaluations-api" class="section-name selfRef">Evaluations API</a>
+          </h4>
+<p id="section-5.2.2-1">If all decisions returned by the PDP have the value <code>true</code> (permit), then the PEP MUST allow the tool call to proceed.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2.2-2">If one or more of the decisions returned by the PDP are <code>false</code> (deny), then the PEP MUST NOT execute the tool and MUST return a JSON-RPC error response to the MCP client.<a href="#section-5.2.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 </section>
@@ -1950,11 +2155,11 @@ in a deny decision for the requested tool invocation.<a href="#section-6-3.4.1" 
       <dd class="break"></dd>
 </dl>
 <p id="section-6-4">The <code>message</code> field of the JSON-RPC error object MAY be populated from the
-<code>context.reason</code> field of the AuthZen Access Evaluation API response, if
+<code>context.reason</code> field of <span>[<a href="#AUTHZEN" class="cite xref">AUTHZEN</a>]</span> Access Evaluation API response, if
 present.<a href="#section-6-4" class="pilcrow">¶</a></p>
 <p id="section-6-5">The following is a non-normative example of an error response:<a href="#section-6-5" class="pilcrow">¶</a></p>
 <span id="name-example-json-rpc-error-resp"></span><div id="fig-error-response">
-<figure id="figure-5">
+<figure id="figure-7">
         <div class="lang-json sourcecode" id="section-6-6.1">
 <pre>
 {
@@ -1967,7 +2172,7 @@ present.<a href="#section-6-4" class="pilcrow">¶</a></p>
 }
 </pre>
 </div>
-<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<figcaption><a href="#figure-7" class="selfRef">Figure 7</a>:
 <a href="#name-example-json-rpc-error-resp" class="selfRef">Example JSON-RPC error response for authorization denial</a>
         </figcaption></figure>
 </div>
@@ -2069,21 +2274,17 @@ tool's <code>inputSchema</code> before constructing the AuthZen request.<a href=
         <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC6749">[RFC6749]</dt>
-        <dd>
-<span class="refAuthor">Hardt, D., Ed.</span>, <span class="refTitle">"The OAuth 2.0 Authorization Framework"</span>, <span class="seriesInfo">RFC 6749</span>, <span class="seriesInfo">DOI 10.17487/RFC6749</span>, <time datetime="2012-10" class="refDate">October 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6749">https://www.rfc-editor.org/rfc/rfc6749</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="RFC6901">[RFC6901]</dt>
         <dd>
 <span class="refAuthor">Bryan, P., Ed.</span>, <span class="refAuthor">Zyp, K.</span>, and <span class="refAuthor">M. Nottingham, Ed.</span>, <span class="refTitle">"JavaScript Object Notation (JSON) Pointer"</span>, <span class="seriesInfo">RFC 6901</span>, <span class="seriesInfo">DOI 10.17487/RFC6901</span>, <time datetime="2013-04" class="refDate">April 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6901">https://www.rfc-editor.org/rfc/rfc6901</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC8174">[RFC8174]</dt>
+<dt id="RFC7519">[RFC7519]</dt>
         <dd>
-<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">N. Sakimura</span>, <span class="refTitle">"JSON Web Token (JWT)"</span>, <span class="seriesInfo">RFC 7519</span>, <span class="seriesInfo">DOI 10.17487/RFC7519</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7519">https://www.rfc-editor.org/rfc/rfc7519</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC9110">[RFC9110]</dt>
+<dt id="RFC8174">[RFC8174]</dt>
       <dd>
-<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <span class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI 10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>&gt;</span>. </dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -2097,10 +2298,6 @@ tool's <code>inputSchema</code> before constructing the AuthZen request.<a href=
 <dt id="OAUTH21">[OAUTH21]</dt>
         <dd>
 <span class="refTitle">"The OAuth 2.1 Authorization Framework"</span>, <time datetime="2024" class="refDate">2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-12">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-12</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC7519">[RFC7519]</dt>
-        <dd>
-<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">N. Sakimura</span>, <span class="refTitle">"JSON Web Token (JWT)"</span>, <span class="seriesInfo">RFC 7519</span>, <span class="seriesInfo">DOI 10.17487/RFC7519</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7519">https://www.rfc-editor.org/rfc/rfc7519</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8259">[RFC8259]</dt>
         <dd>

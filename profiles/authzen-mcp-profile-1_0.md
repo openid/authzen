@@ -28,9 +28,8 @@ author:
 normative:
   RFC2119:
   RFC8174:
-  RFC6749:
-  RFC9110:
   RFC6901:
+  RFC7519:
   AUTHZEN:
     title: "Authorization API 1.0"
     target: https://openid.net/specs/authorization-api-1_0.html
@@ -60,7 +59,6 @@ normative:
 informative:
   RFC8259:
   RFC9396:
-  RFC7519:
   OAUTH21:
     title: "The OAuth 2.1 Authorization Framework"
     target: https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-12
@@ -119,7 +117,7 @@ when, and only when, they appear in all capitals, as shown here.
 This specification uses the following terms:
 
 MCP:
-: The Model Context Protocol, which enables AI agents integrate with independent services.
+: The Model Context Protocol, which enables AI agents to integrate with independent services.
 
 MCP Client:
 : An AI agent or application that connects to MCP servers and invokes tools.
@@ -250,10 +248,10 @@ The architecture is described below:
 |             |        |             |           |             |       |             |
 +-------------+        +-------------+           +-------------+       +-------------+
 ~~~
- {: #fig-coaz-architecture title="COAZ Architecture"}
+{: #fig-coaz-architecture title="COAZ Architecture"}
 
 
- In the above diagram, the arrows 3 and 5 are alternatives to each other. If a Gateway exists, then it calls the AuthZen PDP, but if it doesn't exist, then the Server calls the AuthZen PDP. It is possible, but redundant for both these components to call the AuthZen PDP.
+In the above diagram, the arrows 3 and 5 are alternatives to each other. If a Gateway exists, then it calls the AuthZen PDP, but if it doesn't exist, then the Server calls the AuthZen PDP. It is possible, but redundant for both these components to call the AuthZen PDP.
 
 
 # Declaring AuthZen Compatibility {#declaring-support}
@@ -276,12 +274,12 @@ both a COAZ-compatible tool and a non-compatible tool:
       "name": "get_weather",
       "coaz": true,
       "title": "Weather Information Provider",
-      // more response fields.
+      ... more response fields.
     },
     {
       "name": "get_local_weather",
       "title": "Get local area weather",
-      // more response fields, not including a "coaz" field.
+      ... more response fields, not including a "coaz" field.
     }
   ]
 }
@@ -297,7 +295,7 @@ AuthZen compatible because it does not include a `coaz` field.
 ## Overview
 
 For COAZ tools, the `inputSchema` object MUST include
-an `x-coaz-mapping` field. This field contains a JSON object that defines how
+an `x-coaz-mapping` field. This field contains a JSON object whose fields are arrays that define how
 the tool's input parameters and the caller's access token map to the AuthZen
 information model entities: Subject, Action, Resource, and Context.
 
@@ -322,48 +320,89 @@ Fields within these variables MUST be referred to using JSONPath expressions.
 
 The `x-coaz-mapping` object MUST contain the following fields:
 
+`subject`:
+: REQUIRED. An array of JSON objects describing how to construct the `subject`
+  parameter of the AuthZen Access Evaluation API request. At least one field
+  of the `subject` MUST be derived from the `$.token` variable.
+
+`action`:
+: OPTIONAL. An array of JSON objects describing how to construct the `action`
+  parameter of the AuthZen Access Evaluation API request. If this field is
+  absent, the PEP MUST use a single-element array containing `{"name": "<tool name>"}`, where `<tool name>` is the name of the MCP tool.
+
 `resource`:
-: REQUIRED. A JSON object describing how to construct the `resource`
+: REQUIRED. An array of JSON objects describing how to construct the `resource`
   parameter of the AuthZen Access Evaluation API request. The object MAY
   contain static values and/or JSONPath references to tool input properties
   and token claims.
 
-`subject`:
-: REQUIRED. A JSON object describing how to construct the `subject`
-  parameter of the AuthZen Access Evaluation API request. At least one field
-  of the `subject` MUST be derived from the `$.token` variable.
-
 `context`:
-: REQUIRED. A JSON object describing how to construct the `context`
+: REQUIRED. An array of JSON objects describing how to construct the `context`
   parameter of the AuthZen Access Evaluation API request. For autonomous
   agent use cases, the `context` MUST include the identity of the agent.
   At least one field of either the `subject` or the `context` MUST be
   derived from the `$.token` variable.
 
-`action`:
-: OPTIONAL. A JSON object describing how to construct the `action`
-  parameter of the AuthZen Access Evaluation API request. If this field is
-  absent, the PEP MUST construct an Action object containing a single field
-  named `name` whose value is the tool name from the MCP tool definition.
-
 At least one field across the `subject` and `context` parameters MUST be
 derived from the `$token` variable.
+
+## Processing Rules {#processing-rules}
+The following rules MUST be used to construct the Authorization API request from the above mapping object:
+
+* If all fields specified in a mapping have arrays with a single element in them, then the `evaluation` API is called.
+* If any field has an array with more than one element, then the `evaluations` API is called.
+* If the PDP does not support the `evaluations` API and there is at least one field with more than one element in the COAZ mapping, then the PEP MUST give an error when it discovers the tool descriptions. This can be at initialization or in response to the `tools/list` call, depending on when it can access the description.
+* All fields with single element arrays are specified outside of the `evaluations` array in the `evaluations` API request.
+* If the `action` field is missing, it is assumed to be a single-element array containing `{"name": "<tool name>"}`, where `<tool name>` is the MCP tool name.
+* All fields that have more than one element in the array values MUST have the same number of elements. A PEP MUST give an error if this is not the case.
+* All fields with more than one element are specified inside the `evaluations` array in the `evaluations` API request. Each successive element of the `evaluations` array contains the successive value from each multi-valued field.
 
 ## Schema
 
 The schema of the `x-coaz-mapping` object is as follows:
 
-~~~ typescript
-
-interface CoazMapping {
-  resource: object;
-  subject: object;
-  context: object;
-  action?: object;
+~~~ json
+{
+  "type": "object",
+  "required": ["subject", "resource", "context"],
+  "properties": {
+    "subject": {
+      "type": "array",
+      "description": "Array of subjects requesting access, as defined in {{AUTHZEN}}",
+      "items": {
+        "type": "object",
+        "description": "Subject object as specified in Section 3.2 of {{AUTHZEN}}"
+      }
+    },
+    "action": {
+      "type": "array",
+      "description": "Array of actions to be performed on the resources (optional)",
+      "items": {
+        "type": "object",
+        "description": "Action object as specified in Section 3.3 of {{AUTHZEN}}"
+      }
+    },
+    "resource": {
+      "type": "array",
+      "description": "Array of resources to be accessed, as defined in {{AUTHZEN}}",
+      "items": {
+        "type": "object",
+        "description": "Resource object as specified in Section 3.1 of {{AUTHZEN}}"
+      }
+    },
+    "context": {
+      "type": "array",
+      "description": "Array of contextual information relevant to the authorization decision",
+      "items": {
+        "type": "object",
+        "description": "Context object as specified in Section 3.4 of {{AUTHZEN}}"
+      }
+    }
+  }
 }
 ~~~
 
-## Example {#mapping-example}
+## Single-valued Example {#mapping-single-example}
 
 The following is a non-normative example of a complete tool definition with
 a COAZ mapping:
@@ -391,18 +430,18 @@ a COAZ mapping:
             }
           },
           "x-coaz-mapping": {
-            "resource": {
+            "resource": [{
               "id": "$properties['id']",
               "type": "customer"
-            },
-            "subject": {
+            }],
+            "subject": [{
               "type": "user",
               "id": "$token['sub']"
-            },
-            "context": {
+            }],
+            "context": [{
               "agent": "$token['client_id']",
               "case": "$properties['case']"
-            }
+            }]
           }
         }
       }
@@ -450,6 +489,101 @@ The resulting AuthZen Access Evaluation API request would be:
 ~~~
 {: #fig-authzen-request title="Resulting AuthZen Access Evaluation request"}
 
+## Multi-valued Example {#mapping-multi-example}
+
+The following is a non-normative example of a tool that copies an object from
+one storage location to another. The operation requires two distinct privileges:
+`read` access on the source location and `write` access on the destination
+location. These are expressed as two entries in the action and resource arrays of
+the x-coaz-mapping object. The `subject` and `context` are the same for both checks and are therefore each a single-element array:
+
+~~~ json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "tools": [
+      {
+        "name": "copy_object",
+        "coaz": true,
+        "description": "Copy a storage object from one location to another",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "description": "The source object location"
+            },
+            "destination": {
+              "type": "string",
+              "description": "The destination object location"
+            }
+          },
+          "x-coaz-mapping": {
+            "action": [
+              { "name": "read" },
+              { "name": "write" }
+            ],
+            "resource": [
+              { "type": "storage_object", "id": "$properties['source']" },
+              { "type": "storage_object", "id": "$properties['destination']" }
+            ],
+            "subject": [{
+              "type": "user",
+              "id": "$token['sub']"
+            }],
+            "context": [{
+              "agent": "$token['client_id']"
+            }]
+          }
+        }
+      }
+    ]
+  }
+}
+~~~
+{: #fig-coaz-multi-example title="Example COAZ tool definition with multi-valued mapping"}
+
+In this example:
+
+- The `action` array has two elements: `read` for the source and `write` for
+  the destination.
+
+- The `resource` array has two elements: the source location and the
+  destination location, each taken from the corresponding tool input property.
+
+- The `subject` and `context` arrays each have a single element, as the same
+  caller identity and agent context apply to both privilege checks.
+
+Because `action` and `resource` each contain more than one element, the
+Processing Rules require the PEP to call the AuthZen Access Evaluations API.
+The single-element `subject` and `context` values are placed at the top level
+of the request as defaults. The resulting AuthZen Access Evaluations API
+request would be:
+
+~~~ json
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "context": {
+    "agent": "http://agentprovider.com/agent-app-id"
+  },
+  "evaluations": [
+    {
+      "action": { "name": "read" },
+      "resource": { "type": "storage_object", "id": "/bucket/reports/q1.pdf" }
+    },
+    {
+      "action": { "name": "write" },
+      "resource": { "type": "storage_object", "id": "/bucket/archive/q1.pdf" }
+    }
+  ]
+}
+~~~
+{: #fig-authzen-multi-request title="Resulting AuthZen Access Evaluations request for multi-valued mapping"}
+
 # PEP Behavior {#pep-behavior}
 
 ## Constructing the AuthZen Request
@@ -462,19 +596,24 @@ When a COAZ tool is invoked, the PEP MUST:
    (for `$.properties` references) and the access token (for `$.token`
    references).
 
-3. Construct the AuthZen Access Evaluation API request using the resolved
-   values.
+3. Construct the AuthZen Access Evaluation or Evaluations API request according to the processing rules described in {{processing-rules}} using the resolved values.
 
 4. Send the request to the configured AuthZen PDP.
 
 ## Handling the AuthZen Response
 
+### Evaluation API
 If the AuthZen PDP returns a `decision` value of `true` (permit), the PEP
 MUST allow the tool call to proceed.
 
 If the AuthZen PDP returns a `decision` value of `false` (deny), the PEP
 MUST NOT execute the tool and MUST return a JSON-RPC error response to
 the MCP client.
+
+### Evaluations API
+If all decisions returned by the PDP have the value `true` (permit), then the PEP MUST allow the tool call to proceed.
+
+If one or more of the decisions returned by the PDP are `false` (deny), then the PEP MUST NOT execute the tool and MUST return a JSON-RPC error response to the MCP client.
 
 # Error Handling {#error-handling}
 
@@ -492,7 +631,7 @@ Meaning:
   in a deny decision for the requested tool invocation.
 
 The `message` field of the JSON-RPC error object MAY be populated from the
-`context.reason` field of the AuthZen Access Evaluation API response, if
+`context.reason` field of {{AUTHZEN}} Access Evaluation API response, if
 present.
 
 The following is a non-normative example of an error response:
