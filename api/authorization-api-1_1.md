@@ -5,9 +5,9 @@ cat: std # Check
 submissiontype: IETF
 wg: OpenID AuthZEN
 
-docname: authorization-api-1_0
+docname: authorization-api-1_1
 
-title: Authorization API 1.0
+title: Authorization API 1.1
 abbrev: azapi
 lang: en
 kw:
@@ -20,7 +20,7 @@ kw:
   - PDP
   - PEP
   - ALFA
-# date: 2022-02-02 -- date is filled in automatically by xml2rfc if not given
+# date: 2026-03-11 -- date is filled in automatically by xml2rfc if not given
 author:
 - role: editor # remove if not true
   ins: O. Gazitt
@@ -37,6 +37,11 @@ author:
   name: Atul Tulshibagwale
   org: SGNL
   email: atul@sgnl.ai
+- role: editor # remove if not true
+  ins: A. Babeanu
+  name: Alexandre Babeanu
+  org: Indykite
+  email: alex.babeanu@indykite.com
 contributor: # Same structure as author list, but goes into contributors
 - name: Marc Jordan
   org: SGNL
@@ -80,6 +85,25 @@ normative:
       role: editor
       org: Entrust
     date: 2006
+  OPENID-CORE:
+    title: OpenID Connect Core 1.0 incorporating errata set 2
+    target: https://openid.net/specs/openid-connect-core-1_0.html#acrSemantics
+    author:
+    - name: Nat Sakimura
+      role: editor
+      org: NAT.Consulting
+    - name: John Bradley
+      role: editor
+      org: Yubico
+    - name: Michael B. Jones
+      role: editor
+      org: Self-Issued Consulting
+    - name: Breno Meideros
+      role: editor
+      org: Google
+    - name: Chuck Mortimore
+      role: editor
+      org: Disney
 
 informative:
   RFC7519: # JWT
@@ -350,11 +374,225 @@ In addition to a `decision`, a response MAY contain a `context` field which cont
 Examples include, but are not limited to:
 
 - Reason(s) a decision was made,
-- "Advices" and/or "Obligations" tied to the access decision,
+- "Obligations" tied to the access decision,
 - Hints for rendering UI state,
-- Instructions for step-up authentication,
 - Environmental information,
+- Special filters or directives for the PEP,
 - etc.
+
+#### Obligation context field
+OPTIONAL - Obligations are a set of actions that the PEP MUST perform regardless of the decision or search results otherwise provided in the response. If the PEP cannot comply, or the actions fail, then the PEP MUST change the decision to `false` ("Denied"), or in the case of searches, prevent any retrieved data to be presented to the requestor. This ensures that the stipulated actions are indeed carried out in all cases.
+
+The `obligations` field is OPTIONAL, but if provided in the PDP response then the PEP MUST understand and perform all associated obligations.
+
+Common Use Cases: 
+- _Logging and Accountability_: Recording access attempts, especially for sensitive data (e.g., logging that a doctor accessed a patient's medical record under emergency conditions).
+
+- _Notifications_: Triggering alerts or sending emails (e.g., notifying a manager if an unauthorized access attempt occurs).
+
+- _Multi-Factor Authentication/Trust Elevation_: Redirecting a user to an additional authentication step after an initial decision (e.g., requiring a higher assurance authentication method).
+
+- _Data Transformation_ : Watermarking a documents before they are returned to the user, or masking PII or other attributes is fetched data.
+
+When used, the `obligations` context field MUST be an array of JSON objects. Each obligation MUST be uniquely identified within the object array by an identifier, which can then be used by the PEP to refer the the obligation in  logs for example. The obligation `id` fields can be any string or identifier that can uniquely identity the `obligation` within the array.
+
+i.e., 
+
+`id` :
+: REQUIRED. The Unique identifier of this obligation within the `obligations` array.
+
+
+#### Normative Obligations
+In order to improve interoperability, the following obligation formats and semantics are provided as normative obligation actions, and are part of this specification. These correspond to common use-cases, and are expected to provide wide applicability.
+
+**Notes:** 
+- Only the `obligations` *format* is normative, any attribute values provided hereafter are non-normative examples.
+- Implementers can add any additonal, implementation-specific non-normative fields to the `obligations` object, as required by their environments.
+- The following `obligations` consitute a non-exhaustive base list, custom obligation actions can be devised by implementers if none of the normative obligation actions below suit their needs.
+
+##### Obligation: Step-Up Authentication
+Signaling the need for Step-Up authentication is a very common use case. Step-up can be requested before granting access to the requested resource, or before returning data via any of the Search APIs.
+
+_Normative Step-Up format_:
+Obligation fields:
+
+`step-up` :
+: REQUIRED. The Obligation action.
+
+`acr_value` : 
+: REQUIRED. The value of the Authentication Context Class Reference the requestor MUST achieve. The PEP MUST force the requestor to re-authenticate in order to achieve this authentication class. The `acr` class generally corresponds to a level of authentication assurance that the subject must reach. Example: `urn:com:example:loa:3` (see also [OPENID-CORE]).
+
+`amr_values` : 
+: OPTIONAL. A JSON Array of case-sensitive Strings that identify the Authentication Methods that MUST be used during the authentication process. These values SHOULD be registered with IANA, as per [OPENID-CORE] (see also [IANA.well-known-uris]). Example: `["mfa","hwk"]`.
+
+Format:
+~~~ json
+{
+  "context": {
+    "obligations": [
+      {
+        "id": "",
+        "step-up": {
+          "acr_values": "",
+          "amr_values": ""
+        }
+      }
+    ]
+  }
+}
+~~~
+{: #step-up-obligation title="Step-Up obligation Normative format"}
+
+The following is non-normative example of a Step-Up Authentication obligation, which includes an implementation-specific, custom `reason_user` object:
+~~~ json
+{
+  "context": {
+    "obligations": [
+      {
+        "id": "OBL-01",
+        "step-up": {
+          "acr_values": "urn:com:example:loa:3",
+          "amr_values": ["mfa","hwk"],
+          "reason_user": {
+            "en-403": "Insufficient privileges. Contact your administrator",
+            "es-403": "Privilegios insuficientes. Póngase en contacto con su administrador"
+          }
+        }
+      }
+    ]
+  }
+}
+~~~
+
+##### Obligation: Notification
+A notification obligation requires the transmission of a notification message to a destination, regardless of transport. Example notifications include email messages, asynchronous messages sent via pub/sub frameworks or any other means of conveying a message to a remote destination.
+
+_Normative Notification format_:
+Obligation fields:
+
+`notification` :
+: REQUIRED. The Obligation action.
+
+`to`: 
+: REQUIRED. An implementation-specific string identifiying the address of the Notification message destination. This identifier must be unique, and meaningful in the implementer's environment. Example: an email address, such as `"manager@example.com"`.
+
+`body` :
+: REQUIRED. The payload of the notification message. The actual message String.
+
+`topic`:
+: OPTIONAL. The Subject of the message (in case of email for example), provides a short high-lebvel purpose of the message. This field can be reused as needed by implementers, to help route the message as designating Kafka messaging topics for example.
+
+Format:
+~~~ json
+{
+  "context": {
+    "obligations": [
+      {
+        "id": "",
+        "notification": {
+          "to": "",
+          "body": "",
+          "topic": ""
+        }
+      }
+    ]
+  }
+}
+~~~
+{: #notification-obligation title="Notification obligation Normative format"}
+
+The following is non-normative example of a Notification Email obligation, here using a URI identifier:
+~~~ json
+{
+  "context": {
+    "obligations": [
+      {
+        "id": "urn:example:obligation:1",
+        "notification": {
+            "to": "manager@example.com",
+            "topic": "Insufficient Assurance Level in Access Request",
+            "body": "<userid> attempted to access resource <type.id> at <timestamp>."
+          }
+        }
+      }
+    ]
+  }
+}
+~~~
+
+##### Obligation: Session Terminate
+The session termination obligation requires the PEP to initiate any flow necessary to the terminate of the session of the provided Subject. The expectation is the invalidation of all of that Subject's session, including in Federated environments.
+
+_Normative Session Termination format_:
+Obligation fields:
+
+`session_termination` :
+: REQUIRED. The Obligation action.
+
+`subject` :
+: REQUIRED. The unique identifier of the subject who's sessions must be terminated.
+
+Format:
+~~~ json
+{
+  "context": {
+    "obligations": [
+      {
+        "id": "",
+        "session_termination": {
+          "subject": ""
+        }
+      }
+    ]
+  }
+}
+~~~
+{: #session-termination-obligation title="Session Termination obligation Normative format"}
+
+The following is non-normative example of a Session Termination obligation:
+~~~ json
+{
+  "context": {
+    "obligations": [
+      {
+        "id": "0010",
+        "session_termination": {
+            "subject": "alice@example.com"
+          }
+        }
+      }
+    ]
+  }
+}
+~~~
+
+#### Full Obligations examle
+The following non-normative example depicts a decision response with two context obligations to notify a manager about a denied attempt, and terminate the user's session:
+
+~~~ json
+{
+  "decision": false,
+  "context": {
+    "obligations": [
+      {
+        "id": "OBL-01",
+        "session_termination": {
+          "subject": "alice@example.com"
+        }
+      },
+      {
+        "id": "OBL-02",
+         "notification": {
+            "to": "admin@example.com",
+            "topic": "Illegal access attempt.",
+            "body": "<userid> attempted to access resource <type.id> at <timestamp>."
+          }
+      }
+    ]
+  }
+}
+~~~
+{: #obligations-full-example title="Non-normative sample obligations requiring Email notification and session termination"}
 
 ### Examples (non-normative) {#decision-examples}
 The following are all non-normative examples of possible and valid contexts, provided to illustrate possible usages. The actual semantics and format of the `context` object are an implementation concern and outside the scope of this specification. For example, implementations MAY use keys that correspond to concepts from other standards, such as HTTP status codes, to convey common reasons in an interoperable manner.
@@ -397,20 +635,6 @@ In the following non-normative example, the PDP justifies its decision by includ
 }
 ~~~
 {: #response-with-environment-context-example title="Non-normative Example Response with Environment and Metadata Context"}
-
-#### Non-normative Example 3: requesting step-up authentication
-In the following non-normative example, the PDP requests a step-up authentication of the requesting subject, by signalling the required `acr` and `amr` access token claim values it expects to see in order to approve the request:
-
-~~~ json
-{
-  "decision": false,
-  "context": {
-    "acr_values": "urn:com:example:loa:3",
-    "amr_values": "mfa hwk"
-  }
-}
-~~~
-{: #response-with-step-up-example title="Non-normative Example Response with a step-up request Context"}
 
 # Access Evaluation API {#access-evaluation-api}
 
