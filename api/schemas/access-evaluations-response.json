@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "authzen-evaluations-api-response",
+  "title": "Access Evaluations API - Response",
+  "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#name-the-access-evaluations-api-r",
+  "type": "object",
+  "properties": {
+    "evaluations": {
+      "type": "array",
+      "items": {
+        "$ref": "./decision-base.json"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "evaluations": [
+        {
+          "decision": true
+        }
+      ]
+    },
+    {
+      "evaluations": [
+        {
+          "decision": true
+        },
+        {
+          "decision": false,
+          "context": {
+            "code": "200",
+            "reason": "deny_on_first_deny"
+          }
+        }
+      ]
+    },
+    {
+      "evaluations": [
+        {
+          "decision": true
+        },
+        {
+          "decision": false,
+          "context": {
+            "reason": "resource not found"
+          }
+        },
+        {
+          "decision": false,
+          "context": {
+            "reason": "Subject is a viewer of the resource"
+          }
+        }
+      ]
+    },
+    {
+      "evaluations": [
+        {
+          "decision": true
+        },
+        {
+          "decision": false,
+          "context": {
+            "error": {
+              "status": 404,
+              "message": "Resource not found"
+            }
+          }
+        },
+        {
+          "decision": false,
+          "context": {
+            "reason": "Subject is a viewer of the resource"
+          }
+        }
+      ]
+    }
+  ]
+}

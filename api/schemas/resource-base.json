@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "authzen-resource-base",
+  "title": "Base model for Authzen resource",
+  "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#name-resource",
+  "type": "object",
+  "required": [
+    "type",
+    "id"
+  ],
+  "properties": {
+    "type": {
+      "description": "A string value that specifies the type of the Resource.",
+      "type": "string"
+    },
+    "id": {
+      "description": "A string value containing the unique identifier of the Resource, scoped to the `type`.",
+      "type": "string"
+    },
+    "properties": {
+      "description": "An object which can be used to express additional attributes of a Resource.",
+      "type": "object",
+      "examples": [
+        {
+          "library_record":{
+            "title": "AuthZEN in Action",
+            "isbn": "978-0593383322"
+          }
+        }
+      ]
+    }
+  }
+}

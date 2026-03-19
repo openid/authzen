@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "authzen-evaluation-api-request",
+  "title": "Access Evaluation API - Request",
+  "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#section-6.1",
+  "type": "object",
+  "required": [
+    "subject",
+    "resource",
+    "action"
+  ],
+  "properties": {
+    "subject": {
+      "$ref": "./subject-base.json"
+    },
+    "resource": {
+      "description": "The resource of type Resource.",
+      "$ref": "./resource-base.json"
+    },
+    "action": {
+      "description": "The action (or verb) of type Action.",
+      "$ref": "./action-base.json"
+    },
+    "context": {
+      "description": "The context (or environment) of type Context.",
+      "$comment": "https://openid.net/specs/authorization-api-1_0-05.html#name-context",
+      "type": "object",
+      "examples": [
+        {
+          "time": "1985-10-26T01:22-07:00"
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}
