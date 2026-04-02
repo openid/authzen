@@ -407,10 +407,10 @@ The PEP populates the CEL input variables as follows:
 
 ### Expression Syntax {#expression-syntax}
 
-A string value in the `x-coaz-mapping` object is treated as a CEL
-expression if it references the `params` or `token` input variables.
-String values that do not reference these variables are treated as static
-literal values.
+Every string value in the `x-coaz-mapping` object is a CEL expression.
+Static string values MUST be expressed as CEL string literals by wrapping
+them in single quotes (e.g., `'customer'`). A string value that is not a
+valid CEL expression MUST cause a mapping error (see {{mapping-errors}}).
 
 ## Mapping Object Schema {#mapping-schema}
 
@@ -430,8 +430,8 @@ The `x-coaz-mapping` object MUST contain the following fields:
 `resource`:
 : REQUIRED. An array of JSON objects describing how to construct the `resource`
   parameter of the AuthZen Access Evaluation API request. The object MAY
-  contain static values and/or CEL expressions referencing tool call
-  parameters and token claims.
+  contain CEL string literals for static values and/or CEL expressions
+  referencing tool call parameters and token claims.
 
 `context`:
 : REQUIRED. An array of JSON objects describing how to construct the `context`
@@ -529,10 +529,10 @@ a COAZ mapping:
           "x-coaz-mapping": {
             "resource": [{
               "id": "params.arguments.id",
-              "type": "customer"
+              "type": "'customer'"
             }],
             "subject": [{
-              "type": "user",
+              "type": "'user'",
               "id": "token.sub"
             }],
             "context": [{
@@ -550,11 +550,13 @@ a COAZ mapping:
 
 In this example:
 
-- The `resource` is constructed with a static `type` value of `"customer"` and the `id` derived from the tool call's `id`
-  argument using the CEL expression `params.arguments.id`.
+- The `resource` is constructed with the `type` set to the CEL string literal
+  `'customer'` and the `id` derived from the tool call's `id` argument using
+  the CEL expression `params.arguments.id`.
 
-- The `subject` is constructed with a static `type` value of `"user"` and the
-  `id` derived from the `sub` claim of the access token using `token.sub`.
+- The `subject` is constructed with the `type` set to the CEL string literal
+  `'user'` and the `id` derived from the `sub` claim of the access token
+  using `token.sub`.
 
 - The `context` includes the `client_id` claim from the access token
   (`token.client_id`) as the agent identifier, and the `case` argument
@@ -618,15 +620,15 @@ the x-coaz-mapping object. The `subject` and `context` are the same for both che
           },
           "x-coaz-mapping": {
             "action": [
-              { "name": "read" },
-              { "name": "write" }
+              { "name": "'read'" },
+              { "name": "'write'" }
             ],
             "resource": [
-              { "type": "storage_object", "id": "params.arguments.source" },
-              { "type": "storage_object", "id": "params.arguments.destination" }
+              { "type": "'storage_object'", "id": "params.arguments.source" },
+              { "type": "'storage_object'", "id": "params.arguments.destination" }
             ],
             "subject": [{
-              "type": "user",
+              "type": "'user'",
               "id": "token.sub"
             }],
             "context": [{
@@ -680,6 +682,81 @@ request would be:
 }
 ~~~
 {: #fig-authzen-multi-request title="Resulting AuthZen Access Evaluations request for multi-valued mapping"}
+
+## CEL Conditions Example (Non-normative) {#mapping-cel-conditions-example}
+
+The following non-normative example demonstrates the use of CEL conditional
+expressions and built-in functions within a COAZ mapping. A `transfer_funds`
+tool uses CEL ternary expressions to dynamically derive mapping values based
+on the tool call arguments and token claims:
+
+~~~ json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "tools": [
+      {
+        "name": "transfer_funds",
+        "coaz": true,
+        "description": "Transfer funds between accounts",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "from_account": {
+              "type": "string",
+              "description": "Source account identifier"
+            },
+            "to_account": {
+              "type": "string",
+              "description": "Destination account identifier"
+            },
+            "amount": {
+              "type": "number",
+              "description": "Transfer amount"
+            },
+            "currency": {
+              "type": "string",
+              "description": "Currency code (e.g., USD, EUR)"
+            }
+          },
+          "x-coaz-mapping": {
+            "resource": [{
+              "type": "'account'",
+              "id": "params.arguments.from_account",
+              "sensitivity": "params.arguments.amount > 10000 ? 'high' : 'standard'"
+            }],
+            "action": [{
+              "name": "params.arguments.currency == 'USD' ? 'domestic_transfer' : 'international_transfer'"
+            }],
+            "subject": [{
+              "type": "token.roles.exists(r, r == 'treasury') ? 'treasury_user' : 'standard_user'",
+              "id": "token.sub"
+            }],
+            "context": [{
+              "agent": "token.client_id",
+              "target_account": "params.arguments.to_account"
+            }]
+          }
+        }
+      }
+    ]
+  }
+}
+~~~
+{: #fig-coaz-cel-conditions-example title="Example COAZ tool definition with CEL conditional expressions"}
+
+In this example:
+
+- The `resource.sensitivity` field uses a ternary expression to set the value
+  to `"high"` when the transfer amount exceeds 10000, or `"standard"` otherwise.
+
+- The `action.name` field uses a string equality check to distinguish between
+  domestic and international transfers based on the currency.
+
+- The `subject.type` field uses the CEL `exists()` macro to check whether the
+  token's `roles` claim contains `"treasury"`, setting the subject type
+  accordingly.
 
 # PEP Behavior {#pep-behavior}
 
