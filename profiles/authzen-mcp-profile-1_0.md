@@ -24,11 +24,14 @@ author:
     fullname: Atul Tulshibagwale
     organization: SGNL
     email: atul@sgnl.ai
+ -
+    fullname: Alex Olivier
+    organization: Cerbos
+    email: alex@cerbos.dev
 
 normative:
   RFC2119:
   RFC8174:
-  RFC6901:
   RFC7519:
   AUTHZEN:
     title: "Authorization API 1.0"
@@ -55,6 +58,13 @@ normative:
     title: "JSON-RPC 2.0 Specification"
     target: https://www.jsonrpc.org/specification
     date: 2013
+  CEL:
+    title: "Common Expression Language"
+    target: https://cel.dev/
+    author:
+      -
+        name: Google
+    date: 2024
 
 informative:
   RFC8259:
@@ -274,12 +284,32 @@ both a COAZ-compatible tool and a non-compatible tool:
       "name": "get_weather",
       "coaz": true,
       "title": "Weather Information Provider",
-      ... more response fields.
+      "description": "Get current weather information for a location",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "string",
+            "description": "City name or zip code"
+          }
+        },
+        "required": ["location"]
+      }
     },
     {
       "name": "get_local_weather",
       "title": "Get local area weather",
-      ... more response fields, not including a "coaz" field.
+      "description": "Get weather for the local area",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "zip": {
+            "type": "string",
+            "description": "Zip code"
+          }
+        },
+        "required": ["zip"]
+      }
     }
   ]
 }
@@ -299,22 +329,96 @@ an `x-coaz-mapping` field. This field contains a JSON object whose fields are ar
 the tool's input parameters and the caller's access token map to the AuthZen
 information model entities: Subject, Action, Resource, and Context.
 
-## Mapping Variables {#mapping-variables}
+## Mapping Expressions {#mapping-expressions}
 
-Values within the `x-coaz-mapping` object MAY reference elements from the
-tool invocation using the following variables:
+Values within the `x-coaz-mapping` object MAY be dynamically derived from
+elements of the tool invocation using Common Expression Language (CEL)
+{{CEL}} expressions.
 
-`$properties`:
-: Refers to the `properties` field of the `inputSchema` of the tool object.
-  Individual properties within this variable are referenced using JSON
-  Pointer {{RFC6901}} notation adapted for JSONPath.
+### CEL Input Variables {#cel-input}
 
-`$token`:
-: Refers to the JWT-formatted {{RFC7519}} OAuth access token used to authorize
-  the tool call. Claims within the token are referenced using JSONPath
-  notation.
+Each CEL expression is evaluated with the following input variables:
 
-Fields within these variables MUST be referred to using JSONPath expressions.
+`params`:
+: A map corresponding to the `params` object of the `tools/call` {{MCP}}
+  JSON-RPC {{JSONRPC}} request. This includes the `name` of the tool being
+  invoked and the `arguments` map containing the caller-supplied values.
+  Fields are accessed using standard CEL field or index notation
+  (e.g., `params.name`, `params.arguments.id`, or
+  `params.arguments["customer-id"]`).
+
+`token`:
+: A map corresponding to the complete set of decoded claims of the
+  JWT-formatted {{RFC7519}} OAuth access token used to authorize the tool
+  call. All claims present in the token are available, including but not
+  limited to `sub`, `iss`, `aud`, `exp`, and `client_id`. Claims are
+  accessed using standard CEL field or index notation (e.g., `token.sub`,
+  `token.aud`, or `token.client_id`).
+
+### CEL Output {#cel-output}
+
+Each CEL expression MUST evaluate to a value. The value MAY be a scalar
+(string, number, or boolean), a list, or a map. The resulting value is
+used as the field value in the constructed AuthZen request parameter.
+
+Each CEL expression is scoped to a single field within a single element
+of a mapping array. The choice between the `evaluation` and `evaluations`
+API is determined by the number of elements in the mapping arrays, not by
+the type of value a CEL expression returns. See {{processing-rules}} for
+the rules governing single-element versus multi-element mappings.
+
+### Non-normative Example {#cel-example}
+
+The following example illustrates how the CEL input variables are populated
+from a `tools/call` JSON-RPC request and an access token.
+
+Given the following `tools/call` request:
+
+~~~ json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "get_customer",
+    "arguments": {
+      "id": "cust-12345",
+      "case": "case-67890"
+    }
+  }
+}
+~~~
+{: #fig-tools-call title="Example tools/call JSON-RPC request"}
+
+And an access token with the following decoded claims:
+
+~~~ json
+{
+  "sub": "alice@example.com",
+  "client_id": "http://agentprovider.com/agent-app-id",
+  "iss": "https://auth.example.com",
+  "exp": 1750000000
+}
+~~~
+{: #fig-token-claims title="Example decoded access token claims"}
+
+The PEP populates the CEL input variables as follows:
+
+| CEL Expression | Resolved Value |
+|:---|:---|
+| `params.name` | `"get_customer"` |
+| `params.arguments.id` | `"cust-12345"` |
+| `params.arguments.case` | `"case-67890"` |
+| `token.sub` | `"alice@example.com"` |
+| `token.client_id` | `"http://agentprovider.com/agent-app-id"` |
+{: #fig-cel-resolution title="CEL expression resolution"}
+
+### Expression Syntax {#expression-syntax}
+
+Every string value in the `x-coaz-mapping` object is a CEL expression.
+Static string values MUST be expressed as CEL string literals by wrapping
+them in single quotes (e.g., `'customer'`). A string value that is not a
+valid CEL expression MUST cause a mapping error (see {{mapping-errors}}).
 
 ## Mapping Object Schema {#mapping-schema}
 
@@ -323,7 +427,8 @@ The `x-coaz-mapping` object MUST contain the following fields:
 `subject`:
 : REQUIRED. An array of JSON objects describing how to construct the `subject`
   parameter of the AuthZen Access Evaluation API request. At least one field
-  of the `subject` MUST be derived from the `$.token` variable.
+  of the `subject` MUST be derived from the `token` input variable via a CEL
+  expression.
 
 `action`:
 : OPTIONAL. An array of JSON objects describing how to construct the `action`
@@ -333,18 +438,18 @@ The `x-coaz-mapping` object MUST contain the following fields:
 `resource`:
 : REQUIRED. An array of JSON objects describing how to construct the `resource`
   parameter of the AuthZen Access Evaluation API request. The object MAY
-  contain static values and/or JSONPath references to tool input properties
-  and token claims.
+  contain CEL string literals for static values and/or CEL expressions
+  referencing tool call parameters and token claims.
 
 `context`:
 : REQUIRED. An array of JSON objects describing how to construct the `context`
   parameter of the AuthZen Access Evaluation API request. For autonomous
   agent use cases, the `context` MUST include the identity of the agent.
   At least one field of either the `subject` or the `context` MUST be
-  derived from the `$.token` variable.
+  derived from the `token` input variable via a CEL expression.
 
 At least one field across the `subject` and `context` parameters MUST be
-derived from the `$token` variable.
+derived from the `token` input variable.
 
 ## Processing Rules {#processing-rules}
 The following rules MUST be used to construct the Authorization API request from the above mapping object:
@@ -405,7 +510,40 @@ The schema of the `x-coaz-mapping` object is as follows:
 ## Single-valued Example {#mapping-single-example}
 
 The following is a non-normative example of a complete tool definition with
-a COAZ mapping:
+a COAZ mapping. The example uses the same `tools/call` request and access
+token from {{cel-example}}:
+
+Given the following `tools/call` request:
+
+~~~ json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "get_customer",
+    "arguments": {
+      "id": "cust-12345",
+      "case": "case-67890"
+    }
+  }
+}
+~~~
+{: #fig-single-tools-call title="Example tools/call request for single-valued mapping"}
+
+And an access token with the following decoded claims:
+
+~~~ json
+{
+  "sub": "alice@example.com",
+  "client_id": "http://agentprovider.com/agent-app-id",
+  "iss": "https://auth.example.com",
+  "exp": 1750000000
+}
+~~~
+{: #fig-single-token-claims title="Example decoded access token claims for single-valued mapping"}
+
+The tool definition is as follows:
 
 ~~~ json
 {
@@ -431,16 +569,16 @@ a COAZ mapping:
           },
           "x-coaz-mapping": {
             "resource": [{
-              "id": "$properties['id']",
-              "type": "customer"
+              "id": "params.arguments.id",
+              "type": "'customer'"
             }],
             "subject": [{
-              "type": "user",
-              "id": "$token['sub']"
+              "type": "'user'",
+              "id": "token.sub"
             }],
             "context": [{
-              "agent": "$token['client_id']",
-              "case": "$properties['case']"
+              "agent": "token.client_id",
+              "case": "params.arguments.case"
             }]
           }
         }
@@ -453,15 +591,17 @@ a COAZ mapping:
 
 In this example:
 
-- The `resource` is constructed with a static `type` value of `"customer"` and the `id` taken from the tool's `id`
-  input property.
+- The `resource` is constructed with the `type` set to the CEL string literal
+  `'customer'` and the `id` derived from the tool call's `id` argument using
+  the CEL expression `params.arguments.id`.
 
-- The `subject` is constructed with a static `type` value of `"user"` and the
-  `id` taken from the `sub` claim of the access token.
+- The `subject` is constructed with the `type` set to the CEL string literal
+  `'user'` and the `id` derived from the `sub` claim of the access token
+  using `token.sub`.
 
-- The `context` includes the `client_id` claim from the access token as
-  the agent identifier, and the `case` input property from the tool
-  invocation.
+- The `context` includes the `client_id` claim from the access token
+  (`token.client_id`) as the agent identifier, and the `case` argument
+  (`params.arguments.case`) from the tool invocation.
 
 - The `action` is not specified in the mapping, so the PEP constructs it
   as `{"name": "get_customer"}` using the tool name.
@@ -495,7 +635,39 @@ The following is a non-normative example of a tool that copies an object from
 one storage location to another. The operation requires two distinct privileges:
 `read` access on the source location and `write` access on the destination
 location. These are expressed as two entries in the action and resource arrays of
-the x-coaz-mapping object. The `subject` and `context` are the same for both checks and are therefore each a single-element array:
+the x-coaz-mapping object. The `subject` and `context` are the same for both checks and are therefore each a single-element array.
+
+Given the following `tools/call` request:
+
+~~~ json
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "method": "tools/call",
+  "params": {
+    "name": "copy_object",
+    "arguments": {
+      "source": "/bucket/reports/q1.pdf",
+      "destination": "/bucket/archive/q1.pdf"
+    }
+  }
+}
+~~~
+{: #fig-multi-tools-call title="Example tools/call request for multi-valued mapping"}
+
+And an access token with the following decoded claims:
+
+~~~ json
+{
+  "sub": "alice@example.com",
+  "client_id": "http://agentprovider.com/agent-app-id",
+  "iss": "https://auth.example.com",
+  "exp": 1750000000
+}
+~~~
+{: #fig-multi-token-claims title="Example decoded access token claims for multi-valued mapping"}
+
+The tool definition is as follows:
 
 ~~~ json
 {
@@ -521,19 +693,19 @@ the x-coaz-mapping object. The `subject` and `context` are the same for both che
           },
           "x-coaz-mapping": {
             "action": [
-              { "name": "read" },
-              { "name": "write" }
+              { "name": "'read'" },
+              { "name": "'write'" }
             ],
             "resource": [
-              { "type": "storage_object", "id": "$properties['source']" },
-              { "type": "storage_object", "id": "$properties['destination']" }
+              { "type": "'storage_object'", "id": "params.arguments.source" },
+              { "type": "'storage_object'", "id": "params.arguments.destination" }
             ],
             "subject": [{
-              "type": "user",
-              "id": "$token['sub']"
+              "type": "'user'",
+              "id": "token.sub"
             }],
             "context": [{
-              "agent": "$token['client_id']"
+              "agent": "token.client_id"
             }]
           }
         }
@@ -584,6 +756,81 @@ request would be:
 ~~~
 {: #fig-authzen-multi-request title="Resulting AuthZen Access Evaluations request for multi-valued mapping"}
 
+## CEL Conditions Example (Non-normative) {#mapping-cel-conditions-example}
+
+The following non-normative example demonstrates the use of CEL conditional
+expressions and built-in functions within a COAZ mapping. A `transfer_funds`
+tool uses CEL ternary expressions to dynamically derive mapping values based
+on the tool call arguments and token claims:
+
+~~~ json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "tools": [
+      {
+        "name": "transfer_funds",
+        "coaz": true,
+        "description": "Transfer funds between accounts",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "from_account": {
+              "type": "string",
+              "description": "Source account identifier"
+            },
+            "to_account": {
+              "type": "string",
+              "description": "Destination account identifier"
+            },
+            "amount": {
+              "type": "number",
+              "description": "Transfer amount"
+            },
+            "currency": {
+              "type": "string",
+              "description": "Currency code (e.g., USD, EUR)"
+            }
+          },
+          "x-coaz-mapping": {
+            "resource": [{
+              "type": "'account'",
+              "id": "params.arguments.from_account",
+              "sensitivity": "params.arguments.amount > 10000 ? 'high' : 'standard'"
+            }],
+            "action": [{
+              "name": "params.arguments.currency == 'USD' ? 'domestic_transfer' : 'international_transfer'"
+            }],
+            "subject": [{
+              "type": "token.roles.exists(r, r == 'treasury') ? 'treasury_user' : 'standard_user'",
+              "id": "token.sub"
+            }],
+            "context": [{
+              "agent": "token.client_id",
+              "target_account": "params.arguments.to_account"
+            }]
+          }
+        }
+      }
+    ]
+  }
+}
+~~~
+{: #fig-coaz-cel-conditions-example title="Example COAZ tool definition with CEL conditional expressions"}
+
+In this example:
+
+- The `resource.sensitivity` field uses a ternary expression to set the value
+  to `"high"` when the transfer amount exceeds 10000, or `"standard"` otherwise.
+
+- The `action.name` field uses a string equality check to distinguish between
+  domestic and international transfers based on the currency.
+
+- The `subject.type` field uses the CEL `exists()` macro to check whether the
+  token's `roles` claim contains `"treasury"`, setting the subject type
+  accordingly.
+
 # PEP Behavior {#pep-behavior}
 
 ## Constructing the AuthZen Request
@@ -592,9 +839,9 @@ When a COAZ tool is invoked, the PEP MUST:
 
 1. Parse the `x-coaz-mapping` from the tool's `inputSchema`.
 
-2. Resolve all JSONPath references against the tool call's input arguments
-   (for `$.properties` references) and the access token (for `$.token`
-   references).
+2. Evaluate all CEL expressions with the `params` variable populated from the
+   `tools/call` JSON-RPC request and the `token` variable populated from the
+   decoded access token claims.
 
 3. Construct the AuthZen Access Evaluation or Evaluations API request according to the processing rules described in {{processing-rules}} using the resolved values.
 
@@ -617,11 +864,56 @@ If one or more of the decisions returned by the PDP are `false` (deny), then the
 
 # Error Handling {#error-handling}
 
-When the PEP receives a deny decision from the AuthZen PDP, it MUST respond
-to the MCP client with a JSON-RPC 2.0 {{JSONRPC}} error response.
+COAZ error handling follows the MCP {{MCP}} distinction between protocol errors
+and tool execution errors. COAZ mapping failures and authorization denials are
+protocol errors because they prevent the tool from executing. The PEP MUST
+report these as JSON-RPC 2.0 {{JSONRPC}} error responses.
 
-This specification defines the following error code for authorization failures
-in JSON-RPC:
+## COAZ Mapping Errors {#mapping-errors}
+
+A COAZ mapping error occurs when the PEP cannot construct a valid AuthZen
+request from the `x-coaz-mapping` and the `tools/call` {{MCP}} request. This
+includes, but is not limited to:
+
+- A CEL expression references a field that does not exist in the `params` or
+  `token` input variables.
+- A CEL expression fails to evaluate (e.g., type error, division by zero).
+- The `x-coaz-mapping` object is malformed or missing required fields.
+- Multi-valued arrays have mismatched element counts (see {{processing-rules}}).
+
+When a mapping error occurs, the PEP MUST NOT execute the tool and MUST return
+a JSON-RPC error response using the standard Invalid Params error code:
+
+Error Code:
+: `-32602`
+
+Meaning:
+: Invalid params. The PEP was unable to construct a valid AuthZen request from
+  the COAZ mapping and the tool call parameters.
+
+The `message` field SHOULD describe the specific mapping failure to aid
+debugging.
+
+The following is a non-normative example of a mapping error response:
+
+~~~ json
+{
+  "jsonrpc": "2.0",
+  "id": 456,
+  "error": {
+    "code": -32602,
+    "message": "COAZ mapping error: CEL expression 'params.arguments.region' failed: no such key 'region' in params.arguments"
+  }
+}
+~~~
+{: #fig-mapping-error-response title="Example JSON-RPC error response for COAZ mapping failure"}
+
+## Authorization Denial {#authorization-denial}
+
+When the PEP receives a deny decision from the AuthZen PDP, it MUST respond
+to the MCP client with a JSON-RPC error response.
+
+This specification defines the following error code for authorization failures:
 
 Error Code:
 : `-32401`
@@ -634,7 +926,7 @@ The `message` field of the JSON-RPC error object MAY be populated from the
 `context.reason` field of {{AUTHZEN}} Access Evaluation API response, if
 present.
 
-The following is a non-normative example of an error response:
+The following is a non-normative example of an authorization denial response:
 
 ~~~ json
 {
@@ -647,6 +939,33 @@ The following is a non-normative example of an error response:
 }
 ~~~
 {: #fig-error-response title="Example JSON-RPC error response for authorization denial"}
+
+## PDP Communication Errors {#pdp-errors}
+
+If the PEP is unable to reach the AuthZen PDP or receives an invalid response,
+the PEP MUST NOT execute the tool and MUST return a JSON-RPC error response
+using the standard Internal Error code:
+
+Error Code:
+: `-32603`
+
+Meaning:
+: Internal error. The PEP was unable to complete the authorization check due to
+  a communication failure with the AuthZen PDP.
+
+The following is a non-normative example of a PDP communication error response:
+
+~~~ json
+{
+  "jsonrpc": "2.0",
+  "id": 101,
+  "error": {
+    "code": -32603,
+    "message": "Authorization service unavailable"
+  }
+}
+~~~
+{: #fig-pdp-error-response title="Example JSON-RPC error response for PDP communication failure"}
 
 # Security Considerations
 
@@ -667,8 +986,8 @@ supporting zero-trust architectures for AI agent interactions.
 
 ## Token Integrity
 
-The access token referenced by `$token` MUST be validated by the PEP before
-extracting claims for the AuthZen request. The PEP MUST verify the token
+The access token referenced by the `token` CEL input variable MUST be
+validated by the PEP before extracting claims for the AuthZen request. The PEP MUST verify the token
 signature, issuer, audience, and expiration in accordance with {{RFC7519}}
 and the OAuth framework in use.
 
@@ -683,6 +1002,16 @@ The `x-coaz-mapping` is provided by the MCP server as part of the tool
 definition. MCP clients and gateways that act as PEPs SHOULD validate that
 the mapping is well-formed and that all referenced properties exist in the
 tool's `inputSchema` before constructing the AuthZen request.
+
+## Deployment Coverage
+
+Implementors SHOULD ensure that at least one COAZ-aware PEP in the
+deployment path evaluates the `x-coaz-mapping` for each tool invocation.
+If no PEP in the request path processes the mapping, no AuthZen
+authorization occurs and access control falls back to whatever other
+mechanisms are in place (e.g., OAuth scopes). Deployment architectures
+SHOULD be validated to confirm that COAZ mappings are consumed by an
+appropriate enforcement point.
 
 # IANA Considerations
 
