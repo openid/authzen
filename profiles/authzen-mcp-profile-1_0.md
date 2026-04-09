@@ -348,16 +348,24 @@ Each CEL expression is evaluated with the following input variables:
   `params.arguments["customer-id"]`).
 
 `token`:
-: A map corresponding to the decoded claims of the JWT-formatted {{RFC7519}}
-  OAuth access token used to authorize the tool call. Claims are accessed
-  using standard CEL field or index notation (e.g., `token.sub` or
-  `token.client_id`).
+: A map corresponding to the complete set of decoded claims of the
+  JWT-formatted {{RFC7519}} OAuth access token used to authorize the tool
+  call. All claims present in the token are available, including but not
+  limited to `sub`, `iss`, `aud`, `exp`, and `client_id`. Claims are
+  accessed using standard CEL field or index notation (e.g., `token.sub`,
+  `token.aud`, or `token.client_id`).
 
 ### CEL Output {#cel-output}
 
 Each CEL expression MUST evaluate to a value. The value MAY be a scalar
 (string, number, or boolean), a list, or a map. The resulting value is
 used as the field value in the constructed AuthZen request parameter.
+
+Each CEL expression is scoped to a single field within a single element
+of a mapping array. The choice between the `evaluation` and `evaluations`
+API is determined by the number of elements in the mapping arrays, not by
+the type of value a CEL expression returns. See {{processing-rules}} for
+the rules governing single-element versus multi-element mappings.
 
 ### Non-normative Example {#cel-example}
 
@@ -502,7 +510,40 @@ The schema of the `x-coaz-mapping` object is as follows:
 ## Single-valued Example {#mapping-single-example}
 
 The following is a non-normative example of a complete tool definition with
-a COAZ mapping:
+a COAZ mapping. The example uses the same `tools/call` request and access
+token from {{cel-example}}:
+
+Given the following `tools/call` request:
+
+~~~ json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "get_customer",
+    "arguments": {
+      "id": "cust-12345",
+      "case": "case-67890"
+    }
+  }
+}
+~~~
+{: #fig-single-tools-call title="Example tools/call request for single-valued mapping"}
+
+And an access token with the following decoded claims:
+
+~~~ json
+{
+  "sub": "alice@example.com",
+  "client_id": "http://agentprovider.com/agent-app-id",
+  "iss": "https://auth.example.com",
+  "exp": 1750000000
+}
+~~~
+{: #fig-single-token-claims title="Example decoded access token claims for single-valued mapping"}
+
+The tool definition is as follows:
 
 ~~~ json
 {
@@ -594,7 +635,39 @@ The following is a non-normative example of a tool that copies an object from
 one storage location to another. The operation requires two distinct privileges:
 `read` access on the source location and `write` access on the destination
 location. These are expressed as two entries in the action and resource arrays of
-the x-coaz-mapping object. The `subject` and `context` are the same for both checks and are therefore each a single-element array:
+the x-coaz-mapping object. The `subject` and `context` are the same for both checks and are therefore each a single-element array.
+
+Given the following `tools/call` request:
+
+~~~ json
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "method": "tools/call",
+  "params": {
+    "name": "copy_object",
+    "arguments": {
+      "source": "/bucket/reports/q1.pdf",
+      "destination": "/bucket/archive/q1.pdf"
+    }
+  }
+}
+~~~
+{: #fig-multi-tools-call title="Example tools/call request for multi-valued mapping"}
+
+And an access token with the following decoded claims:
+
+~~~ json
+{
+  "sub": "alice@example.com",
+  "client_id": "http://agentprovider.com/agent-app-id",
+  "iss": "https://auth.example.com",
+  "exp": 1750000000
+}
+~~~
+{: #fig-multi-token-claims title="Example decoded access token claims for multi-valued mapping"}
+
+The tool definition is as follows:
 
 ~~~ json
 {
@@ -929,6 +1002,16 @@ The `x-coaz-mapping` is provided by the MCP server as part of the tool
 definition. MCP clients and gateways that act as PEPs SHOULD validate that
 the mapping is well-formed and that all referenced properties exist in the
 tool's `inputSchema` before constructing the AuthZen request.
+
+## Deployment Coverage
+
+Implementors SHOULD ensure that at least one COAZ-aware PEP in the
+deployment path evaluates the `x-coaz-mapping` for each tool invocation.
+If no PEP in the request path processes the mapping, no AuthZen
+authorization occurs and access control falls back to whatever other
+mechanisms are in place (e.g., OAuth scopes). Deployment architectures
+SHOULD be validated to confirm that COAZ mappings are consumed by an
+appropriate enforcement point.
 
 # IANA Considerations
 
