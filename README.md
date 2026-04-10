@@ -9,7 +9,7 @@ The latest published version of the spec is available [here](https://openid.gith
 
 ## MCP Profile
 
-The AuthZEN profile for Model Context Protocol (MCP) Tool Authorization is versioned in markdown at `profiles/authzen-mcp-profile-1_0.md`. The GitHub workflow builds this into HTML, published at https://openid.github.io/authzen/authzen-mcp-profile-1_0.html.
+The AuthZEN profile for Model Context Protocol (MCP) Tool Authorization is versioned in markdown at `profiles/authzen-mcp-profile-1_0.md`. The GitHub workflow builds this into HTML, published [here](https://openid.github.io/authzen/authzen-mcp-profile-1_0.html).
 
 ## Interop harness
 
