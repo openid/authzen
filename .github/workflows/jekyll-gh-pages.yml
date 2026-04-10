@@ -63,6 +63,20 @@ jobs:
           path: |
             archive/authorization-api-0_0.html
 
+      - name: Convert MCP Profile to rfc xml
+        run: kramdown-rfc2629 profiles/authzen-mcp-profile-1_0.md > profiles/authzen-mcp-profile-1_0.xml
+      - name: Render MCP Profile HTML
+        run: xml2rfc profiles/authzen-mcp-profile-1_0.xml --html -o authzen-mcp-profile-1_0.html
+      - name: Render MCP Profile Text
+        run: xml2rfc profiles/authzen-mcp-profile-1_0.xml --text
+      - name: Upload MCP Profile artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-profile
+          path: |
+            authzen-mcp-profile-1_0.html
+            profiles/authzen-mcp-profile-1_0.xml
+
   publish-to-pages:
     if: github.ref == 'refs/heads/main'
     needs: [build-rfc]
@@ -84,6 +98,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: patterns-doc
+      - name: Download artifact - MCP profile
+        uses: actions/download-artifact@v4
+        with:
+          name: mcp-profile
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

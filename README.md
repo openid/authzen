@@ -5,6 +5,12 @@ This repository contains the output of the [OpenID AuthZEN](https://openid.net/w
 
 The AuthZEN authorization API is versioned in markdown at `api/authorization-api-1_0.md`. A GitHub workflow builds this into HTML. See the "Building the spec" section for more details.
 
+The latest published version of the spec is available [here](https://openid.github.io/authzen).
+
+## MCP Profile
+
+The AuthZEN profile for Model Context Protocol (MCP) Tool Authorization is versioned in markdown at `profiles/authzen-mcp-profile-1_0.md`. The GitHub workflow builds this into HTML, published at https://openid.github.io/authzen/authzen-mcp-profile-1_0.html.
+
 ## Interop harness
 
 The `interop` directory contains the interoperability scenarios for AuthZEN. Currently, there is a single scenario based on a "Todo" application. The scenario spec and results can be viewed [here](https://authzen-interop.net).
