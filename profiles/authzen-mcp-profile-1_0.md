@@ -1,5 +1,5 @@
 ---
-title: "AuthZen Profile for Model Context Protocol Tool Authorization"
+title: "AuthZen Profile for Model Context Protocol Tool Authorization - Draft 1"
 abbrev: "coaz"
 category: std
 date: 2026-02-13
