@@ -413,12 +413,30 @@ The PEP populates the CEL input variables as follows:
 | `token.client_id` | `"http://agentprovider.com/agent-app-id"` |
 {: #fig-cel-resolution title="CEL expression resolution"}
 
-### Expression Syntax {#expression-syntax}
+### Value Syntax {#value-syntax}
 
-Every string value in the `x-coaz-mapping` object is a CEL expression.
-Static string values MUST be expressed as CEL string literals by wrapping
-them in single quotes (e.g., `'customer'`). A string value that is not a
-valid CEL expression MUST cause a mapping error (see {{mapping-errors}}).
+Every field value within the elements of the `subject`, `action`, `resource`,
+and `context` arrays of the `x-coaz-mapping` object MUST be a JSON object
+containing exactly one of the following keys:
+
+`value`:
+: A static value. The corresponding JSON value is used as-is in the
+  constructed AuthZen request without CEL evaluation. It MAY be a string,
+  number, boolean, list, or map.
+
+`expr`:
+: A CEL expression, expressed as a string. The expression is evaluated with
+  the `params` and `token` input variables defined in {{cel-input}}, and
+  the resulting value (see {{cel-output}}) is used in the constructed
+  AuthZen request. A string that is not a valid CEL expression MUST cause
+  a mapping error (see {{mapping-errors}}).
+
+A field value that is a plain JSON scalar (for example
+`"type": "customer"`) rather than an object with a `value` or `expr` key
+MUST cause a mapping error. The structural distinction between static
+values and CEL expressions is deliberate: it removes the ambiguity between
+a literal string and a CEL variable reference, and allows implementations
+to validate the mapping at parse time.
 
 ## Mapping Object Schema {#mapping-schema}
 
@@ -437,9 +455,10 @@ The `x-coaz-mapping` object MUST contain the following fields:
 
 `resource`:
 : REQUIRED. An array of JSON objects describing how to construct the `resource`
-  parameter of the AuthZen Access Evaluation API request. The object MAY
-  contain CEL string literals for static values and/or CEL expressions
-  referencing tool call parameters and token claims.
+  parameter of the AuthZen Access Evaluation API request. Each field value
+  MUST follow the value syntax defined in {{value-syntax}}, using either a
+  static `value` or a CEL `expr` referencing tool call parameters and
+  token claims.
 
 `context`:
 : REQUIRED. An array of JSON objects describing how to construct the `context`
@@ -569,16 +588,16 @@ The tool definition is as follows:
           },
           "x-coaz-mapping": {
             "resource": [{
-              "id": "params.arguments.id",
-              "type": "'customer'"
+              "id": { "expr": "params.arguments.id" },
+              "type": { "value": "customer" }
             }],
             "subject": [{
-              "type": "'user'",
-              "id": "token.sub"
+              "type": { "value": "user" },
+              "id": { "expr": "token.sub" }
             }],
             "context": [{
-              "agent": "token.client_id",
-              "case": "params.arguments.case"
+              "agent": { "expr": "token.client_id" },
+              "case": { "expr": "params.arguments.case" }
             }]
           }
         }
@@ -591,12 +610,12 @@ The tool definition is as follows:
 
 In this example:
 
-- The `resource` is constructed with the `type` set to the CEL string literal
-  `'customer'` and the `id` derived from the tool call's `id` argument using
+- The `resource` is constructed with the `type` set to the static value
+  `"customer"` and the `id` derived from the tool call's `id` argument using
   the CEL expression `params.arguments.id`.
 
-- The `subject` is constructed with the `type` set to the CEL string literal
-  `'user'` and the `id` derived from the `sub` claim of the access token
+- The `subject` is constructed with the `type` set to the static value
+  `"user"` and the `id` derived from the `sub` claim of the access token
   using `token.sub`.
 
 - The `context` includes the `client_id` claim from the access token
@@ -693,19 +712,19 @@ The tool definition is as follows:
           },
           "x-coaz-mapping": {
             "action": [
-              { "name": "'read'" },
-              { "name": "'write'" }
+              { "name": { "value": "read" } },
+              { "name": { "value": "write" } }
             ],
             "resource": [
-              { "type": "'storage_object'", "id": "params.arguments.source" },
-              { "type": "'storage_object'", "id": "params.arguments.destination" }
+              { "type": { "value": "storage_object" }, "id": { "expr": "params.arguments.source" } },
+              { "type": { "value": "storage_object" }, "id": { "expr": "params.arguments.destination" } }
             ],
             "subject": [{
-              "type": "'user'",
-              "id": "token.sub"
+              "type": { "value": "user" },
+              "id": { "expr": "token.sub" }
             }],
             "context": [{
-              "agent": "token.client_id"
+              "agent": { "expr": "token.client_id" }
             }]
           }
         }
@@ -795,20 +814,20 @@ on the tool call arguments and token claims:
           },
           "x-coaz-mapping": {
             "resource": [{
-              "type": "'account'",
-              "id": "params.arguments.from_account",
-              "sensitivity": "params.arguments.amount > 10000 ? 'high' : 'standard'"
+              "type": { "value": "account" },
+              "id": { "expr": "params.arguments.from_account" },
+              "sensitivity": { "expr": "params.arguments.amount > 10000 ? 'high' : 'standard'" }
             }],
             "action": [{
-              "name": "params.arguments.currency == 'USD' ? 'domestic_transfer' : 'international_transfer'"
+              "name": { "expr": "params.arguments.currency == 'USD' ? 'domestic_transfer' : 'international_transfer'" }
             }],
             "subject": [{
-              "type": "token.roles.exists(r, r == 'treasury') ? 'treasury_user' : 'standard_user'",
-              "id": "token.sub"
+              "type": { "expr": "token.roles.exists(r, r == 'treasury') ? 'treasury_user' : 'standard_user'" },
+              "id": { "expr": "token.sub" }
             }],
             "context": [{
-              "agent": "token.client_id",
-              "target_account": "params.arguments.to_account"
+              "agent": { "expr": "token.client_id" },
+              "target_account": { "expr": "params.arguments.to_account" }
             }]
           }
         }
@@ -878,6 +897,8 @@ includes, but is not limited to:
 - A CEL expression references a field that does not exist in the `params` or
   `token` input variables.
 - A CEL expression fails to evaluate (e.g., type error, division by zero).
+- A field value is a plain JSON scalar rather than an object with a
+  `value` or `expr` key as required by {{value-syntax}}.
 - The `x-coaz-mapping` object is malformed or missing required fields.
 - Multi-valued arrays have mismatched element counts (see {{processing-rules}}).
 
