@@ -293,7 +293,17 @@ both a COAZ-compatible tool and a non-compatible tool:
             "description": "City name or zip code"
           }
         },
-        "required": ["location"]
+        "required": ["location"],
+        "x-coaz-mapping": {
+          "resource": [{
+            "type": "'location'",
+            "id": "params.arguments.location"
+          }],
+          "subject": [{
+            "type": "'user'",
+            "id": "token.sub"
+          }]
+        }
       }
     },
     {
