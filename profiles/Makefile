@@ -1,5 +1,5 @@
 OPEN=$(word 1, $(wildcard /usr/bin/xdg-open /usr/bin/open /bin/echo))
-SOURCES?=${wildcard *.xml}
+SOURCES?=${wildcard *.xml */*.xml}
 TEXT=${SOURCES:.xml=.txt}
 HTML=${SOURCES:.xml=.html}
 
@@ -16,9 +16,12 @@ html:   $(HTML)
 	kramdown-rfc2629 > $@ $^
 
 all:
-	@ make authzen-mcp-profile-1_0.xml
-	@ make authzen-mcp-profile-1_0.html
-	@ make authzen-mcp-profile-1_0.txt
+	@ $(MAKE) authzen-mcp-profile-1_0.xml
+	@ $(MAKE) authzen-mcp-profile-1_0.html
+	@ $(MAKE) authzen-mcp-profile-1_0.txt
+	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml
+	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.html
+	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.txt
 
 propose:
 	@ cp authzen-mcp-profile-1_0.txt ../publication/sharedsignals/authzen-mcp-profile-1_0.txt
