@@ -105,7 +105,7 @@ This profile defines that protocol layer: a narrow, interoperable mechanism for 
 5.  The PEP can poll the task, receive a callback, or otherwise use the task handle to determine completion.
 6.  When the task is approved, the PEP performs a new AuthZEN Authorization API evaluation; the PDP remains authoritative at enforcement time.
 
-This specification intentionally does not define a workflow engine, approval policy language, ticketing system, entitlement catalog, or user interface.  Those capabilities are the responsibility of the PDP or Access Request Service.  The purpose of this profile is to standardize the handoff between authorization enforcement and the workflow that resolves a denial, so that any PEP, autonomous or user-facing, can route denials through a uniform interface to whatever evaluator the deployment uses, human or automated.
+This specification intentionally does not define a workflow engine, approval policy language, ticketing system, entitlement catalog, user interface, or approver-facing inbox or enumeration API.  Those capabilities are the responsibility of the PDP or Access Request Service.  In particular, how an approver discovers and acts on pending requests is intentionally out of scope, so that approver-facing surface is not interoperable across implementations by design.  The purpose of this profile is to standardize the handoff between authorization enforcement and the workflow that resolves a denial, so that any PEP, autonomous or user-facing, can route denials through a uniform interface to whatever evaluator the deployment uses, human or automated.
 
 This profile resolves missing authority, not missing information.  A denied evaluation that could be completed with attributes or context the caller already holds is a matter of supplying those inputs; partial evaluation, where the PDP returns the residual conditions a caller can satisfy locally, addresses that case.  A requestable denial is different: the authority does not yet exist at evaluation time, and is created by an asynchronous governance process, often a human approver.  No information the PEP can supply would satisfy such a denial; a workflow must produce new authority first.  The two mechanisms are orthogonal and can be used together.
 
@@ -547,7 +547,7 @@ The submitted `denial` object for each requested item MUST include either `denia
 
 A PEP SHOULD include an `Idempotency-Key` header, following the conventions described in {{I-D.ietf-httpapi-idempotency-key-header}}.  The Idempotency-Key covers the entire submission body, including all members of the `items` array when present.
 
-The Access Request Service SHOULD treat a repeated submission with the same `Idempotency-Key`, the same authenticated requester, and an equivalent submission body as the same request, returning the same Task Handle while the original request remains available.  A submission with the same `Idempotency-Key` and authenticated requester but a materially different submission body MUST be rejected with `urn:openid:authzen:access-request:error:duplicate_request`.
+The Access Request Service SHOULD treat a repeated submission with the same `Idempotency-Key`, the same authenticated requester, and an equivalent submission body as the same request, returning the same Task Handle while the original request remains available.  A submission with the same `Idempotency-Key` and authenticated requester but a materially different submission body MUST be rejected with `urn:openid:authzen:access-request:error:duplicate_request`.  Two submission bodies are equivalent when they are identical under a deterministic comparison chosen by the Access Request Service (for example, a stable JSON canonicalization that ignores insignificant whitespace and object-member ordering, excluding the `Idempotency-Key` header itself).  Because the same Access Request Service that recorded the `Idempotency-Key` evaluates the retry, this comparison is a single-server concern and need not be interoperable across implementations; a body that is not equivalent under it is materially different.
 
 The Access Request Service SHOULD retain Idempotency-Key state at least until `task.expires_at` and SHOULD continue to retain it for at least 24 hours after the task reaches a terminal status.  This window lets retries from delayed PEP restarts find the original task rather than spawning a duplicate.  After the retention window elapses, the Access Request Service MAY reclaim the Idempotency-Key; a submission presenting a previously seen Idempotency-Key whose state has been reclaimed is processed as a new submission.
 
@@ -971,6 +971,8 @@ The PDP MUST only consider an Approval Result applicable when the current evalua
 
 A PEP MUST NOT treat an Approval Result as authorizing any future Access Evaluation solely on the basis that the Access Request was approved.  A PEP MAY include the Approval Result in a subsequent Access Evaluation (by placing the `approval` object at `context.approval` as described above), but the PDP remains responsible for determining whether the Approval Result applies under current policy.  A PEP MAY cache or retain an Approval Result, but MUST NOT independently infer that a future request is covered by that approval unless directed by the PDP or by a profile-defined mechanism.
 
+The following non-normative example shows the shared-state (lookup) topology: the PDP resolves `approval.id` against trusted server-side state, so the re-evaluation carries only `approval.id` and timestamps.  A deployment where the Access Request Service is independent of the PDP instead carries integrity-protected `approval.state`, as shown in the end-to-end agent tool-discovery example.
+
 Non-normative re-evaluation request:
 
 ~~~ json
@@ -1018,7 +1020,7 @@ A PEP MAY request callback notification by including a `callback` object in the 
 The `callback` object has the following members:
 
 `endpoint`:
-: REQUIRED.  HTTPS URI to which the Access Request Service sends completion notifications.  The Access Request Service MUST validate that the endpoint is authorized for the authenticated PEP, either by matching a pre-registered callback URI or by applying an explicit deployment allowlist.  The Access Request Service MUST reject callback endpoints that resolve to loopback, link-local, private-use, or otherwise internal network addresses unless the deployment has explicitly allowed that destination.
+: REQUIRED.  HTTPS URI to which the Access Request Service sends completion notifications.  The Access Request Service MUST validate that the endpoint is authorized for the authenticated PEP, either by matching a pre-registered callback URI or by applying an explicit deployment allowlist.  The Access Request Service MUST reject callback endpoints that resolve to loopback, link-local, private-use, or otherwise internal network addresses unless the deployment has explicitly allowed that destination.  In-cluster or same-trust-domain deployments, where the PEP's callback endpoint is legitimately an internal address, permit those specific destinations through this explicit allowlist rather than by disabling the check; the secure default of blocking internal destinations protects internet-facing Access Request Services from server-side request forgery.
 
 `state`:
 : OPTIONAL.  Opaque value supplied by the PEP and returned unmodified in the callback.
@@ -1068,7 +1070,7 @@ The following problem types are defined:
 : HTTP `400 Bad Request`.  The submitted Access Request cannot be bound to the denied AuthZEN Decision.
 
 `urn:openid:authzen:access-request:error:duplicate_request`:
-: HTTP `409 Conflict`.  A semantically duplicate Access Request exists and cannot be reused.
+: HTTP `409 Conflict`.  The `Idempotency-Key` was reused by the same requester with a submission body that is not equivalent to the original request (see {{access-request-submission}}).
 
 `urn:openid:authzen:access-request:error:unknown_task`:
 : HTTP `404 Not Found`.  The task handle is unknown or unavailable to the caller.
@@ -1273,7 +1275,7 @@ This profile does not mandate a specific JWS payload; the contents are deploymen
 * `iss`: PDP identifier.  Lets the Access Request Service select the correct verification key from the PDP's JWK Set ({{discovery}}).
 * `aud`: Access Request Service identifier, or an array of identifiers including the Access Request Service.  Array audiences support polyglot deployments that issue a single JWT consumed by multiple verifiers; the Access Request Service accepts the JWT when its identifier is among the listed audiences.  Prevents replay of a token issued for one Access Request Service against another.
 * `iat`, `exp`: issued-at and expiry.  Expiry SHOULD be short (typically minutes, aligned with the requestable-denial hint lifetime).
-* `jti`: unique token identifier.  The Access Request Service SHOULD track recently-seen `jti` values to detect replay of an otherwise valid token.
+* `jti`: unique token identifier.  The Access Request Service SHOULD track recently-seen `jti` values until the token's `exp` to detect replay of an otherwise valid token; because `exp` is short (typically minutes), the replay-tracking window is correspondingly bounded.
 * Binding claims that identify the original denied evaluation.  Either:
     * Inline: the Subject, Resource, Action, and authorization-relevant Context of the denied evaluation, in shapes the Access Request Service can compare against the submitted Subject, Resource, Action, and Context; or
     * Hashed: a `binding_hash` over a canonical serialization of the Subject, Resource, Action, and authorization-relevant Context, which the Access Request Service recomputes from the submission.
@@ -1290,6 +1292,8 @@ When `binding_token` is a JWS-signed JWT using these claims, the Access Request 
 3. checks `jti` against recently-seen tokens to detect replay;
 4. compares the binding claims (inline or hashed) against the submission's Subject, Resource, Action, and authorization-relevant Context (or per-item for bulk submissions);
 5. rejects with `urn:openid:authzen:access-request:error:invalid_denial_binding` on any failure.
+
+When the `binding_token` carries its own expiry (`exp`) and the requestable denial also carries `context.access_request.expires_at`, the Access Request Service MUST enforce the earlier of the two as the freshness deadline for the submission.
 
 When `binding_token` uses another integrity-protected format, the Access Request Service MUST perform equivalent verification for issuer authenticity, audience or intended recipient, expiry when present, replay resistance when provided by the format, and binding to the submitted Subject, Resource, Action, and relevant Context.
 
