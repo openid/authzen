@@ -957,6 +957,24 @@ The PEP MUST include the `approval` object unchanged at `context.approval` insid
 
 The PDP MUST evaluate the new request using current policy and the approval reference.  The PDP MAY still deny access if policy, subject, resource, action, context, approval lifetime, or risk state no longer permits access.
 
+When the PDP denies a re-evaluation that presented an `approval` reference, it SHOULD tell the PEP what to do next so the PEP reacts correctly instead of blindly retrying.  The PDP conveys this with the following Decision Context members:
+
+* `next_action`: RECOMMENDED.  String.  The action the PEP should take, and the durable interoperability surface.  One of:
+    * `request`: submit a new Access Request.  The PDP MUST also include a fresh `context.access_request` ({{requestable-denial-context}}) so the PEP has a valid requestable-denial signal for the new submission.
+    * `retry`: re-evaluate the same request after a delay; the denial is expected to be transient.
+    * `none`: do not retry or re-request; the denial is terminal for this approval.
+
+  A PEP MUST drive its behavior from `next_action` when the value is recognized.  A PEP that receives `next_action: "request"` without `context.access_request` MUST NOT submit a new Access Request and treats the denial as `none`.  A PEP that receives no `next_action`, or an unrecognized value, falls back first to the default next action for a recognized `reason`, then to the requestable-denial signal.  When the fallback action is `request`, the PEP treats the denial as `request` only when `context.access_request` is present; otherwise it treats the denial as `none`.
+* `retry_after`: RECOMMENDED when `next_action` is `retry`.  Integer.  Number of seconds the PEP waits before re-evaluating the same request.  This has the same value semantics as the delta-seconds form of the HTTP `Retry-After` field (Section 10.2.3 of {{RFC9110}}), but is carried in the Decision Context because the Access Evaluation response itself is a successful protocol response.  A PEP that receives `next_action: "retry"` without `retry_after` SHOULD apply bounded exponential backoff with jitter, starting at several seconds and growing to no more than one minute between attempts, and MUST stop retrying once the approval expires.
+* `reason`: OPTIONAL.  String.  A machine-readable reason code for UX and audit.  This profile defines the following well-known re-evaluation denial reason codes with their default `next_action`:
+    * `approval_expired` (`request`): the approval is no longer valid because `approved_until` has passed or it was revoked, cancelled, or superseded.
+    * `out_of_scope` (`request`): the approval is valid but the current evaluation falls outside its approval scope.
+    * `grant_pending` (`retry`): the approval is valid and in scope, but the backing entitlement, role, or grant is not yet present (for example, provisioning has not completed).
+    * `policy_denied` (`none`): the approval is valid and in scope, but current policy, subject status, or risk state denies the request; re-requesting will not help.
+    * `approval_unverifiable` (`none`): the presented `approval.id` or `approval.state` could not be resolved or verified, or its binding did not match.
+
+  Implementations MAY register additional reason codes (for example, a more specific `approval_revoked`); a PEP uses a recognized `reason`'s registered default only when `next_action` is absent or unrecognized.  A PEP treats an unrecognized `reason` as informational and relies on `next_action` or the fallback rule above.  These codes are registered in the AuthZEN Access Request Re-evaluation Denial Reason registry ({{iana-reeval-reasons}}).
+
 The PDP MUST check current approval status during re-evaluation, including whether the approval has been revoked, cancelled, superseded, or otherwise invalidated before `approved_until`.  The `approved_until` timestamp is a PEP-side maximum reuse and enforcement bound; it does not prevent the PDP from denying earlier because of revocation, cancellation, policy change, risk change, or other current state.
 
 When the re-evaluation response indicates an approval expiry (typically as `context.approval.approved_until`), the PEP MUST NOT enforce access past that timestamp.  PEPs that issue downstream credentials on the basis of the approved evaluation (for example, an OAuth Authorization Server issuing access tokens) MUST bound the lifetime of those credentials by the earlier of the approval expiry in the Approval Result and any approval expiry returned by the PDP during re-evaluation.
@@ -1112,6 +1130,7 @@ This specification defines a base wire format.  Several of its objects are inten
 Additional members beyond those defined in this document MAY appear only at the following locations, and those members MUST follow the naming rules in {{extension-naming}}.  No other object members may be extended without a revision of this specification or a profile that explicitly redefines them.
 
 * `context.access_request.display`: user-interface hints in a requestable denial.
+* AuthZEN Decision Context members defined by this profile.
 * `context` in an Access Request submission: augments the AuthZEN Context.
 * `requested_access` in an Access Request submission.
 * `client`, `client.actor`, and `client.source` in an Access Request submission.
@@ -1482,6 +1501,46 @@ Initial entries registered by this specification:
 | `ticket` | `task.links` | URL where the requester can view the request and its status. |
 | `review` | `task.links` | URL where an approver or administrator can review or act on the request. |
 | `cancel` | `task.links` | URL where the PEP can cancel the request. |
+| `next_action` | AuthZEN Decision Context | Action the PEP should take after a denied re-evaluation with an approval reference. |
+| `retry_after` | AuthZEN Decision Context | Number of seconds the PEP waits before retrying a transient re-evaluation denial. |
+| `access_request` | AuthZEN Decision Context | Requestable-denial object signaling that a denied decision may be requested. |
+| `evaluation_id` | AuthZEN Decision Context | Stable identifier of the AuthZEN Authorization API evaluation, used for denial binding and audit. |
+| `evaluated_at` | AuthZEN Decision Context | RFC 3339 timestamp at which the Decision was produced. |
+| `reason` | AuthZEN Decision Context | Machine-readable reason code for a denial, including re-evaluation denials. |
+| `approval` | AuthZEN Decision Context | Approval reference carried at `context.approval` during re-evaluation. |
+
+Change Controller for all initial entries: OpenID Foundation AuthZEN Working Group.  Specification Document for all initial entries: This document.
+
+## AuthZEN Access Request Re-evaluation Denial Reason Registry {#iana-reeval-reasons}
+
+This specification requests creation of a new registry: the AuthZEN Access Request Re-evaluation Denial Reason registry.
+
+The registry tracks well-known `context.reason` values a PDP returns when it denies a re-evaluation that presented an `approval` reference ({{completion-semantics}}).  Registration policy is Specification Required.  Each entry has the following fields:
+
+Reason:
+: The `context.reason` value as it appears on the wire.
+
+Default Next Action:
+: The RECOMMENDED `next_action` for the value: `request`, `retry`, or `none`.
+
+Description:
+: A short description of the denial condition.
+
+Change Controller:
+: The registering specification's change controller.
+
+Specification Document:
+: The document defining the value.
+
+Initial entries registered by this specification:
+
+| Reason | Default Next Action | Description |
+|---|---|---|
+| `approval_expired` | `request` | Approval no longer valid: `approved_until` passed, or revoked, cancelled, or superseded. |
+| `out_of_scope` | `request` | Approval valid but the evaluation is outside its approval scope. |
+| `grant_pending` | `retry` | Approval valid and in scope, but the backing grant is not yet present (for example, provisioning incomplete). |
+| `policy_denied` | `none` | Approval valid and in scope, but current policy, subject status, or risk state denies the request. |
+| `approval_unverifiable` | `none` | The presented `approval.id` or `approval.state` could not be resolved, verified, or bound. |
 
 Change Controller for all initial entries: OpenID Foundation AuthZEN Working Group.  Specification Document for all initial entries: This document.
 
