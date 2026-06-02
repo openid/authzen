@@ -2,35 +2,33 @@
 title: "AuthZEN Access Request and Approval Profile - Draft 1"
 abbrev: "ARAP"
 category: std
+date: 2026-06-02
+ipr: none
 
 docname: authzen-access-request-approval-profile-1_0
-submissiontype: IETF
-workgroup: OpenID AuthZEN
 consensus: true
-v: 3
+workgroup: OpenID AuthZEN
 keyword:
-  - authorization
-  - authorization escalation
-  - AI agent
-  - access request
-  - approval workflow
-  - human-in-the-loop
-  - just-in-time access
-  - delegation
-  - authority
-  - step-up authorization
-  - governance
+ - authorization
+ - authorization escalation
+ - AI agent
+ - access request
+ - approval workflow
+ - human-in-the-loop
+ - just-in-time access
+ - delegation
+ - authority
+ - step-up authorization
+ - governance
 
-venue:
-#  group: "OpenID AuthZEN Working Group"
-#  type: "Working Group"
-#  mail: "openid-specs-authzen@lists.openid.net"
-#  arch: "https://lists.openid.net/pipermail/openid-specs-authzen/"
+stand_alone: true
+smart_quotes: no
+pi: [toc, sortrefs, symrefs, private]
 
 author:
-  -
-    name: Karl McGuinness
-    org: Independent
+ -
+    fullname: Karl McGuinness
+    organization: Independent
     email: public@karlmcguinness.com
 
 normative:
@@ -51,18 +49,18 @@ normative:
   I-D.ietf-httpapi-idempotency-key-header:
   AuthZEN:
     title: "Authorization API 1.0"
-    target: "https://openid.github.io/authzen/"
+    target: https://openid.net/specs/authorization-api-1_0.html
     author:
       -
-        ins: O. Gazitt
         name: Omri Gazitt
+        org: Aserto
       -
-        ins: D. Brossard
         name: David Brossard
+        org: Axiomatics
       -
-        ins: A. Tulshibagwale
         name: Atul Tulshibagwale
-    date: 2026-04-29
+        org: SGNL
+    date: 2026
 
 --- abstract
 
