@@ -91,6 +91,20 @@ jobs:
             authzen-access-request-approval-profile-1_0.html
             profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml
 
+      - name: Convert Authorization API 1.0 Certification Scenario to rfc xml
+        run: kramdown-rfc2629 certification/authorization-api-1_0-scenario.md > certification/authorization-api-1_0-scenario.xml
+      - name: Render Certification Scenario HTML
+        run: xml2rfc certification/authorization-api-1_0-scenario.xml --html -o authorization-api-1_0-certification-scenario.html
+      - name: Render Certification Scenario Text
+        run: xml2rfc certification/authorization-api-1_0-scenario.xml --text
+      - name: Upload Certification Scenario artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: certification-scenario
+          path: |
+            authorization-api-1_0-certification-scenario.html
+            certification/authorization-api-1_0-scenario.xml
+
   publish-to-pages:
     if: github.ref == 'refs/heads/main'
     needs: [build-rfc]
@@ -120,6 +134,10 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: access-request-approval-profile
+      - name: Download artifact - Certification Scenario
+        uses: actions/download-artifact@v8
+        with:
+          name: certification-scenario
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
