@@ -77,6 +77,20 @@ jobs:
             authzen-mcp-profile-1_0.html
             profiles/authzen-mcp-profile-1_0.xml
 
+      - name: Convert Access Request Approval Profile to rfc xml
+        run: kramdown-rfc2629 profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.md > profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml
+      - name: Render Access Request Approval Profile HTML
+        run: xml2rfc profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml --html -o authzen-access-request-approval-profile-1_0.html
+      - name: Render Access Request Approval Profile Text
+        run: xml2rfc profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml --text
+      - name: Upload Access Request Approval Profile artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: access-request-approval-profile
+          path: |
+            authzen-access-request-approval-profile-1_0.html
+            profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml
+
   publish-to-pages:
     if: github.ref == 'refs/heads/main'
     needs: [build-rfc]
@@ -102,6 +116,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: mcp-profile
+      - name: Download artifact - Access Request Approval profile
+        uses: actions/download-artifact@v4
+        with:
+          name: access-request-approval-profile
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
