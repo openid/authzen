@@ -12,12 +12,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.10'
       - name: Install kramdown-rfc2629
@@ -34,7 +34,7 @@ jobs:
       - name: Render Authz API 1.0 Text
         run: xml2rfc api/authorization-api-1_0.xml --text
       - name: Upload Authz API 1.0 artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: authorization-api-1_0
           path: |
@@ -49,7 +49,7 @@ jobs:
       - name: Render Authz Design Patterns Text
         run: xml2rfc patterns/AuthorizationDesignPatterns.xml --text
       - name: Upload Authz Design Patterns artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: patterns-doc
           path: |
@@ -57,7 +57,7 @@ jobs:
             patterns/AuthorizationDesignPatterns.xml
 
       - name: Upload Authz API 1.0 original submission artifact (version 0_0)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: authorization-api-0_0
           path: |
@@ -70,7 +70,7 @@ jobs:
       - name: Render MCP Profile Text
         run: xml2rfc profiles/authzen-mcp-profile-1_0.xml --text
       - name: Upload MCP Profile artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mcp-profile
           path: |
@@ -84,7 +84,7 @@ jobs:
       - name: Render Access Request Approval Profile Text
         run: xml2rfc profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml --text
       - name: Upload Access Request Approval Profile artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: access-request-approval-profile
           path: |
@@ -103,27 +103,27 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: authorization-api-*
           path: .
           merge-multiple: true
       - name: Download artifact - pattern document
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: patterns-doc
       - name: Download artifact - MCP profile
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: mcp-profile
       - name: Download artifact - Access Request Approval profile
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: access-request-approval-profile
       - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: .
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
