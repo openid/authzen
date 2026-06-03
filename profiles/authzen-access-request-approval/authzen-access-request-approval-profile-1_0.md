@@ -2,12 +2,14 @@
 title: "AuthZEN Access Request and Approval Profile - Draft 1"
 abbrev: "ARAP"
 category: std
+ipr: none
 
 docname: authzen-access-request-approval-profile-1_0
-submissiontype: IETF
 workgroup: OpenID AuthZEN
 consensus: true
 v: 3
+stand_alone: true
+pi: [toc, sortrefs, symrefs, private]
 keyword:
   - authorization
   - authorization escalation
@@ -20,12 +22,6 @@ keyword:
   - authority
   - step-up authorization
   - governance
-
-venue:
-#  group: "OpenID AuthZEN Working Group"
-#  type: "Working Group"
-#  mail: "openid-specs-authzen@lists.openid.net"
-#  arch: "https://lists.openid.net/pipermail/openid-specs-authzen/"
 
 author:
   -
