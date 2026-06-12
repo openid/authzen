@@ -7,9 +7,13 @@ The AuthZEN authorization API is versioned in markdown at `api/authorization-api
 
 The latest published version of the spec is available [here](https://openid.github.io/authzen).
 
-## MCP Profile
+## Draft MCP Profile
 
 The AuthZEN profile for Model Context Protocol (MCP) Tool Authorization is at `profiles/authzen-mcp-profile-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-mcp-profile-1_0.html).
+
+## Draft Access Request and Approval Profile
+A profile that specifies an approval workflow for handling denials in a structured way.
+The HTML version is available [here](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html)
 
 ## Interop harness
 
