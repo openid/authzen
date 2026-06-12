@@ -23,5 +23,3 @@ all:
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.html
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.txt
 
-propose:
-	@ cp authzen-mcp-profile-1_0.txt ../publication/sharedsignals/authzen-mcp-profile-1_0.txt
