@@ -868,9 +868,9 @@ Top-level `context` applies to all evaluations unless overridden per-evaluation.
 
 **Properties (continued — Batch Properties certification):**
 
-### Batch with default value merging {#c-3-2-7}
+### Batch with top-level default inheritance {#c-3-2-7}
 
-> **Advisory:** Per-evaluation fields override top-level defaults at the **entity level** (whole-object replacement), not at the sub-field level. A per-evaluation `resource` replaces the entire top-level `resource`, except that the PDP MUST fall back to the top-level value for any required sub-field (`type`, `id`) absent from the per-evaluation object. This test validates that behavior. Vendors MAY treat this test as advisory until the specification text is updated to codify entity-level replacement semantics.
+Per the specification, the top-level `subject`, `action`, and `resource` keys provide default values for each evaluation. An evaluation that **omits** one of these keys inherits the entire top-level value; an evaluation that **provides** a key overrides the top-level default at the **entity level** (whole-object replacement). Because `subject`, `action`, and `resource` are required for a valid evaluation, any key absent from an evaluation object MUST be supplied at the top level. There is no sub-field merging: a per-evaluation entity either is complete or is absent (inherited whole).
 
 **Request:**
 
@@ -878,14 +878,9 @@ Top-level `context` applies to all evaluations unless overridden per-evaluation.
 {
   "subject": { "type": "user", "id": "alice" },
   "action": { "name": "write" },
-  "resource": { "type": "record" },
+  "resource": { "type": "record", "id": "record-1", "properties": { "status": "active" } },
   "evaluations": [
-    {
-      "resource": {
-        "id": "record-1",
-        "properties": { "status": "active" }
-      }
-    },
+    {},
     {
       "resource": {
         "type": "record",
@@ -908,7 +903,7 @@ Top-level `context` applies to all evaluations unless overridden per-evaluation.
 }
 ~~~
 
-The first evaluation merges the per-evaluation `resource.id` and `resource.properties` with the top-level `resource.type`, yielding a fully specified resource `record-1` with `status: "active"`. Alice can write to active records (rule 2). The second evaluation fully specifies the resource, so no merging is needed. Alice cannot write to archived records (rule 5).
+The first evaluation is empty (`{}`), so it inherits the entire top-level `subject`, `action`, and `resource` — alice writing the active resource `record-1`. Alice can write to active records (decision rule 2), so the decision is `true`. The second evaluation supplies a complete `resource`, replacing the top-level default wholesale with the archived `record-2`. Alice cannot write to archived records (decision rule 5), so the decision is `false`. This validates entity-level default inheritance and whole-object override.
 
 ## Response Format {#c-3-3}
 
@@ -930,11 +925,13 @@ When the response contains an `evaluations` array, the top-level `decision` fiel
 
 ## Error Handling {#c-3-4}
 
-### Evaluation-level errors {#c-3-4-1}
+### Evaluation-level errors (execute_all semantic) {#c-3-4-1}
 
-If a single evaluation within a batch fails (e.g. due to missing required fields in that evaluation), the PDP MUST handle this as an evaluation-level error for otherwise valid batch payloads: return HTTP 200 with an `evaluations` array matching the request cardinality, set the failed item to `"decision": false`, and MAY include error details in that item's `context`.
+This test exercises the default `execute_all` evaluation semantic, under which the PDP executes every evaluation in the array and returns all results in request order. Per the specification, a failed evaluation under `execute_all` *may* be denoted by `"decision": false`, optionally with a reason code in that item's `context`. The harness pins the semantic explicitly via `options.evaluations_semantic` and treats this denotation as the expected behavior for certification.
 
-Transport-level or whole-payload failures (for example malformed JSON) remain HTTP error responses as defined in [](#c-2-4).
+For an otherwise valid batch payload in which a single evaluation is missing a required field, the PDP MUST return HTTP 200 with an `evaluations` array matching the request cardinality and ordering ([](#c-3-3-1), [](#c-3-3-2)), and MUST denote the failed item with `"decision": false` (it MAY include error details in that item's `context`).
+
+> **Note:** The specification permits, but does not require, this `decision: false` denotation for per-item failures under `execute_all`, and it separately requires a `400 Bad Request` when a required attribute is omitted from a (whole) request. This scenario adopts the per-item `execute_all` interpretation for failures *inside* an otherwise valid batch; transport-level or whole-payload failures (for example malformed JSON, or a request that is invalid at the top level) remain HTTP error responses as defined in [](#c-2-4). The short-circuit semantics (`deny_on_first_deny`, `permit_on_first_permit`) are out of scope for this test.
 
 **Request (second evaluation missing resource):**
 
@@ -942,6 +939,7 @@ Transport-level or whole-payload failures (for example malformed JSON) remain HT
 {
   "subject": { "type": "user", "id": "alice" },
   "action": { "name": "read" },
+  "options": { "evaluations_semantic": "execute_all" },
   "evaluations": [
     {
       "resource": { "type": "record", "id": "record-1" }
