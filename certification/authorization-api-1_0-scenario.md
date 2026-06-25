@@ -812,6 +812,15 @@ The first evaluation denies (rule 5: alice cannot write to archived). The second
 
 **Expected:** HTTP 200. Evaluations array of two elements with decisions `true` and `false` respectively.
 
+~~~ json
+{
+  "evaluations": [
+    { "decision": true },
+    { "decision": false }
+  ]
+}
+~~~
+
 ### Batch with context inheritance {#c-3-2-6}
 
 Top-level `context` applies to all evaluations unless overridden per-evaluation.
