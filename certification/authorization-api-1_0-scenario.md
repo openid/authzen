@@ -851,6 +851,15 @@ Top-level `context` applies to all evaluations unless overridden per-evaluation.
 
 **Expected:** HTTP 200 with two evaluations. The harness validates that the request is accepted; the decision values are not validated (not fixture rules).
 
+~~~ json
+{
+  "evaluations": [
+    { "decision": <boolean> },
+    { "decision": <boolean> }
+  ]
+}
+~~~
+
 **Properties (continued — Batch Properties certification):**
 
 ### Batch with default value merging {#c-3-2-7}
