@@ -1134,6 +1134,14 @@ Per the specification, `resource.id` should be omitted from Resource Search requ
 
 **Expected:** HTTP 200 with a `results` array. Per the fixture ([](#c-1-5)), the results MUST include at least `record-2`. Validates rule 6.
 
+~~~ json
+{
+  "results": [
+    { "type": "record", "id": "record-2" }
+  ]
+}
+~~~
+
 ## Action Search {#c-4-4}
 
 **Core (Search Core certification):**
