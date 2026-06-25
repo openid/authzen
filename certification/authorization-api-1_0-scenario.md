@@ -93,8 +93,8 @@ Prerequisites:
 | **Basic Properties** | [](#c-2-2-4), [](#c-2-2-5), [](#c-2-2-6), [](#c-2-2-7) |
 | **Batch Core** | [](#c-3-2-1), [](#c-3-2-2), [](#c-3-2-5), [](#c-3-2-6), [](#c-3-3), [](#c-3-4) |
 | **Batch Properties** | [](#c-3-2-3), [](#c-3-2-4), [](#c-3-2-7) |
-| **Search Core** | [](#c-4-2-1), [](#c-4-2-2), [](#c-4-2-3), [](#c-4-3-1), [](#c-4-3-2), [](#c-4-4-1), [](#c-4-4-2), [](#c-4-5), [](#c-4-6), [](#c-4-7) |
-| **Search Properties** | [](#c-4-2-4), [](#c-4-3-3), [](#c-4-4-3) |
+| **Search Core** | [](#c-4-2-1), [](#c-4-2-2), [](#c-4-2-3), [](#c-4-3-1), [](#c-4-3-2), [](#c-4-3-3), [](#c-4-4-1), [](#c-4-4-2), [](#c-4-5), [](#c-4-6), [](#c-4-7) |
+| **Search Properties** | [](#c-4-2-4), [](#c-4-3-4), [](#c-4-4-3) |
 | **Discovery** | [](#c-6) |
 
 The response format, error handling, header handling, and idempotency requirements ([](#c-2-3), [](#c-2-4), [](#c-2-5), [](#c-2-6)) and the transport requirements ([](#c-5)) apply to all certification sub-levels.
@@ -669,6 +669,8 @@ Or at a path discoverable via the PDP metadata endpoint.
 }
 ~~~
 
+This case validates response **structure** only: the harness asserts that `evaluations` is an array of two objects, each containing a `decision` boolean. It does not assert the decision values. The first evaluation (`alice`/`read`/`record-1`) corresponds to fixture rule 1 ([](#c-1-4)) and the second (`alice`/`read`/`record-2`) is unspecified by the fixture and therefore implementer-defined. Decision **values** in batch responses are validated separately in [](#c-3-2-2).
+
 ### Batch with fixture decisions validated {#c-3-2-2}
 
 **Request:**
@@ -1058,7 +1060,23 @@ The harness validates:
 
 ### Subject search with context {#c-4-2-2}
 
-The PDP MUST accept a Subject Search request that includes the optional `context` field.
+The PDP MUST accept a Subject Search request that includes the optional `context` field without error. Per [](#c-1-6), `context` does not affect fixture decisions, so the results MUST match those of [](#c-4-2-1).
+
+**Request:**
+
+~~~ json
+{
+  "subject": { "type": "user" },
+  "action": { "name": "read" },
+  "resource": { "type": "record", "id": "record-1" },
+  "context": {
+    "time": "2025-06-27T18:03-07:00",
+    "ip": "192.168.1.1"
+  }
+}
+~~~
+
+**Expected:** HTTP 200 with a `results` array including at least `alice` and `bob`, identical to [](#c-4-2-1).
 
 ### Subject search with subject id present {#c-4-2-3}
 
@@ -1127,13 +1145,33 @@ The harness validates:
 - `record-1` appears in the results.
 - Additional results are permitted.
 
-### Resource search with resource id present {#c-4-3-2}
+### Resource search with context {#c-4-3-2}
+
+The PDP MUST accept a Resource Search request that includes the optional `context` field without error. Per [](#c-1-6), `context` does not affect fixture decisions, so the results MUST match those of [](#c-4-3-1).
+
+**Request:**
+
+~~~ json
+{
+  "subject": { "type": "user", "id": "alice" },
+  "action": { "name": "read" },
+  "resource": { "type": "record" },
+  "context": {
+    "time": "2025-06-27T18:03-07:00",
+    "ip": "192.168.1.1"
+  }
+}
+~~~
+
+**Expected:** HTTP 200 with a `results` array including at least `record-1`, identical to [](#c-4-3-1).
+
+### Resource search with resource id present {#c-4-3-3}
 
 Per the specification, `resource.id` should be omitted from Resource Search requests. The harness does not send `resource.id` in Resource Search requests.
 
 **Properties (Search Properties certification):**
 
-### Resource search with subject properties — fixture validated {#c-4-3-3}
+### Resource search with subject properties — fixture validated {#c-4-3-4}
 
 **Request:**
 
@@ -1197,7 +1235,22 @@ The harness validates:
 
 ### Action search with context {#c-4-4-2}
 
-The PDP MUST accept an Action Search request that includes the optional `context` field.
+The PDP MUST accept an Action Search request that includes the optional `context` field without error. Per [](#c-1-6), `context` does not affect fixture decisions, so the results MUST match those of [](#c-4-4-1).
+
+**Request:**
+
+~~~ json
+{
+  "subject": { "type": "user", "id": "alice" },
+  "resource": { "type": "record", "id": "record-1" },
+  "context": {
+    "time": "2025-06-27T18:03-07:00",
+    "ip": "192.168.1.1"
+  }
+}
+~~~
+
+**Expected:** HTTP 200 with a `results` array including at least `read` and `write`, identical to [](#c-4-4-1).
 
 **Properties (Search Properties certification):**
 
