@@ -1090,6 +1090,7 @@ Per the specification, `subject.id` should be omitted from Subject Search reques
     { "type": "user", "id": "bob" }
   ]
 }
+~~~
 
 ## Resource Search {#c-4-3}
 
