@@ -48,16 +48,8 @@ normative:
     date: 2026
 
 informative:
-  RFC7519:
   RFC8259:
   RFC9110:
-  MCP:
-    title: "Model Context Protocol Specification"
-    target: https://spec.modelcontextprotocol.io/
-    author:
-      -
-        name: Anthropic
-    date: 2025
   COAZMCP:
     title: "COAZ Profile for Model Context Protocol"
     target: https://openid.net/specs/authzen-mcp-profile-1_0.html

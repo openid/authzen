@@ -78,9 +78,7 @@ normative:
     date: 2024
 
 informative:
-  RFC8259:
   RFC8707:
-  RFC9396:
   OAUTH21:
     title: "The OAuth 2.1 Authorization Framework"
     target: https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-12

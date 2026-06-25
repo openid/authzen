@@ -63,6 +63,20 @@ jobs:
           path: |
             archive/authorization-api-0_0.html
 
+      - name: Convert COAZ Framework to rfc xml
+        run: kramdown-rfc2629 profiles/authzen-coaz-framework-1_0.md > profiles/authzen-coaz-framework-1_0.xml
+      - name: Render COAZ Framework HTML
+        run: xml2rfc profiles/authzen-coaz-framework-1_0.xml --html -o authzen-coaz-framework-1_0.html
+      - name: Render COAZ Framework Text
+        run: xml2rfc profiles/authzen-coaz-framework-1_0.xml --text
+      - name: Upload COAZ Framework artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: coaz-framework
+          path: |
+            authzen-coaz-framework-1_0.html
+            profiles/authzen-coaz-framework-1_0.xml
+
       - name: Convert MCP Profile to rfc xml
         run: kramdown-rfc2629 profiles/authzen-mcp-profile-1_0.md > profiles/authzen-mcp-profile-1_0.xml
       - name: Render MCP Profile HTML
@@ -126,6 +140,10 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: patterns-doc
+      - name: Download artifact - COAZ framework
+        uses: actions/download-artifact@v8
+        with:
+          name: coaz-framework
       - name: Download artifact - MCP profile
         uses: actions/download-artifact@v8
         with:
