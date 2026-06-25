@@ -938,6 +938,15 @@ Transport-level or whole-payload failures (for example malformed JSON) remain HT
 
 **Expected:** HTTP 200 with two evaluations. The second evaluation MUST have `"decision": false`.
 
+~~~ json
+{
+  "evaluations": [
+    { "decision": true },
+    { "decision": false, "context": <context> }
+  ]
+}
+~~~
+
 ### Missing evaluations array (backwards-compatible) {#c-3-4-2}
 
 Per the specification, if the `evaluations` array is not present, the Access Evaluations endpoint behaves in a backwards-compatible manner with the single Access Evaluation API. The PDP MUST accept a valid request with `subject`, `action`, and `resource` at the top level and return an Access Evaluation response.
