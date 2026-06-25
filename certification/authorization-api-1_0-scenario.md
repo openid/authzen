@@ -1075,6 +1075,13 @@ Per the specification, `subject.id` should be omitted from Subject Search reques
 
 **Expected:** HTTP 200 with a `results` array. Per the fixture ([](#c-1-5)), the results MUST include at least `bob`. Validates rule 6.
 
+~~~ json
+{
+  "results": [
+    { "type": "user", "id": "bob" }
+  ]
+}
+
 ## Resource Search {#c-4-3}
 
 **Core (Search Core certification):**
