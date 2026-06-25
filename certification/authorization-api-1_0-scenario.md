@@ -49,7 +49,7 @@ normative:
 
 --- abstract
 
-This document defines the conformance certification scenario for Policy Decision Points (PDPs) implementing the AuthZEN Authorization API 1.0. It specifies a minimal fixture and a set of certification levels -- Basic, Batch, Search, and Discovery -- that verify protocol conformance: that a PDP correctly accepts well-formed requests and returns correctly structured responses per the specification. The scenario does not verify the correctness of authorization decisions, which are a function of the implementer's policy.
+This document defines the conformance certification scenario for Policy Decision Points (PDPs) implementing the AuthZEN Authorization API 1.0. It specifies a minimal fixture and a set of certification levels -- Basic, Batch, Search, and Discovery -- that verify protocol conformance: that a PDP correctly accepts well-formed requests and returns correctly structured responses per the specification. The scenario does not judge the implementer's own policy logic, which is out of scope. To confirm that a PDP genuinely evaluates requests rather than returning canned responses, the harness validates decision values only for the small, fixed set of cases mandated by the fixture.
 
 --- middle
 
@@ -57,9 +57,11 @@ This document defines the conformance certification scenario for Policy Decision
 
 This document defines the conformance certification scenario for Policy Decision Points (PDPs) implementing the AuthZEN Authorization API 1.0 {{AUTHZEN}} specification.
 
-The certification verifies **protocol conformance**: that the PDP correctly accepts well-formed requests and returns correctly structured responses per the specification. The certification does **not** verify the correctness of authorization decisions -- whether a PDP permits or denies a given request is a function of the implementer's policy.
+The certification verifies **protocol conformance**: that the PDP correctly accepts well-formed requests and returns correctly structured responses per the specification. It does **not** judge the implementer's own policy logic -- whether a PDP permits or denies an arbitrary request is a function of that policy and is out of scope.
 
-To exercise the protocol, the PDP under test must be loaded with a minimal policy and dataset so that the harness can receive real responses. This scenario defines the required fixture in [](#c-1). The fixture is deliberately small -- it exists to give the PDP something to evaluate, not to test policy logic.
+There is one deliberate, bounded exception. To confirm that a PDP genuinely evaluates requests rather than returning canned responses, the harness validates the actual decision values for a small, fixed set of cases -- but only those mandated by the fixture policy defined in [](#c-1-4), never the implementer's own rules. Every other request uses fixture identifiers but has only its response *structure* checked.
+
+To exercise the protocol, the PDP under test must be loaded with this minimal policy and dataset so that the harness can receive real responses. This scenario defines the required fixture in [](#c-1). The fixture is deliberately small -- it exists to give the PDP something to evaluate, not to exercise the implementer's own policy logic.
 
 # Notational Conventions {#notational-conventions}
 
@@ -1082,7 +1084,19 @@ The PDP MUST accept a Subject Search request that includes the optional `context
 
 ### Subject search with subject id present {#c-4-2-3}
 
-Per the specification, `subject.id` should be omitted from Subject Search requests. The harness does not send `subject.id` in Subject Search requests.
+Per the specification, `subject.id` SHOULD be omitted from Subject Search requests, but if present it MUST be ignored. The harness sends a Subject Search request that includes a `subject.id` and asserts the PDP ignores it: the result set MUST be identical to the equivalent request without `subject.id` ([](#c-4-2-1)).
+
+**Request:**
+
+~~~ json
+{
+  "subject": { "type": "user", "id": "alice" },
+  "action": { "name": "read" },
+  "resource": { "type": "record", "id": "record-1" }
+}
+~~~
+
+**Expected:** HTTP 200 with a `results` array including at least `alice` and `bob`, identical to [](#c-4-2-1). The presence of `subject.id` MUST NOT change the result set (in particular, `bob` MUST still be returned even though `alice`'s id was supplied).
 
 **Properties (Search Properties certification):**
 
@@ -1169,7 +1183,19 @@ The PDP MUST accept a Resource Search request that includes the optional `contex
 
 ### Resource search with resource id present {#c-4-3-3}
 
-Per the specification, `resource.id` should be omitted from Resource Search requests. The harness does not send `resource.id` in Resource Search requests.
+Per the specification, `resource.id` SHOULD be omitted from Resource Search requests, but if present it MUST be ignored. The harness sends a Resource Search request that includes a `resource.id` and asserts the PDP ignores it: the result set MUST be identical to the equivalent request without `resource.id` ([](#c-4-3-1)).
+
+**Request:**
+
+~~~ json
+{
+  "subject": { "type": "user", "id": "alice" },
+  "action": { "name": "read" },
+  "resource": { "type": "record", "id": "record-1" }
+}
+~~~
+
+**Expected:** HTTP 200 with a `results` array including at least `record-1`, identical to [](#c-4-3-1). The presence of `resource.id` MUST NOT constrain or change the result set.
 
 **Properties (Search Properties certification):**
 
