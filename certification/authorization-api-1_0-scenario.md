@@ -1205,6 +1205,14 @@ The PDP MUST accept an Action Search request that includes the optional `context
 
 **Expected:** HTTP 200 with a `results` array. Per the fixture ([](#c-1-5)), the results MUST include at least `write`. Validates rule 6.
 
+~~~ json
+{
+  "results": [
+    { "name": "write" }
+  ]
+}
+~~~
+
 ## Pagination {#c-4-5}
 
 ### Request with page limit {#c-4-5-1}
