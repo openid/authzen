@@ -160,17 +160,19 @@ How the PDP implements this policy is entirely at the implementer's discretion. 
 
 For Search certification, the fixture MUST be configured such that:
 
+The requirements below are labelled `S1`–`S6` to distinguish them from the decision rules in [](#c-1-4) (which are referenced as "decision rule N").
+
 **Core:**
 
-1. A Subject Search for subjects of type `user` who can perform `read` on resource `record-1` MUST return a non-empty `results` array that includes at least `alice` and `bob`.
-2. A Resource Search for resources of type `record` that subject `alice` can perform `read` on MUST return a non-empty `results` array that includes at least `record-1`.
-3. An Action Search for subject `alice` on resource `record-1` MUST return a non-empty `results` array that includes at least `read` and `write` (per rules 1 and 2).
+- **S1** — A Subject Search for subjects of type `user` who can perform `read` on resource `record-1` MUST return a non-empty `results` array that includes at least `alice` and `bob`.
+- **S2** — A Resource Search for resources of type `record` that subject `alice` can perform `read` on MUST return a non-empty `results` array that includes at least `record-1`.
+- **S3** — An Action Search for subject `alice` on resource `record-1` MUST return a non-empty `results` array that includes at least `read` and `write` (per decision rules 1 and 2).
 
 **Properties:**
 
-4. A Subject Search for subjects of type `user` who can perform `write` on resource `record-2` with `properties.status` = `"archived"` MUST return a non-empty `results` array that includes at least `bob` (per rule 6).
-5. A Resource Search for resources of type `record` that subject `bob` with `properties.role` = `"admin"` can perform `write` on MUST return a non-empty `results` array that includes at least `record-2` (per rule 6).
-6. An Action Search for subject `bob` with `properties.role` = `"admin"` on resource `record-2` with `properties.status` = `"archived"` MUST return a non-empty `results` array that includes at least `write`.
+- **S4** — A Subject Search for subjects of type `user` who can perform `write` on resource `record-2` with `properties.status` = `"archived"` MUST return a non-empty `results` array that includes at least `bob` (per decision rule 6).
+- **S5** — A Resource Search for resources of type `record` that subject `bob` with `properties.role` = `"admin"` can perform `write` on MUST return a non-empty `results` array that includes at least `record-2` (per decision rule 6).
+- **S6** — An Action Search for subject `bob` with `properties.role` = `"admin"` on resource `record-2` with `properties.status` = `"archived"` MUST return a non-empty `results` array that includes at least `write` (per decision rule 6).
 
 > **Note:** `delete` is excluded from the Properties Action Search fixture. Action Search omits the `action` key from requests per the spec, so `action.properties.soft` cannot be provided. Action Search results return action names only, without constraining properties.
 
@@ -853,7 +855,7 @@ Top-level `context` applies to all evaluations unless overridden per-evaluation.
 
 **Expected:** HTTP 200 with two evaluations. The harness validates that the request is accepted; the decision values are not validated (not fixture rules).
 
-~~~ json
+~~~
 {
   "evaluations": [
     { "decision": <boolean> },
@@ -949,7 +951,7 @@ Transport-level or whole-payload failures (for example malformed JSON) remain HT
 
 **Expected:** HTTP 200 with two evaluations. The second evaluation MUST have `"decision": false`.
 
-~~~ json
+~~~
 {
   "evaluations": [
     { "decision": true },
@@ -1100,7 +1102,7 @@ Per the specification, `subject.id` should be omitted from Subject Search reques
 }
 ~~~
 
-**Expected:** HTTP 200 with a `results` array. Per the fixture ([](#c-1-5)), the results MUST include at least `bob`. Validates rule 6.
+**Expected:** HTTP 200 with a `results` array. Per the fixture ([](#c-1-5)), the results MUST include at least `bob`. Validates search requirement S4 (derived from decision rule 6).
 
 ~~~ json
 {
@@ -1187,7 +1189,7 @@ Per the specification, `resource.id` should be omitted from Resource Search requ
 }
 ~~~
 
-**Expected:** HTTP 200 with a `results` array. Per the fixture ([](#c-1-5)), the results MUST include at least `record-2`. Validates rule 6.
+**Expected:** HTTP 200 with a `results` array. Per the fixture ([](#c-1-5)), the results MUST include at least `record-2`. Validates search requirement S5 (derived from decision rule 6).
 
 ~~~ json
 {
@@ -1230,7 +1232,7 @@ The harness validates:
 - HTTP 200 response.
 - `results` is an array.
 - Each element contains a `name` field.
-- `read` and `write` appear in the results (per rules 1 and 2).
+- `read` and `write` appear in the results (per decision rules 1 and 2).
 - Additional results are permitted.
 
 ### Action search with context {#c-4-4-2}
@@ -1273,7 +1275,7 @@ The PDP MUST accept an Action Search request that includes the optional `context
 }
 ~~~
 
-**Expected:** HTTP 200 with a `results` array. Per the fixture ([](#c-1-5)), the results MUST include at least `write`. Validates rule 6.
+**Expected:** HTTP 200 with a `results` array. Per the fixture ([](#c-1-5)), the results MUST include at least `write`. Validates search requirement S6 (derived from decision rule 6).
 
 ~~~ json
 {
@@ -1360,11 +1362,13 @@ The PDP MAY support pagination on search endpoints. If it does not support pagin
 
 ## Empty results {#c-4-6}
 
-The PDP MUST return an empty `results` array (not an error) when no entities match the search criteria. This applies both when the entity identifier is unknown and when the entity type itself is unrecognised by the PDP.
+The PDP MUST return an empty `results` array (not an error) when no entities match the search criteria. This applies both when the entity identifier is unknown and when the entity type itself is unrecognised by the PDP, and it applies to all three search endpoints (Subject, Resource, and Action Search). The examples below illustrate the requirement against a representative endpoint; the same behaviour is required of the other two.
 
 ### Unknown entity identifier {#c-4-6-1}
 
-**Request:**
+The example below is an Action Search (the `action` key is omitted) whose input subject identifier does not exist in the fixture.
+
+**Request (Action Search, unknown subject identifier):**
 
 ~~~ json
 {
@@ -1383,9 +1387,9 @@ The PDP MUST return an empty `results` array (not an error) when no entities mat
 
 ### Unknown entity type {#c-4-6-2}
 
-The PDP MUST return an empty `results` array (not HTTP 400) when the search specifies an entity type the PDP does not recognise.
+The PDP MUST return an empty `results` array (not HTTP 400) when the search specifies an entity type the PDP does not recognise. The example below is a Subject Search whose searched-for subject type does not exist in the fixture.
 
-**Request:**
+**Request (Subject Search, unrecognised subject type):**
 
 ~~~ json
 {
@@ -1443,7 +1447,9 @@ The PDP MUST return HTTP 400 when a required field is missing from a search requ
 
 ### Missing required sub-fields {#c-4-7-2}
 
-**Subject Search (resource missing `id`):**
+In each search the searched-for entity legitimately omits its `id` (that is what the search resolves), while every *input* entity MUST be fully identified. The required sub-field therefore differs by endpoint, so the same request body can be valid against one endpoint and invalid against another — the endpoint determines which entity is the input.
+
+**Subject Search (input `resource` missing `id`):** the subject is the search target, so `resource` is an input and MUST carry an `id`.
 
 ~~~ json
 {
@@ -1455,13 +1461,24 @@ The PDP MUST return HTTP 400 when a required field is missing from a search requ
 
 **Expected:** HTTP 400.
 
-**Resource Search (subject missing `id`):**
+**Resource Search (input `subject` missing `id`):** the resource is the search target, so `subject` is an input and MUST carry an `id`.
 
 ~~~ json
 {
   "subject": { "type": "user" },
   "action": { "name": "read" },
   "resource": { "type": "record" }
+}
+~~~
+
+**Expected:** HTTP 400.
+
+**Action Search (input `subject` missing `id`):** the action is the search target (and `action` is omitted entirely), so both `subject` and `resource` are inputs and MUST carry an `id`.
+
+~~~ json
+{
+  "subject": { "type": "user" },
+  "resource": { "type": "record", "id": "record-1" }
 }
 ~~~
 
