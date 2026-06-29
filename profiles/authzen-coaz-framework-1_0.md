@@ -20,14 +20,14 @@ smart_quotes: no
 pi: [toc, sortrefs, symrefs, private]
 
 author:
--
+ -
+    fullname: Atul Tulshibagwale
+    organization: SGNL
+    email: atul@sgnl.ai
+ -
     fullname: Alex Olivier
     organization: Cerbos
     email: alex@cerbos.dev
- -
-    fullname: Atul Tulshibagwale
-    organization: CrowdStrike
-    email: atul.tulshibagwale@crowdstrike.com
 
 normative:
   RFC2119:
@@ -61,11 +61,6 @@ informative:
       -
         name: Google
     date: 2024
-  MCP:
-    title: "Model Context Protocol"
-    target: https://modelcontextprotocol.io/specification/2025-11-25
-    date: 2025-11-25
-
   OPENAPI:
     title: "OpenAPI Specification"
     target: https://spec.openapis.org/oas/latest.html
@@ -83,24 +78,19 @@ model. Mapping values are either literal constants or expressions evaluated
 against the operation's inputs, enabling both fixed field-to-field mappings and
 dynamic, computed mappings. This framework does not define a mapping for any
 specific protocol; instead it defines the common model and a conformance
-contract that individual COAZ *profiles* - for example a profile for the Model
-Context Protocol (MCP), for HTTP APIs, or for OpenAPI-described routes.
+contract that individual COAZ *profiles* — for example a profile for the Model
+Context Protocol, for HTTP APIs, or for OpenAPI-described routes — fulfil.
 
 --- middle
 
 # Introduction
 
 A wide range of systems need to make fine-grained authorization decisions about
-operations expressed in some protocol or interface, for example: 
-
-* An HTTP request
-* A JSON-RPC message
-* An invocation of a tool described by a schema
-* A route described by an OpenAPI {{OPENAPI}} document.
-
-The OpenID AuthZEN Authorization API {{AUTHZEN}} provides a standardized,
-interoperable way to obtain such decisions using the
-Subject-Action-Resource-Context (SARC) model. What it does not define
+operations expressed in some protocol or interface: an HTTP request, a JSON-RPC
+message, an invocation of a tool described by a schema, or a route described by
+an OpenAPI {{OPENAPI}} document. The OpenID AuthZEN Authorization API
+{{AUTHZEN}} provides a standardized, interoperable way to obtain such decisions
+using the Subject-Action-Resource-Context (SARC) model. What it does not define
 is how to *derive* an AuthZEN request from the information model of any
 particular protocol.
 
@@ -225,7 +215,7 @@ named input variables. Expressions reference these variables by name. The
 framework does not mandate any particular variables; naming and contents are
 entirely profile-defined. For example, a profile for a request/response
 protocol might expose a variable for the request and a variable for the
-caller's authorization token.
+caller's security token.
 
 A profile MUST specify, for each input variable, its name, the source from
 which the PEP populates it, and its structure, so that mapping authors can
@@ -296,10 +286,10 @@ optional. If an expression yields **absent** or null for a required field, the
 PEP cannot construct a valid request; this is a mapping error (see {{errors}}).
 
 A value that an expression returns is always a single field value, including
-when it is a list or a map. Returning a list SHALL NOT cause the request to
+when it is a list or a map. Returning a list does **not** cause the request to
 fan out into multiple evaluations. The number of evaluations in the constructed
-request MUST be determined solely by the number of entries in the mapping's
-`evaluations` array (see {{construction}}), not by the type of a value an
+request is determined solely by the number of entries in the mapping's
+`evaluations` array (see {{construction}}), never by the type of a value an
 expression returns.
 
 ## Constructing the AuthZEN Request {#construction}
@@ -335,16 +325,15 @@ to carry its own mapping by some profile-defined means.
 
 ## Trust-Anchored Fields {#trust-anchored}
 
-Inputs to a COAZ mapping are considered to be untrusted, because they may be
-provided by the same entity whose operation is being
+A declared mapping is supplied by a party that is not, in general, as trusted as
+the PEP — and that party may be the same entity whose operation is being
 authorized. Allowing such a mapping to set the fields that establish *identity*
 would let the authorized party assert who the subject is, inverting the trust
 model.
 
-To prevent this, and to prevent mapping developers from accidentally trusting 
-inputs to the mapping, a profile MAY designate certain request fields as
+To prevent this, a profile MAY designate certain request fields as
 **trust-anchored**: their value MUST be derived from the PEP's trusted inputs
-(such as an independently verifiable authorization token), not asserted by a mapping. A trust-anchored
+(such as a validated security token), not asserted by a mapping. A trust-anchored
 field MAY be as specific as a single identifying attribute — for example, the
 subject's identifier — leaving the remaining attributes of the same object
 available to a declared mapping. A profile that admits declared mappings from a
