@@ -823,21 +823,21 @@
   dependencies:
     undici-types "~6.19.2"
 
-"@zuplo/cli@6.71.18":
-  version "6.71.18"
-  resolved "https://registry.yarnpkg.com/@zuplo/cli/-/cli-6.71.18.tgz#e3b94f55cda4f655f058ec48beaf9d857f5945f6"
-  integrity sha512-ajruQ+K4V9DmXVtTIiKpj/TDjfu5arFAbDk+lGfVAB0XNWLZggOi8isq0XnGMucGiXgLMcV+190iqwXTfhpA6w==
+"@zuplo/cli@6.71.21":
+  version "6.71.21"
+  resolved "https://registry.yarnpkg.com/@zuplo/cli/-/cli-6.71.21.tgz#c657dcb53ff8a42dc8ab86098d99fcef27677d89"
+  integrity sha512-/jNCP2sqKrBvHACeMKbUqQcwUQB6+2MczuKLHrCo56QWZUSY8/YGQQ3TVzFmN4lX+Adj+LUzUOAaGRHpSsr/4w==
   dependencies:
     "@inquirer/prompts" "8.5.2"
     "@opentelemetry/api" "1.9.0"
     "@opentelemetry/api-logs" "0.201.1"
     "@swc/core" "1.10.18"
-    "@zuplo/core" "6.71.18"
+    "@zuplo/core" "6.71.21"
     "@zuplo/editor" "1.0.20821740935"
-    "@zuplo/graphql" "6.71.18"
-    "@zuplo/openapi-tools" "6.71.18"
-    "@zuplo/otel" "6.71.18"
-    "@zuplo/runtime" "6.71.18"
+    "@zuplo/graphql" "6.71.21"
+    "@zuplo/openapi-tools" "6.71.21"
+    "@zuplo/otel" "6.71.21"
+    "@zuplo/runtime" "6.71.21"
     chalk "5.4.1"
     chokidar "3.5.3"
     cookie "1.0.2"
@@ -869,10 +869,10 @@
     yargs "17.7.2"
     zod "3.25.76"
 
-"@zuplo/core@6.71.18":
-  version "6.71.18"
-  resolved "https://registry.yarnpkg.com/@zuplo/core/-/core-6.71.18.tgz#4259e5038e369a7a7d3f714ed64346a4065a3276"
-  integrity sha512-3U4SQgim7dEr32uEYyaFTqgWjzEMj6XB7Kzuzamrz8nj+j+pyzy/xlLjlXD7mWjb+kGDsti+IrzYfWexwkrx1w==
+"@zuplo/core@6.71.21":
+  version "6.71.21"
+  resolved "https://registry.yarnpkg.com/@zuplo/core/-/core-6.71.21.tgz#8e7b255f27dfb15c6f284bfc968fe1326582b082"
+  integrity sha512-ErvcdKqa4Cssds9EU6qJRfc8iJOEAiUwB9lXeXQLrVFGoU+ukrqyGlPrFXBsp8vqbybRRLRC5o5o2NUgrulExg==
   dependencies:
     chokidar "^3.5.3"
     esbuild "0.28.1"
@@ -904,17 +904,17 @@
   resolved "https://registry.yarnpkg.com/@zuplo/errors/-/errors-6.59.52.tgz#1e2ba48c929c12e921bc80ab948c17763faec776"
   integrity sha512-pm0pH8Mug3Mivi8RuZ0/xgpphBrSNO49naicjAZS/6JF+ePQD63px92kRHiVfvT0UjklFna68vAn6FK9oQD/GA==
 
-"@zuplo/graphql@6.71.18":
-  version "6.71.18"
-  resolved "https://registry.yarnpkg.com/@zuplo/graphql/-/graphql-6.71.18.tgz#654ecb1fa0fc0c67bb25711b7e5d4709579a22ce"
-  integrity sha512-B0N4MTxYXSO6HCBZWD3I845ZQJOfwRBjcuOYfdfWwn7sTdYdfIrVx0SUQ/K+HmOZWmapBzU5OM14+Qbz41g9zg==
+"@zuplo/graphql@6.71.21":
+  version "6.71.21"
+  resolved "https://registry.yarnpkg.com/@zuplo/graphql/-/graphql-6.71.21.tgz#bd0a7e2142a55a7cbfd21f801c9a84ee644cb860"
+  integrity sha512-V64Z79VlZ6mHhCnSahsANdAaHPZ/yaJrxsfZDEvQZvtbTKqaqx7uEn0Xn4xsSd1SRA78F8jLMHr1RLGz5E5NQQ==
   dependencies:
     graphql "^16.8.1"
 
-"@zuplo/openapi-tools@6.71.18":
-  version "6.71.18"
-  resolved "https://registry.yarnpkg.com/@zuplo/openapi-tools/-/openapi-tools-6.71.18.tgz#2fc619204715fb82c1cab9d72e86cc63459430c3"
-  integrity sha512-MmHk8Sn/ocMLncA67rzX0rOvrnIGeBB1Wd1iblLbHfrwRf+c/wglWOx93jiYuu91d0kbYzHUD2tMn8Y/N955xg==
+"@zuplo/openapi-tools@6.71.21":
+  version "6.71.21"
+  resolved "https://registry.yarnpkg.com/@zuplo/openapi-tools/-/openapi-tools-6.71.21.tgz#06c8b26a78838c02b76767554e3f8b331c50ae38"
+  integrity sha512-pEUafBIYBVCmRP5q9coFCo3FCqlD90HrcTJszp/gEIfDTGj9/EzH2tPx6oR1eYOGjf/jjsqXckar7+aPQIwYzQ==
   dependencies:
     js-yaml "^4.1.0"
     jsonpath-plus "^10.3.0"
@@ -923,10 +923,10 @@
     uuid "^11.1.0"
     zod "3.25.76"
 
-"@zuplo/otel@6.71.18":
-  version "6.71.18"
-  resolved "https://registry.yarnpkg.com/@zuplo/otel/-/otel-6.71.18.tgz#729a3af888889b1d2dff96795740c87eaea63cc7"
-  integrity sha512-D2IHhas1GKQY2OPO01z7HMGjFMIXKbv/qkmHZrTTkF47G2VBF4p1jPYijWuhrfxincNIm6yCwUefENzCB7wb8A==
+"@zuplo/otel@6.71.21":
+  version "6.71.21"
+  resolved "https://registry.yarnpkg.com/@zuplo/otel/-/otel-6.71.21.tgz#640667d3042930e134b7c03f644236282c8e217c"
+  integrity sha512-PzSM4oaIHPCjoKJIl+7u5vVjL2Ud8IH9cKj7p7PV5j47RwfWewOiSWoJUD+11zAXdpPmIHmc9fwJICslM1O4UQ==
   dependencies:
     "@opentelemetry/api" "1.9.0"
     "@opentelemetry/api-logs" "0.201.1"
@@ -939,10 +939,10 @@
     "@opentelemetry/sdk-trace-base" "2.0.1"
     "@opentelemetry/semantic-conventions" "1.34.0"
 
-"@zuplo/runtime@6.71.18":
-  version "6.71.18"
-  resolved "https://registry.yarnpkg.com/@zuplo/runtime/-/runtime-6.71.18.tgz#c1c758fe5a288b71fe9e87f3a0a60f3b88240778"
-  integrity sha512-beha0o0tdWbwKfdfIrRHZCOLxeFQdpLy2UsYLh6uKysvqD34ZMWIakWNtw55FZsxJg6Bz+y9Q7a/WOdRxLv8+g==
+"@zuplo/runtime@6.71.21":
+  version "6.71.21"
+  resolved "https://registry.yarnpkg.com/@zuplo/runtime/-/runtime-6.71.21.tgz#e06b5b7498393c5dd3fc9f049230706357f08a21"
+  integrity sha512-vvHK9Z3ToZ6wk5dVg8teT3NiPhPQLqowvZ4if+boO3ASlPA4WTbdSiHKVgeKlQUjxahL7Xyh/ANjP1NKvZ0Emg==
   dependencies:
     "@cfworker/json-schema" "4.1.1"
     "@modelcontextprotocol/sdk" "^1.29.0"
@@ -2633,9 +2633,9 @@ prettier@3.8.1:
   integrity sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==
 
 prettier@^3, prettier@^3.5.3:
-  version "3.8.4"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.8.4.tgz#f334f013ac04a96676f24dabc23c1c4ae1bae411"
-  integrity sha512-N2MylSdi48+5N/6S5j+maeHbUSIzzZ5uOcX5Hm4QpV8Dkb1HFjfAKTKX6yNPJQD9AhcT3ifHNB66tWTTJDi11Q==
+  version "3.9.3"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.9.3.tgz#4caabe6fb955e8b8f13319f25872522ece519534"
+  integrity sha512-HWmu+K+zvHNpaMfSnYeqdqrDbR16cuIXaPx8WoHaviQkDJh1/0BNtOZmHVQI5jc3wXv0H1yXc9wjvFdXh+n3hQ==
 
 pretty-ms@^7.0.0:
   version "7.0.1"
@@ -3316,11 +3316,11 @@ zod@3.25.76:
   integrity sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==
 
 zuplo@^6:
-  version "6.71.18"
-  resolved "https://registry.yarnpkg.com/zuplo/-/zuplo-6.71.18.tgz#8383db05751faeb4d1f919a28c062862e5d850fc"
-  integrity sha512-CSbnvJTCX03Ef9d/VvF9ZTZvniu+OQy2FKGA4PDBcaZPWJv0msfJ4qjX6FUa6PiQUN/tWl+N332Nu24wraPXfw==
+  version "6.71.21"
+  resolved "https://registry.yarnpkg.com/zuplo/-/zuplo-6.71.21.tgz#bc4e018ae860208cb447f97c4389bffdac22398a"
+  integrity sha512-33M5xgf/ibvk0xlUhhsNJxqbvHYrVCT/goCzMz6doDBAGNFsaqgxb1wAD0fTG/P0yoIE9PVE/HM4ntMidrMCKw==
   dependencies:
-    "@zuplo/cli" "6.71.18"
-    "@zuplo/core" "6.71.18"
-    "@zuplo/runtime" "6.71.18"
+    "@zuplo/cli" "6.71.21"
+    "@zuplo/core" "6.71.21"
+    "@zuplo/runtime" "6.71.21"
     "@zuplo/test" "1.4.0"
