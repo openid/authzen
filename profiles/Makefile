@@ -16,6 +16,9 @@ html:   $(HTML)
 	kramdown-rfc2629 > $@ $^
 
 all:
+	@ $(MAKE) authzen-coaz-framework-1_0.xml
+	@ $(MAKE) authzen-coaz-framework-1_0.html
+	@ $(MAKE) authzen-coaz-framework-1_0.txt
 	@ $(MAKE) authzen-mcp-profile-1_0.xml
 	@ $(MAKE) authzen-mcp-profile-1_0.html
 	@ $(MAKE) authzen-mcp-profile-1_0.txt
