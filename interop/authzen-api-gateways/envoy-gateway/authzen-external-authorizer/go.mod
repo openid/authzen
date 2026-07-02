@@ -1,6 +1,6 @@
 module github.com/openid/authzen/authzen-todo-envoy-gateway
 
-go 1.24.0
+go 1.25.0
 
 require github.com/envoyproxy/go-control-plane/envoy v1.36.0
 
@@ -22,9 +22,9 @@ require (
 	github.com/getkin/kin-openapi v0.131.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
-	golang.org/x/net v0.48.0 // indirect
-	golang.org/x/sys v0.39.0 // indirect
-	golang.org/x/text v0.32.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217
 	google.golang.org/grpc v1.79.3
 	google.golang.org/protobuf v1.36.10 // indirect
