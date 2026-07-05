@@ -687,3 +687,9 @@ To cancel a pending request:
 # IANA Considerations
 
 This profile defines no new OAuth grant types, parameters, endpoints, or error codes; it reuses {{I-D.gerber-oauth-deferred-token-response}}, {{OIDC-CIBA}}, {{I-D.rosomakho-oauth-txn-challenge}}, and {{RFC9396}}.  It requests no IANA registrations.  Any `authorization_details` type used by a deployment is registered per {{RFC9396}}.
+
+--- back
+
+# Acknowledgements
+
+The author thanks Yaron Zehavi for review and discussion, including how this profile composes with the remediation mechanism of {{?I-D.zehavi-oauth-rar-metadata}}.
