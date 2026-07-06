@@ -10,7 +10,7 @@ workgroup: OpenID AuthZEN
 keyword:
   - authorization
   - obligations
-  - AuthZen
+  - AuthZEN
   - fine-grained authorization
   - policy enforcement
 stand_alone: true
@@ -89,13 +89,13 @@ informative:
 
 --- abstract
 
-This specification defines a profile of the OpenID AuthZen Authorization API for expressing obligations. It introduces a standardized mechanism, called the Obligations Profile, by which a Policy Decision Point (PDP) can attach one or more mandatory, machine-readable actions to an authorization decision. A Policy Enforcement Point (PEP) that receives such a decision MUST perform every attached action in order to honor it. This profile defines the Obligation object model, PEP compliance semantics for GRANT and DENY decisions and for Search-shaped requests, a set of Normative Obligation Types ready for immediate implementation, and a discovery and negotiation mechanism by which PDPs and PEPs establish which Obligation Types they mutually support.
+This specification defines a profile of the OpenID AuthZEN Authorization API for expressing obligations. It introduces a standardized mechanism, called the Obligations Profile, by which a Policy Decision Point (PDP) can attach one or more mandatory, machine-readable actions to an authorization decision. A Policy Enforcement Point (PEP) that receives such a decision MUST perform every attached action in order to honor it. This profile defines the Obligation object model, PEP compliance semantics for PERMIT and DENY decisions and for Search-shaped requests, a set of Normative Obligation Types ready for immediate implementation, and a discovery and negotiation mechanism by which PDPs and PEPs establish which Obligation Types they mutually support.
 
 --- middle
 
 # Introduction
 
-The OpenID AuthZen Authorization API {{AUTHZEN}} defines a simple, protocol-agnostic API by which a Policy Enforcement Point (PEP) submits an authorization query to a Policy Decision Point (PDP) and receives back a decision object whose primary member is a boolean `decision` field. In many real-world deployments, a binary allow/deny decision is insufficient: the PDP frequently needs to require the PEP to take additional, mandatory actions as a condition of, or companion to, the decision it renders.
+The OpenID AuthZEN Authorization API {{AUTHZEN}} defines a simple, protocol-agnostic API by which a Policy Enforcement Point (PEP) submits an authorization query to a Policy Decision Point (PDP) and receives back a decision object whose primary member is a boolean `decision` field. In many real-world deployments, a binary allow/deny decision is insufficient: the PDP frequently needs to require the PEP to take additional, mandatory actions as a condition of, or companion to, the decision it renders.
 
 Common examples include:
 
@@ -105,7 +105,7 @@ Common examples include:
 - **Data Transformation**: watermarking a document before it is returned to a user, or masking PII or other sensitive attributes in fetched data.
 - **Requesting Human Approval**: for human-in-the-loop use cases, where a human must approve an action or an access request before it is considered final.
 
-These requirements are commonly grouped under the term "obligations" in prior authorization standards such as {{XACML}}. This specification, the AuthZen Obligations Profile, defines an analogous, but AuthZen-native, mechanism. It is designed to be backward compatible with implementations of the base AuthZen specification that are unaware of this profile: obligations are carried exclusively inside the existing, open-ended `context` member of an AuthZen response, and PDPs that do not implement this profile simply never populate that member with obligations.
+These requirements are commonly grouped under the term "obligations" in prior authorization standards such as {{XACML}}. This specification, the AuthZEN Obligations Profile, defines an analogous, but AuthZEN-native, mechanism. It is designed to be backward compatible with implementations of the base AuthZEN specification that are unaware of this profile: obligations are carried exclusively inside the existing, open-ended `context` member of an AuthZEN response, and PDPs that do not implement this profile simply never populate that member with obligations.
 
 This profile does not attempt to define a general-purpose workflow or orchestration language. Obligations are intentionally coarse-grained, declarative instructions; how a PEP actually performs an obligation (e.g., which SMTP relay it uses to send a notification) is implementation-specific and out of scope.
 
@@ -138,15 +138,15 @@ Custom Obligation:
 
 Obligations Metadata:
 
-: An extension to AuthZen PDP metadata (see {{AUTHZEN}}) by which a PDP advertises the Obligation Types it is capable of issuing.
+: An extension to AuthZEN PDP metadata (see {{AUTHZEN}}) by which a PDP advertises the Obligation Types it is capable of issuing.
 
 # Design Overview
 
 This profile makes the following core design choices:
 
-1. Obligations are OPTIONALLY added by the PDP to the `context` member of an AuthZen response, under a reserved key, `obligations`. A PDP that has nothing to say about obligations simply omits this key; existing AuthZen PEPs are unaffected.
+1. Obligations are OPTIONALLY added by the PDP to the `context` member of an AuthZEN response, under a reserved key, `obligations`. A PDP that has nothing to say about obligations simply omits this key; existing AuthZEN PEPs are unaffected.
 
-2. Obligations MAY be attached to a response regardless of the value of the `decision` field. That is, a PDP MAY return obligations alongside `"decision": true` (GRANT) or `"decision": false` (DENY). In both cases, the obligations are mandatory.
+2. Obligations MAY be attached to a response regardless of the value of the `decision` field. That is, a PDP MAY return obligations alongside `"decision": true` (PERMIT) or `"decision": false` (DENY). In both cases, the obligations are mandatory.
 
 3. A PEP that receives obligations it cannot or does not understand MUST treat the overall response as a DENY, regardless of the original value of `decision`. The single exception is defined in {{search-requests}} for Search-shaped requests, where the PEP instead filters, rather than withholds, results.
 
@@ -154,14 +154,18 @@ This profile makes the following core design choices:
 
 # The Obligation Object {#obligation-object}
 
-Obligations are carried as a JSON array under the `obligations` key of the AuthZen response `context` object:
+Obligations are carried as a JSON array under the `obligations` key of the AuthZEN response `context` object:
 
 ~~~ json
 {
   "decision": true,
   "context": {
     "obligations": [
-      { "...": "..." }
+      {
+        "id": "...",
+        "type": "...",
+        "properties": { "...": "..." }
+      }
     ]
   }
 }
@@ -170,21 +174,23 @@ Obligations are carried as a JSON array under the `obligations` key of the AuthZ
 
 Each element of the `obligations` array is a JSON object (an "Obligation object") with the following members:
 
-type:
-
-: REQUIRED. A String. A unique, IANA-registered identifier for the type of obligation being requested, drawn from the "AuthZen Obligation Types" registry defined in {{iana-obligation-types}}, or the literal value `custom` (see {{obligation-custom}}).
-
 id:
 
 : REQUIRED. A String. Uniquely identifies this Obligation instance within the enclosing response `context`. This allows a PEP to unambiguously report success or failure of individual obligations (e.g., in logs) when more than one Obligation is returned.
 
-Additional members are defined per Obligation Type; see {{normative-obligation-types}} for the members required by each Normative Obligation Type, and {{obligation-custom}} for `custom` obligations.
+type:
+
+: REQUIRED. A String. A unique, IANA-registered identifier for the type of obligation being requested, drawn from the "AuthZEN Obligation Types" registry defined in {{iana-obligation-types}}, or the literal value `custom` (see {{obligation-custom}}).
+
+properties:
+
+: REQUIRED. A JSON object containing obligation type-specific properties. The additional members are defined per Obligation Type; see {{normative-obligation-types}} for the members required by each Normative Obligation Type, and {{obligation-custom}} for `custom` obligations.
 
 The relative order of elements in the `obligations` array carries no normative meaning; a PEP MUST be capable of executing obligations in any order, or concurrently, unless a future profile or bilateral agreement specifies otherwise. All obligations present in a given response are mandatory and independent: partial execution is addressed in {{non-compliance}}.
 
 # PEP Compliance Semantics
 
-## Obligations on GRANT Decisions
+## Obligations on PERMIT Decisions
 
 When a PDP returns `"decision": true` together with one or more Obligation objects, the grant of access is conditioned on the PEP executing every returned Obligation. If the PEP executes all returned obligations successfully, it MUST honor the decision and grant access. If the PEP cannot, or does not, comply with one or more of the returned obligations (see {{non-compliance}} for what "cannot comply" means), the PEP MUST treat the response as though `"decision": false` had been returned, and MUST NOT grant access.
 
@@ -198,7 +204,7 @@ When a PDP returns `"decision": false` together with one or more Obligation obje
 
 Accordingly, for Search requests: if the PDP returns per-result Obligations and the PEP cannot comply with an Obligation attached to a given result, the PEP MUST exclude only that result from the returned result set. The PEP MUST NOT withhold the entire Search response, and MUST continue to return every other result for which either no Obligation was returned, or all attached Obligations were executed successfully.
 
-The following non-normative example showcases an AuthZEN Resource Search result, where the first element requires a Step-Up authentication. The PEP must enforce this step-action before it can display this data element. In this example, the second resource element doesn't have any obligatoons context, the PEP can therefore return this data item to the requesting Client right away.
+The following non-normative example showcases an AuthZEN Resource Search result, where the first element requires a Step-Up authentication. The PEP must enforce this step-action before it can display this data element. In this example, the second resource element doesn't have any obligations attached, the PEP can therefore return this data item to the requesting Client right away.
 
 ~~~ json
 {
@@ -213,16 +219,16 @@ The following non-normative example showcases an AuthZEN Resource Search result,
     {
       "type": "account",
       "id": "123",
-      "context" :  {
-        "obligations": [
-          {
-            "type": "step-up",
-            "id": "obl-1",
+      "obligations": [
+        {
+          "type": "step-up",
+          "id": "obl-1",
+          "properties": {
             "acr_value": "urn:com:example:loa:3",
             "amr_values": ["mfa", "hwk"]
           }
-        ]
-      }
+        }
+      ]
     },
     {
       "type": "account",
@@ -247,11 +253,11 @@ When a PEP cannot comply with one or more Obligations in a response (outside of 
 1. Treat the overall response as a DENY, regardless of the value of the `decision` member that was returned.
 2. Nonetheless execute every Obligation in the response that it DOES understand and is able to execute, notably including any `notification` or logging-type obligations, so that accountability and auditability are preserved even when the access itself is not granted.
 
-A PDP that anticipates a PEP may be unable to satisfy an Obligation it would otherwise be required to issue for a given decision MAY, at its own discretion and based on its internal policy, choose instead to issue a DENY decision outright (with or without its own accompanying Obligations), rather than issuing a GRANT it expects the PEP cannot lawfully enforce. This specification does not mandate how a PDP makes that choice; it is informed by the negotiation mechanism of {{negotiation}}, when used.
+A PDP that anticipates a PEP may be unable to satisfy an Obligation it would otherwise be required to issue for a given decision MAY, at its own discretion and based on its internal policy, choose instead to issue a DENY decision outright (with or without its own accompanying Obligations), rather than issuing a PERMIT it expects the PEP cannot lawfully enforce. This specification does not mandate how a PDP makes that choice; it is informed by the negotiation mechanism of {{negotiation}}, when used.
 
 # Normative Obligation Types {#normative-obligation-types}
 
-This section defines the initial set of Normative Obligation Types. Each is registered in the IANA "AuthZen Obligation Types" registry ({{iana-obligation-types}}).
+This section defines the initial set of Normative Obligation Types. Each is registered in the IANA "AuthZEN Obligation Types" registry ({{iana-obligation-types}}).
 
 ## step-up {#obligation-step-up}
 
@@ -273,8 +279,10 @@ The following is a non-normative example of a `step-up` obligation:
 {
   "type": "step-up",
   "id": "obl-1",
-  "acr_value": "urn:com:example:loa:3",
-  "amr_values": ["mfa", "hwk"]
+  "properties": {
+    "acr_value": "urn:com:example:loa:3",
+    "amr_values": ["mfa", "hwk"]
+  }
 }
 ~~~
 {: #fig-obligation-step-up title="Non-normative example of a step-up obligation"}
@@ -303,9 +311,11 @@ The following is a non-normative example of a `notification` obligation:
 {
   "type": "notification",
   "id": "obl-2",
-  "to": "manager@example.com",
-  "topic": "Unauthorized access attempt",
-  "body": "User jdoe attempted to access patient record 4471 outside of business hours."
+  "properties": {
+    "to": "manager@example.com",
+    "topic": "Unauthorized access attempt",
+    "body": "User jdoe attempted to access patient record 4471 outside of business hours."
+  }
 }
 ~~~
 {: #fig-obligation-notification title="Non-normative example of a notification obligation"}
@@ -326,7 +336,9 @@ The following is a non-normative example of a `session_termination` obligation:
 {
   "type": "session_termination",
   "id": "obl-3",
-  "subject": "jdoe@example.com"
+  "properties": {
+    "subject": "jdoe@example.com"
+  }
 }
 ~~~
 {: #fig-obligation-session-termination title="Non-normative example of a session_termination obligation"}
@@ -343,24 +355,26 @@ The following is a non-normative example of a `custom` obligation used to reques
 {
   "type": "custom",
   "id": "obl-4",
-  "vendor": "example-dlp-suite",
-  "action": "watermark",
-  "watermark_text": "CONFIDENTIAL - jdoe@example.com - 2026-07-03"
+  "properties": {
+    "vendor": "example-dlp-suite",
+    "action": "watermark",
+    "watermark_text": "CONFIDENTIAL - jdoe@example.com - 2026-07-03"
+  }
 }
 ~~~
 {: #fig-obligation-custom title="Non-normative example of a custom obligation"}
 
 # Discovery: PDP Metadata Extension {#metadata-extension}
 
-{{AUTHZEN}} defines a metadata discovery mechanism by which a PEP learns the capabilities of a PDP. This profile adds a new metadata member, `obligations_supported`, an array of Strings, each of which MUST be either an Obligation Type registered per {{iana-obligation-types}}, or the literal value `custom`, that the PDP is capable of issuing.
+{{AUTHZEN}} defines a metadata discovery mechanism by which a PEP learns the capabilities of a PDP. This profile adds a new metadata member, `supported_obligations`, an array of Strings, each of which MUST be either an Obligation Type registered per {{iana-obligation-types}}, or the literal value `custom`, that the PDP is capable of issuing.
 
-A PDP that implements this profile MUST include `obligations_supported` in its metadata document. A PDP that supports no obligations, or does not implement this profile, MAY omit the member entirely; its absence is equivalent to an empty array.
+A PDP that implements this profile MUST include `supported_obligations` in its metadata document. A PDP that supports no obligations, or does not implement this profile, MAY omit the member entirely; its absence is equivalent to an empty array.
 
 The following is a non-normative example of a metadata fragment:
 
 ~~~ json
 {
-  "obligations_supported": [
+  "supported_obligations": [
     "step-up",
     "notification",
     "session_termination",
@@ -372,7 +386,7 @@ The following is a non-normative example of a metadata fragment:
 
 # Negotiation: PEP-Declared Obligation Support {#negotiation}
 
-Because a PDP's decision may need to differ depending on which Obligation Types the requesting PEP is actually able to execute, this profile allows a PEP to declare, on a per-request basis, the Obligation Types it supports, by including an `obligations_supported` array in the `context` member of the AuthZen request:
+Because a PDP's decision may need to differ depending on which Obligation Types the requesting PEP is actually able to execute, this profile allows a PEP to declare, on a per-request basis, the Obligation Types it supports, by including an `supported_obligations` array in the `context` member of the AuthZEN request:
 
 ~~~ json
 {
@@ -380,32 +394,32 @@ Because a PDP's decision may need to differ depending on which Obligation Types 
   "resource": { "...": "..." },
   "action": { "...": "..." },
   "context": {
-    "obligations_supported": ["notification", "step-up"]
+    "supported_obligations": ["notification", "step-up"]
   }
 }
 ~~~
 {: #fig-request-negotiation title="PEP declaring supported obligation types in a request"}
 
-Every value in a request's `obligations_supported` array MUST be drawn from the set the PDP has itself advertised via its `obligations_supported` metadata ({{metadata-extension}}); a PDP MUST ignore any value in a request that it did not itself advertise as supported, treating the request as though that value were absent.
+Every value in a request's `supported_obligations` array MUST be drawn from the set the PDP has itself advertised via its `supported_obligations` metadata ({{metadata-extension}}); a PDP MUST ignore any value in a request that it did not itself advertise as supported, treating the request as though that value were absent.
 
-Inclusion of this member is OPTIONAL. A PDP MUST treat the absence of `obligations_supported` in a request as no information about PEP capability, and remains free to return any Obligation Types it deems necessary for the decision; the PEP compliance semantics of {{obligation-object}} through {{non-compliance}} continue to apply unconditionally in that case.
+Inclusion of this member is OPTIONAL. A PDP MUST treat the absence of `supported_obligations` in a request as no information about PEP capability, and remains free to return any Obligation Types it deems necessary for the decision; the PEP compliance semantics of {{obligation-object}} through {{non-compliance}} continue to apply unconditionally in that case.
 
-Declaring `obligations_supported` in a request is advisory to the PDP's policy evaluation; it does not by itself change the AuthZen response contract. A PDP MAY use this information to avoid issuing an Obligation Type the PEP has declared it cannot execute -- for example, by issuing a DENY outright, by selecting a different, supported Obligation Type that achieves an equivalent policy goal, or by proceeding to issue the unsupported Obligation Type anyway, if its own internal policy requires it regardless of PEP capability, in accordance with {{non-compliance}}.
+Declaring `supported_obligations` in a request is advisory to the PDP's policy evaluation; it does not by itself change the AuthZEN response contract. A PDP MAY use this information to avoid issuing an Obligation Type the PEP has declared it cannot execute -- for example, by issuing a DENY outright, by selecting a different, supported Obligation Type that achieves an equivalent policy goal, or by proceeding to issue the unsupported Obligation Type anyway, if its own internal policy requires it regardless of PEP capability, in accordance with {{non-compliance}}.
 
 # Protocol Flow
 
 A conformant deployment of this profile proceeds as follows:
 
-1. The PEP retrieves PDP metadata and inspects `obligations_supported` to learn which Obligation Types the PDP may issue.
-2. The PEP, when it submits an AuthZen decision or Search request, MAY include its own `obligations_supported` array in the request `context`, restricted to values the PDP advertised in step 1.
+1. The PEP retrieves PDP metadata and inspects `supported_obligations` to learn which Obligation Types the PDP may issue.
+2. The PEP, when it submits an AuthZEN decision or Search request, MAY include its own `supported_obligations` array in the request `context`, restricted to values the PDP advertised in step 1.
 3. The PDP evaluates policy and constructs its response. If its policy requires one or more mandatory PEP actions as a condition of, or companion to, the decision, it includes them as Obligation objects under `context.obligations` in the response, per {{obligation-object}}, regardless of whether `decision` is `true` or `false`.
 4. The PEP inspects any returned Obligations and applies the compliance rules of {{non-compliance}}: executing every Obligation it is able to; treating the response as DENY if it cannot comply with any Obligation (except for Search requests, where it instead excludes only the non-compliant result, per {{search-requests}}); and executing every Obligation it does understand even when treating the response as a DENY.
 
 # Examples
 
-## Example: GRANT with a Data Transformation Obligation
+## Example: PERMIT with a Data Transformation Obligation
 
-The following is a non-normative example of an AuthZen response granting access to a document, conditioned on the PEP applying a watermark before returning it:
+The following is a non-normative example of an AuthZEN response granting access to a document, conditioned on the PEP applying a watermark before returning it:
 
 ~~~ json
 {
@@ -415,19 +429,21 @@ The following is a non-normative example of an AuthZen response granting access 
       {
         "type": "custom",
         "id": "obl-1",
-        "vendor": "example-dlp-suite",
-        "action": "watermark",
-        "watermark_text": "jdoe@example.com - 2026-07-03T14:02:00Z"
+        "properties": {
+          "vendor": "example-dlp-suite",
+          "action": "watermark",
+          "watermark_text": "jdoe@example.com - 2026-07-03T14:02:00Z"
+        }
       }
     ]
   }
 }
 ~~~
-{: #fig-example-grant-transform title="GRANT response with a data transformation obligation"}
+{: #fig-example-grant-transform title="PERMIT response with a data transformation obligation"}
 
 ## Example: DENY with a Step-Up Obligation
 
-The following is a non-normative example of an AuthZen response denying access until the subject completes step-up authentication:
+The following is a non-normative example of an AuthZEN response denying access until the subject completes step-up authentication:
 
 ~~~ json
 {
@@ -437,8 +453,10 @@ The following is a non-normative example of an AuthZen response denying access u
       {
         "type": "step-up",
         "id": "obl-1",
-        "acr_value": "urn:com:example:loa:3",
-        "amr_values": ["mfa"]
+        "properties": {
+          "acr_value": "urn:com:example:loa:3",
+          "amr_values": ["mfa"]
+        }
       }
     ]
   }
@@ -469,17 +487,17 @@ The following is a non-normative example of a Search response listing three cand
     {
       "type": "Document",
       "id": "doc-2",
-      "context" :  {
-        "obligations": [
-          {
-            "type": "notification",
-            "id": "obl-2",
+      "obligations": [
+        {
+          "type": "notification",
+          "id": "obl-2",
+          "properties": {
             "to": "manager@example.com",
             "topic": "Protected Document Access",
             "body": "User AliceSmith attempted to read Document "doc-2" from Europe."
           }
-        ]
-      }
+        }
+      ]
     },
     {
       "type": "Document",
@@ -497,7 +515,7 @@ A PEP unable to perform a notification mid-Search MUST return `doc-1` and `doc-3
 ~~~ json
 {
   "policy_decision_point": "https://pdp.example.com",
-  "obligations_supported": [
+  "supported_obligations": [
     "step-up",
     "notification",
     "session_termination"
@@ -514,7 +532,7 @@ A PEP unable to perform a notification mid-Search MUST return `doc-1` and `doc-3
   "resource": { "type": "record", "id": "patient-4471" },
   "action": { "name": "view" },
   "context": {
-    "obligations_supported": ["notification"]
+    "supported_obligations": ["notification"]
   }
 }
 ~~~
@@ -522,11 +540,11 @@ A PEP unable to perform a notification mid-Search MUST return `doc-1` and `doc-3
 
 # Security Considerations
 
-Obligations that are silently dropped or only partially executed by a non-conformant PEP can create a false sense of enforcement (e.g., an access is granted, and appears in the PDP's policy audit as having been logged or watermarked, while the PEP in fact failed to do so). Implementers of PDPs that rely on Obligations for critical controls (accountability logging, step-up authentication, or data transformation) SHOULD, where possible, independently verify or audit PEP compliance out-of-band, rather than relying solely on the PEP's self-reported behavior, since this profile has no built-in mechanism for a PEP to attest, within the AuthZen protocol itself, that an Obligation was in fact executed.
+Obligations that are silently dropped or only partially executed by a non-conformant PEP can create a false sense of enforcement (e.g., an access is granted, and appears in the PDP's policy audit as having been logged or watermarked, while the PEP in fact failed to do so). Implementers of PDPs that rely on Obligations for critical controls (accountability logging, step-up authentication, or data transformation) SHOULD, where possible, independently verify or audit PEP compliance out-of-band, rather than relying solely on the PEP's self-reported behavior, since this profile has no built-in mechanism for a PEP to attest, within the AuthZEN protocol itself, that an Obligation was in fact executed.
 
 A malicious or compromised PDP could attempt to abuse the `notification` Obligation Type to cause a PEP to relay attacker-controlled content to an arbitrary destination (e.g., using the PEP's trusted mail relay to send spam or phishing content). PEPs SHOULD treat `to` and `body` values in `notification` Obligations as untrusted input, and SHOULD apply the same validation, rate-limiting, and content-safety controls they would apply to any other externally influenced message-sending operation.
 
-The negotiation mechanism of {{negotiation}} is advisory only. A PEP MUST NOT assume that declaring `obligations_supported` in a request guarantees the PDP will avoid issuing an unsupported Obligation Type; the PDP retains discretion per {{negotiation}}, and the PEP MUST still be prepared to apply the compliance rules of {{non-compliance}} to any response it receives, including one containing Obligation Types it did not declare support for.
+The negotiation mechanism of {{negotiation}} is advisory only. A PEP MUST NOT assume that declaring `supported_obligations` in a request guarantees the PDP will avoid issuing an unsupported Obligation Type; the PDP retains discretion per {{negotiation}}, and the PEP MUST still be prepared to apply the compliance rules of {{non-compliance}} to any response it receives, including one containing Obligation Types it did not declare support for.
 
 # Privacy Considerations
 
@@ -534,9 +552,9 @@ The negotiation mechanism of {{negotiation}} is advisory only. A PEP MUST NOT as
 
 # IANA Considerations
 
-## AuthZen Obligation Types Registry {#iana-obligation-types}
+## AuthZEN Obligation Types Registry {#iana-obligation-types}
 
-IANA is requested to create a new registry titled "AuthZen Obligation Types" under a to-be-determined "AuthZen Parameters" registry group. Registration requests are evaluated under the Specification Required policy {{RFC8126}}.
+IANA is requested to create a new registry titled "AuthZEN Obligation Types" under a to-be-determined "AuthZEN Parameters" registry group. Registration requests are evaluated under the Specification Required policy {{RFC8126}}.
 
 Each registration MUST include:
 
@@ -555,8 +573,8 @@ This specification requests the following initial registrations:
 | notification | Requires the PEP to transmit a message to a destination. | {{obligation-notification}} |
 | session_termination | Requires the PEP to terminate all sessions of a subject. | {{obligation-session-termination}} |
 | custom | Reserved for bilaterally agreed obligations outside this specification's scope. | {{obligation-custom}} |
-{: #tab-iana-registrations title="Initial AuthZen Obligation Types registrations"}
+{: #tab-iana-registrations title="Initial AuthZEN Obligation Types registrations"}
 
 # Acknowledgements {#acknowledgements numbered="false"}
 
-The author acknowledges the OpenID AuthZen Working Group for the base specification upon which this profile builds, and prior obligation-bearing access-control models (notably {{XACML}}) for informing the design of this profile's Obligation object model.
+The author acknowledges the OpenID AuthZEN Working Group for the base specification upon which this profile builds, and prior obligation-bearing access-control models (notably {{XACML}}) for informing the design of this profile's Obligation object model.
