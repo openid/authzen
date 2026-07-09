@@ -77,6 +77,20 @@ jobs:
             authzen-mcp-profile-1_0.html
             profiles/authzen-mcp-profile-1_0.xml
 
+      - name: Convert Obligations Profile to rfc xml
+        run: kramdown-rfc2629 profiles/authzen-obligations-profile-1_0.md > profiles/authzen-obligations-profile-1_0.xml
+      - name: Render Obligations Profile HTML
+        run: xml2rfc profiles/authzen-obligations-profile-1_0.xml --html -o authzen-obligations-profile-1_0.html
+      - name: Render Obligations Profile Text
+        run: xml2rfc profiles/authzen-obligations-profile-1_0.xml --text
+      - name: Upload Obligations Profile artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: obligations-profile
+          path: |
+            authzen-obligations-profile-1_0.html
+            profiles/authzen-obligations-profile-1_0.xml
+
   publish-to-pages:
     if: github.ref == 'refs/heads/main'
     needs: [build-rfc]
@@ -102,6 +116,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: mcp-profile
+      - name: Download artifact - Obligations profile
+        uses: actions/download-artifact@v4
+        with:
+          name: obligations-profile
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
