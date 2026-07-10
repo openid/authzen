@@ -24,7 +24,7 @@ author:
     fullname: Alex Olivier
     organization: Cerbos
     email: alex@cerbos.dev
- -
+-
     fullname: Atul Tulshibagwale
     organization: CrowdStrike
     email: atul.tulshibagwale@crowdstrike.com
