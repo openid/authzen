@@ -46,6 +46,13 @@ normative:
         name: Atul Tulshibagwale
         org: SGNL
     date: 2026
+  CEL:
+    title: "Common Expression Language"
+    target: https://cel.dev/
+    author:
+      -
+        name: Google
+    date: 2024
 
 informative:
   RFC8259:
@@ -54,13 +61,6 @@ informative:
     title: "COAZ Profile for Model Context Protocol"
     target: https://openid.net/specs/authzen-mcp-profile-1_0.html
     date: 2026
-  CEL:
-    title: "Common Expression Language"
-    target: https://cel.dev/
-    author:
-      -
-        name: Google
-    date: 2024
   MCP:
     title: "Model Context Protocol"
     target: https://modelcontextprotocol.io/specification/2025-11-25
@@ -82,9 +82,9 @@ Authorization API request — an Access Evaluation request for a single decision
 or an Access Evaluations request for several — expressed using the
 Subject-Action-Resource-Context (SARC) model. Mapping values are either literal constants or expressions evaluated
 against the operation's inputs, enabling both fixed field-to-field mappings and
-dynamic, computed mappings. This framework does not define a mapping for any
-specific protocol; instead it defines the common model and a conformance
-contract that individual COAZ *profiles* - for example a profile for the Model
+dynamic, computed mappings. This document does not define a mapping for any
+specific protocol; it defines the common model and the conformance contract
+that individual COAZ *profiles* fulfil — for example, a profile for the Model
 Context Protocol (MCP), for HTTP APIs, or for OpenAPI-described routes.
 
 --- middle
@@ -189,8 +189,9 @@ Literal:
   to any input variable.
 
 Expression:
-: A value in a mapping that is computed by evaluating it, in a profile-defined
-  expression language, against the operation's input variables.
+: A value in a mapping that is computed by evaluating it, in the profile's
+  expression language ({{expression-contract}}), against the operation's input
+  variables.
 
 PDP:
 : Policy Decision Point, as defined in {{AUTHZEN}}. A service that evaluates
@@ -243,8 +244,8 @@ protocol might expose a variable for the request and a variable for the
 caller's authorization token.
 
 A profile MUST specify, for each input variable, its name, the source from
-which the PEP populates it, and its structure, so that mapping authors can
-write expressions against it deterministically.
+which the PEP populates it, and its structure, so that a mapping author knows
+exactly which fields an expression can reference and what they will contain.
 
 ## The Mapping {#mapping}
 
@@ -340,7 +341,10 @@ from an expression for every leaf value. A profile MUST also define an escape
 mechanism such that any literal value — including one whose text resembles an
 expression — can be represented unambiguously. The framework does not mandate
 any particular syntax for this discriminator or escape; it requires only that
-the distinction be lossless.
+the distinction be lossless. As a concrete example, the COAZ Profile for MCP
+{{COAZMCP}} treats a string beginning with `$` as an expression, any other
+value as a literal, and doubles the prefix (`$$`) to express a literal string
+that begins with `$`.
 
 This framework does not use the terms "static" or "dynamic" to describe values.
 A field reference such as "the request's path" is an expression, not a literal,
@@ -348,11 +352,13 @@ because it is computed from an input variable. Only constants are literals.
 
 ## The Expression Contract {#expression-contract}
 
-A profile MUST designate an expression language (for example, Common Expression
-Language {{CEL}} for a message-oriented protocol, or another language better
-suited to a different environment). Regardless of the language chosen, every
-COAZ expression MUST satisfy the following contract, which is what allows the
-rest of this framework to remain language-neutral:
+The default expression language for COAZ is Common Expression Language {{CEL}},
+and a profile SHOULD use it, so that mappings look and behave the same across
+protocols. A profile MAY designate a different expression language where CEL is
+a poor fit for its environment; a profile that does so MUST name the language
+it uses. Regardless of the language, every COAZ expression MUST satisfy the
+following contract, which is what allows the rest of this framework to remain
+language-neutral:
 
 1. An expression is evaluated against the input variables defined by the
    profile, and only those variables.
@@ -535,8 +541,9 @@ specifies all of the following:
    distinguishes a literal from an expression, together with the escape
    mechanism required by {{literals-expressions}}.
 
-4. **Expression language.** The expression language used, satisfying the
-   expression contract of {{expression-contract}}.
+4. **Expression language.** The expression language used — CEL {{CEL}} unless
+   the profile designates otherwise — satisfying the expression contract of
+   {{expression-contract}}.
 
 5. **Envelopes.** The envelope keys it permits in mappings, drawn from those
    defined in {{mapping}} or by the profile itself ({{construction}}).
@@ -570,11 +577,10 @@ are fixed by this framework and {{AUTHZEN}}.
 
 ## Externalized Authorization
 
-This framework promotes the externalization of authorization logic from the
-implementation of the protected operation. By delegating decisions to an
-AuthZEN PDP, implementers separate security logic from business logic, enabling
-centralized policy management and consistent enforcement across operations and
-protocols.
+This framework moves authorization logic out of the implementation of the
+protected operation. Decisions are delegated to an AuthZEN PDP, so security
+logic lives apart from business logic, policy is managed in one place, and
+enforcement is consistent across operations and protocols.
 
 ## Fail-Closed Enforcement
 
@@ -661,14 +667,14 @@ simple mapping — is in fact computed from an input variable and is therefore a
 expression. Reserving "literal" for true constants keeps the model precise and
 avoids the contradiction of a "static" mapping that is full of computed values.
 
-## Profile-Chosen Expression Languages
+## A Default Language, an Overridable Contract
 
-By fixing an expression *contract* rather than an expression *language*, the
-framework lets each profile choose the language best suited to its environment
-while keeping request construction language-neutral. A message-oriented profile
-may choose Common Expression Language {{CEL}}; a gateway-oriented profile may
-choose another language. The contract in {{expression-contract}} is what makes
-this substitution safe.
+The framework names CEL as its default expression language so that mappings
+look the same across profiles and a mapping author carries one skill between
+them. Alongside the default it fixes an expression *contract*, so that a
+profile whose environment genuinely cannot host a CEL evaluator can substitute
+another language without destabilizing the rest of the model: the contract in
+{{expression-contract}} defines exactly what any replacement must guarantee.
 
 # Acknowledgements
 
