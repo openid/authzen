@@ -77,9 +77,10 @@ This specification defines COAZ (Compatible with OpenID AuthZEN, pronounced
 "cozy"), a framework for mapping the information model of an arbitrary protocol
 or interface into a request to the OpenID AuthZEN Authorization API. COAZ
 establishes a single, protocol-neutral model: the inputs of an incoming
-operation are projected, through a declarative mapping, into an AuthZEN Access
-Evaluations request expressed using the Subject-Action-Resource-Context (SARC)
-model. Mapping values are either literal constants or expressions evaluated
+operation are projected, through a declarative mapping, into an AuthZEN
+Authorization API request — an Access Evaluation request for a single decision,
+or an Access Evaluations request for several — expressed using the
+Subject-Action-Resource-Context (SARC) model. Mapping values are either literal constants or expressions evaluated
 against the operation's inputs, enabling both fixed field-to-field mappings and
 dynamic, computed mappings. This framework does not define a mapping for any
 specific protocol; instead it defines the common model and a conformance
@@ -108,10 +109,11 @@ COAZ (Compatible with OpenID AuthZEN) is the framework that fills this gap. It
 defines a single, protocol-neutral pattern:
 
 ~~~ ascii-art
-   any information model        a declarative mapping        an AuthZEN request
+   an operation in any          a declarative                an AuthZEN
+   information model            mapping                      request
   +-------------------+        +-------------------+        +-------------------+
   |  operation inputs |        |   literals  +     |        |  Access           |
-  |  (request fields, | -----> |   expressions over| -----> |  Evaluations      |
+  |  (request fields, | -----> |   expressions over| -----> |  Evaluation(s)    |
   |   tokens, schema) |        |   the inputs      |        |  (SARC)           |
   +-------------------+        +-------------------+        +-------------------+
 ~~~
@@ -119,8 +121,10 @@ defines a single, protocol-neutral pattern:
 
 COAZ deliberately separates two concerns:
 
-- The **output** side is fixed. Every COAZ mapping produces an AuthZEN Access
-  Evaluations request. The SARC structure, the semantics of defaults and
+- The **output** side is fixed. Every COAZ mapping produces a request to the
+  AuthZEN Authorization API — an Access Evaluation request for a single decision
+  or an Access Evaluations request for several, selected by the mapping's
+  envelope ({{mapping}}). The SARC structure, the semantics of defaults and
   overrides, and the decision response all belong to {{AUTHZEN}} and are
   identical for every protocol.
 
@@ -155,6 +159,10 @@ Profile:
   by fulfilling the conformance requirements of {{conformance}}. Examples
   include profiles for the Model Context Protocol, HTTP APIs, and OpenAPI.
 
+Operation:
+: A unit of work in the specific protocol or interface that requires an
+  independent authorization decision from the AuthZEN PDP.
+
 Information Model:
 : The set of data associated with an operation that a profile makes available
   to a mapping, such as request fields, message parameters, and security
@@ -166,9 +174,15 @@ Input Variable:
   decoded token claims).
 
 Mapping:
-: A declarative description, structured as an AuthZEN Access Evaluations
-  request, of how to construct that request from an operation's input
-  variables. Each value in a mapping is either a literal or an expression.
+: A declarative description of how to construct an AuthZEN Authorization API
+  request from an operation's input variables, consisting of an envelope that
+  names the AuthZEN API to call and a template for that API's request body.
+  Each value in a mapping is either a literal or an expression.
+
+Envelope:
+: The single top-level member of a mapping. Its key names the AuthZEN API
+  (`evaluation` or `evaluations`) to which the constructed request is sent, and
+  its value is the template for that API's request body. See {{mapping}}.
 
 Literal:
 : A value in a mapping that is used verbatim, as a constant, without reference
@@ -200,9 +214,10 @@ Declared Mapping:
 
 ## Overview
 
-A COAZ mapping is a template, shaped exactly as an AuthZEN Access Evaluations
-request, in which any value MAY be replaced by an expression over the
-operation's input variables. To authorize an operation, a PEP:
+A COAZ mapping is a template, corresponding to a distinct operation, for an
+AuthZEN Authorization API request, in which any value MAY be replaced by an
+expression over the operation's input variables. To authorize an operation, a
+PEP:
 
 1. Populates the input variables defined by the applicable profile from the
    incoming operation (see {{inputs}}).
@@ -213,8 +228,8 @@ operation's input variables. To authorize an operation, a PEP:
    expressions are evaluated against the input variables (see
    {{literals-expressions}} and {{expression-contract}}).
 
-4. Constructs an AuthZEN Access Evaluations request from the resolved values
-   (see {{construction}}) and sends it to the PDP.
+4. Constructs the AuthZEN request from the resolved values and sends it to the
+   API named by the mapping's envelope (see {{construction}}).
 
 5. Enforces the returned decisions.
 
@@ -233,20 +248,82 @@ write expressions against it deterministically.
 
 ## The Mapping {#mapping}
 
-A COAZ mapping is a JSON {{RFC8259}} object structured as an AuthZEN Access
-Evaluations request. It MAY contain the top-level `subject`, `action`,
-`resource`, and `context` fields, and an `evaluations` array whose entries MAY
-each contain their own `subject`, `action`, `resource`, and `context` fields.
+A COAZ mapping is a JSON {{RFC8259}} object with exactly one top-level member,
+its **envelope**. The envelope's key names the AuthZEN Authorization API to
+which the constructed request is sent, and its value is a template shaped
+exactly as that API's request body. This framework defines two envelope keys:
 
-The framework does not redefine this structure or its semantics. The meaning of
-the top-level fields, the meaning of the per-entry fields, and the rules by
-which per-entry fields override top-level defaults are exactly as defined for
-the Access Evaluations request in {{AUTHZEN}}. In particular, custom attributes
-of a `subject`, `resource`, or `action` MUST be nested under that object's
-`properties` key as defined by {{AUTHZEN}}, rather than added as sibling keys;
-`context` is a free-form object and is the exception. COAZ's primary addition to
-this structure is that any leaf value MAY be an expression rather than a literal
-(a profile MAY also designate trust-anchored fields; see {{trust-anchored}}).
+`evaluation`:
+: The value is a template for an Access Evaluation request as defined in
+  Section 6 of {{AUTHZEN}}: a single authorization decision, expressed with
+  `subject`, `action`, and `resource` fields and an OPTIONAL `context` field.
+
+`evaluations`:
+: The value is a template for an Access Evaluations request as defined in
+  Section 7 of {{AUTHZEN}}: one or more authorization decisions, expressed with OPTIONAL
+  top-level `subject`, `action`, `resource`, and `context` defaults and an
+  `evaluations` array whose entries MAY each contain their own `subject`,
+  `action`, `resource`, and `context` fields.
+
+A mapping with no top-level member, more than one top-level member, or an
+envelope key not defined by this framework or by the applicable profile is
+malformed, and a PEP MUST treat it as a mapping error ({{errors}}). Future
+versions of this framework, and individual profiles, MAY define additional
+envelope keys corresponding to other AuthZEN APIs; a PEP MUST treat an envelope
+key it does not support as a mapping error rather than ignore it.
+
+The framework does not redefine the request structures or their semantics. The
+meaning of each field and — for the `evaluations` envelope — the rules by which
+per-entry fields override top-level defaults are exactly as defined in
+Sections 6 and 7 of {{AUTHZEN}}. In particular, custom attributes of a `subject`, `resource`, or
+`action` MUST be nested under that object's `properties` key as defined by
+{{AUTHZEN}}, rather than added as sibling keys; `context` is a free-form object
+and is the exception. COAZ's primary addition to these structures is that any
+leaf value MAY be an expression rather than a literal (a profile MAY also
+designate trust-anchored fields; see {{trust-anchored}}).
+
+## Example Mappings {#example-mappings}
+
+This section is non-normative. The examples use an illustrative profile that
+exposes two input variables — `request`, holding the operation's parameters,
+and `token`, holding the caller's validated token claims — and that marks an
+expression with a leading `$`, as the COAZ Profile for MCP {{COAZMCP}} does.
+
+An operation requiring a single decision is mapped with the `evaluation`
+envelope. Literals (here `identity`, `read`, and `document`) and expressions
+appear side by side:
+
+~~~ json
+{
+  "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "action": { "name": "read" },
+    "resource": { "type": "document", "id": "$request.document_id" }
+  }
+}
+~~~
+{: #fig-example-evaluation title="Mapping using the evaluation envelope"}
+
+An operation requiring several decisions — here, a move that must be authorized
+as a `read` of the source and a `write` of the destination — is mapped with the
+`evaluations` envelope. The two decisions are entries in the `evaluations`
+array, and the shared `subject` sits at the top level of the request body,
+applying to both per the default semantics of {{AUTHZEN}}:
+
+~~~ json
+{
+  "evaluations": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "evaluations": [
+      { "action": { "name": "read" },
+        "resource": { "type": "folder", "id": "$request.source" } },
+      { "action": { "name": "write" },
+        "resource": { "type": "folder", "id": "$request.destination" } }
+    ]
+  }
+}
+~~~
+{: #fig-example-evaluations title="Mapping using the evaluations envelope"}
 
 ## Literals and Expressions {#literals-expressions}
 
@@ -297,22 +374,32 @@ PEP cannot construct a valid request; this is a mapping error (see {{errors}}).
 
 A value that an expression returns is always a single field value, including
 when it is a list or a map. Returning a list SHALL NOT cause the request to
-fan out into multiple evaluations. The number of evaluations in the constructed
-request MUST be determined solely by the number of entries in the mapping's
-`evaluations` array (see {{construction}}), not by the type of a value an
-expression returns.
+fan out into multiple evaluations. The number of decisions requested MUST be
+determined solely by the mapping's envelope — one for `evaluation`, and the
+number of entries in the `evaluations` array for `evaluations` (see
+{{construction}}) — not by the type of a value an expression returns.
 
 ## Constructing the AuthZEN Request {#construction}
 
-A PEP MUST construct an AuthZEN Access Evaluations request, as defined in
-{{AUTHZEN}}, from the resolved mapping. COAZ uses the Access Evaluations API
-exclusively; a single authorization check is expressed as an `evaluations`
-array with one entry. A PDP used with COAZ MUST support the Access Evaluations
-API.
+A PEP MUST construct, from the resolved mapping, the AuthZEN request named by
+the mapping's envelope, as defined in {{AUTHZEN}}, and send it to the
+corresponding API: the Access Evaluation API for an `evaluation` envelope, or
+the Access Evaluations API for an `evaluations` envelope.
 
-The top-level and per-entry fields of the constructed request carry exactly the
-default and override semantics defined by {{AUTHZEN}}. COAZ does not define any
-additional merge behavior.
+A PDP used with COAZ MUST support the Access Evaluation API. Support for the
+Access Evaluations API is additionally required wherever mappings use the
+`evaluations` envelope. A PEP whose PDP does not support the Access Evaluations
+API MAY instead satisfy an `evaluations` mapping by issuing one Access
+Evaluation request per entry of the constructed request — applying the
+top-level defaults to each entry exactly as {{AUTHZEN}} defines for the Access
+Evaluations request — and permitting the operation only if every decision is a
+permit.
+
+For an `evaluations` envelope, the top-level and per-entry fields of the
+constructed request carry exactly the default and override semantics defined by
+{{AUTHZEN}}. COAZ does not define any additional merge behavior.
+
+A profile MUST state which envelope keys it permits ({{conformance}}).
 
 ## Default and Declared Mappings {#default-declared}
 
@@ -332,6 +419,36 @@ to carry its own mapping by some profile-defined means.
   mappings MUST define who may author them, where they are carried, and how a
   declared mapping relates to any default mapping for the same operation (for
   example, whether it overrides the default).
+
+As a non-normative illustration, using the same illustrative profile as
+{{example-mappings}}: a profile for an HTTP API might define a default mapping
+that authorizes any request from its method and path,
+
+~~~ json
+{
+  "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "action": { "name": "$request.method" },
+    "resource": { "type": "http_route", "id": "$request.path" }
+  }
+}
+~~~
+{: #fig-example-default title="An illustrative default mapping for an HTTP API"}
+
+while allowing the authority that describes a specific route (for example, its
+OpenAPI definition) to declare a mapping that overrides the default for that
+route with domain-specific semantics:
+
+~~~ json
+{
+  "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "action": { "name": "approve" },
+    "resource": { "type": "expense_report", "id": "$request.path_params.report_id" }
+  }
+}
+~~~
+{: #fig-example-declared title="An illustrative declared mapping for one route"}
 
 ## Trust-Anchored Fields {#trust-anchored}
 
@@ -375,9 +492,12 @@ request accordingly. Discoverability is OPTIONAL and is not always achievable:
 some protocols provide no channel through which a mapping can be advertised.
 Profiles MUST NOT assume discoverability unless they define a mechanism for it.
 
-# Error Categories {#errors}
+# Denials and Errors {#errors}
 
-COAZ defines three categories of error that a PEP can encounter. The framework
+COAZ defines three categories of outcome in which a PEP refuses an operation.
+An authorization denial is not an error: it is the normal course of policy
+enforcement. It is categorized alongside the two error categories only because
+it shares their consequence — the operation does not proceed. The framework
 defines the categories and their meaning; the transport used to report each
 category to the caller is profile-defined, because it depends on the protocol.
 
@@ -388,7 +508,8 @@ Mapping Error:
   required field is missing. The PEP MUST NOT permit the operation.
 
 Authorization Denial:
-: The PDP returns a deny decision for one or more evaluations. The PEP MUST NOT
+: The PDP returns a deny decision for one or more requested decisions. This is
+  the normal operation of policy enforcement, not a fault. The PEP MUST NOT
   permit the operation.
 
 PDP Communication Error:
@@ -396,8 +517,8 @@ PDP Communication Error:
   The PEP MUST NOT permit the operation.
 
 In all three categories the PEP MUST fail closed: the operation MUST NOT proceed
-unless an explicit permit decision is obtained for every evaluation in the
-constructed request.
+unless an explicit permit decision is obtained for every decision requested by
+the constructed request.
 
 # Profile Conformance Requirements {#conformance}
 
@@ -417,30 +538,33 @@ specifies all of the following:
 4. **Expression language.** The expression language used, satisfying the
    expression contract of {{expression-contract}}.
 
-5. **Operations in scope.** The set of operations the profile authorizes and,
+5. **Envelopes.** The envelope keys it permits in mappings, drawn from those
+   defined in {{mapping}} or by the profile itself ({{construction}}).
+
+6. **Operations in scope.** The set of operations the profile authorizes and,
    where a default mapping is provided, the explicit set of pass-through
    operations ({{default-declared}}).
 
-6. **Default mapping behavior.** The default mappings it defines, if any, or a
+7. **Default mapping behavior.** The default mappings it defines, if any, or a
    statement that it defines none ({{default-declared}}).
 
-7. **Declared mapping behavior.** Whether declared mappings are permitted, who
+8. **Declared mapping behavior.** Whether declared mappings are permitted, who
    authors them, where they are carried, and how they relate to default
    mappings ({{default-declared}}).
 
-8. **Trust-anchored fields.** Where declared mappings are permitted from a party
+9. **Trust-anchored fields.** Where declared mappings are permitted from a party
    other than the PEP, the fields that are trust-anchored, and whether each is
    enforced by verification or substitution ({{trust-anchored}}).
 
-9. **Error transport.** The mechanism by which each error category of
-   {{errors}} is reported to the caller.
+10. **Error transport.** The mechanism by which each category of {{errors}} is
+    reported to the caller.
 
-10. **Discoverability.** The discoverability mechanism it defines, if any
+11. **Discoverability.** The discoverability mechanism it defines, if any
     ({{discoverability}}). OPTIONAL.
 
-A profile MUST NOT redefine the AuthZEN request structure, the semantics of
-defaults and overrides, or the requirement to use the Access Evaluations API,
-all of which are fixed by this framework and {{AUTHZEN}}.
+A profile MUST NOT redefine the AuthZEN request structures, the semantics of
+defaults and overrides, or the envelope rule of {{construction}}, all of which
+are fixed by this framework and {{AUTHZEN}}.
 
 # Security Considerations
 
@@ -491,9 +615,10 @@ This document has no IANA actions.
 ## OpenID AuthZEN Authorization API
 
 This framework is built directly on the OpenID AuthZEN Authorization API
-{{AUTHZEN}}. A COAZ mapping is a template for an Access Evaluations request, and
-COAZ defers entirely to {{AUTHZEN}} for the structure of that request, the
-semantics of its defaults and overrides, and the form of the decision response.
+{{AUTHZEN}}. A COAZ mapping is a template for an Access Evaluation or Access
+Evaluations request, selected by its envelope, and COAZ defers entirely to
+{{AUTHZEN}} for the structure of that request, the semantics of its defaults
+and overrides, and the form of the decision response.
 COAZ adds only the projection from an arbitrary information model into that
 request.
 
@@ -506,6 +631,19 @@ Context Protocol {{COAZMCP}} is the reference profile. Profiles for HTTP APIs
 {{RFC9110}} and for OpenAPI-described routes {{OPENAPI}} are anticipated.
 
 # Design Considerations
+
+## The Request Envelope
+
+A mapping names the AuthZEN API it targets through a single outer key rather
+than assuming one API for all mappings. The Access Evaluation API is the
+baseline capability of every AuthZEN PDP, so the common case — one operation,
+one decision — asks no more of the PDP than {{AUTHZEN}} itself requires. The
+Access Evaluations API is engaged only by mappings that genuinely need several
+decisions for a single operation. The envelope also leaves room for growth:
+future versions of this framework, or individual profiles, can bind additional
+keys to other AuthZEN APIs without changing the shape of existing mappings,
+and a PEP treats an envelope key it does not support as a mapping error, so
+unknown request types fail closed.
 
 ## One Output, Many Inputs
 

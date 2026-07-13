@@ -86,7 +86,7 @@ informative:
 
 --- abstract
 
-This specification is a COAZ profile, as defined by the COAZ framework
+This specification is a COAZ profile, as defined by the COAZ Framework
 {{COAZFW}}, for the Model Context Protocol (MCP) {{MCP}}. It defines how MCP
 JSON-RPC messages are mapped into requests to the OpenID AuthZEN Authorization
 API {{AUTHZEN}}, enabling MCP gateways and servers to perform fine-grained,
@@ -107,23 +107,23 @@ and invoke capabilities offered by MCP servers — tools, resources, prompts, an
 more — over JSON-RPC {{JSONRPC}}. Authorization in MCP relies on OAuth 2.1
 {{OAUTH21}}, but OAuth alone leaves some concerns unaddressed:
 
-- The OAuth access token is issued to the agent, which may act autonomously on
-  behalf of a human user who is not present, or with a human in the loop. There
-  is no standard mechanism to capture, per request, the identity of the user on
-  whose behalf the agent acts as distinct from the agent itself.
-
 - The access token may carry scopes, but the resources a given call is actually
   permitted to touch depend on the user and on dynamic, fine-grained policy that
   scopes cannot express.
 
+- If the OAuth access token is issued to the agent — which may act autonomously
+  on behalf of a human user who is not present, or with a human in the loop —
+  there is no standard mechanism to capture, per request, the identity of the
+  user on whose behalf the agent acts as distinct from the agent itself.
+
 The OpenID AuthZEN Authorization API {{AUTHZEN}} provides standardized,
 fine-grained authorization using the Subject-Action-Resource-Context (SARC)
-model. The COAZ framework {{COAZFW}} defines, in a protocol-neutral way, how to
-project the information model of a protocol into an AuthZEN Access Evaluations
+model. The COAZ Framework {{COAZFW}} defines, in a protocol-neutral way, how to
+project the information model of a protocol into an AuthZEN Authorization API
 request. This document is the COAZ *profile* for MCP: it binds that framework to
 MCP's information model.
 
-This profile authorizes **all** MCP messages, not only tool invocations. It does
+This profile authorizes **all** MCP messages. It does
 so by defining a fixed default mapping for each MCP method ({{default-mappings}}),
 which a PEP applies unless an MCP server has declared a more specific mapping for
 a particular tool ({{declared-mappings}}).
@@ -137,7 +137,7 @@ when, and only when, they appear in all capitals, as shown here.
 
 ## Terminology
 
-This specification uses the terms defined in the COAZ framework {{COAZFW}} —
+This specification uses the terms defined in the COAZ Framework {{COAZFW}} —
 notably *profile*, *information model*, *input variable*, *mapping*, *literal*,
 *expression*, *default mapping*, *declared mapping*, *PEP*, and *PDP* — and adds
 the following:
@@ -164,8 +164,8 @@ COAZ:
 
 # Relationship to the COAZ Framework {#framework-conformance}
 
-This profile fulfils the COAZ framework conformance requirements ({{COAZFW}},
-Section 6) as summarized below; each row is specified in the referenced section.
+This profile fulfils the profile conformance requirements of the COAZ Framework
+{{COAZFW}} as summarized below; each row is specified in the referenced section.
 
 | Framework requirement | This profile |
 |:---|:---|
@@ -173,9 +173,10 @@ Section 6) as summarized below; each row is specified in the referenced section.
 | Mapping location | `x-authzen-mapping` in a tool's `inputSchema`; otherwise the default mapping ({{declared-mappings}}, {{default-mappings}}) |
 | Literal/expression discriminator | bare value = literal; `$`-prefixed string = CEL expression; `$$` escape ({{expressions}}) |
 | Expression language | Common Expression Language {{CEL}} ({{expressions}}) |
+| Envelopes | `evaluation` and `evaluations` ({{mapping-envelopes}}) |
 | Operations in scope | All MCP methods, per the default mapping table; pass-through set listed ({{default-mappings}}) |
 | Default mapping behavior | Per-method default mapping table ({{default-mappings}}) |
-| Declared mapping behavior | MCP server MAY declare a mapping for a tool; overrides that tool's default ({{declared-mappings}}) |
+| Declared mapping behavior | MCP server MAY declare a mapping for a tool; overrides the default for that tool ({{declared-mappings}}) |
 | Trust-anchored fields | `subject.id`, enforced by verification against `$token.sub` ({{declared-mappings}}) |
 | Error transport | JSON-RPC 2.0 error responses ({{error-handling}}) |
 | Discoverability | Declared mappings advertised in the `tools/list` response ({{declaring-support}}) |
@@ -183,14 +184,30 @@ Section 6) as summarized below; each row is specified in the referenced section.
 ## Architecture
 
 The response to `tools/list` carries each tool's `inputSchema`, and, for tools
-that declare a mapping, the `x-authzen-mapping` within it. Carrying the mapping in
-`tools/list` makes it available to the MCP client, so that the client (or the
-LLM driving it) can shape tool arguments appropriately.
+that declare a mapping, the `x-authzen-mapping` within it. Because the mapping
+travels in the protocol itself, it reaches every party that can act as the PEP.
+This profile supports both deployment shapes:
 
-When an MCP message is processed, a PEP — an MCP gateway or the MCP server
+- **Gateway as PEP.** Where an MCP gateway sits between clients and servers, it
+  obtains each tool's declared mapping by observing the `tools/list` response
+  it proxies, with no out-of-band configuration. This is what lets a gateway —
+  often operated by a platform or IT team with no knowledge of a specific
+  server's business logic — enforce authorization that the server itself
+  defined: the MCP server declares *how* its operations are to be authorized,
+  and the gateway enforces it.
+
+- **Server as PEP.** Where no gateway is present, the MCP server enforces its
+  own declared mappings, and the default mappings for everything else, calling
+  the PDP directly.
+
+In both shapes, carrying the mapping in `tools/list` also makes it available to
+the MCP client, so that the client (or the LLM driving it) can understand how a
+call will be authorized and shape tool arguments appropriately.
+
+When an MCP message is processed, the PEP — the MCP gateway or the MCP server
 itself — selects the applicable mapping (declared, if present for the tool;
-otherwise the default mapping for the method), constructs an AuthZEN Access
-Evaluations request, and calls the PDP before allowing the message to take
+otherwise the default mapping for the method), constructs the corresponding
+AuthZEN request, and calls the PDP before allowing the message to take
 effect.
 
 ~~~ ascii-art
@@ -280,7 +297,7 @@ and distinguishes literals from expressions syntactically:
   Doubling applies only to a leading `$`.
 
 A CEL expression MUST evaluate to a single JSON value — a scalar, list, or map —
-as required by the COAZ expression contract ({{COAZFW}}, Section 3.5). A list or
+as required by the COAZ expression contract ({{COAZFW}}). A list or
 map returned by an expression is a single field value and does not, by itself,
 produce multiple evaluations.
 
@@ -288,10 +305,12 @@ CEL field selection on a missing key is an error. To populate an OPTIONAL field
 from a claim or parameter that may be absent, an expression MUST use CEL optional
 selection (the `.?` operator, e.g. `$token.?client_id`); an expression that
 yields an absent optional causes its field to be omitted from the request, as
-defined by the COAZ expression contract. An expression that errors, or that
-yields absent or null for a REQUIRED field (`subject`, `action`, or `resource`),
-is a mapping error ({{mapping-errors}}). Because evaluating CEL requires a CEL
-evaluator, there is no expression-free conformance level for this profile.
+defined by the COAZ expression contract. An expression whose evaluation results
+in an error, or that yields absent or null for a REQUIRED field (`subject`,
+`action`, or `resource`), is a mapping error ({{mapping-errors}}). Every mapping
+in this profile — including every default mapping — contains CEL expressions, so
+a conforming PEP MUST include a CEL evaluator; there is no expression-free
+conformance level.
 
 The following example illustrates how the input variables are populated. Given
 the `tools/call` request:
@@ -333,6 +352,32 @@ expressions resolve as follows:
 | `customer` | `"customer"` (literal) |
 {: #fig-cel-resolution title="Expression and literal resolution"}
 
+# Mapping Envelopes {#mapping-envelopes}
+
+As defined by the COAZ Framework ({{COAZFW}}), a mapping is a JSON object with
+a single top-level member — its envelope — whose key names the AuthZEN API to
+call. This profile permits both envelope keys defined by the framework:
+
+- `evaluation` — a template for a single-decision Access Evaluation request.
+  Every default mapping in this profile uses this envelope
+  ({{default-mappings}}), and it is the RECOMMENDED envelope for declared
+  mappings that require one decision.
+
+- `evaluations` — a template for a multi-decision Access Evaluations request,
+  for tools whose single invocation requires more than one decision (see
+  {{fig-coaz-multi}}).
+
+A mapping whose top-level structure is anything other than exactly one of these
+two keys is malformed, and the PEP MUST treat it as a mapping error
+({{mapping-errors}}).
+
+A PDP used with this profile MUST support the Access Evaluation API. Where a
+declared mapping uses the `evaluations` envelope, the PEP MUST either send the
+constructed request to the Access Evaluations API or, if its PDP does not
+support that API, issue one Access Evaluation request per entry — applying the
+top-level defaults to each entry exactly as {{AUTHZEN}} defines — and allow the
+message only if every decision is a permit.
+
 # Declaring a Mapping {#declaring-support}
 
 An MCP server declares a mapping for a tool by including an `x-authzen-mapping`
@@ -342,9 +387,11 @@ its absence means the default mapping for `tools/call` applies. No separate
 marker field is used.
 
 Because the declared mapping is carried in the `tools/list` response, it is
-available to the MCP client, satisfying the framework's discoverability
-capability. When MCP Server Cards become available, `x-authzen-mapping` SHOULD
-also be included there.
+available to any MCP gateway on the path — which can therefore enforce it as
+the PEP without out-of-band configuration ({{framework-conformance}}) — and to
+the MCP client, satisfying the framework's discoverability capability. When MCP
+Server Cards become available, `x-authzen-mapping` SHOULD also be included
+there.
 
 The following non-normative example shows a `tools/list` response with one tool
 that declares a mapping and one that does not:
@@ -363,12 +410,12 @@ that declares a mapping and one that does not:
         },
         "required": ["id"],
         "x-authzen-mapping": {
-          "subject": { "type": "identity", "id": "$token.sub" },
-          "context": { "agent": "$token.?client_id", "case": "$params.arguments.case" },
-          "evaluations": [
-            { "action": { "name": "get_customer" },
-              "resource": { "type": "customer", "id": "$params.arguments.id" } }
-          ]
+          "evaluation": {
+            "subject": { "type": "identity", "id": "$token.sub" },
+            "action": { "name": "get_customer" },
+            "resource": { "type": "customer", "id": "$params.arguments.id" },
+            "context": { "agent": "$token.?client_id", "case": "$params.arguments.case" }
+          }
         }
       }
     },
@@ -395,17 +442,21 @@ This profile defines a default mapping for each MCP method. A PEP MUST apply the
 default mapping for a method unless a declared mapping applies to the specific
 operation ({{declared-mappings}}).
 
-Every default mapping shares the following top-level defaults, which establish
-the subject (the user on whose behalf the agent acts) and the agent context:
+Every default mapping uses the `evaluation` envelope ({{mapping-envelopes}})
+and shares the following `subject` and `context`, which establish the subject
+(the user on whose behalf the agent acts) and the agent context:
 
 ~~~ json
 {
-  "subject": { "type": "identity", "id": "$token.sub" },
-  "context": { "agent": "$token.?client_id" },
-  "evaluations": [ { "...": "per-method action and resource" } ]
+  "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id" },
+    "action":   { "...": "per-method" },
+    "resource": { "...": "per-method" }
+  }
 }
 ~~~
-{: #fig-default-envelope title="Shared default-mapping envelope"}
+{: #fig-default-envelope title="Shared default-mapping shape"}
 
 For methods that target the MCP server as a whole rather than a specific item,
 `resource.id` identifies this MCP server. MCP requires access tokens to be
@@ -427,10 +478,11 @@ The default mappings are:
 
 ~~~ jsonc
 // initialize
-{ "subject": { "type": "identity", "id": "$token.sub" },
-  "context": { "agent": "$token.?client_id", "protocol_version": "$params.protocolVersion" },
-  "evaluations": [ { "action": { "name": "initialize" },
-    "resource": { "type": "mcp_server", "id": "$token.aud" } } ] }
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id", "protocol_version": "$params.protocolVersion" },
+    "action": { "name": "initialize" },
+    "resource": { "type": "mcp_server", "id": "$token.aud" } } }
 ~~~
 
 `ping` is a pass-through operation: the PEP MUST NOT call the PDP and MUST allow
@@ -440,72 +492,79 @@ it to proceed.
 
 ~~~ jsonc
 // tools/list
-{ "subject": { "type": "identity", "id": "$token.sub" },
-  "context": { "agent": "$token.?client_id" },
-  "evaluations": [ { "action": { "name": "tools/list" },
-    "resource": { "type": "mcp_server", "id": "$token.aud" } } ] }
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id" },
+    "action": { "name": "tools/list" },
+    "resource": { "type": "mcp_server", "id": "$token.aud" } } }
 
 // tools/call  (applies when the tool declares no mapping)
-{ "subject": { "type": "identity", "id": "$token.sub" },
-  "context": { "agent": "$token.?client_id" },
-  "evaluations": [ { "action": { "name": "$params.name" },
-    "resource": { "type": "tool", "id": "$params.name" } } ] }
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id" },
+    "action": { "name": "tools/call" },
+    "resource": { "type": "tool", "id": "$params.name" } } }
 ~~~
 
 ## Resources
 
 ~~~ jsonc
 // resources/list
-{ "subject": { "type": "identity", "id": "$token.sub" },
-  "context": { "agent": "$token.?client_id" },
-  "evaluations": [ { "action": { "name": "resources/list" },
-    "resource": { "type": "mcp_server", "id": "$token.aud" } } ] }
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id" },
+    "action": { "name": "resources/list" },
+    "resource": { "type": "mcp_server", "id": "$token.aud" } } }
 
 // resources/read   (resources/subscribe and resources/unsubscribe use the
 //                   same shape; only action.name differs)
-{ "subject": { "type": "identity", "id": "$token.sub" },
-  "context": { "agent": "$token.?client_id" },
-  "evaluations": [ { "action": { "name": "resources/read" },
-    "resource": { "type": "resource", "id": "$params.uri" } } ] }
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id" },
+    "action": { "name": "resources/read" },
+    "resource": { "type": "resource", "id": "$params.uri" } } }
 ~~~
 
 ## Prompts
 
 ~~~ jsonc
 // prompts/list
-{ "subject": { "type": "identity", "id": "$token.sub" },
-  "context": { "agent": "$token.?client_id" },
-  "evaluations": [ { "action": { "name": "prompts/list" },
-    "resource": { "type": "mcp_server", "id": "$token.aud" } } ] }
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id" },
+    "action": { "name": "prompts/list" },
+    "resource": { "type": "mcp_server", "id": "$token.aud" } } }
 
 // prompts/get
-{ "subject": { "type": "identity", "id": "$token.sub" },
-  "context": { "agent": "$token.?client_id" },
-  "evaluations": [ { "action": { "name": "prompts/get" },
-    "resource": { "type": "prompt", "id": "$params.name" } } ] }
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id" },
+    "action": { "name": "prompts/get" },
+    "resource": { "type": "prompt", "id": "$params.name" } } }
 ~~~
 
 ## Completion
 
 ~~~ jsonc
 // completion/complete
-{ "subject": { "type": "identity", "id": "$token.sub" },
-  "context": { "agent": "$token.?client_id" },
-  "evaluations": [ {
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id" },
     "action": { "name": "completion/complete" },
     "resource": {
       "type": "$params.ref.type == 'ref/prompt' ? 'prompt' : 'resource'",
-      "id":   "$params.ref.type == 'ref/prompt' ? $params.ref.name : $params.ref.uri" } } ] }
+      "id":   "$params.ref.type == 'ref/prompt' ? $params.ref.name : $params.ref.uri" } } }
 ~~~
 
 ## Logging
 
 ~~~ jsonc
 // logging/setLevel
-{ "subject": { "type": "identity", "id": "$token.sub" },
-  "context": { "agent": "$token.?client_id", "level": "$params.level" },
-  "evaluations": [ { "action": { "name": "logging/setLevel" },
-    "resource": { "type": "mcp_server", "id": "$token.aud" } } ] }
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id", "level": "$params.level" },
+    "action": { "name": "logging/setLevel" },
+    "resource": { "type": "mcp_server", "id": "$token.aud" } } }
 ~~~
 
 ## Tasks
@@ -513,16 +572,18 @@ it to proceed.
 ~~~ jsonc
 // tasks/get   (tasks/result and tasks/cancel use the same shape; only
 //              action.name differs)
-{ "subject": { "type": "identity", "id": "$token.sub" },
-  "context": { "agent": "$token.?client_id" },
-  "evaluations": [ { "action": { "name": "tasks/get" },
-    "resource": { "type": "task", "id": "$params.taskId" } } ] }
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id" },
+    "action": { "name": "tasks/get" },
+    "resource": { "type": "task", "id": "$params.taskId" } } }
 
 // tasks/list
-{ "subject": { "type": "identity", "id": "$token.sub" },
-  "context": { "agent": "$token.?client_id" },
-  "evaluations": [ { "action": { "name": "tasks/list" },
-    "resource": { "type": "mcp_server", "id": "$token.aud" } } ] }
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id" },
+    "action": { "name": "tasks/list" },
+    "resource": { "type": "mcp_server", "id": "$token.aud" } } }
 ~~~
 
 ## Pass-through Operations
@@ -558,16 +619,22 @@ version of the profile.
 
 An MCP server MAY declare a mapping for a tool by including `x-authzen-mapping` in
 the tool's `inputSchema` ({{declaring-support}}). A declared mapping has the same
-shape as a default mapping — an AuthZEN Access Evaluations request template — and
-uses the same expression and literal rules ({{expressions}}).
+shape as a default mapping — an envelope naming the AuthZEN API and a template
+for that API's request body ({{mapping-envelopes}}) — and uses the same
+expression and literal rules ({{expressions}}). A declared mapping MAY use
+either the `evaluation` or the `evaluations` envelope: `evaluation` suffices
+for most tools, while `evaluations` serves tools whose single invocation
+requires multiple decisions.
 
 A declared mapping for a tool **overrides the default `tools/call` mapping for
 that tool only**. It does not affect the default mapping for any other method or
 for `tools/call` of any other tool.
 
-The subject identifier (`subject.id`) is a trust-anchored field ({{COAZFW}},
-Section 3.8), enforced by verification. A declared mapping MUST include a
-top-level `subject` whose `id` is set to an expression resolving to the
+The subject identifier (`subject.id`) is a trust-anchored field as defined by
+the COAZ Framework ({{COAZFW}}), enforced by verification. A declared mapping MUST include a
+`subject` — the request's `subject` under the `evaluation` envelope, or the
+top-level `subject` under the `evaluations` envelope — whose `id` is set to an
+expression resolving to the
 subject-identity claim ({{subject-identity-claim}}) — that is, `$token.sub` (or
 `$token.C` where an on-behalf-of claim `C` is designated). The PEP MUST verify
 that the resolved `subject.id` equals the value of the subject-identity claim in
@@ -577,12 +644,13 @@ This keeps the identifier explicit in the mapping while preventing an MCP server
 — the party being authorized — from asserting the identity of a different
 subject.
 
-To close off identity smuggling, a declared mapping MUST NOT set `subject` within
-any entry of the `evaluations` array; the single top-level `subject` applies to
-all evaluations. A PEP MUST reject a declared mapping that places `subject` inside
-an `evaluations` entry as a mapping error.
+To close off identity smuggling, a declared mapping using the `evaluations`
+envelope MUST NOT set `subject` within any entry of its `evaluations` array;
+the single top-level `subject` applies to all evaluations. A PEP MUST reject a
+declared mapping that places `subject` inside an `evaluations` entry as a
+mapping error.
 
-A declared mapping MAY otherwise shape the top-level `subject`: it MAY set
+A declared mapping MAY otherwise shape the `subject`: it MAY set
 `subject.type` and additional subject attributes (under `properties`, per
 {{AUTHZEN}}), so that different invocations can produce different subject objects.
 If a declared mapping omits `subject.type`, the PEP MUST supply `identity`. Any
@@ -596,27 +664,29 @@ For autonomous-agent use cases the `context` MUST include the agent identity
 
 ## Single-evaluation Example
 
-The declared mapping for `get_customer` in {{fig-tools-list}}, applied to the
-request and token in {{fig-tools-call}} and {{fig-token-claims}}, produces:
+The declared mapping for `get_customer` in {{fig-tools-list}} uses the
+`evaluation` envelope. Applied to the request and token in {{fig-tools-call}}
+and {{fig-token-claims}}, it produces the following Access Evaluation request,
+sent to the Access Evaluation API:
 
 ~~~ json
 {
   "subject": { "type": "identity", "id": "alice@example.com" },
-  "context": { "agent": "http://agentprovider.com/agent-app-id", "case": "case-67890" },
-  "evaluations": [
-    { "action": { "name": "get_customer" },
-      "resource": { "type": "customer", "id": "cust-12345" } }
-  ]
+  "action": { "name": "get_customer" },
+  "resource": { "type": "customer", "id": "cust-12345" },
+  "context": { "agent": "http://agentprovider.com/agent-app-id", "case": "case-67890" }
 }
 ~~~
-{: #fig-authzen-single title="Resulting Access Evaluations request (single evaluation)"}
+{: #fig-authzen-single title="Resulting Access Evaluation request (single decision)"}
 
 ## Multi-evaluation Example
 
 A tool that copies an object requires two checks: `read` on the source and
-`write` on the destination. These are two entries in the `evaluations` array; the
-shared `subject` and `context` remain at the top level. As in every declared
-mapping, `subject.id` is set to `$token.sub` and verified by the PEP.
+`write` on the destination. The mapping therefore uses the `evaluations`
+envelope: the two checks are entries in the `evaluations` array, and the shared
+`subject` and `context` remain at the top level of the request body. As in
+every declared mapping, `subject.id` is set to `$token.sub` and verified by the
+PEP.
 
 ~~~ json
 {
@@ -630,14 +700,16 @@ mapping, `subject.id` is set to `$token.sub` and verified by the PEP.
     },
     "required": ["source", "destination"],
     "x-authzen-mapping": {
-      "subject": { "type": "identity", "id": "$token.sub" },
-      "context": { "agent": "$token.?client_id" },
-      "evaluations": [
-        { "action": { "name": "read" },
-          "resource": { "type": "storage_object", "id": "$params.arguments.source" } },
-        { "action": { "name": "write" },
-          "resource": { "type": "storage_object", "id": "$params.arguments.destination" } }
-      ]
+      "evaluations": {
+        "subject": { "type": "identity", "id": "$token.sub" },
+        "context": { "agent": "$token.?client_id" },
+        "evaluations": [
+          { "action": { "name": "read" },
+            "resource": { "type": "storage_object", "id": "$params.arguments.source" } },
+          { "action": { "name": "write" },
+            "resource": { "type": "storage_object", "id": "$params.arguments.destination" } }
+        ]
+      }
     }
   }
 }
@@ -646,7 +718,8 @@ mapping, `subject.id` is set to `$token.sub` and verified by the PEP.
 
 For a `tools/call` to `copy_object` with arguments
 `{"source": "/bucket/reports/q1.pdf", "destination": "/bucket/archive/q1.pdf"}`,
-the resulting request is:
+the resulting Access Evaluations request, sent to the Access Evaluations API,
+is:
 
 ~~~ json
 {
@@ -685,23 +758,21 @@ so on the basis of the verified `subject.id`, not the declared `subject.type`:
     },
     "required": ["from_account", "to_account", "amount", "currency"],
     "x-authzen-mapping": {
-      "subject": {
-        "type": "$token.roles.exists(r, r == 'treasury') ? 'treasury_user' : 'standard_user'",
-        "id": "$token.sub"
-      },
-      "context": { "agent": "$token.?client_id", "target_account": "$params.arguments.to_account" },
-      "evaluations": [
-        {
-          "action": { "name": "$params.arguments.currency == 'USD' ? 'domestic_transfer' : 'international_transfer'" },
-          "resource": {
-            "type": "account",
-            "id": "$params.arguments.from_account",
-            "properties": {
-              "sensitivity": "$params.arguments.amount > 10000 ? 'high' : 'standard'"
-            }
+      "evaluation": {
+        "subject": {
+          "type": "$token.roles.exists(r, r == 'treasury') ? 'treasury_user' : 'standard_user'",
+          "id": "$token.sub"
+        },
+        "action": { "name": "$params.arguments.currency == 'USD' ? 'domestic_transfer' : 'international_transfer'" },
+        "resource": {
+          "type": "account",
+          "id": "$params.arguments.from_account",
+          "properties": {
+            "sensitivity": "$params.arguments.amount > 10000 ? 'high' : 'standard'"
           }
-        }
-      ]
+        },
+        "context": { "agent": "$token.?client_id", "target_account": "$params.arguments.to_account" }
+      }
     }
   }
 }
@@ -726,18 +797,20 @@ When an MCP message is processed, the PEP MUST:
 4. Resolve the mapping: literals verbatim, `$`-prefixed values by evaluating the
    CEL expression ({{expressions}}).
 
-5. Verify the subject identity: the effective `subject.id` of every evaluation in
-   the constructed request — the top-level subject, and after any override the
-   subject of each `evaluations` entry — MUST equal the value of the
-   subject-identity claim ({{subject-identity-claim}}) in the validated access
-   token. A declared mapping MUST NOT carry a per-evaluation `subject`
+5. Verify the subject identity: the effective `subject.id` of every decision in
+   the constructed request — the request's `subject` under the `evaluation`
+   envelope; the top-level subject and, after any override, the subject of each
+   `evaluations` entry under the `evaluations` envelope — MUST equal the value
+   of the subject-identity claim ({{subject-identity-claim}}) in the validated
+   access token. A declared mapping MUST NOT carry a per-evaluation `subject`
    ({{declared-mappings}}). If any effective `subject.id` does not match, or a
    per-evaluation `subject` is present in a declared mapping, treat the request as
    a mapping error ({{mapping-errors}}) and do not call the PDP.
 
-6. Construct the AuthZEN Access Evaluations request from the resolved mapping and
-   send it to the configured PDP. This profile always uses the Access Evaluations
-   API; the PDP MUST support it.
+6. Construct the AuthZEN request from the resolved mapping and send it to the
+   API named by the mapping's envelope ({{mapping-envelopes}}): the Access
+   Evaluation API for `evaluation`, the Access Evaluations API for
+   `evaluations`.
 
 7. Enforce the response: if every decision is `true` (permit), allow the message
    to proceed; if any decision is `false` (deny), do not allow it and return a
@@ -745,7 +818,7 @@ When an MCP message is processed, the PEP MUST:
 
 # Error Handling {#error-handling}
 
-This profile reports the COAZ error categories ({{COAZFW}}, Section 4) as
+This profile reports the COAZ denial and error categories ({{COAZFW}}) as
 JSON-RPC 2.0 {{JSONRPC}} error responses. In every case the PEP MUST NOT allow
 the message to proceed. As required by {{JSONRPC}}, the `id` of each error
 response MUST equal the `id` of the request that caused it, or be `null` if the
@@ -772,8 +845,10 @@ evaluate, or the mapping is malformed. The PEP MUST return error code `-32602`
 
 ## Authorization Denial {#authorization-denial}
 
-When one or more decisions are deny, the PEP MUST return an error response with
-code `-32001`. This code is drawn from the JSON-RPC 2.0 {{JSONRPC}} range
+A denial is the normal course of policy enforcement, not a fault; it is
+conveyed as a JSON-RPC error response because that is the channel {{JSONRPC}}
+provides for refusing a request. When one or more decisions are deny, the PEP
+MUST return an error response with code `-32001`. This code is drawn from the JSON-RPC 2.0 {{JSONRPC}} range
 reserved for implementation-defined server errors (`-32000` to `-32099`); a
 code outside that range, such as `-32401`, is non-conformant with {{JSONRPC}}
 and MUST NOT be used. The `message` MAY be populated from an implementation-
@@ -887,7 +962,7 @@ This document has no IANA actions.
 
 ## COAZ Framework
 
-This document is a profile of the COAZ framework {{COAZFW}}. The framework
+This document is a profile of the COAZ Framework {{COAZFW}}. The framework
 defines the protocol-neutral model — mappings shaped as AuthZEN Access
 Evaluations requests, the literal/expression distinction, the expression
 contract, and the conformance requirements. This profile binds that model to
@@ -896,7 +971,9 @@ MCP's information model and JSON-RPC transport.
 ## OpenID AuthZEN Authorization API
 
 The constructed request and the decision response are defined by {{AUTHZEN}}.
-This profile uses the Access Evaluations API exclusively.
+This profile uses the Access Evaluation API for single-decision mappings —
+including every default mapping — and the Access Evaluations API where a
+declared mapping requires multiple decisions ({{mapping-envelopes}}).
 
 ## Model Context Protocol
 
