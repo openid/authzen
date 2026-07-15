@@ -58,7 +58,7 @@ informative:
   RFC8259:
   RFC9110:
   COAZMCP:
-    title: "COAZ Profile for Model Context Protocol"
+    title: "COAZ-MCP: COAZ Binding for the Model Context Protocol"
     target: https://openid.net/specs/authzen-mcp-profile-1_0.html
     date: 2026
   MCP:
@@ -83,11 +83,11 @@ or an Access Evaluations request for several — expressed using the
 Subject-Action-Resource-Context (SARC) model. Mapping values are either literal constants or expressions evaluated
 against the operation's inputs, enabling both fixed field-to-field mappings and
 dynamic, computed mappings. Expressions are written, by default, in the Common
-Expression Language (CEL); a profile MAY designate a different expression
+Expression Language (CEL); a binding MAY designate a different expression
 language. This specification does not define a mapping for any
 specific protocol; it defines the common model and the conformance contract
-that individual COAZ *profiles* fulfil — for example, a profile for the Model
-Context Protocol (MCP), for HTTP APIs, or for OpenAPI-described routes.
+that individual COAZ *bindings* fulfil — for example, COAZ-MCP for the Model
+Context Protocol, or bindings for HTTP APIs or OpenAPI-described routes.
 
 --- middle
 
@@ -132,14 +132,15 @@ COAZ deliberately separates two concerns:
 
 - The **input** side is specialized. The set of available input variables, the
   location where a mapping is stored, and the way errors are reported back to
-  the caller all depend on the protocol, and are defined by a COAZ *profile*.
+  the caller all depend on the protocol, and are defined by a COAZ *binding*.
   Expressions over those inputs are written, by default, in Common Expression
   Language {{CEL}} ({{expression-contract}}).
 
 This specification defines the output-side model and the conformance contract that
-every profile fulfils. It does not, by itself, define a mapping for any
-protocol. Companion profiles — such as the COAZ Profile for the Model Context
-Protocol {{COAZMCP}} — bind this framework to a concrete information model.
+every binding fulfils. It does not, by itself, define a mapping for any
+protocol. Companion bindings — such as COAZ-MCP {{COAZMCP}}, the binding for
+the Model Context Protocol — apply this framework to a concrete information
+model.
 
 ## Requirements Notation and Conventions
 
@@ -157,22 +158,23 @@ COAZ:
   this specification for mapping an information model into an AuthZEN Authorization
   API request.
 
-Profile:
+Binding:
 : A specification that binds this framework to a specific protocol or interface
-  by fulfilling the conformance requirements of {{conformance}}. Examples
-  include profiles for the Model Context Protocol, HTTP APIs, and OpenAPI.
+  by fulfilling the conformance requirements of {{conformance}}. A binding is
+  designated `COAZ-<PROTOCOL>`: for example, COAZ-MCP for the Model Context
+  Protocol. Bindings for HTTP APIs and OpenAPI are anticipated.
 
 Operation:
 : A unit of work in the specific protocol or interface that requires an
   independent authorization decision from the AuthZEN PDP.
 
 Information Model:
-: The set of data associated with an operation that a profile makes available
+: The set of data associated with an operation that a binding makes available
   to a mapping, such as request fields, message parameters, and security
   tokens.
 
 Input Variable:
-: A named element of the information model, exposed to expressions by a profile
+: A named element of the information model, exposed to expressions by a binding
   (for example, a variable holding a request's parameters or a variable holding
   decoded token claims).
 
@@ -192,7 +194,7 @@ Literal:
   to any input variable.
 
 Expression:
-: A value in a mapping that is computed by evaluating it, in the profile's
+: A value in a mapping that is computed by evaluating it, in the binding's
   expression language ({{expression-contract}}), against the operation's input
   variables.
 
@@ -206,7 +208,7 @@ PEP:
   the decision.
 
 Default Mapping:
-: A mapping defined by a profile that applies to an operation when no other
+: A mapping defined by a binding that applies to an operation when no other
   mapping has been supplied for it. OPTIONAL; see {{default-declared}}.
 
 Declared Mapping:
@@ -223,7 +225,7 @@ AuthZEN Authorization API request, in which any value MAY be replaced by an
 expression over the operation's input variables. To authorize an operation, a
 PEP:
 
-1. Populates the input variables defined by the applicable profile from the
+1. Populates the input variables defined by the applicable binding from the
    incoming operation (see {{inputs}}).
 
 2. Selects the mapping that applies to the operation (see {{default-declared}}).
@@ -239,14 +241,14 @@ PEP:
 
 ## Information Model and Input Variables {#inputs}
 
-A profile MUST define the information model it exposes to mappings as a set of
+A binding MUST define the information model it exposes to mappings as a set of
 named input variables. Expressions reference these variables by name. The
 framework does not mandate any particular variables; naming and contents are
-entirely profile-defined. For example, a profile for a request/response
+entirely binding-defined. For example, a binding for a request/response
 protocol might expose a variable for the request and a variable for the
 caller's authorization token.
 
-A profile MUST specify, for each input variable, its name, the source from
+A binding MUST specify, for each input variable, its name, the source from
 which the PEP populates it, and its structure, so that a mapping author knows
 exactly which fields an expression can reference and what they will contain.
 
@@ -270,9 +272,9 @@ exactly as that API's request body. This framework defines two envelope keys:
   `action`, `resource`, and `context` fields.
 
 A mapping with no top-level member, more than one top-level member, or an
-envelope key not defined by this framework or by the applicable profile is
+envelope key not defined by this framework or by the applicable binding is
 malformed, and a PEP MUST treat it as a mapping error ({{errors}}). Future
-versions of this framework, and individual profiles, MAY define additional
+versions of this framework, and individual bindings, MAY define additional
 envelope keys corresponding to other AuthZEN APIs; a PEP MUST treat an envelope
 key it does not support as a mapping error rather than ignore it.
 
@@ -283,12 +285,12 @@ Sections 6 and 7 of {{AUTHZEN}}. In particular, custom attributes of a `subject`
 `action` MUST be nested under that object's `properties` key as defined by
 {{AUTHZEN}}, rather than added as sibling keys; `context` is a free-form object
 and is the exception. COAZ's primary addition to these structures is that any
-leaf value MAY be an expression rather than a literal (a profile MAY also
+leaf value MAY be an expression rather than a literal (a binding MAY also
 designate trust-anchored fields; see {{trust-anchored}}).
 
 ## Example Mappings {#example-mappings}
 
-This section is non-normative. The examples use an illustrative profile that
+This section is non-normative. The examples use an illustrative binding that
 exposes two input variables — `request`, holding the operation's parameters,
 and `token`, holding the caller's validated token claims — and the framework's
 defaults: CEL as the expression language and the leading-`$` discriminator of
@@ -343,11 +345,11 @@ Every leaf value in a mapping is either a literal or an expression:
 
 - A **literal** is used verbatim as a constant in the constructed request.
 
-- An **expression** is evaluated, in the profile's expression language, against
+- An **expression** is evaluated, in the binding's expression language, against
   the operation's input variables, and its result is used in the constructed
   request.
 
-The default discriminator, which a profile SHOULD use, is the `$` prefix:
+The default discriminator, which a binding SHOULD use, is the `$` prefix:
 
 - A string value whose first character is `$` is an expression; the text
   following the `$` is the expression itself.
@@ -360,7 +362,7 @@ The default discriminator, which a profile SHOULD use, is the `$` prefix:
   leading `$`; a `$` anywhere else in a string has no special meaning and does
   not mark an expression.
 
-A profile MAY define a different discriminator where the default conflicts
+A binding MAY define a different discriminator where the default conflicts
 with its environment. Any discriminator MUST distinguish a literal from an
 expression unambiguously for every leaf value, and MUST include an escape
 mechanism such that any literal value — including one whose text resembles an
@@ -373,15 +375,15 @@ because it is computed from an input variable. Only constants are literals.
 ## The Expression Contract {#expression-contract}
 
 The default expression language for COAZ is Common Expression Language {{CEL}},
-and a profile SHOULD use it, so that mappings look and behave the same across
-protocols. A profile MAY designate a different expression language where CEL is
-a poor fit for its environment; a profile that does so MUST name the language
+and a binding SHOULD use it, so that mappings look and behave the same across
+protocols. A binding MAY designate a different expression language where CEL is
+a poor fit for its environment; a binding that does so MUST name the language
 it uses. Regardless of the language, every COAZ expression MUST satisfy the
 following contract, which is what allows the rest of this framework to remain
 language-neutral:
 
 1. An expression is evaluated against the input variables defined by the
-   profile, and only those variables.
+   binding, and only those variables.
 
 2. An expression MUST evaluate to a single JSON value — a scalar (string,
    number, boolean, or null), a list, or a map — or to the distinguished value
@@ -389,7 +391,7 @@ language-neutral:
    appears; **absent** causes that field to be omitted from the constructed
    request entirely.
 
-A profile MUST specify how an expression yields **absent**, so that mapping
+A binding MUST specify how an expression yields **absent**, so that mapping
 authors can distinguish "field deliberately omitted" from "field present with a
 null value." When the expression language is CEL, the default is CEL optional
 selection: the `.?` operator yields **absent** when the selected key is
@@ -427,29 +429,29 @@ For an `evaluations` envelope, the top-level and per-entry fields of the
 constructed request carry exactly the default and override semantics defined by
 {{AUTHZEN}}. COAZ does not define any additional merge behavior.
 
-A profile MUST state which envelope keys it permits ({{conformance}}).
+A binding MUST state which envelope keys it permits ({{conformance}}).
 
 ## Default and Declared Mappings {#default-declared}
 
-A profile MAY support either or both of the following sources of mappings. This
-capability is OPTIONAL; a profile that supports neither requires every operation
-to carry its own mapping by some profile-defined means.
+A binding MAY support either or both of the following sources of mappings. This
+capability is OPTIONAL; a binding that supports neither requires every operation
+to carry its own mapping by some binding-defined means.
 
-- **Default mappings.** A profile MAY define one or more mappings that apply to
-  operations when no declared mapping has been supplied. A profile that defines
+- **Default mappings.** A binding MAY define one or more mappings that apply to
+  operations when no declared mapping has been supplied. A binding that defines
   default mappings MUST enumerate the operations in scope and MUST explicitly
   identify any operations that are *not* authorized by COAZ (pass-through
   operations), so that the absence of a mapping is never interpreted as an
   implicit deny.
 
-- **Declared mappings.** A profile MAY allow an authority that describes an
-  operation to supply a mapping for it. A profile that supports declared
+- **Declared mappings.** A binding MAY allow an authority that describes an
+  operation to supply a mapping for it. A binding that supports declared
   mappings MUST define who may author them, where they are carried, and how a
   declared mapping relates to any default mapping for the same operation (for
   example, whether it overrides the default).
 
-As a non-normative illustration, using the same illustrative profile as
-{{example-mappings}}: a profile for an HTTP API might define a default mapping
+As a non-normative illustration, using the same illustrative binding as
+{{example-mappings}}: a binding for an HTTP API might define a default mapping
 that authorizes any request from its method and path,
 
 ~~~ json
@@ -487,15 +489,15 @@ would let the authorized party assert who the subject is, inverting the trust
 model.
 
 To prevent this, and to prevent mapping developers from accidentally trusting 
-inputs to the mapping, a profile MAY designate certain request fields as
+inputs to the mapping, a binding MAY designate certain request fields as
 **trust-anchored**: their value MUST be derived from the PEP's trusted inputs
 (such as an independently verifiable authorization token), not asserted by a mapping. A trust-anchored
 field MAY be as specific as a single identifying attribute — for example, the
 subject's identifier — leaving the remaining attributes of the same object
-available to a declared mapping. A profile that admits declared mappings from a
+available to a declared mapping. A binding that admits declared mappings from a
 party other than the PEP MUST specify which fields are trust-anchored.
 
-A profile MUST require the PEP to enforce each trust-anchored field by one of:
+A binding MUST require the PEP to enforce each trust-anchored field by one of:
 
 - **Verification.** The mapping sets the field, and the PEP verifies that its
   resolved value matches the corresponding trusted input, treating a mismatch as
@@ -506,19 +508,19 @@ A profile MUST require the PEP to enforce each trust-anchored field by one of:
 
 Sibling fields that are not trust-anchored remain available to the mapping. An
 attribute does not become trustworthy merely by appearing in the constructed
-request: a profile and its deployments MUST treat any attribute that originates
+request: a binding and its deployments MUST treat any attribute that originates
 from a declared mapping — including non-trust-anchored attributes of an object
 whose identifier is trust-anchored — as untrusted input, and policy MUST NOT rely
 on such an attribute as authoritative for identity or privilege.
 
 ## Discoverability {#discoverability}
 
-A profile MAY define a mechanism by which a caller can obtain, in advance of
+A binding MAY define a mechanism by which a caller can obtain, in advance of
 invoking an operation, the mapping that will be applied to it. This enables a
 caller to understand how authorization will be performed and to shape its
 request accordingly. Discoverability is OPTIONAL and is not always achievable:
 some protocols provide no channel through which a mapping can be advertised.
-Profiles MUST NOT assume discoverability unless they define a mechanism for it.
+Bindings MUST NOT assume discoverability unless they define a mechanism for it.
 
 # Denials and Errors {#errors}
 
@@ -527,7 +529,7 @@ An authorization denial is not an error: it is the normal course of policy
 enforcement. It is categorized alongside the two error categories only because
 it shares their consequence — the operation does not proceed. The framework
 defines the categories and their meaning; the transport used to report each
-category to the caller is profile-defined, because it depends on the protocol.
+category to the caller is binding-defined, because it depends on the protocol.
 
 Mapping Error:
 : The PEP cannot construct a valid AuthZEN request from the mapping and the
@@ -548,9 +550,9 @@ In all three categories the PEP MUST fail closed: the operation MUST NOT proceed
 unless an explicit permit decision is obtained for every decision requested by
 the constructed request.
 
-# Profile Conformance Requirements {#conformance}
+# Binding Conformance Requirements {#conformance}
 
-A specification conforms to this framework as a COAZ profile if, and only if, it
+A specification conforms to this framework as a COAZ binding if, and only if, it
 specifies all of the following:
 
 1. **Information model.** The named input variables it exposes to expressions,
@@ -559,18 +561,18 @@ specifies all of the following:
 2. **Mapping location.** Where a mapping is stored or carried for an operation,
    and how the PEP obtains it.
 
-3. **Literal/expression discriminator.** Whether the profile uses the default
+3. **Literal/expression discriminator.** Whether the binding uses the default
    `$` discriminator and `$$` escape of {{literals-expressions}}, or the
    alternative unambiguous syntax and escape mechanism it defines.
 
 4. **Expression language.** The expression language used — CEL {{CEL}} unless
-   the profile designates otherwise — satisfying the expression contract of
+   the binding designates otherwise — satisfying the expression contract of
    {{expression-contract}}.
 
 5. **Envelopes.** The envelope keys it permits in mappings, drawn from those
-   defined in {{mapping}} or by the profile itself ({{construction}}).
+   defined in {{mapping}} or by the binding itself ({{construction}}).
 
-6. **Operations in scope.** The set of operations the profile authorizes and,
+6. **Operations in scope.** The set of operations the binding authorizes and,
    where a default mapping is provided, the explicit set of pass-through
    operations ({{default-declared}}).
 
@@ -591,7 +593,7 @@ specifies all of the following:
 11. **Discoverability.** The discoverability mechanism it defines, if any
     ({{discoverability}}). OPTIONAL.
 
-A profile MUST NOT redefine the AuthZEN request structures, the semantics of
+A binding MUST NOT redefine the AuthZEN request structures, the semantics of
 defaults and overrides, or the envelope rule of {{construction}}, all of which
 are fixed by this framework and {{AUTHZEN}}.
 
@@ -607,7 +609,7 @@ enforcement is consistent across operations and protocols.
 ## Fail-Closed Enforcement
 
 As required by {{errors}}, a PEP MUST fail closed. A mapping error, a denial, or
-a PDP communication failure all result in the operation being refused. Profiles
+a PDP communication failure all result in the operation being refused. Bindings
 and deployments MUST NOT define fallbacks that permit an operation in the
 absence of an explicit permit decision.
 
@@ -650,12 +652,12 @@ and overrides, and the form of the decision response.
 COAZ adds only the projection from an arbitrary information model into that
 request.
 
-## COAZ Profiles
+## COAZ Bindings
 
-This specification is the common foundation for a family of profiles, each of which
+This specification is the common foundation for a family of bindings, each of which
 binds the framework to a specific protocol or interface by fulfilling the
-conformance requirements of {{conformance}}. The COAZ Profile for the Model
-Context Protocol {{COAZMCP}} is the reference profile. Profiles for HTTP APIs
+conformance requirements of {{conformance}}. COAZ-MCP {{COAZMCP}} is the
+reference binding. Bindings for HTTP APIs
 {{RFC9110}} and for OpenAPI-described routes {{OPENAPI}} are anticipated.
 
 # Design Considerations
@@ -668,7 +670,7 @@ baseline capability of every AuthZEN PDP, so the common case — one operation,
 one decision — asks no more of the PDP than {{AUTHZEN}} itself requires. The
 Access Evaluations API is engaged only by mappings that genuinely need several
 decisions for a single operation. The envelope also leaves room for growth:
-future versions of this framework, or individual profiles, can bind additional
+future versions of this framework, or individual bindings, can bind additional
 keys to other AuthZEN APIs without changing the shape of existing mappings,
 and a PEP treats an envelope key it does not support as a mapping error, so
 unknown request types fail closed.
@@ -679,7 +681,7 @@ The central design choice of COAZ is to fix the output and vary the input. The
 AuthZEN request is the same regardless of the source protocol, so PDPs, policy
 authors, and tooling work identically across protocols. Only the projection
 from each protocol's information model differs, and that projection is exactly
-what a profile specifies.
+what a binding specifies.
 
 ## Literals and Expressions, Not Static and Dynamic
 
@@ -692,13 +694,13 @@ avoids the contradiction of a "static" mapping that is full of computed values.
 ## A Default Language, an Overridable Contract
 
 The framework names CEL as its default expression language so that mappings
-look the same across profiles and a mapping author carries one skill between
+look the same across bindings and a mapping author carries one skill between
 them. Alongside the default it fixes an expression *contract*, so that a
-profile whose environment genuinely cannot host a CEL evaluator can substitute
+binding whose environment genuinely cannot host a CEL evaluator can substitute
 another language without destabilizing the rest of the model: the contract in
 {{expression-contract}} defines exactly what any replacement must guarantee.
 The same reasoning applies to the default `$` discriminator and `$$` escape of
-{{literals-expressions}}: one default syntax across profiles, overridable only
+{{literals-expressions}}: one default syntax across bindings, overridable only
 where a protocol's environment forces it.
 
 # Acknowledgements

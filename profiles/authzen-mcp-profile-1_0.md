@@ -1,5 +1,5 @@
 ---
-title: "COAZ Profile for the Model Context Protocol - Draft 1"
+title: "COAZ-MCP: COAZ Binding for the Model Context Protocol - Draft 1"
 abbrev: "coaz-mcp"
 category: std
 date: 2026-02-13
@@ -86,12 +86,12 @@ informative:
 
 --- abstract
 
-This specification is a COAZ profile, as defined by the COAZ Framework
-{{COAZFW}}, for the Model Context Protocol (MCP) {{MCP}}. It defines how MCP
+This specification defines COAZ-MCP, the COAZ binding — as defined by the COAZ
+Framework {{COAZFW}} — for the Model Context Protocol (MCP) {{MCP}}. It defines how MCP
 JSON-RPC messages are mapped into requests to the OpenID AuthZEN Authorization
 API {{AUTHZEN}}, enabling MCP gateways and servers to perform fine-grained,
 parameter-level authorization through an AuthZEN Policy Decision Point (PDP).
-The profile defines a fixed *default mapping* for each MCP method, so that all
+The binding defines a fixed *default mapping* for each MCP method, so that all
 MCP messages can be authorized without per-operation configuration, and allows
 MCP servers to override the default for a specific tool by *declaring* a mapping
 in the tool's input schema using Common Expression Language (CEL) {{CEL}}. It
@@ -120,10 +120,10 @@ The OpenID AuthZEN Authorization API {{AUTHZEN}} provides standardized,
 fine-grained authorization using the Subject-Action-Resource-Context (SARC)
 model. The COAZ Framework {{COAZFW}} defines, in a protocol-neutral way, how to
 project the information model of a protocol into an AuthZEN Authorization API
-request. This specification is the COAZ *profile* for MCP: it binds that framework to
-MCP's information model.
+request. This specification is COAZ-MCP, the COAZ *binding* for MCP: it binds
+that framework to MCP's information model.
 
-This profile authorizes **all** MCP messages. It does
+This binding authorizes **all** MCP messages. It does
 so by defining a fixed default mapping for each MCP method ({{default-mappings}}),
 which a PEP applies unless an MCP server has declared a more specific mapping for
 a particular tool ({{declared-mappings}}).
@@ -138,7 +138,7 @@ when, and only when, they appear in all capitals, as shown here.
 ## Terminology
 
 This specification uses the terms defined in the COAZ Framework {{COAZFW}} —
-notably *profile*, *information model*, *input variable*, *mapping*, *literal*,
+notably *binding*, *information model*, *input variable*, *mapping*, *literal*,
 *expression*, *default mapping*, *declared mapping*, *PEP*, and *PDP* — and adds
 the following:
 
@@ -160,14 +160,14 @@ Tool:
 
 COAZ:
 : Compatible with OpenID AuthZEN (pronounced "cozy"). The framework {{COAZFW}}
-  of which this specification is a profile.
+  of which this specification is a binding.
 
 # Relationship to the COAZ Framework {#framework-conformance}
 
-This profile fulfils the profile conformance requirements of the COAZ Framework
+This binding fulfils the binding conformance requirements of the COAZ Framework
 {{COAZFW}} as summarized below; each row is specified in the referenced section.
 
-| Framework requirement | This profile |
+| Framework requirement | This binding |
 |:---|:---|
 | Information model | `params`, `token` ({{information-model}}) |
 | Mapping location | `x-authzen-mapping` in a tool's `inputSchema`; otherwise the default mapping ({{declared-mappings}}, {{default-mappings}}) |
@@ -186,7 +186,7 @@ This profile fulfils the profile conformance requirements of the COAZ Framework
 The response to `tools/list` carries each tool's `inputSchema`, and, for tools
 that declare a mapping, the `x-authzen-mapping` within it. Because the mapping
 travels in the protocol itself, it reaches every party that can act as the PEP.
-This profile supports both deployment shapes:
+This binding supports both deployment shapes:
 
 - **Gateway as PEP.** Where an MCP gateway sits between clients and servers, it
   obtains each tool's declared mapping by observing the `tools/list` response
@@ -242,7 +242,7 @@ PDP.
 
 # Information Model {#information-model}
 
-This profile exposes two input variables to expressions:
+This binding exposes two input variables to expressions:
 
 `params`:
 : A map corresponding to the `params` object of the MCP JSON-RPC request being
@@ -262,7 +262,7 @@ This profile exposes two input variables to expressions:
 ## The Subject-Identity Claim {#subject-identity-claim}
 
 The AuthZEN `subject` identifies the principal on whose behalf authorization is
-requested. Throughout this profile, `subject.id` is derived from a single token
+requested. Throughout this binding, `subject.id` is derived from a single token
 claim, the **subject-identity claim**, which by convention is `sub` — hence the
 expression `$token.sub` used in the mappings below.
 
@@ -271,7 +271,7 @@ identifies the *agent*, not the human user on whose behalf it acts), a deploymen
 MAY designate a different claim — an on-behalf-of claim — as the subject-identity
 claim, so that `subject.id` carries the human user. When a deployment designates
 an on-behalf-of claim `C`, every use of `$token.sub` as `subject.id` in this
-profile (in default mappings, in declared mappings, and in the verification of
+binding (in default mappings, in declared mappings, and in the verification of
 {{declared-mappings}}) is read as `$token.C`. The agent identity remains in
 `context.agent` (typically `$token.?client_id`) regardless. The designated claim
 MUST be agreed between the PEP and the token issuer; absent any designation, the
@@ -279,7 +279,7 @@ subject-identity claim is `sub`.
 
 # Expressions and Literals {#expressions}
 
-This profile uses the framework's defaults unchanged ({{COAZFW}}): expressions
+This binding uses the framework's defaults unchanged ({{COAZFW}}): expressions
 are written in Common Expression Language {{CEL}}, and the leading-`$`
 discriminator with its `$$` escape distinguishes them from literals. A string
 value beginning with `$` is a CEL expression evaluated against the `params` and
@@ -299,7 +299,7 @@ is missing; plain field selection on a missing key is an evaluation error.
 
 An expression whose evaluation results in an error, or that yields absent or
 null for a REQUIRED field (`subject`, `action`, or `resource`), is a mapping
-error ({{mapping-errors}}). Every mapping in this profile — including every
+error ({{mapping-errors}}). Every mapping in this binding — including every
 default mapping — contains CEL expressions, so a conforming PEP MUST include a
 CEL evaluator; there is no expression-free conformance level.
 
@@ -347,10 +347,10 @@ expressions resolve as follows:
 
 As defined by the COAZ Framework ({{COAZFW}}), a mapping is a JSON object with
 a single top-level member — its envelope — whose key names the AuthZEN API to
-call. This profile permits both envelope keys defined by the framework:
+call. This binding permits both envelope keys defined by the framework:
 
 - `evaluation` — a template for a single-decision Access Evaluation request.
-  Every default mapping in this profile uses this envelope
+  Every default mapping in this binding uses this envelope
   ({{default-mappings}}), and it is the RECOMMENDED envelope for declared
   mappings that require one decision.
 
@@ -362,7 +362,7 @@ A mapping whose top-level structure is anything other than exactly one of these
 two keys is malformed, and the PEP MUST treat it as a mapping error
 ({{mapping-errors}}).
 
-A PDP used with this profile MUST support the Access Evaluation API. Where a
+A PDP used with this binding MUST support the Access Evaluation API. Where a
 declared mapping uses the `evaluations` envelope, the PEP MUST either send the
 constructed request to the Access Evaluations API or, if its PDP does not
 support that API, issue one Access Evaluation request per entry — applying the
@@ -429,7 +429,7 @@ authorized by the default `tools/call` mapping ({{default-mappings}}).
 
 # Default Mappings {#default-mappings}
 
-This profile defines a default mapping for each MCP method. A PEP MUST apply the
+This binding defines a default mapping for each MCP method. A PEP MUST apply the
 default mapping for a method unless a declared mapping applies to the specific
 operation ({{declared-mappings}}).
 
@@ -589,7 +589,7 @@ mapping is never interpreted as a deny.
 
 ## Unknown Methods
 
-A request whose `method` has neither a default mapping defined by this profile
+A request whose `method` has neither a default mapping defined by this binding
 nor an applicable declared mapping, and that is not in the pass-through set
 above, MUST be denied: the PEP MUST NOT allow it to proceed and MUST return an
 authorization denial ({{authorization-denial}}). This ensures that methods
@@ -601,10 +601,10 @@ without a PDP decision.
 
 The MCP requests `sampling/createMessage`, `elicitation/create`, and
 `roots/list` are initiated by the server toward the client. The PEP model in
-this profile authorizes client-to-server requests using the client's access
+this binding authorizes client-to-server requests using the client's access
 token, which is not the appropriate identity for server-initiated requests.
 Authorization of server-initiated requests is therefore out of scope for this
-version of the profile.
+version of the binding.
 
 # Declared Mappings {#declared-mappings}
 
@@ -809,7 +809,7 @@ When an MCP message is processed, the PEP MUST:
 
 # Error Handling {#error-handling}
 
-This profile reports the COAZ denial and error categories ({{COAZFW}}) as
+This binding reports the COAZ denial and error categories ({{COAZFW}}) as
 JSON-RPC 2.0 {{JSONRPC}} error responses. In every case the PEP MUST NOT allow
 the message to proceed. As required by {{JSONRPC}}, the `id` of each error
 response MUST equal the `id` of the request that caused it, or be `null` if the
@@ -891,7 +891,7 @@ resource-indicator binding {{RFC8707}} are essential.
 
 ## Zero-Trust for AI Agents
 
-This profile represents the human user as the AuthZEN Subject and the AI agent
+This binding represents the human user as the AuthZEN Subject and the AI agent
 as part of the Context. This separation lets policies evaluate the trust level of
 the user and the agent independently, supporting zero-trust architectures for AI
 agent interactions.
@@ -953,30 +953,30 @@ This specification has no IANA actions.
 
 ## COAZ Framework
 
-This specification is a profile of the COAZ Framework {{COAZFW}}. The framework
+This specification is a binding of the COAZ Framework {{COAZFW}}. The framework
 defines the protocol-neutral model — mappings shaped as AuthZEN Access
 Evaluations requests, the literal/expression distinction, the expression
-contract, and the conformance requirements. This profile binds that model to
+contract, and the conformance requirements. This binding binds that model to
 MCP's information model and JSON-RPC transport.
 
 ## OpenID AuthZEN Authorization API
 
 The constructed request and the decision response are defined by {{AUTHZEN}}.
-This profile uses the Access Evaluation API for single-decision mappings —
+This binding uses the Access Evaluation API for single-decision mappings —
 including every default mapping — and the Access Evaluations API where a
 declared mapping requires multiple decisions ({{mapping-envelopes}}).
 
 ## Model Context Protocol
 
-This profile extends the MCP {{MCP}} tool schema with the `x-authzen-mapping`
+This binding extends the MCP {{MCP}} tool schema with the `x-authzen-mapping`
 extension to `inputSchema`. It is backward compatible: servers and clients that
 do not understand it ignore the field, and the default mappings still allow a
 PEP to authorize their messages.
 
 ## OAuth 2.1
 
-This profile complements OAuth 2.1 {{OAUTH21}}. OAuth provides authentication and
-coarse-grained authorization via scopes; this profile enables fine-grained,
+This binding complements OAuth 2.1 {{OAUTH21}}. OAuth provides authentication and
+coarse-grained authorization via scopes; this binding enables fine-grained,
 parameter-level decisions that consider the specific resources and context of
 each message.
 
