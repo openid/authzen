@@ -120,7 +120,7 @@ The OpenID AuthZEN Authorization API {{AUTHZEN}} provides standardized,
 fine-grained authorization using the Subject-Action-Resource-Context (SARC)
 model. The COAZ Framework {{COAZFW}} defines, in a protocol-neutral way, how to
 project the information model of a protocol into an AuthZEN Authorization API
-request. This document is the COAZ *profile* for MCP: it binds that framework to
+request. This specification is the COAZ *profile* for MCP: it binds that framework to
 MCP's information model.
 
 This profile authorizes **all** MCP messages. It does
@@ -151,8 +151,8 @@ MCP Server:
   Model Context Protocol.
 
 MCP Gateway:
-: An intermediary between an MCP client and one or more MCP servers. A gateway
-  MAY act as the PEP on behalf of the MCP server.
+: An *optional* intermediary between an MCP client and one or more MCP servers.
+  Where present, a gateway MAY act as the PEP on behalf of the MCP server.
 
 Tool:
 : A callable capability exposed by an MCP server, described by a name,
@@ -160,7 +160,7 @@ Tool:
 
 COAZ:
 : Compatible with OpenID AuthZEN (pronounced "cozy"). The framework {{COAZFW}}
-  of which this document is a profile.
+  of which this specification is a profile.
 
 # Relationship to the COAZ Framework {#framework-conformance}
 
@@ -171,8 +171,8 @@ This profile fulfils the profile conformance requirements of the COAZ Framework
 |:---|:---|
 | Information model | `params`, `token` ({{information-model}}) |
 | Mapping location | `x-authzen-mapping` in a tool's `inputSchema`; otherwise the default mapping ({{declared-mappings}}, {{default-mappings}}) |
-| Literal/expression discriminator | bare value = literal; `$`-prefixed string = CEL expression; `$$` escape ({{expressions}}) |
-| Expression language | Common Expression Language {{CEL}} ({{expressions}}) |
+| Literal/expression discriminator | framework default: `$` prefix, `$$` escape ({{expressions}}) |
+| Expression language | framework default: Common Expression Language {{CEL}} ({{expressions}}) |
 | Envelopes | `evaluation` and `evaluations` ({{mapping-envelopes}}) |
 | Operations in scope | All MCP methods, per the default mapping table; pass-through set listed ({{default-mappings}}) |
 | Default mapping behavior | Per-method default mapping table ({{default-mappings}}) |
@@ -279,38 +279,29 @@ subject-identity claim is `sub`.
 
 # Expressions and Literals {#expressions}
 
-This profile uses Common Expression Language {{CEL}} as its expression language,
-and distinguishes literals from expressions syntactically:
+This profile uses the framework's defaults unchanged ({{COAZFW}}): expressions
+are written in Common Expression Language {{CEL}}, and the leading-`$`
+discriminator with its `$$` escape distinguishes them from literals. A string
+value beginning with `$` is a CEL expression evaluated against the `params` and
+`token` input variables (e.g., `$token.sub`, `$params.arguments.id`,
+`$params.arguments.amount > 10000 ? 'high' : 'standard'`); any other value is a
+literal, used verbatim (e.g., the string `customer`, the number `10`, the
+boolean `true`); `$$50` denotes the literal string `$50`. Within an expression,
+ordinary CEL syntax applies, including CEL's own single-quoted string literals.
 
-- A string value that begins with a `$` is a **CEL expression**. The text
-  following the `$` is the CEL expression, evaluated against the `params` and
-  `token` input variables (e.g., `$token.sub`, `$params.arguments.id`,
-  `$params.arguments.amount > 10000 ? 'high' : 'standard'`). Within the
-  expression, ordinary CEL syntax applies, including CEL's own single-quoted
-  string literals.
+Per the COAZ expression contract ({{COAZFW}}), a CEL expression MUST evaluate
+to a single JSON value — a scalar, list, or map. A list or map returned by an
+expression is a single field value and does not, by itself, produce multiple
+evaluations. To populate an OPTIONAL field from a claim or parameter that may
+be absent, an expression MUST use CEL optional selection (the `.?` operator,
+e.g. `$token.?client_id`), which omits the field from the request when the key
+is missing; plain field selection on a missing key is an evaluation error.
 
-- Any other value is a **literal**, used verbatim (e.g., the string `customer`,
-  the number `10`, the boolean `true`).
-
-- To express a literal string that begins with a `$`, the leading `$` is doubled.
-  `$$50` denotes the literal string `$50`; `$$` denotes the literal string `$`.
-  Doubling applies only to a leading `$`.
-
-A CEL expression MUST evaluate to a single JSON value — a scalar, list, or map —
-as required by the COAZ expression contract ({{COAZFW}}). A list or
-map returned by an expression is a single field value and does not, by itself,
-produce multiple evaluations.
-
-CEL field selection on a missing key is an error. To populate an OPTIONAL field
-from a claim or parameter that may be absent, an expression MUST use CEL optional
-selection (the `.?` operator, e.g. `$token.?client_id`); an expression that
-yields an absent optional causes its field to be omitted from the request, as
-defined by the COAZ expression contract. An expression whose evaluation results
-in an error, or that yields absent or null for a REQUIRED field (`subject`,
-`action`, or `resource`), is a mapping error ({{mapping-errors}}). Every mapping
-in this profile — including every default mapping — contains CEL expressions, so
-a conforming PEP MUST include a CEL evaluator; there is no expression-free
-conformance level.
+An expression whose evaluation results in an error, or that yields absent or
+null for a REQUIRED field (`subject`, `action`, or `resource`), is a mapping
+error ({{mapping-errors}}). Every mapping in this profile — including every
+default mapping — contains CEL expressions, so a conforming PEP MUST include a
+CEL evaluator; there is no expression-free conformance level.
 
 The following example illustrates how the input variables are populated. Given
 the `tools/call` request:
@@ -954,7 +945,7 @@ AuthZEN authorization occurs and access control falls back to other mechanisms.
 
 # IANA Considerations
 
-This document has no IANA actions.
+This specification has no IANA actions.
 
 --- back
 
@@ -962,7 +953,7 @@ This document has no IANA actions.
 
 ## COAZ Framework
 
-This document is a profile of the COAZ Framework {{COAZFW}}. The framework
+This specification is a profile of the COAZ Framework {{COAZFW}}. The framework
 defines the protocol-neutral model — mappings shaped as AuthZEN Access
 Evaluations requests, the literal/expression distinction, the expression
 contract, and the conformance requirements. This profile binds that model to

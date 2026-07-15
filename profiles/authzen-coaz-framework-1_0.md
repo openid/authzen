@@ -82,7 +82,9 @@ Authorization API request — an Access Evaluation request for a single decision
 or an Access Evaluations request for several — expressed using the
 Subject-Action-Resource-Context (SARC) model. Mapping values are either literal constants or expressions evaluated
 against the operation's inputs, enabling both fixed field-to-field mappings and
-dynamic, computed mappings. This document does not define a mapping for any
+dynamic, computed mappings. Expressions are written, by default, in the Common
+Expression Language (CEL); a profile MAY designate a different expression
+language. This specification does not define a mapping for any
 specific protocol; it defines the common model and the conformance contract
 that individual COAZ *profiles* fulfil — for example, a profile for the Model
 Context Protocol (MCP), for HTTP APIs, or for OpenAPI-described routes.
@@ -129,11 +131,12 @@ COAZ deliberately separates two concerns:
   identical for every protocol.
 
 - The **input** side is specialized. The set of available input variables, the
-  syntax used to write mappings, the location where a mapping is stored, and
-  the way errors are reported back to the caller all depend on the protocol.
-  These are defined by a COAZ *profile*.
+  location where a mapping is stored, and the way errors are reported back to
+  the caller all depend on the protocol, and are defined by a COAZ *profile*.
+  Expressions over those inputs are written, by default, in Common Expression
+  Language {{CEL}} ({{expression-contract}}).
 
-This document defines the output-side model and the conformance contract that
+This specification defines the output-side model and the conformance contract that
 every profile fulfils. It does not, by itself, define a mapping for any
 protocol. Companion profiles — such as the COAZ Profile for the Model Context
 Protocol {{COAZMCP}} — bind this framework to a concrete information model.
@@ -151,7 +154,7 @@ This specification uses the following terms:
 
 COAZ:
 : Compatible with OpenID AuthZEN (pronounced "cozy"). The framework defined by
-  this document for mapping an information model into an AuthZEN Authorization
+  this specification for mapping an information model into an AuthZEN Authorization
   API request.
 
 Profile:
@@ -287,8 +290,9 @@ designate trust-anchored fields; see {{trust-anchored}}).
 
 This section is non-normative. The examples use an illustrative profile that
 exposes two input variables — `request`, holding the operation's parameters,
-and `token`, holding the caller's validated token claims — and that marks an
-expression with a leading `$`, as the COAZ Profile for MCP {{COAZMCP}} does.
+and `token`, holding the caller's validated token claims — and the framework's
+defaults: CEL as the expression language and the leading-`$` discriminator of
+{{literals-expressions}}.
 
 An operation requiring a single decision is mapped with the `evaluation`
 envelope. Literals (here `identity`, `read`, and `document`) and expressions
@@ -304,6 +308,13 @@ appear side by side:
 }
 ~~~
 {: #fig-example-evaluation title="Mapping using the evaluation envelope"}
+
+An expression can also embed literal text, using the expression language's own
+operators rather than any additional mapping syntax. In CEL this is string
+concatenation: the value `"$'urn:doc:' + request.document_id"` resolves to the
+literal prefix `urn:doc:` followed by the value of `request.document_id`. The
+leading `$` marks the whole value as an expression; the embedded literal uses
+ordinary CEL single-quoted string syntax.
 
 An operation requiring several decisions — here, a move that must be authorized
 as a `read` of the source and a `write` of the destination — is mapped with the
@@ -336,15 +347,24 @@ Every leaf value in a mapping is either a literal or an expression:
   the operation's input variables, and its result is used in the constructed
   request.
 
-A profile MUST define an unambiguous discriminator that distinguishes a literal
-from an expression for every leaf value. A profile MUST also define an escape
+The default discriminator, which a profile SHOULD use, is the `$` prefix:
+
+- A string value whose first character is `$` is an expression; the text
+  following the `$` is the expression itself.
+
+- Any other value — a string not beginning with `$`, or any number, boolean,
+  null, list, or map — is a literal.
+
+- A string value beginning with `$$` is a literal whose text begins with `$`:
+  the leading `$$` denotes a single literal `$`. Doubling applies only to a
+  leading `$`; a `$` anywhere else in a string has no special meaning and does
+  not mark an expression.
+
+A profile MAY define a different discriminator where the default conflicts
+with its environment. Any discriminator MUST distinguish a literal from an
+expression unambiguously for every leaf value, and MUST include an escape
 mechanism such that any literal value — including one whose text resembles an
-expression — can be represented unambiguously. The framework does not mandate
-any particular syntax for this discriminator or escape; it requires only that
-the distinction be lossless. As a concrete example, the COAZ Profile for MCP
-{{COAZMCP}} treats a string beginning with `$` as an expression, any other
-value as a literal, and doubles the prefix (`$$`) to express a literal string
-that begins with `$`.
+expression — can be represented. The distinction MUST be lossless.
 
 This framework does not use the terms "static" or "dynamic" to describe values.
 A field reference such as "the request's path" is an expression, not a literal,
@@ -369,9 +389,11 @@ language-neutral:
    appears; **absent** causes that field to be omitted from the constructed
    request entirely.
 
-A profile MUST specify how an expression yields **absent** (for example, via the
-expression language's optional-value semantics), so that mapping authors can
-distinguish "field deliberately omitted" from "field present with a null value."
+A profile MUST specify how an expression yields **absent**, so that mapping
+authors can distinguish "field deliberately omitted" from "field present with a
+null value." When the expression language is CEL, the default is CEL optional
+selection: the `.?` operator yields **absent** when the selected key is
+missing, while plain field selection on a missing key is an evaluation error.
 
 The framework relies on {{AUTHZEN}} for which fields are required: `subject`,
 `action`, and `resource` are required for every evaluation, and `context` is
@@ -537,9 +559,9 @@ specifies all of the following:
 2. **Mapping location.** Where a mapping is stored or carried for an operation,
    and how the PEP obtains it.
 
-3. **Literal/expression discriminator.** The unambiguous syntax that
-   distinguishes a literal from an expression, together with the escape
-   mechanism required by {{literals-expressions}}.
+3. **Literal/expression discriminator.** Whether the profile uses the default
+   `$` discriminator and `$$` escape of {{literals-expressions}}, or the
+   alternative unambiguous syntax and escape mechanism it defines.
 
 4. **Expression language.** The expression language used — CEL {{CEL}} unless
    the profile designates otherwise — satisfying the expression contract of
@@ -612,7 +634,7 @@ consumed by an appropriate enforcement point for every in-scope operation.
 
 # IANA Considerations
 
-This document has no IANA actions.
+This specification has no IANA actions.
 
 --- back
 
@@ -630,7 +652,7 @@ request.
 
 ## COAZ Profiles
 
-This document is the common foundation for a family of profiles, each of which
+This specification is the common foundation for a family of profiles, each of which
 binds the framework to a specific protocol or interface by fulfilling the
 conformance requirements of {{conformance}}. The COAZ Profile for the Model
 Context Protocol {{COAZMCP}} is the reference profile. Profiles for HTTP APIs
@@ -675,6 +697,9 @@ them. Alongside the default it fixes an expression *contract*, so that a
 profile whose environment genuinely cannot host a CEL evaluator can substitute
 another language without destabilizing the rest of the model: the contract in
 {{expression-contract}} defines exactly what any replacement must guarantee.
+The same reasoning applies to the default `$` discriminator and `$$` escape of
+{{literals-expressions}}: one default syntax across profiles, overridable only
+where a protocol's environment forces it.
 
 # Acknowledgements
 
