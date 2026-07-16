@@ -1012,28 +1012,6 @@ coarse-grained authorization via scopes; this binding enables fine-grained,
 parameter-level decisions that consider the specific resources and context of
 each message.
 
-# Design Considerations
-
-## No Per-Tool Authorization Opt-Out
-
-This binding deliberately does not define a flag — in `x-authzen-mapping` or
-elsewhere in a tool definition — that marks an individual tool as exempt from
-authorization, causing a COAZ-aware PEP to skip the PDP call for it. Every MCP
-method is authorized, either by its default mapping or by a declared mapping
-({{default-mappings}}, {{declared-mappings}}); the only messages that proceed
-without a PDP decision are the fixed, binding-defined pass-through operations
-(`ping` and notifications).
-
-A tool that should always be permitted is expressed as policy in the AuthZEN
-PDP — for example, a rule that always returns a permit decision for that tool —
-not as metadata carried in the tool definition. Encoding an authorization bypass
-in the mapping metadata would be a loaded foot-gun: a mapping is authored by the
-MCP server, the party being authorized, so a per-tool opt-out flag would let that
-server — or a misconfigured or tampered mapping — silently disable enforcement
-for a tool. Keeping the "always allow" decision in the PDP preserves a single,
-auditable place where authorization outcomes are decided and ensures every
-non-pass-through message is subject to a policy decision.
-
 # Acknowledgements
 
 The authors would like to thank Martin Besozzi for the original proposal on
