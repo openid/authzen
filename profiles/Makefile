@@ -19,9 +19,9 @@ all:
 	@ $(MAKE) authzen-coaz-framework-1_0.xml
 	@ $(MAKE) authzen-coaz-framework-1_0.html
 	@ $(MAKE) authzen-coaz-framework-1_0.txt
-	@ $(MAKE) authzen-mcp-profile-1_0.xml
-	@ $(MAKE) authzen-mcp-profile-1_0.html
-	@ $(MAKE) authzen-mcp-profile-1_0.txt
+	@ $(MAKE) authzen-coaz-mcp-binding-1_0.xml
+	@ $(MAKE) authzen-coaz-mcp-binding-1_0.html
+	@ $(MAKE) authzen-coaz-mcp-binding-1_0.txt
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.html
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.txt

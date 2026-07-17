@@ -10,7 +10,7 @@ consensus: true
 workgroup: OpenID AuthZEN
 keyword:
  - authorization
- - AuthZen
+ - AuthZEN
  - fine-grained authorization
  - information model mapping
  - policy enforcement
