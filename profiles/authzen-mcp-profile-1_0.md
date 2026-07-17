@@ -32,11 +32,11 @@ author:
 informative:
   COAZFW:
     title: "COAZ: A Framework for Mapping Information Models to AuthZEN Authorization Requests"
-    target: https://openid.net/specs/authzen-coaz-framework-1_0.html
+    target: https://openid.github.io/authzen/authzen-coaz-framework-1_0.html
     date: 2026
   COAZMCP:
     title: "COAZ-MCP: COAZ Binding for the Model Context Protocol"
-    target: https://openid.net/specs/authzen-coaz-mcp-binding-1_0.html
+    target: https://openid.github.io/authzen/authzen-coaz-mcp-binding-1_0.html
     date: 2026
 
 --- abstract
