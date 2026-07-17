@@ -13,7 +13,7 @@ COAZ (Compatible with OpenID AuthZEN) is a protocol-neutral framework for mappin
 
 ## Draft COAZ-MCP Binding
 
-COAZ-MCP is the COAZ binding for the Model Context Protocol (MCP), defining how MCP JSON-RPC messages map into AuthZEN Authorization API requests. It is at `profiles/authzen-mcp-profile-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-mcp-profile-1_0.html).
+COAZ-MCP is the COAZ binding for the Model Context Protocol (MCP), defining how MCP JSON-RPC messages map into AuthZEN Authorization API requests. It is at `profiles/authzen-coaz-mcp-binding-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-coaz-mcp-binding-1_0.html).
 
 ## Draft Access Request and Approval Profile
 A profile that specifies an approval workflow for handling denials in a structured way.
