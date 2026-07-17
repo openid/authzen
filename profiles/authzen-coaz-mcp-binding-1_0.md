@@ -22,8 +22,8 @@ pi: [toc, sortrefs, symrefs, private]
 author:
  -
     fullname: Atul Tulshibagwale
-    organization: SGNL
-    email: atul@sgnl.ai
+    organization: CrowdStrike
+    email: atul.tulshibagwale@crowdstrike.com
  -
     fullname: Alex Olivier
     organization: Cerbos
