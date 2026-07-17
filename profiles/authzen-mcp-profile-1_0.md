@@ -177,7 +177,7 @@ This binding fulfils the binding conformance requirements of the COAZ Framework
 | Operations in scope | All MCP methods, per the default mapping table; pass-through set listed ({{default-mappings}}) |
 | Default mapping behavior | Per-method default mapping table ({{default-mappings}}) |
 | Declared mapping behavior | MCP server MAY declare a mapping for a tool; overrides the default for that tool ({{declared-mappings}}) |
-| Trust-anchored fields | `subject.id`, enforced by verification against `$token.sub` ({{declared-mappings}}) |
+| Trust-anchored fields | `subject.id` SHOULD be anchored to the subject-identity claim; when it is, it is enforced by verification against `$token.sub`, and a mapping MAY override its source for edge cases ({{declared-mappings}}) |
 | Error transport | JSON-RPC 2.0 error responses ({{error-handling}}) |
 | Discoverability | Declared mappings advertised in the `tools/list` response ({{declaring-support}}) |
 
@@ -621,19 +621,37 @@ A declared mapping for a tool **overrides the default `tools/call` mapping for
 that tool only**. It does not affect the default mapping for any other method or
 for `tools/call` of any other tool.
 
-The subject identifier (`subject.id`) is a trust-anchored field as defined by
-the COAZ Framework ({{COAZFW}}), enforced by verification. A declared mapping MUST include a
+The subject identifier (`subject.id`) SHOULD be anchored to the subject-identity
+claim of the validated access token. A declared mapping SHOULD include a
 `subject` — the request's `subject` under the `evaluation` envelope, or the
 top-level `subject` under the `evaluations` envelope — whose `id` is set to an
-expression resolving to the
-subject-identity claim ({{subject-identity-claim}}) — that is, `$token.sub` (or
-`$token.C` where an on-behalf-of claim `C` is designated). The PEP MUST verify
-that the resolved `subject.id` equals the value of the subject-identity claim in
-the validated access token; if it does not, or if `subject` or `subject.id` is
-absent, the PEP MUST treat the request as a mapping error ({{mapping-errors}}).
-This keeps the identifier explicit in the mapping while preventing an MCP server
-— the party being authorized — from asserting the identity of a different
-subject.
+expression resolving to the subject-identity claim ({{subject-identity-claim}})
+— that is, `$token.sub` (or `$token.C` where an on-behalf-of claim `C` is
+designated). Where `subject.id` is set to the subject-identity claim, the PEP
+MUST verify that its resolved value equals that claim in the validated access
+token, treating a mismatch as a mapping error ({{mapping-errors}}); this is the
+trust-anchored, verification-enforced case defined by the COAZ Framework
+({{COAZFW}}), and it prevents an MCP server — the party being authorized — from
+asserting the identity of a different subject.
+
+Some deployments cannot convey the subject identity in a token claim — for
+example, an agentic deployment whose access token is issued to the agent while
+the identity of the acting user is carried outside the token. For these edge
+cases a declared mapping MAY override `subject.id` with a value derived from
+elsewhere in the operation's inputs; because full override via a CEL expression
+is already available, any field of the incoming request — token claim, request
+parameter, or otherwise — can be mapped to `subject.id`. An overridden
+`subject.id` SHOULD still be derived from the validated token rather than from
+caller-controlled request parameters. When a declared mapping sets `subject.id`
+from a source the PEP cannot verify against a token claim, the subject identity
+is asserted by the mapping author rather than anchored to the token; a PEP —
+particularly a gateway enforcing a mapping authored by an MCP server — SHOULD
+emit a warning in this case, and deployments SHOULD account for the additional
+trust this places in the mapping author (see {{security-considerations}}).
+
+If a declared mapping omits `subject` or `subject.id`, the PEP MUST supply the
+default subject identifier, `$token.sub` (or `$token.C`), so that every request
+still carries a token-anchored subject.
 
 To close off identity smuggling, a declared mapping using the `evaluations`
 envelope MUST NOT set `subject` within any entry of its `evaluations` array;
@@ -788,15 +806,18 @@ When an MCP message is processed, the PEP MUST:
 4. Resolve the mapping: literals verbatim, `$`-prefixed values by evaluating the
    CEL expression ({{expressions}}).
 
-5. Verify the subject identity: the effective `subject.id` of every decision in
-   the constructed request — the request's `subject` under the `evaluation`
-   envelope; the top-level subject and, after any override, the subject of each
-   `evaluations` entry under the `evaluations` envelope — MUST equal the value
-   of the subject-identity claim ({{subject-identity-claim}}) in the validated
-   access token. A declared mapping MUST NOT carry a per-evaluation `subject`
-   ({{declared-mappings}}). If any effective `subject.id` does not match, or a
-   per-evaluation `subject` is present in a declared mapping, treat the request as
-   a mapping error ({{mapping-errors}}) and do not call the PDP.
+5. Anchor the subject identity: where a mapping sets `subject.id` to the
+   subject-identity claim ({{subject-identity-claim}}) — as every default mapping
+   does — the effective `subject.id` of every decision in the constructed request
+   — the request's `subject` under the `evaluation` envelope; the top-level
+   subject and, after any override, the subject of each `evaluations` entry under
+   the `evaluations` envelope — MUST equal the value of that claim in the validated
+   access token, and the PEP MUST treat a mismatch as a mapping error
+   ({{mapping-errors}}) and not call the PDP. Where a declared mapping instead
+   overrides `subject.id` from another source ({{declared-mappings}}), the PEP
+   cannot perform this verification and SHOULD emit a warning. A declared mapping
+   MUST NOT carry a per-evaluation `subject`; if one is present, treat the request
+   as a mapping error and do not call the PDP.
 
 6. Construct the AuthZEN request from the resolved mapping and send it to the
    API named by the mapping's envelope ({{mapping-envelopes}}): the Access
@@ -898,14 +919,25 @@ agent interactions.
 
 ## Subject Identity
 
-The subject identifier (`subject.id`) is trust-anchored: every mapping sets it to
-`$token.sub`, and the PEP verifies that the resolved value equals the subject of
-the validated access token, rejecting any mismatch ({{declared-mappings}}). This
-is essential where the PEP is an MCP gateway and the declared mapping is authored
-by the MCP server: without this check, the server — the party being authorized —
-could assert the identity of any principal and obtain a decision for a user the
-caller never authenticated as. The verification keeps the identifier explicit in
-the mapping while binding it to the authenticated identity.
+The subject identifier (`subject.id`) SHOULD be anchored to the subject-identity
+claim of the validated access token. Every default mapping sets it to `$token.sub`,
+and where a declared mapping sets it to the subject-identity claim the PEP verifies
+that the resolved value equals the subject of the validated access token, rejecting
+any mismatch ({{declared-mappings}}). This verification is essential where the PEP
+is an MCP gateway and the declared mapping is authored by the MCP server: without
+it, the server — the party being authorized — could assert the identity of any
+principal and obtain a decision for a user the caller never authenticated as.
+
+This binding uses SHOULD rather than MUST so that agentic deployments whose
+acting-user identity is not carried in a verifiable token claim can still map a
+`subject.id` ({{declared-mappings}}). This flexibility is a deliberate trade-off:
+a `subject.id` that the PEP cannot verify against a token claim is only as
+trustworthy as the mapping author and the source it is drawn from. Deployments
+SHOULD prefer token-anchored subject identities, SHOULD surface a warning when a
+mapping overrides `subject.id` from an unverifiable source, and MUST weigh, in
+their threat model, the trust placed in whoever authored such a mapping. Where the
+PEP is a gateway enforcing a mapping authored by a less-trusted MCP server, an
+unverifiable `subject.id` SHOULD NOT be relied upon as an authenticated identity.
 
 ## Untrusted Declared-Mapping Attributes
 

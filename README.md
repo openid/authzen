@@ -7,9 +7,13 @@ The AuthZEN authorization API is versioned in markdown at `api/authorization-api
 
 The latest published version of the spec is available [here](https://openid.github.io/authzen).
 
-## Draft MCP Profile
+## Draft COAZ Framework
 
-The AuthZEN profile for Model Context Protocol (MCP) Tool Authorization is at `profiles/authzen-mcp-profile-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-mcp-profile-1_0.html).
+COAZ (Compatible with OpenID AuthZEN) is a protocol-neutral framework for mapping the information model of an arbitrary protocol or interface into a request to the AuthZEN Authorization API. It is at `profiles/authzen-coaz-framework-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-coaz-framework-1_0.html).
+
+## Draft COAZ-MCP Binding
+
+COAZ-MCP is the COAZ binding for the Model Context Protocol (MCP), defining how MCP JSON-RPC messages map into AuthZEN Authorization API requests. It is at `profiles/authzen-mcp-profile-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-mcp-profile-1_0.html).
 
 ## Draft Access Request and Approval Profile
 A profile that specifies an approval workflow for handling denials in a structured way.
