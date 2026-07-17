@@ -171,6 +171,10 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: coaz-framework
+      - name: Download artifact - COAZ-MCP binding
+        uses: actions/download-artifact@v8
+        with:
+          name: coaz-mcp-binding
       - name: Download artifact - MCP profile
         uses: actions/download-artifact@v8
         with:
