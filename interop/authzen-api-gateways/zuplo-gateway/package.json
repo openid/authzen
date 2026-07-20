@@ -12,8 +12,8 @@
     "zuplo": "^6"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/node": "^26",
     "prettier": "^3",
-    "typescript": "^5"
+    "typescript": "^7"
   }
 }
