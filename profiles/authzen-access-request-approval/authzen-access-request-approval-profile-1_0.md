@@ -1,6 +1,6 @@
 ---
-title: "AuthZEN Access Request and Approval Profile - Draft 1"
-abbrev: "ARAP"
+title: "Remediating AuthZEN Denials - Draft 1"
+abbrev: "RAD"
 category: std
 ipr: none
 
@@ -62,60 +62,39 @@ normative:
 
 --- abstract
 
-This specification defines an extension profile for the OpenID AuthZEN Authorization API that allows a Policy Enforcement Point (PEP) to submit an access request when an authorization decision is denied but requestable.  The profile preserves the AuthZEN Authorization API decision model: a denied decision remains a denial and MUST NOT be treated as access.  It adds a requestable denial context, an access request endpoint, a task handle for the asynchronous workflow that resolves a denial, and a re-evaluation completion mode that lets the Policy Decision Point remain authoritative at enforcement time after approval.
+This specification defines an extension for the OpenID AuthZEN Authorization API that allows a Policy Enforcement Point (PEP) to add remediation semantics to a denial decision, when the decision is remediable. The extension adds a remediation context, an access request endpoint, a task handle for the asynchronous workflow that resolves a denial, and a re-evaluation completion mode that lets the Policy Decision Point remain authoritative at enforcement time after approval.
 
 --- middle
 
 # Introduction
 
-The AuthZEN Authorization API enables a Policy Enforcement Point (PEP) to ask a Policy Decision Point (PDP) whether a Subject may perform an Action on a Resource within a Context.  The PDP returns a Decision indicating whether the operation is allowed or denied.
+The AuthZEN Authorization API enables a Policy Enforcement Point (PEP) to ask a Policy Decision Point (PDP) whether a Subject may perform an Action on a Resource within a Context.  The PDP returns a Decision indicating whether the operation is allowed or denied. It currently does not provide remediation semantics when the PEP receives a denial. However, modern systems increasingly require authorization decisions to evolve during ongoing execution due to delegation, dynamic resource discovery, scope expansion, and long-running agent activity:
 
-In classic deployments, the authority a caller needs is largely fixed at provisioning time.  A user is granted a role; an OAuth client is registered with a set of scopes; a service account is granted access to a database.  Runtime denials are uncommon and typically indicate misconfiguration or attack, and the appropriate response is to log, alert, or refuse.
-
-Modern systems increasingly require authorization decisions to evolve during ongoing execution due to delegation, dynamic resource discovery, scope expansion, and long-running agent activity:
-
-* An AI agent executing a multi-step task discovers, mid-execution, that it needs to read a document, query a record, or post to a channel that was not declared when the agent was deployed.  Each previously unseen resource produces a denial, and the same agent may produce many such denials over the course of a single task.
-* An OAuth Authorization Server issuing fine-grained access tokens cannot pre-enumerate the cross-resource scope combinations a fleet of long-lived clients will request over time, and so it denies token requests for scope combinations that require governance review (policy evaluation, risk scoring, or human approval) before issuance.
-* A gateway acting as a PEP for an internal API encounters a user attempting an operation that requires elevated authority their standing role does not grant.  The deployment expects the gateway to route the request to an owner for approval rather than refuse the call outright.
+* An AI agent executing a multi-step task discovers, mid-execution, that it needs to read a document, query a record, or post to a channel that was not declared when the agent was deployed.  Each previously unseen resource produces a denial, and the same agent may encounter many such denials over the course of a single task.
+* An OAuth Authorization Server issuing fine-grained access tokens denies token requests for certain scope combinations that require governance review (policy evaluation, risk scoring, or human approval) before issuance.
+* An API server or API gateway, acting as a PEP, denies a user request that requires elevated authority which the user's role does not grant. The API requires a manager user's approval in order to permit access.
 * A Security Token Service minting tokens for downstream calls discovers that a particular downstream resource requires per-call approval beyond what the upstream token already conveys.
 
-In each pattern, the denial is not a terminal error.  It is a signal that further authority is required before the caller can proceed, that the deployment has a workflow capable of evaluating that request, and that the caller should hand off through a defined protocol surface rather than guess at remediation.  Autonomous callers heighten this requirement: an agent, gateway, or token service has no browser to open and no human present at the moment of denial, and the volume of denials a single such caller produces makes per-deployment integrations unsustainable.
+In each pattern, the denial is remediable.  Rather than guess at remediation, the PDP points to a workflow capable of evaluating that request, which the caller should hand off through a defined protocol surface.  Autonomous callers heighten this requirement: an agent, gateway, or token service has no browser to open and/or no human present at the moment of denial, and the volume of denials a single such caller produces makes per-deployment integrations unsustainable.
 
 The same need has long existed in user-facing patterns.  SaaS applications surface approval prompts to end users when access is missing.  Identity governance, ITSM, and case-management platforms accept access requests routed from enforcing applications.  These flows are typically implemented through vendor-specific integrations because the protocol layer between authorization enforcement and the workflow that resolves a denial is not standardized.  PEPs without such a standardized surface fall back to non-standard user-interface messages, out-of-band tickets, or vendor-specific governance integrations.
 
-This profile defines that protocol layer: a narrow, interoperable mechanism for requestable denials that applies uniformly to autonomous runtime callers and to user-facing approval flows.  The flow is:
+This profile defines a narrow, interoperable remediation mechanism that applies uniformly to autonomous runtime callers and to user-facing approval flows.  The flow is:
 
 1.  The PEP evaluates access using the AuthZEN Access Evaluation API.
-2.  The PDP returns `decision: false` and a structured `access_request` object in the Decision Context when the denial can be resolved by a workflow capable of evaluating the request.
-3.  The PEP submits an access request to the Access Request Endpoint.
-4.  The Access Request Service returns an opaque task handle.
+2.  The PDP returns `decision: false` and a structured `remediations` object in the Decision Context when the denial can be resolved by a workflow capable of evaluating the request.
+3.  The PEP submits a remediation request from the remediations object to a Remediation Service
+4.  The Remeditations Service returns an opaque task handle.
 5.  The PEP can poll the task, receive a callback, or otherwise use the task handle to determine completion.
-6.  When the task is approved, the PEP performs a new AuthZEN Authorization API evaluation; the PDP remains authoritative at enforcement time.
+6.  When the task is completed, the PEP performs a new AuthZEN Authorization API evaluation; the PDP remains authoritative at enforcement time.
 
-This specification intentionally does not define a workflow engine, approval policy language, ticketing system, entitlement catalog, user interface, or approver-facing inbox or enumeration API.  Those capabilities are the responsibility of the PDP or Access Request Service.  In particular, how an approver discovers and acts on pending requests is intentionally out of scope, so that approver-facing surface is not interoperable across implementations by design.  The purpose of this profile is to standardize the handoff between authorization enforcement and the workflow that resolves a denial, so that any PEP, autonomous or user-facing, can route denials through a uniform interface to whatever evaluator the deployment uses, human or automated.
-
-This profile resolves missing authority, not missing information.  A denied evaluation that could be completed with attributes or context the caller already holds is a matter of supplying those inputs; partial evaluation, where the PDP returns the residual conditions a caller can satisfy locally, addresses that case.  A requestable denial is different: the authority does not yet exist at evaluation time, and is created by an asynchronous governance process, often a human approver.  No information the PEP can supply would satisfy such a denial; a workflow must produce new authority first.  The two mechanisms are orthogonal and can be used together.
+This specification intentionally does not define how a Remediations Service operates.  The purpose of this profile is to standardize the remediation flow when a PEP receives a denial from a PDP such that, for where it is possible, the PEP has a self-service path to remediate the situation and consequently gain access.
 
 # Requirements Notation and Conventions
 
 {::boilerplate bcp14-tagged}
 
 The terms Policy Decision Point (PDP), Policy Enforcement Point (PEP), Subject, Resource, Action, Context, and Decision are used as defined by {{AuthZEN}}.
-
-# Design Goals
-
-This profile has the following design goals:
-
-* Preserve the AuthZEN Authorization API's allow/deny decision model.
-* Preserve the AuthZEN Authorization API's stateless evaluation model: the PDP retains no decision state between the denial and the re-evaluation, and the durable request and approval state lives in the Access Request Service role.
-* Provide an interoperable interface for any PEP to route denied access to a centralized governance evaluator, whether that evaluator is human (an owner, approver, or delegate), automated (a policy engine, risk engine, or rule-based evaluator), or a combination of the two.
-* Support high-volume autonomous callers by combining a uniform per-denial submission shape with Access Request Service workflow patterns that absorb load (broad-scope approvals, auto-approval, pre-approval, bulk approval).
-* Make requestability explicit and machine-readable so autonomous PEPs can construct a conformant submission without human intervention at submission time.
-* Provide an opaque task handle suitable for the asynchronous workflow that resolves a denial.
-* Avoid embedding a workflow policy language in the authorization response.
-* Allow approval and evaluation systems such as automated policy engines, risk engines, AI supervisors, ITSM platforms, identity governance platforms, chat approval, case management, or custom governance systems to sit behind a common endpoint.
-* Support re-evaluation after approval so the PDP remains authoritative at enforcement time.
-* Provide enough audit correlation to bind the original denial, submitted request, approver action, and final authorization result.
 
 # Terminology
 
@@ -1541,6 +1520,21 @@ Initial entries registered by this specification:
 Change Controller for all initial entries: OpenID Foundation AuthZEN Working Group.  Specification Document for all initial entries: This document.
 
 --- back
+
+# Design Goals
+
+This profile has the following design goals:
+
+* Preserve the AuthZEN Authorization API's allow/deny decision model.
+* Preserve the AuthZEN Authorization API's stateless evaluation model: the PDP retains no decision state between the denial and the re-evaluation, and the durable request and approval state lives in the Access Request Service role.
+* Provide an interoperable interface for any PEP to route denied access to a centralized governance evaluator, whether that evaluator is human (an owner, approver, or delegate), automated (a policy engine, risk engine, or rule-based evaluator), or a combination of the two.
+* Support high-volume autonomous callers by combining a uniform per-denial submission shape with Access Request Service workflow patterns that absorb load (broad-scope approvals, auto-approval, pre-approval, bulk approval).
+* Make requestability explicit and machine-readable so autonomous PEPs can construct a conformant submission without human intervention at submission time.
+* Provide an opaque task handle suitable for the asynchronous workflow that resolves a denial.
+* Avoid embedding a workflow policy language in the authorization response.
+* Allow approval and evaluation systems such as automated policy engines, risk engines, AI supervisors, ITSM platforms, identity governance platforms, chat approval, case management, or custom governance systems to sit behind a common endpoint.
+* Support re-evaluation after approval so the PDP remains authoritative at enforcement time.
+* Provide enough audit correlation to bind the original denial, submitted request, approver action, and final authorization result.
 
 # Examples
 
