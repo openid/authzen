@@ -26,6 +26,13 @@ jobs:
 
       - name: Convert working version of Authz API 1.0 to rfc xml
         run: kramdown-rfc2629 api/authorization-api-1_0.md > api/authorization-api-1_0.xml
+      - name: Fix RFC9110 xrefs in generated XML
+        run: |
+          echo "Checking for RFC9110 xrefs in api/authorization-api-1_0.xml"
+          grep -n 'target="RFC9110"' api/authorization-api-1_0.xml || echo "none found"
+          # Replace any <xref target="RFC9110" section="...">text</xref> with a ulink to the RFC HTML+fragment.perl -0777 -pe 's#<xref\s+([^>]*?)target="RFC9110"([^>]*?)section="([^"]+)"([^>]*?)>(.*?)</xref>#<ulink url="https://www.rfc-editor.org/rfc/rfc9110.html#section-$3">$5</ulink>#igs' -i api/authorization-api-1_0.xml
+          echo "Replacement done. Sample lines:"
+          grep -n 'rfc9110.html' api/authorization-api-1_0.xml | head -n 5 || true
       - name: Render Authz API 1.0 HTML
         run: xml2rfc api/authorization-api-1_0.xml --html -o authorization-api-1_0.html
       - name: Render Index HTML (this is the current working draft of the spec)
