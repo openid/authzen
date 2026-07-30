@@ -1,5 +1,5 @@
 ---
-title: "Remediating AuthZEN Denials - Draft 1"
+title: "Remediable Denial Extension - Draft 1"
 abbrev: "RAD"
 category: std
 ipr: none
@@ -75,11 +75,9 @@ The AuthZEN Authorization API enables a Policy Enforcement Point (PEP) to ask a 
 * An API server or API gateway, acting as a PEP, denies a user request that requires elevated authority which the user's role does not grant. The API requires a manager user's approval in order to permit access.
 * A Security Token Service minting tokens for downstream calls discovers that a particular downstream resource requires per-call approval beyond what the upstream token already conveys.
 
-In each pattern, the denial is remediable.  Rather than guess at remediation, the PDP points to a workflow capable of evaluating that request, which the caller should hand off through a defined protocol surface.  Autonomous callers heighten this requirement: an agent, gateway, or token service has no browser to open and/or no human present at the moment of denial, and the volume of denials a single such caller produces makes per-deployment integrations unsustainable.
+Oftentimes, including in the above patterns, the denial is remediable. This specification introduces a workflow where the PDP points to a workflow capable of evaluating that request.  Since in autonomous workflows, the human required to remediate a denial may not be present at the moment of the denial, this specification enables the remediation to occur asynchronously.
 
-The same need has long existed in user-facing patterns.  SaaS applications surface approval prompts to end users when access is missing.  Identity governance, ITSM, and case-management platforms accept access requests routed from enforcing applications.  These flows are typically implemented through vendor-specific integrations because the protocol layer between authorization enforcement and the workflow that resolves a denial is not standardized.  PEPs without such a standardized surface fall back to non-standard user-interface messages, out-of-band tickets, or vendor-specific governance integrations.
-
-This profile defines a narrow, interoperable remediation mechanism that applies uniformly to autonomous runtime callers and to user-facing approval flows.  The flow is:
+This profile defines a narrow, interoperable remediation mechanism that applies uniformly to autonomous callers and to user-facing approval flows.  The flow is:
 
 1.  The PEP evaluates access using the AuthZEN Access Evaluation API.
 2.  The PDP returns `decision: false` and a structured `remediations` object in the Decision Context when the denial can be resolved by a workflow capable of evaluating the request.
@@ -98,16 +96,16 @@ The terms Policy Decision Point (PDP), Policy Enforcement Point (PEP), Subject, 
 
 # Terminology
 
-Access Request:
+Remediation Request:
 : A request submitted after a denied AuthZEN Authorization API decision asking that access be approved, granted, or otherwise remediated.
 
-Access Request Service:
-: A role that receives Access Request submissions and manages the resulting approval task.  This role MAY be played by the PDP itself (logically part of the PDP), by a service trusted by the PDP (such as a governance platform), or by an independent service operating with delegated authority from the PDP.
+Remediation Service:
+: A role that receives Remediation Request submissions and manages the resulting approval task.  This role MAY be played by the PDP itself or an independent service operating with delegated authority from the PDP.
 
-: References to "the Access Request Service" in this profile refer to whichever entity plays this role for a given deployment.  The protocol surface, authorization rules, and binding requirements apply uniformly regardless of which deployment shape is chosen.
+: References to "the Remediation Service" in this profile refer to whichever entity plays this role for a given deployment.  The protocol surface, authorization rules, and binding requirements apply uniformly regardless of which deployment shape is chosen.
 
-Requestable Denial:
-: An AuthZEN Authorization API Decision with `decision` set to `false` and a Decision Context indicating that the denied access can be requested through an Access Request Endpoint.
+Remediable Denial:
+: An AuthZEN Authorization API Decision with `decision` set to `false` and a Decision Context indicating that the denied access can be requested through an Remediation Endpoint.
 
 Task Handle:
 : An opaque identifier and associated status endpoint representing the lifecycle of an Access Request.
