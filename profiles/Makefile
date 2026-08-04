@@ -33,3 +33,6 @@ all:
 	@ $(MAKE) authzen-oauth/authzen-oauth-authorization-claims-1_0.xml
 	@ $(MAKE) authzen-oauth/authzen-oauth-authorization-claims-1_0.html
 	@ $(MAKE) authzen-oauth/authzen-oauth-authorization-claims-1_0.txt
+	@ $(MAKE) authzen-subject-side-access-challenge-1_0.xml
+	@ $(MAKE) authzen-subject-side-access-challenge-1_0.html
+	@ $(MAKE) authzen-subject-side-access-challenge-1_0.txt
