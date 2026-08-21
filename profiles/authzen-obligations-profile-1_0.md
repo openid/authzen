@@ -289,13 +289,13 @@ The following is a non-normative example of a `step-up` obligation:
 
 ## notification {#obligation-notification}
 
-The `notification` obligation requires the PEP to transmit a message to a destination. This specification is transport-agnostic: the destination MAY be an email address, a phone number, a pub/sub topic, a webhook, or any other implementation-meaningful identifier.
+The `notification` obligation requires the PEP to transmit a message to one or more destinations. This specification is transport-agnostic: a destination MAY be an email address, a phone number, a pub/sub topic, a webhook, or any other implementation-meaningful identifier.
 
 Obligation-specific members:
 
 to:
 
-: REQUIRED. A String. An implementation-specific identifier for the destination of the notification (e.g., an email address such as `manager@example.com`, or a queue/topic name). The identifier MUST be unique and meaningful within the deploying implementer's environment.
+: REQUIRED. A JSON array of Strings, each an implementation-specific identifier for a destination of the notification (e.g., an email address such as `manager@example.com`, or a queue/topic name). The array MUST contain at least one element. Each identifier MUST be unique and meaningful within the deploying implementer's environment. The PEP MUST transmit the notification to every destination listed in the array; the obligation is satisfied only when transmission to all listed destinations succeeds. If transmission to any listed destination fails, the PEP cannot comply with the obligation, and, per {{non-compliance}}, MUST treat the overall response as a DENY, regardless of whether the original `decision` was `true` or `false`.
 
 body:
 
@@ -305,20 +305,37 @@ topic:
 
 : OPTIONAL. A String. A short, high-level subject or purpose for the message, e.g., an email subject line, or a routing topic identifier for a pub/sub transport.
 
-The following is a non-normative example of a `notification` obligation:
+If the AuthZEN request that gave rise to this decision included a `context.decision_subject` element -- an implementation-defined identifier for the entity the authorization request pertains to, which is typically distinct from the requesting `subject` (for example, the patient whose record a doctor is requesting access to) -- the PDP MUST include that identifier as an additional destination in the `to` array of every `notification` obligation it issues for that decision, so that the decision subject is notified alongside any other configured destinations.
+
+The following is a non-normative example of a `notification` obligation with a single destination:
 
 ~~~ json
 {
   "type": "notification",
   "id": "obl-2",
   "properties": {
-    "to": "manager@example.com",
+    "to": ["manager@example.com"],
     "topic": "Unauthorized access attempt",
     "body": "User jdoe attempted to access patient record 4471 outside of business hours."
   }
 }
 ~~~
 {: #fig-obligation-notification title="Non-normative example of a notification obligation"}
+
+The following is a non-normative example of a `notification` obligation issued for a request that included a `context.decision_subject` of `patient-4471`, in addition to a statically configured destination:
+
+~~~ json
+{
+  "type": "notification",
+  "id": "obl-2b",
+  "properties": {
+    "to": ["manager@example.com", "patient-4471"],
+    "topic": "Medical record accessed",
+    "body": "User jdoe accessed patient record 4471 under emergency access provisions."
+  }
+}
+~~~
+{: #fig-obligation-notification-decision-subject title="Non-normative example of a notification obligation with a decision_subject destination"}
 
 ## session_termination {#obligation-session-termination}
 
@@ -492,7 +509,7 @@ The following is a non-normative example of a Search response listing three cand
           "type": "notification",
           "id": "obl-2",
           "properties": {
-            "to": "manager@example.com",
+            "to": ["manager@example.com"],
             "topic": "Protected Document Access",
             "body": "User AliceSmith attempted to read Document "doc-2" from Europe."
           }
