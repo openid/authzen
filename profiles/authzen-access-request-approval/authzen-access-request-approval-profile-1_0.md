@@ -1312,6 +1312,8 @@ Throughout this profile, structural comparison of two JSON values treats them as
 
 When `items` is present in the submission (bulk), the binding claims cover the entire `items` array and authorization-relevant Context.  Inline bulk binding claims list each submitted item, including the full Resource and Action objects for that item, in the same order as the bound Access Request.  A bulk `binding_hash` is the base64url-encoded (without padding) SHA-256 digest of the JCS serialization of the JSON object `{"subject": <Subject>, "items": [{"resource": <Resource>, "action": <Action>}, ...], "context": <authorization-relevant Context>}`, where `<Subject>` is the bound Subject with `subject.properties.act` removed and the `items` array order is the order bound by the denial.  Implementations that use a bulk hashed form MUST use exactly this construction.  When every item carries its own per-item `denial`, each per-item binding is verified using the single-item rules instead of this bundle construction.
 
+Non-normative byte-identical conformance vectors for the single-item and bulk `binding_hash` constructions are available in the [AuthZEN repository](https://github.com/openid/authzen/blob/main/profiles/authzen-access-request-approval/test-vectors/binding-hash.json).
+
 PDPs MAY add deployment-specific claims (policy version, factors, risk score, tenant identifier) when the Access Request Service needs them for routing or audit.  When such claims must remain opaque to the PEP, the PDP wraps the signed payload in JWE encrypted to the Access Request Service.
 
 When `binding_token` is a JWS-signed JWT using these claims, the Access Request Service, on receipt:
