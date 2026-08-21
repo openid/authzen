@@ -6,10 +6,44 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build-rfc:
     runs-on: ubuntu-latest
-
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: authorization-api-1_0
+            source: api/authorization-api-1_0.md
+            html: authorization-api-1_0.html
+            # The working draft of the spec is also published as the site index
+            extra_html: index.html
+          - name: patterns-doc
+            source: patterns/AuthorizationDesignPatterns.md
+            html: patterns.html
+          - name: coaz-framework
+            source: profiles/authzen-coaz-framework-1_0.md
+            html: authzen-coaz-framework-1_0.html
+          - name: coaz-mcp-binding
+            source: profiles/authzen-coaz-mcp-binding-1_0.md
+            html: authzen-coaz-mcp-binding-1_0.html
+          - name: mcp-profile
+            source: profiles/authzen-mcp-profile-1_0.md
+            html: authzen-mcp-profile-1_0.html
+          - name: access-request-approval-profile
+            source: profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.md
+            html: authzen-access-request-approval-profile-1_0.html
+          - name: obligations-profile
+            source: profiles/authzen-obligations-profile-1_0.md
+            html: authzen-obligations-profile-1_0.html
+          - name: certification-scenario
+            source: certification/authorization-api-1_0-scenario.md
+            html: authorization-api-1_0-certification-scenario.html
+    name: build-rfc (${{ matrix.name }})
     steps:
       - uses: actions/checkout@v7
       - name: Set up Ruby
@@ -19,132 +53,30 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.10"
-      - name: Install kramdown-rfc2629
-        run: gem install kramdown-rfc2629
-      - name: Install xml2rfc
-        run: pip install xml2rfc
+      - name: Install kramdown-rfc2629 and xml2rfc
+        run: |
+          gem install kramdown-rfc2629
+          pip install xml2rfc
 
-      - name: Convert working version of Authz API 1.0 to rfc xml
-        run: kramdown-rfc2629 api/authorization-api-1_0.md > api/authorization-api-1_0.xml
-      - name: Render Authz API 1.0 HTML
-        run: xml2rfc api/authorization-api-1_0.xml --html -o authorization-api-1_0.html
-      - name: Render Index HTML (this is the current working draft of the spec)
-        run: xml2rfc api/authorization-api-1_0.xml --html -o index.html
-      - name: Render Authz API 1.0 Text
-        run: xml2rfc api/authorization-api-1_0.xml --text
-      - name: Upload Authz API 1.0 artifact
+      - name: Render ${{ matrix.name }}
+        run: |
+          src='${{ matrix.source }}'
+          xml="${src%.md}.xml"
+          kramdown-rfc2629 "$src" > "$xml"
+          xml2rfc "$xml" --html -o '${{ matrix.html }}'
+          xml2rfc "$xml" --text
+          mkdir -p "dist/$(dirname "$xml")"
+          cp "$xml" "dist/$xml"
+          cp '${{ matrix.html }}' dist/
+          if [ -n '${{ matrix.extra_html }}' ]; then
+            cp '${{ matrix.html }}' 'dist/${{ matrix.extra_html }}'
+          fi
+
+      - name: Upload ${{ matrix.name }} artifact
         uses: actions/upload-artifact@v7
         with:
-          name: authorization-api-1_0
-          path: |
-            index.html
-            authorization-api-1_0.html
-            api/authorization-api-1_0.xml
-
-      - name: Convert Authz Design Patterns to rfc xml
-        run: kramdown-rfc2629 patterns/AuthorizationDesignPatterns.md > patterns/AuthorizationDesignPatterns.xml
-      - name: Render Authz Design Patterns HTML
-        run: xml2rfc patterns/AuthorizationDesignPatterns.xml --html -o patterns.html
-      - name: Render Authz Design Patterns Text
-        run: xml2rfc patterns/AuthorizationDesignPatterns.xml --text
-      - name: Upload Authz Design Patterns artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: patterns-doc
-          path: |
-            patterns.html
-            patterns/AuthorizationDesignPatterns.xml
-
-      - name: Upload Authz API 1.0 original submission artifact (version 0_0)
-        uses: actions/upload-artifact@v7
-        with:
-          name: authorization-api-0_0
-          path: |
-            archive/authorization-api-0_0.html
-
-      - name: Convert COAZ Framework to rfc xml
-        run: kramdown-rfc2629 profiles/authzen-coaz-framework-1_0.md > profiles/authzen-coaz-framework-1_0.xml
-      - name: Render COAZ Framework HTML
-        run: xml2rfc profiles/authzen-coaz-framework-1_0.xml --html -o authzen-coaz-framework-1_0.html
-      - name: Render COAZ Framework Text
-        run: xml2rfc profiles/authzen-coaz-framework-1_0.xml --text
-      - name: Upload COAZ Framework artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: coaz-framework
-          path: |
-            authzen-coaz-framework-1_0.html
-            profiles/authzen-coaz-framework-1_0.xml
-
-      - name: Convert COAZ-MCP Binding to rfc xml
-        run: kramdown-rfc2629 profiles/authzen-coaz-mcp-binding-1_0.md > profiles/authzen-coaz-mcp-binding-1_0.xml
-      - name: Render COAZ-MCP Binding HTML
-        run: xml2rfc profiles/authzen-coaz-mcp-binding-1_0.xml --html -o authzen-coaz-mcp-binding-1_0.html
-      - name: Render COAZ-MCP Binding Text
-        run: xml2rfc profiles/authzen-coaz-mcp-binding-1_0.xml --text
-      - name: Upload COAZ-MCP Binding artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: coaz-mcp-binding
-          path: |
-            authzen-coaz-mcp-binding-1_0.html
-            profiles/authzen-coaz-mcp-binding-1_0.xml
-
-      - name: Convert MCP Profile to rfc xml
-        run: kramdown-rfc2629 profiles/authzen-mcp-profile-1_0.md > profiles/authzen-mcp-profile-1_0.xml
-      - name: Render MCP Profile HTML
-        run: xml2rfc profiles/authzen-mcp-profile-1_0.xml --html -o authzen-mcp-profile-1_0.html
-      - name: Render MCP Profile Text
-        run: xml2rfc profiles/authzen-mcp-profile-1_0.xml --text
-      - name: Upload MCP Profile artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: mcp-profile
-          path: |
-            authzen-mcp-profile-1_0.html
-            profiles/authzen-mcp-profile-1_0.xml
-
-      - name: Convert Access Request Approval Profile to rfc xml
-        run: kramdown-rfc2629 profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.md > profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml
-      - name: Render Access Request Approval Profile HTML
-        run: xml2rfc profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml --html -o authzen-access-request-approval-profile-1_0.html
-      - name: Render Access Request Approval Profile Text
-        run: xml2rfc profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml --text
-      - name: Upload Access Request Approval Profile artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: access-request-approval-profile
-          path: |
-            authzen-access-request-approval-profile-1_0.html
-            profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml
-
-      - name: Convert Obligations Profile to rfc xml
-        run: kramdown-rfc2629 profiles/authzen-obligations-profile-1_0.md > profiles/authzen-obligations-profile-1_0.xml
-      - name: Render Obligations Profile HTML
-        run: xml2rfc profiles/authzen-obligations-profile-1_0.xml --html -o authzen-obligations-profile-1_0.html
-      - name: Render Obligations Profile Text
-        run: xml2rfc profiles/authzen-obligations-profile-1_0.xml --text
-      - name: Upload Obligations Profile artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: obligations-profile
-          path: |
-            authzen-obligations-profile-1_0.html
-            profiles/authzen-obligations-profile-1_0.xml
-
-      - name: Convert Authorization API 1.0 Certification Scenario to rfc xml
-        run: kramdown-rfc2629 certification/authorization-api-1_0-scenario.md > certification/authorization-api-1_0-scenario.xml
-      - name: Render Certification Scenario HTML
-        run: xml2rfc certification/authorization-api-1_0-scenario.xml --html -o authorization-api-1_0-certification-scenario.html
-      - name: Render Certification Scenario Text
-        run: xml2rfc certification/authorization-api-1_0-scenario.xml --text
-      - name: Upload Certification Scenario artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: certification-scenario
-          path: |
-            authorization-api-1_0-certification-scenario.html
-            certification/authorization-api-1_0-scenario.xml
+          name: rfc-${{ matrix.name }}
+          path: dist
 
   publish-to-pages:
     if: github.ref == 'refs/heads/main'
@@ -157,44 +89,21 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Download artifact
+      - uses: actions/checkout@v7
+      - name: Add archived original submission (version 0_0)
+        run: |
+          mkdir -p site
+          cp archive/authorization-api-0_0.html site/
+      - name: Download rendered documents
         uses: actions/download-artifact@v8
         with:
-          pattern: authorization-api-*
-          path: .
+          pattern: rfc-*
+          path: site
           merge-multiple: true
-      - name: Download artifact - pattern document
-        uses: actions/download-artifact@v8
-        with:
-          name: patterns-doc
-      - name: Download artifact - COAZ framework
-        uses: actions/download-artifact@v8
-        with:
-          name: coaz-framework
-      - name: Download artifact - COAZ-MCP binding
-        uses: actions/download-artifact@v8
-        with:
-          name: coaz-mcp-binding
-      - name: Download artifact - MCP profile
-        uses: actions/download-artifact@v8
-        with:
-          name: mcp-profile
-      - name: Download artifact - Access Request Approval profile
-        uses: actions/download-artifact@v8
-        with:
-          name: access-request-approval-profile
-      - name: Download artifact - Obligations profile
-        uses: actions/download-artifact@v8
-        with:
-          name: obligations-profile
-      - name: Download artifact - Certification Scenario
-        uses: actions/download-artifact@v8
-        with:
-          name: certification-scenario
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: .
+          path: site
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
