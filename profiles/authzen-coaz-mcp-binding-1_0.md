@@ -465,20 +465,6 @@ it from `aud`.
 
 The default mappings are:
 
-## Lifecycle
-
-~~~ jsonc
-// initialize
-{ "evaluation": {
-    "subject": { "type": "identity", "id": "$token.sub" },
-    "context": { "agent": "$token.?client_id", "protocol_version": "$params.protocolVersion" },
-    "action": { "name": "initialize" },
-    "resource": { "type": "mcp_server", "id": "$token.aud" } } }
-~~~
-
-`ping` is a pass-through operation: the PEP MUST NOT call the PDP and MUST allow
-it to proceed.
-
 ## Tools
 
 ~~~ jsonc
