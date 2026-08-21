@@ -25,3 +25,6 @@ all:
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.html
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.txt
+	@ $(MAKE) authzen-subject-side-access-challenge-1_0.xml
+	@ $(MAKE) authzen-subject-side-access-challenge-1_0.html
+	@ $(MAKE) authzen-subject-side-access-challenge-1_0.txt
