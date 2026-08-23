@@ -778,21 +778,25 @@ so on the basis of the verified `subject.id`, not the declared `subject.type`:
 
 When an MCP message is processed, the PEP MUST:
 
-1. Determine the JSON-RPC `method`. If it is a pass-through operation
+1. Apply every rewrite or normalization known to the PEP that can change the
+   JSON-RPC `method`, mapping selection, or a value exposed through a binding
+   input variable. The resulting message is the evaluated message.
+
+2. Determine the JSON-RPC `method`. If it is a pass-through operation
    ({{default-mappings}}), allow it without calling the PDP.
 
-2. Select the applicable mapping: for a `tools/call` whose tool declares an
+3. Select the applicable mapping: for a `tools/call` whose tool declares an
    `x-authzen-mapping`, use the declared mapping; otherwise use the default mapping
    for the method. A method that is neither in the pass-through set nor has a
    mapping MUST be denied ({{default-mappings}}).
 
-3. Populate `params` from the request's `params` object and `token` from the
+4. Populate `params` from the request's `params` object and `token` from the
    decoded, validated access token claims.
 
-4. Resolve the mapping: literals verbatim, `$`-prefixed values by evaluating the
+5. Resolve the mapping: literals verbatim, `$`-prefixed values by evaluating the
    CEL expression ({{expressions}}).
 
-5. Anchor the subject identity: where a mapping sets `subject.id` to the
+6. Anchor the subject identity: where a mapping sets `subject.id` to the
    subject-identity claim ({{subject-identity-claim}}) — as every default mapping
    does — the effective `subject.id` of every decision in the constructed request
    — the request's `subject` under the `evaluation` envelope; the top-level
@@ -805,12 +809,19 @@ When an MCP message is processed, the PEP MUST:
    MUST NOT carry a per-evaluation `subject`; if one is present, treat the request
    as a mapping error and do not call the PDP.
 
-6. Construct the AuthZEN request from the resolved mapping and send it to the
+7. Construct the AuthZEN request from the resolved mapping and send it to the
    API named by the mapping's envelope ({{mapping-envelopes}}): the Access
    Evaluation API for `evaluation`, the Access Evaluations API for
    `evaluations`.
 
-7. Enforce the response: if every decision is `true` (permit), allow the message
+8. Before applying a permit, verify that the message's `method`, selected
+   mapping, and input-variable values are semantically unchanged from those of
+   the evaluated message. Harmless serialization differences do not constitute
+   a change. If any of these values changed, the PEP MUST re-evaluate the final
+   message or refuse it; it MUST NOT apply the earlier permit to the changed
+   message.
+
+9. Enforce the response: if every decision is `true` (permit), allow the message
    to proceed; if any decision is `false` (deny), do not allow it and return a
    JSON-RPC error ({{authorization-denial}}).
 
@@ -944,6 +955,21 @@ declared mapping is well-formed and that its expressions reference only defined
 properties, and MUST verify the trust-anchored `subject.id` ({{declared-mappings}}),
 before relying on it. The trust placed in the server as the author of declared
 mappings MUST be considered in the deployment's threat model.
+
+## Authorization Granularity and Omitted Inputs
+
+An AuthZEN decision applies to the request constructed by the selected mapping.
+Two MCP messages that differ only in an input the mapping does not project can
+therefore construct the same AuthZEN request and receive the same decision.
+This can be intentional for a coarse-grained mapping, but the omitted input is
+not thereby evaluated by the PDP.
+
+For every input on which authorization is intended to depend, the mapping MUST
+project that input into the AuthZEN request or the deployment MUST enforce the
+same condition independently. A PEP MUST NOT represent a permit as evidence
+that the PDP evaluated an omitted input. The operation-binding check in
+{{pep-behavior}} prevents a permit from being transplanted onto a changed
+message after evaluation; it does not make omitted inputs authorization-relevant.
 
 ## Fail-Closed Enforcement
 
