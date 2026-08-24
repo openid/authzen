@@ -3,20 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@tanstack/react-query": "^5.101.3",
-    "@tanstack/react-query-devtools": "^5.101.3",
+    "@tanstack/react-query": "^5.101.4",
+    "@tanstack/react-query-devtools": "^5.101.4",
     "base-64": "^1.0.0",
     "buffer": "^6.0.3",
-    "js-base64": "^3.9.1",
+    "js-base64": "^3.9.3",
     "oidc-react": "^4.0.1",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "react-select": "^5.10.2",
     "react-toastify": "^11.1.0",
     "todomvc-app-css": "^2.4.2",
     "typescript": "^7.0.2",
     "uuidv4": "^6.2.12",
-    "vite": "^8.2.1",
+    "vite": "^8.2.2",
     "vite-plugin-svgr": "^5.2.0",
     "vite-tsconfig-paths": "^6.1.1"
   },
@@ -40,8 +40,8 @@
   "packageManager": "yarn@1.22.19",
   "devDependencies": {
     "@types/node": "^26.2.0",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react-swc": "^4.3.3"
   }
 }
