@@ -781,21 +781,21 @@
   resolved "https://registry.yarnpkg.com/@typescript/typescript-win32-x64/-/typescript-win32-x64-7.0.2.tgz#cf3b7b0d6ce5635daca4c8e01c189cdcde47ec3c"
   integrity sha512-0BQ3HkAHHlKLSp1qRvf3SUhGpGsDuhB/jgFw75guyqbxJqEaS0Cw/VFO8i2nHglJUzQCRtMMR/IBAKE3ETMC4g==
 
-"@zuplo/cli@7.2.1":
-  version "7.2.1"
-  resolved "https://registry.yarnpkg.com/@zuplo/cli/-/cli-7.2.1.tgz#6793ad5580c034733ae4443559160fb008a15c2a"
-  integrity sha512-ULoLSOWrG4sNfSFblQQQ6uJA/KfiNuYTXxPuv84+ge+0BSN/etojfcC0h79tbMvtTc3ukabsTFvOpriA4ZBXvA==
+"@zuplo/cli@7.4.5":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@zuplo/cli/-/cli-7.4.5.tgz#46e3c09be09353c40d6ed4a39a4c312ec0bdb522"
+  integrity sha512-kcOC0tlG7/NAoE6WUejlfW1GdKnHTHvP5hdgg4r9RQLWy4mPVuGbsqP6j19uSLRuLhs4tbA1OcxfpvOMiGokFg==
   dependencies:
     "@inquirer/prompts" "8.5.2"
     "@opentelemetry/api" "1.9.0"
     "@opentelemetry/api-logs" "0.220.0"
     "@swc/core" "1.10.18"
-    "@zuplo/core" "7.2.1"
+    "@zuplo/core" "7.4.5"
     "@zuplo/editor" "1.0.31094607111"
-    "@zuplo/graphql" "7.2.1"
-    "@zuplo/openapi-tools" "7.2.1"
-    "@zuplo/otel" "7.2.1"
-    "@zuplo/runtime" "7.2.1"
+    "@zuplo/graphql" "7.4.5"
+    "@zuplo/openapi-tools" "7.4.5"
+    "@zuplo/otel" "7.4.5"
+    "@zuplo/runtime" "7.4.5"
     chalk "5.4.1"
     chokidar "3.5.3"
     cookie "1.0.2"
@@ -826,11 +826,17 @@
     workerd "1.20241230.0"
     yargs "17.7.2"
     zod "4.4.3"
+  optionalDependencies:
+    "@zuplo/lint-darwin-arm64" "7.4.5"
+    "@zuplo/lint-darwin-x64" "7.4.5"
+    "@zuplo/lint-linux-arm64" "7.4.5"
+    "@zuplo/lint-linux-x64" "7.4.5"
+    "@zuplo/lint-win32-x64" "7.4.5"
 
-"@zuplo/core@7.2.1":
-  version "7.2.1"
-  resolved "https://registry.yarnpkg.com/@zuplo/core/-/core-7.2.1.tgz#fe1652cbc8fd251c33d98d3fdfe715cf92b4bc38"
-  integrity sha512-ODaTogOaCq3tWY1QBUR/uIn2tzSvbbQqYXvbMjtUQgGKp4gPevWFxWISgqrJQ+i0z736PQuksoxtsibTFWw8VA==
+"@zuplo/core@7.4.5":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@zuplo/core/-/core-7.4.5.tgz#8a1b37cd6fa290f6286403745db3dd59f2cd95c6"
+  integrity sha512-tK4V34ttFrjclXiydlxWsUuTu7Zv/PHosCyOomiu7DpDxaV7ehKvIjqL8MuMFt4JMT5JTDqkkvIJG3cMZEx7eg==
   dependencies:
     chokidar "^3.5.3"
     esbuild "0.28.1"
@@ -856,17 +862,42 @@
   resolved "https://registry.yarnpkg.com/@zuplo/errors/-/errors-6.59.52.tgz#1e2ba48c929c12e921bc80ab948c17763faec776"
   integrity sha512-pm0pH8Mug3Mivi8RuZ0/xgpphBrSNO49naicjAZS/6JF+ePQD63px92kRHiVfvT0UjklFna68vAn6FK9oQD/GA==
 
-"@zuplo/graphql@7.2.1":
-  version "7.2.1"
-  resolved "https://registry.yarnpkg.com/@zuplo/graphql/-/graphql-7.2.1.tgz#f57b47659cd45a4e8482e8d2db1e443f557fb26f"
-  integrity sha512-pMdBfr5RyX//Crzcb7a7ozBUIIF/PEnoOD1moTVWxScoFqZhWuW17FiT4X3dRh9XlHDe1OCK24+QDByTDkKqqg==
+"@zuplo/graphql@7.4.5":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@zuplo/graphql/-/graphql-7.4.5.tgz#fea9517f431894745cb16dee1b97bc2baf91c6d5"
+  integrity sha512-V+f59T2p+uA5EsI0m27En8+ggy/FQA1KQJFiFDyXXwVeM+9+YFwSaJ0D25LVXhPY9+HjVkcqt3eK3jFUGEUTkA==
   dependencies:
     graphql "^16.8.1"
 
-"@zuplo/openapi-tools@7.2.1":
-  version "7.2.1"
-  resolved "https://registry.yarnpkg.com/@zuplo/openapi-tools/-/openapi-tools-7.2.1.tgz#18691606d61153c198fcd466203bb6dce4bfeb40"
-  integrity sha512-xUMFC1qGYO1iNrL3HyUbtuTx6klCZAFVqA7H6/cZwWRpM9QDQX5UMsCtcaKRGFE2A3+6GyIzfMnxr0LBiNMcCw==
+"@zuplo/lint-darwin-arm64@7.4.5":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@zuplo/lint-darwin-arm64/-/lint-darwin-arm64-7.4.5.tgz#63a137dca6fdacb95478a1fda99bdcfb75496d26"
+  integrity sha512-Djg3WjWbAI1yWbgrlhx2QmBASg5QyGj6UeVUh48dCCrTwv73mPNMfvH/LSoP5UZciAyFrg0Lk+MEBsyvCtBaLw==
+
+"@zuplo/lint-darwin-x64@7.4.5":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@zuplo/lint-darwin-x64/-/lint-darwin-x64-7.4.5.tgz#265841621b30cdd0643023f8e282bfb2777fca3c"
+  integrity sha512-cR1x4KElcoz52QfW6HfLkOTS3tnBUHUDqMtCSGeCuUBQJ5zDFUoi7q+a8wSdBzDF2mL97QyCSEGZmk3RSpY+Gw==
+
+"@zuplo/lint-linux-arm64@7.4.5":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@zuplo/lint-linux-arm64/-/lint-linux-arm64-7.4.5.tgz#eacd8026225bfd298c1e006215f75216c1285bcd"
+  integrity sha512-K3xp8O9jlzEGKZbPmGf6t+hHzGMaUBElc2/cps+bKvrfkx5hN0E2dq4tZrzqZmYfMYV4vcBxWpBVZN4fH3sPcg==
+
+"@zuplo/lint-linux-x64@7.4.5":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@zuplo/lint-linux-x64/-/lint-linux-x64-7.4.5.tgz#5f32e307c3e7dd116ac1ff56efe7200f085547f9"
+  integrity sha512-00BH9dE0tO6y6nb5l38q7OCyDoyL6U+7ZfPXd28w42RbgGN97U8WEgHyC7fZbPxPb4fhG/ZBkX3m+if564X1Pg==
+
+"@zuplo/lint-win32-x64@7.4.5":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@zuplo/lint-win32-x64/-/lint-win32-x64-7.4.5.tgz#3405eee5aa7749c1ab4e87060e644c9487e9944f"
+  integrity sha512-iKVr/Oh53EDbFg5g/bjqZIG52dfQYBWw5BNASncXumnp1FURd9mg3uFx7VU+p5ECLYB6MmmIuue75zb29G/uQg==
+
+"@zuplo/openapi-tools@7.4.5":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@zuplo/openapi-tools/-/openapi-tools-7.4.5.tgz#206aeccc84d8337ab9d6f70c32744caf754aa938"
+  integrity sha512-QkL50pn8qC5IJ0EXtD7sPeuYVQYvt4Gw4RzmhDVCuab3H8nNKdJE/ZLoFZXZDkT4NM4tanqEkE12TWoKoXzveA==
   dependencies:
     js-yaml "^4.3.0"
     jsonpath-plus "^10.3.0"
@@ -875,10 +906,10 @@
     uuid "^11.1.0"
     zod "4.4.3"
 
-"@zuplo/otel@7.2.1":
-  version "7.2.1"
-  resolved "https://registry.yarnpkg.com/@zuplo/otel/-/otel-7.2.1.tgz#8704de127f555b02a22d55ae10130f0e7c60e29d"
-  integrity sha512-2OXUo6HY3yo/31x+kpPK4SgX5Jxl3ZBPLasEAOpvQmGpOsG+4Jebyso/yaPl2Iige4Kam1fVS9e35E0+G+v5cg==
+"@zuplo/otel@7.4.5":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@zuplo/otel/-/otel-7.4.5.tgz#8259f318344c0b0912b9fe8bcb1443cbe81be661"
+  integrity sha512-4JPtkqPEAVoQuJ8OCthf8WWqJsl1kz2yqrjczHsU4/fnykhXbYGaJlM9ndpgNPJ3A+bSw+9tgGDabskCPN3gOQ==
   dependencies:
     "@opentelemetry/api" "1.9.0"
     "@opentelemetry/api-logs" "0.220.0"
@@ -891,10 +922,10 @@
     "@opentelemetry/sdk-trace-base" "2.9.0"
     "@opentelemetry/semantic-conventions" "1.43.0"
 
-"@zuplo/runtime@7.2.1":
-  version "7.2.1"
-  resolved "https://registry.yarnpkg.com/@zuplo/runtime/-/runtime-7.2.1.tgz#fbdc6b4f363891aa9ceb53088e3eebef031306a3"
-  integrity sha512-lLpA5caV20bUCMgiZa+Ab2Xp0ru6ue0yJtCcFdHqkrpfojkNfEZ+NgIjWnXESBA14ku5arbwCDGp58XAl7BGaA==
+"@zuplo/runtime@7.4.5":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@zuplo/runtime/-/runtime-7.4.5.tgz#6e374172076f477fe08aff61975e2d1618cea400"
+  integrity sha512-uHgMgsySnNi+/TzuqntwRnr8e0PAi2zCqLf6Vow/5LW+ZDN36xDEvg2OPNI4D31KDEe6Rp4QGcLLC8HDK+PpZw==
   dependencies:
     "@cfworker/json-schema" "4.1.1"
     "@modelcontextprotocol/client" "^2.0.0"
@@ -912,10 +943,10 @@
     uuid "^11.1.0"
     zod "4.4.3"
 
-"@zuplo/test@7.2.1":
-  version "7.2.1"
-  resolved "https://registry.yarnpkg.com/@zuplo/test/-/test-7.2.1.tgz#1419244e2c4d6b7cce2caa55f3b9e8c60d8097fc"
-  integrity sha512-PP5yb22Xt377wps3OwYw6tUO619fpIRdcWf26c0IsuBFPyxUnv9G0fQ4eUBtqZGxDxVHKZ0mARThYzK12sIthA==
+"@zuplo/test@7.4.5":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@zuplo/test/-/test-7.4.5.tgz#5411fe43221884b418ff3722c6b1ff1fbe3df830"
+  integrity sha512-TOpjP9xr+v0FfXME9zVNqTquOK6sS1ESjVCVx6xyZk/ZyShOCDnj36JNxkSJdSaJxePw3v0tEMp1L51JCcHe9A==
 
 accepts@^2.0.0:
   version "2.0.0"
@@ -2224,9 +2255,9 @@ prettier@3.8.1:
   integrity sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==
 
 prettier@^3, prettier@^3.5.3:
-  version "3.9.5"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.9.5.tgz#4fec97736e33b9d0b620b48914fe93b530e835ad"
-  integrity sha512-/FVl766LpUfB5vXgCYOYa0MeV/441Ia99AeICQIQFTY/Nw0roZwULcXpku5i1/m5kt/baz+s4Zogspd839HSMg==
+  version "3.9.6"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.9.6.tgz#b3ea5146515d40fc53f18aa63f74dfab1e10dbf6"
+  integrity sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g==
 
 process-warning@^5.0.0:
   version "5.0.0"
@@ -2801,11 +2832,11 @@ zod@4.4.3, "zod@^3.25 || ^4.0", zod@^4.2.0:
   integrity sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==
 
 zuplo@^7:
-  version "7.2.1"
-  resolved "https://registry.yarnpkg.com/zuplo/-/zuplo-7.2.1.tgz#d8c90fc54848b42368ca5eb9795df651c3871cfe"
-  integrity sha512-8V5KkOLsDxC2cmHdtADAWSQ9/syztNIU7HTWUIxkMPz/NZ7WwHfQExgpnPSlXpwmpbYGmFoWX0Pa8e9Aw6Z9nQ==
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/zuplo/-/zuplo-7.4.5.tgz#08488a6baadc9d3eb6fc67b041250fa210e377cc"
+  integrity sha512-DNd63Dvk0lo/UB1eosunSYTZrWVbRzdf+9lrmU1CO0UFBXi7eZrorR6PAKXcME//D/zJS/n20QE011gHDeIMqg==
   dependencies:
-    "@zuplo/cli" "7.2.1"
-    "@zuplo/core" "7.2.1"
-    "@zuplo/runtime" "7.2.1"
-    "@zuplo/test" "7.2.1"
+    "@zuplo/cli" "7.4.5"
+    "@zuplo/core" "7.4.5"
+    "@zuplo/runtime" "7.4.5"
+    "@zuplo/test" "7.4.5"
