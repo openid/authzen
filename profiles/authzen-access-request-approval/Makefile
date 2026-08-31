@@ -22,3 +22,4 @@ all:
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.html
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.txt
+
