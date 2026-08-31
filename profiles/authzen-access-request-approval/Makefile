@@ -3,13 +3,8 @@ SOURCES?=${wildcard *.xml */*.xml}
 TEXT=${SOURCES:.xml=.txt}
 HTML=${SOURCES:.xml=.html}
 
-.PHONY: test-vectors
-
 text:	$(TEXT)
 html:   $(HTML)
-
-test-vectors:
-	node test-vectors/verify-binding-hash-vectors.mjs
 
 %.html: %.xml
 	xml2rfc --html $^
