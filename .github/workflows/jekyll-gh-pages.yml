@@ -132,6 +132,48 @@ jobs:
             authzen-obligations-profile-1_0.html
             profiles/authzen-obligations-profile-1_0.xml
 
+      - name: Convert OAuth 2.0 Token Issuance Profile to rfc xml
+        run: kramdown-rfc2629 profiles/authzen-oauth/authzen-oauth-token-issuance-1_0.md > profiles/authzen-oauth/authzen-oauth-token-issuance-1_0.xml
+      - name: Render OAuth 2.0 Token Issuance Profile HTML
+        run: xml2rfc profiles/authzen-oauth/authzen-oauth-token-issuance-1_0.xml --html -o authzen-oauth-token-issuance-1_0.html
+      - name: Render OAuth 2.0 Token Issuance Profile Text
+        run: xml2rfc profiles/authzen-oauth/authzen-oauth-token-issuance-1_0.xml --text
+      - name: Upload OAuth 2.0 Token Issuance Profile artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: oauth-token-issuance
+          path: |
+            authzen-oauth-token-issuance-1_0.html
+            profiles/authzen-oauth/authzen-oauth-token-issuance-1_0.xml
+
+      - name: Convert OAuth 2.0 Token Exchange Binding to rfc xml
+        run: kramdown-rfc2629 profiles/authzen-oauth/authzen-oauth-token-exchange-1_0.md > profiles/authzen-oauth/authzen-oauth-token-exchange-1_0.xml
+      - name: Render OAuth 2.0 Token Exchange Binding HTML
+        run: xml2rfc profiles/authzen-oauth/authzen-oauth-token-exchange-1_0.xml --html -o authzen-oauth-token-exchange-1_0.html
+      - name: Render OAuth 2.0 Token Exchange Binding Text
+        run: xml2rfc profiles/authzen-oauth/authzen-oauth-token-exchange-1_0.xml --text
+      - name: Upload OAuth 2.0 Token Exchange Binding artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: oauth-token-exchange
+          path: |
+            authzen-oauth-token-exchange-1_0.html
+            profiles/authzen-oauth/authzen-oauth-token-exchange-1_0.xml
+
+      - name: Convert Authorization Claims Profile to rfc xml
+        run: kramdown-rfc2629 profiles/authzen-oauth/authzen-oauth-authorization-claims-1_0.md > profiles/authzen-oauth/authzen-oauth-authorization-claims-1_0.xml
+      - name: Render Authorization Claims Profile HTML
+        run: xml2rfc profiles/authzen-oauth/authzen-oauth-authorization-claims-1_0.xml --html -o authzen-oauth-authorization-claims-1_0.html
+      - name: Render Authorization Claims Profile Text
+        run: xml2rfc profiles/authzen-oauth/authzen-oauth-authorization-claims-1_0.xml --text
+      - name: Upload Authorization Claims Profile artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: oauth-authorization-claims
+          path: |
+            authzen-oauth-authorization-claims-1_0.html
+            profiles/authzen-oauth/authzen-oauth-authorization-claims-1_0.xml
+
       - name: Convert Authorization API 1.0 Certification Scenario to rfc xml
         run: kramdown-rfc2629 certification/authorization-api-1_0-scenario.md > certification/authorization-api-1_0-scenario.xml
       - name: Render Certification Scenario HTML
@@ -187,6 +229,18 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: obligations-profile
+      - name: Download artifact - OAuth 2.0 Token Issuance profile
+        uses: actions/download-artifact@v8
+        with:
+          name: oauth-token-issuance
+      - name: Download artifact - OAuth 2.0 Token Exchange binding
+        uses: actions/download-artifact@v8
+        with:
+          name: oauth-token-exchange
+      - name: Download artifact - Authorization Claims profile
+        uses: actions/download-artifact@v8
+        with:
+          name: oauth-authorization-claims
       - name: Download artifact - Certification Scenario
         uses: actions/download-artifact@v8
         with:

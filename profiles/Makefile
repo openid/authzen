@@ -25,3 +25,12 @@ all:
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.html
 	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.txt
+	@ $(MAKE) authzen-oauth/authzen-oauth-token-issuance-1_0.xml
+	@ $(MAKE) authzen-oauth/authzen-oauth-token-issuance-1_0.html
+	@ $(MAKE) authzen-oauth/authzen-oauth-token-issuance-1_0.txt
+	@ $(MAKE) authzen-oauth/authzen-oauth-token-exchange-1_0.xml
+	@ $(MAKE) authzen-oauth/authzen-oauth-token-exchange-1_0.html
+	@ $(MAKE) authzen-oauth/authzen-oauth-token-exchange-1_0.txt
+	@ $(MAKE) authzen-oauth/authzen-oauth-authorization-claims-1_0.xml
+	@ $(MAKE) authzen-oauth/authzen-oauth-authorization-claims-1_0.html
+	@ $(MAKE) authzen-oauth/authzen-oauth-authorization-claims-1_0.txt
