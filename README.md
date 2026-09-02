@@ -19,6 +19,18 @@ COAZ-MCP is the COAZ binding for the Model Context Protocol (MCP), defining how 
 A profile that specifies an approval workflow for handling denials in a structured way.
 The HTML version is available [here](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html)
 
+## Draft OAuth 2.0 Token Issuance Profile
+
+A profile for using the AuthZEN Authorization API to externalize an authorization server's decision to issue a token, and to let the decision response shape what is issued. It is at `profiles/authzen-oauth/authzen-oauth-token-issuance-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-oauth-token-issuance-1_0.html).
+
+## Draft OAuth 2.0 Token Exchange Binding
+
+The binding of the token issuance profile to OAuth 2.0 Token Exchange, covering delegation, impersonation, identity chaining, ID-JAG and Transaction Tokens. It is at `profiles/authzen-oauth/authzen-oauth-token-exchange-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-oauth-token-exchange-1_0.html).
+
+## Draft Authorization Claims Profile
+
+A profile that sources the `groups`, `roles` and `entitlements` claims of a JWT access token from AuthZEN Resource Search rather than from a directory or a vendor-specific hook. It is at `profiles/authzen-oauth/authzen-oauth-authorization-claims-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-oauth-authorization-claims-1_0.html).
+
 ## Interop harness
 
 The `interop` directory contains the interoperability scenarios for AuthZEN. Currently, there is a single scenario based on a "Todo" application. The scenario spec and results can be viewed [here](https://authzen-interop.net).
