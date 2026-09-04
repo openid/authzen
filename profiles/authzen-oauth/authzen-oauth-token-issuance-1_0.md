@@ -150,14 +150,10 @@ expressions over arbitrary input, and relationship-based engines in the style
 of {{ZANZIBAR}} that reason over a typed graph of subjects, relations, and
 objects.
 
-This is not a claim that a relationship-based engine can consume nothing
-beyond the five-tuple. Such engines commonly accept contextual tuples
-supplied at query time, and a PDP may project `properties` or `context` into
-them. It is a claim about where a profile should put the load. The five-tuple
-has a shape every conforming PDP can be expected to read the same way; a
-free-form bag does not, and a profile that carried its decision-critical
-inputs there would nominally use AuthZEN while leaving each PDP to infer the
-semantics on its own.
+The five-tuple has a shape every conforming PDP can be expected to read the
+same way; a free-form bag does not, and a profile that carried its
+decision-critical inputs there would nominally use AuthZEN while leaving each
+PDP to infer the semantics on its own.
 
 This document therefore adopts a design rule:
 
@@ -264,21 +260,10 @@ deployments with the strictest budgets are expected to evaluate in process
 or on the same host. Step 3 of {{architecture}} is drawn as an arrow because
 it is a request, not because it is a hop.
 
-Two properties of the issuance moment make the budget more forgiving than
-the volume alone suggests.
-
-The decision is made once per token rather than once per request. An access
-token is presented many times, over a lifetime usually measured in minutes
-or hours, so the cost of deciding at issuance is amortized across every
-later presentation. This is the reverse of the resource server deployments
-{{AUTHZEN}} was first written for, where the decision recurs on every call
-and the budget is correspondingly tighter.
-
-The inputs are already in hand. By the time an AS reaches this decision it
-has authenticated the client, validated the grant, and resolved the subject.
-The evaluation request of {{request}} is assembled from values the AS
-already holds, and this profile implies no additional lookup to construct
-it.
+{{AUTHZEN}} was first written for the authorization decisions a resource
+server makes on every request, where the budget is tighter still. The time
+an authorization server spends on an issuance decision is amortized across
+the life of the token it issues, usually minutes or hours.
 
 ## Decisions That Cannot Be Made Synchronously {#deferred}
 
@@ -299,20 +284,16 @@ token exactly as one that arrives promptly would.
 
 ## The Seam Inside the Authorization Server {#as-seam}
 
-{{architecture}} separates validating a grant from deciding whether to honor
-it, and asks a PDP only the second question. In a deployed authorization
-server that separation is often less clean than the figure. Credential
+{{architecture}} draws grant validation and the issuance decision as separate
+steps. Deployed authorization servers rarely separate them. Credential
 handling, grant validation, session and consent state, and token minting are
-commonly one subsystem, with the inputs this profile needs distributed across
-it rather than exposed at any single point.
+commonly one subsystem, and the values this profile needs are spread across
+it.
 
-The consequence is practical rather than normative. An authorization server
-that cannot assemble the fields of {{request}} at one point in its issuance
-path will have to introduce such a point, and for many implementations that
-will be the substantive work rather than the mapping or the response
-handling. This profile is defined in terms of the values an AS holds when it
-makes the decision, not in terms of where an implementation keeps them, so it
-constrains neither the internal structure nor the refactoring.
+For many implementations the work of adopting this profile will be finding or
+creating a single point in the issuance path where all of the fields of
+{{request}} are available, rather than the mapping itself. This profile says
+what those values are, not where an implementation keeps them.
 
 # Forming the Evaluation Request {#request}
 
@@ -424,18 +405,21 @@ issue:<token-type>:<grant-type>
 ~~~
 
 where `<token-type>` and `<grant-type>` are short names registered in
-{{iana-actions}} - for example `issue:access_token:authorization_code`,
-`issue:id_token:authorization_code`, `issue:refresh_token:token_exchange`.
+{{iana-actions}}. `issue:access_token:authorization_code` is the authority to
+mint an access token under `grant_type=authorization_code`;
+`issue:id_token:authorization_code` and `issue:refresh_token:token_exchange`
+read the same way. The last segment always names the grant, never a second
+token type.
 
 The `issue:` prefix is reserved. A deployment MUST NOT use a scope value
 beginning with `issue:` as a scope tuple action. {{ex-cc}} shows a gate tuple
 in a request.
 
-The grant is part of the action because it is not recoverable from the rest
-of the tuple and it is not implied by the token type. The same subject,
-audience, and token type arise from an authorization code request and from
-its later refresh, and from a client requesting a token for itself and that
-same client exchanging for one. A policy that distinguishes those cases -
+The grant is part of the action because nothing else in the tuple determines
+it. The same subject, audience, and token type arise from an authorization
+code request and from its later refresh, and from a client requesting a token
+for itself and that same client exchanging for one. A policy that
+distinguishes those cases -
 requiring fresh authorization at a high-value audience, or permitting a
 client to hold a token but not to exchange for one - has nothing to attach
 to unless the grant is in the five-tuple.
@@ -450,15 +434,15 @@ what means.
 ### Action Name Portability {#action-portability}
 
 Short names registered under {{iana-actions}} MUST match
-`[a-z][a-z0-9_]{0,30}`, and a composed gate action name MUST NOT exceed 50
+`[a-z][a-z0-9_]{0,20}`. A composed gate action name is therefore at most 49
 characters.
 
-The bounds exist for portability. Relationship-based engines commonly
+The bound exists for portability. Relationship-based engines commonly
 validate relation identifiers against a restricted grammar, admitting a small
 character set within a modest length limit. A PDP built on such an engine can
 canonicalize an action name defined by this document by replacing each `:`
-with a character the grammar admits, conventionally `_`. The bounds above are
-what make that transformation total: any registered name survives it, so a
+with a character the grammar admits, conventionally `_`. The bound above is
+what makes that transformation total: any registered name survives it, so a
 policy written against these names ports without being rewritten.
 
 Carrying a grant type URI verbatim would not survive it. The composed action
@@ -1720,10 +1704,10 @@ grows with the number of token types plus the number of grant types, not
 with their product. The combinations that are meaningful in a deployment are
 a matter of policy, not of registration.
 
-Every short name MUST match `[a-z][a-z0-9_]{0,30}`, and a composed action
-name MUST NOT exceed 50 characters. {{action-portability}} gives the reason:
-these bounds are what let the name be transformed mechanically into a
-relation identifier that relationship-based engines accept. Registrants
+Every short name MUST match `[a-z][a-z0-9_]{0,20}`, which holds any composed
+action name to 49 characters. {{action-portability}} gives the reason: this
+bound is what lets the name be transformed mechanically into a relation
+identifier that relationship-based engines accept. Registrants
 should note that the hyphen is excluded deliberately, and that a short name
 therefore differs from the corresponding URI wherever that URI contains one.
 
