@@ -691,10 +691,10 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.6.tgz#628effeeae2064a1b4e79f78e81d87b7e5fc7b50"
   integrity sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==
 
-"@types/node@^26.4.0":
-  version "26.4.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-26.4.0.tgz#4c4ca071c42241fe602741d02999f16b4e64c468"
-  integrity sha512-faiGnoIrLH/V8cibOMEAZ8pMw6oXqSukl29ra4mN8GdaB2ZewzeaLj+INpV5N+Z1eKWzY+IzaIZH2EIR6YZRNQ==
+"@types/node@^26.4.1":
+  version "26.4.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-26.4.1.tgz#3d8dc80515894958448ee266cf5d6bc3e5205bd5"
+  integrity sha512-k97ENvZWtvA6yqz5/FS6a7duDgOPEeOQOc2iKS/nY6mX6qJUKtLnWzQS+Xj6tXweyj6ZcTAK2Qecetnvi9nCLA==
   dependencies:
     undici-types "~8.3.0"
 
@@ -703,10 +703,10 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.2.tgz#5950e50960793055845e956c427fc2b0d70c5239"
   integrity sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==
 
-"@types/react-dom@^19.2.5":
-  version "19.2.5"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-19.2.5.tgz#d4ecf8d704cab59901d3fbb0975b6f855306595f"
-  integrity sha512-fMPwH9v7r/pp43yUd2/Mbiex5KouJwwR3dzHkhLREUC6764VyDsqxhAxv6OFEYR1RhjOyD1naqba8ECDBe7ZQg==
+"@types/react-dom@^19.2.7":
+  version "19.2.7"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-19.2.7.tgz#eba78fc6201e564986ec40d56c86c8434593cace"
+  integrity sha512-I8bPpDLcHBv1qiIiXDCy71Rt8eQDKJP0sMSWJphDdAcdqiJ1sGpZamavoEIRZmYzjia9LuEb2HlYdDpmoENpvQ==
 
 "@types/react-transition-group@^4.4.0":
   version "4.4.12"
