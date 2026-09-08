@@ -35,3 +35,6 @@ section-19-client-actor	(new)	-	0	19	0	new: target for the retargeted 1130 citat
 interoperability-baseline	(new)	-	0	4	0	new: Section 4 subsection holding 1204; cited from the Section 22 pointer list
 verifying-denial-binding	(new)	-	0	6	0	new: Section 6 subsection holding 1190 to 1198; cited from the Section 22 pointer list
 task-lifecycle-details	(new)	-	0	18	0	new: Section 18 heading; cited from the task pointer sentence in Section 6
+shared-state-deployments	(new)	-	0	11	0	new in A2.1: Section 11 heading; cited from the reworded lead-ins at the denial-binding forms, the approval-reference patterns, and the verification rules
+approval-scope-extensions	(new)	-	0	13	0	new in A2.1: Section 13 heading; cited from the reworded approval-scope lead-in
+protocol-overview	(new)	-	0	1	0	new in A2.1: Protocol Overview subsection; cited from the Introduction in place of the removed six-step list
