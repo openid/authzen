@@ -191,7 +191,7 @@ The `access_request_endpoint` MAY be hosted by the PDP itself, by a service trus
 
 Editor's note: identifier values for `iss` and `aud` and key-to-issuer association are the subject of PROTOCOL-GAPS.md G4.
 
-## Endpoint Protection
+## Endpoint Protection {#endpoint-protection}
 
 The Access Request Endpoint and Task Status Endpoint are protected APIs.  Support for OAuth 2.0 {{RFC6749}} is RECOMMENDED.  When OAuth 2.0 bearer tokens are used, the endpoints MUST follow {{RFC6750}}.  The Cancellation endpoint ({{cancellation}}) is similarly protected; its authorization rules are defined in that section.
 
@@ -300,7 +300,7 @@ This profile does not mandate a specific JWS payload; the contents are deploymen
     * Hashed: a `binding_hash` whose value is the base64url-encoded (without padding) SHA-256 digest of the {{RFC8785}} JSON Canonicalization Scheme (JCS) serialization of the JSON object `{"subject": <Subject>, "resource": <Resource>, "action": <Action>, "context": <authorization-relevant Context>}`, where `<Subject>` is the bound Subject with `subject.properties.act` removed (matching the inline form's exclusion) and `<authorization-relevant Context>` is the enumerated set, which the Access Request Service recomputes from the submission.  Implementations that use the hashed form MUST use exactly this construction so that a PDP and an independently implemented Access Request Service compute identical digests.
 * `evaluation_id`: the PDP's identifier for the evaluation, when present in `context.evaluation_id` ({{evaluation-identifier}}).
 
-## Trusting URLs from the Requestable Denial
+## Trusting URLs from the Requestable Denial {#trusting-urls}
 
 The `endpoint`, `form_url`, and `request_schema_url` values, together with any URL a profile adds to the requestable denial or to a document fetched on the basis of it, are all delivered to the PEP inside a denial response or a document fetched on the basis of that response.  A compromised or misconfigured PDP, or an Access Request Service compelled by one, could direct the PEP at attacker-controlled hosts to harvest justifications, render hostile UI, substitute schemas, or perform credential phishing against the requester.
 
@@ -427,11 +427,11 @@ Idempotency-Key: 7b8d0f0d-65a1-4af1-9fd3-a684f08a5d13
 }
 ~~~
 
-### Idempotency Key Abuse
+### Idempotency Key Abuse {#idempotency-key-abuse}
 
 Idempotency keys can be used to correlate requests.  Implementations SHOULD scope idempotency keys to the authenticated caller and avoid storing them longer than necessary.
 
-## Actor and Source Verification
+## Actor and Source Verification {#actor-source-verification}
 
 The Access Request Service MUST authenticate the PEP using the deployment's chosen mechanism (typically an OAuth 2.0 bearer token, mutual TLS certificate, or signed assertion).  When the submission claims an actor or actor chain in `client.actor`, the Access Request Service MUST verify that the authenticated caller's credential authorizes the entire claimed chain, not only the immediate actor.  Mechanisms commonly used to provide such authorization include {{RFC8693}} OAuth 2.0 Token Exchange (where the access token names the Subject as the on-behalf-of party and the chain via `act` claims), signed assertions from a trusted issuer, or deployment-specific authentication policies.  The Access Request Service MUST reject submissions whose claimed chain cannot be verified against the caller's credential or against trusted issuers identified in the deployment.
 
@@ -579,7 +579,7 @@ A task status response MUST NOT disclose approval details, approver identities, 
 
 Task handles can reveal workflow state or be used to poll for sensitive information.  Task handles MUST be opaque, unguessable, and protected by authentication and authorization checks.  A leaked task handle MUST NOT be sufficient to retrieve task status without caller authorization.
 
-### PEP-Facing and End-Client-Facing Surfaces
+### PEP-Facing and End-Client-Facing Surfaces {#pep-facing-surfaces}
 
 Several members of the task response and approval result are intended for PEP-to-Access-Request-Service or PEP-to-PDP machine interactions, not for direct use by end clients (browsers, mobile applications, agent runtime UIs, or other non-PEP callers acting on behalf of the Subject).  The following are PEP-facing:
 
@@ -704,7 +704,7 @@ Content-Type: application/json
 
 An Access Request Service that does not support PEP-initiated cancellation omits `links.cancel`; a cancellation attempted at any cancellation endpoint in such a deployment returns `405 Method Not Allowed`.
 
-## Availability
+## Availability {#availability}
 
 Approval workflows can introduce latency and dependency on external systems.  PEPs SHOULD fail closed when task status cannot be determined.  Access Request Services SHOULD apply rate limits and abuse detection to request submission and polling endpoints.
 
@@ -914,7 +914,7 @@ A PDP implementing this profile:
 * MUST only consider an Approval Result applicable when the current evaluation request is within the approval scope recorded for that Approval Result.
 * MUST ensure that approval does not override policy conditions that remain mandatory at enforcement time, such as subject status, resource sensitivity, action constraints, environmental risk, and approval expiry.
 
-## Access Request Service Processing Rules
+## Access Request Service Processing Rules {#ars-processing-rules}
 
 An Access Request Service implementing this profile:
 
@@ -957,7 +957,7 @@ When `denial.binding_token` is absent, the Access Request Service MUST resolve o
 
 In the lookup pattern, the PDP resolves `approval.id` in trusted server-side state.  The bound-reference pattern, in which the PDP verifies `approval.state`, is defined in {{completion-semantics}}.
 
-# Denial Binding Alternatives
+# Denial Binding Alternatives {#denial-binding-alternatives}
 
 When `items` is present in the submission (bulk), the binding claims cover the entire `items` array and authorization-relevant Context.  Inline bulk binding claims list each submitted item, including the full Resource and Action objects for that item, in the same order as the bound Access Request.  A bulk `binding_hash` is the base64url-encoded (without padding) SHA-256 digest of the JCS serialization of the JSON object `{"subject": <Subject>, "items": [{"resource": <Resource>, "action": <Action>}, ...], "context": <authorization-relevant Context>}`, where `<Subject>` is the bound Subject with `subject.properties.act` removed and the `items` array order is the order bound by the denial.  Implementations that use a bulk hashed form MUST use exactly this construction.  When every item carries its own per-item `denial`, each per-item binding is verified using the single-item rules instead of this bundle construction.
 
@@ -1279,19 +1279,47 @@ This base specification does not enumerate profiles.  Conformance to a profile i
 
 # Security Considerations
 
-The security considerations formerly collected here have moved to the sections that define the rules they concern:
+This section names the threats the profile is designed against and points to the rules that mitigate each. It states no rules of its own; every mitigation cited here is defined, with its force, in the section named.
 
-- Denial Remains Denial: Introduction.
-- Confused Deputy and Request Substitution, Approval Reference Substitution, Approval Replay: {{completion-semantics}}.
-- Binding Token Integrity: {{binding-token-integrity}}, {{structural-comparison}}, {{verifying-denial-binding}}, Denial Binding Alternatives, and {{interoperability-baseline}}.
-- Overbroad Approval and Approver Eligibility and Separation of Duties: {{overbroad-approval}} and {{approver-eligibility}}.
-- Emergency Access: {{delegation}}.
-- Trusting URLs from the Requestable Denial: {{requestable-denial-context}} (the Requestable Denial section).
-- Task Handle Leakage, PEP-Facing and End-Client-Facing Surfaces, Availability: {{authorization-and-authentication}} and {{task-handle-leakage}}.
-- Callback Security: {{callback-completion}}.
-- PEP Acting on Behalf of the Subject and Idempotency Key Abuse: {{access-request-submission}} (the Submitting section).
+## Decision and Binding Integrity
 
-Editor's note: a later editorial pass rewrites this section as threat statements pointing to those rules.
+**Denial remains denial.** A requestable denial is still a denial. A PEP that treated the presence of `context.access_request` as permission would grant access that no policy allowed. The rule that a requestable denial confers no access is stated in the Introduction and restated for PEPs at {{pep-processing-rules}}, together with the fail-closed rules that a PEP treats an unknown task status and an unknown `result.mode` as not approved.
+
+**Confused deputy and request substitution.** An attacker who can influence a submission could seek approval for one Resource and apply it to another, present a Subject other than the one that was denied, or reorder the items of a bundle. Three separate mitigations apply. The Access Request Service verifies that the submitted Subject, Resource, Action, and authorization-relevant Context match the denied evaluation: against the signed `binding_token` using the procedure at {{verifying-denial-binding}}, or, when no token is present, against the recorded evaluation using the `evaluation_id` path at {{shared-state-deployments}}; for a bundle the binding covers every item in the bound order, as described at {{denial-binding-alternatives}}. The Access Request Service binds the resulting task to those values and to the denial, the requester, and the client, as required in the service conformance list at {{ars-processing-rules}}. The PDP checks the current request against the recorded approval scope at {{completion-semantics}}.
+
+Editor's note: how the requester and client identities are compared is the subject of PROTOCOL-GAPS.md G6.
+
+**Binding-token integrity.** The `binding_token` member round-trips PDP-issued state through the PEP. Without integrity protection, a buggy or hostile PEP could drop, alter, or fabricate it to influence approval routing or scope. The integrity requirement and the claim set are at {{binding-token-integrity}}, the comparison rules at {{structural-comparison}}, the verification procedure and freshness rules at {{verifying-denial-binding}}, the bulk and other integrity-protected forms at {{denial-binding-alternatives}}, and the cross-vendor baseline at {{interoperability-baseline}}.
+
+**Approval reference substitution and replay.** A hostile or compromised PEP could present an `approval.id` or `approval.state` obtained from another Access Request during re-evaluation, or replay a reference past its usefulness. The rules at {{completion-semantics}} state that an approval reference is not a bearer grant and that approval results expire, and they distinguish the two ways a reference is verified: when binding material is carried by value, as in `approval.state`, the PDP verifies its integrity, issuer, audience, expiry, and binding before relying on it; when the reference is resolved by lookup, the PDP or Access Request Service protects the backing approval record against unauthorized lookup and mutation. The lookup pattern itself is described at {{shared-state-deployments}}.
+
+**Bulk bundle escalation.** In a bundled task, a top-level result or an aggregate status could be read as approving every item when only some were approved. The rules that a top-level `result` authorizes no individual item unless the same result also appears in that item's own `result` member, and that per-item outcomes are not inferred from the aggregate `task.status`, are at {{section-14-bulk}}.
+
+## Policy and Approver Hygiene
+
+**Overbroad approval.** The `template`, `requested_access`, and `display` members are request signals, not policy. Treating them as sufficient authorization would let a requester describe their own approval scope. See {{overbroad-approval}}.
+
+**Approver eligibility and separation of duties.** An approval recorded by an ineligible approver, through self-approval, a missing delegated authority, a separation-of-duties conflict, or a conflict of interest, could violate enterprise access policy while presenting as a valid completion, unless local policy explicitly allows and records the exception. See {{approver-eligibility}}.
+
+**Emergency access.** The `requested_access.emergency` member is a request signal, not an authorization override. The handling expectations for emergency and break-glass access are in the Emergency Access subsection of {{delegation}}.
+
+## Information Disclosure
+
+**Trusting URLs from the requestable denial.** The `endpoint`, `form_url`, and `request_schema_url` values, and any URL a profile adds, arrive inside a denial response or a document fetched because of one. A compromised or misconfigured PDP, or an Access Request Service compelled by one, could direct the PEP at attacker-controlled hosts to harvest justifications, render hostile user interfaces, substitute schemas, or phish credentials. The host-trust check a PEP performs before fetching or submitting is at {{trusting-urls}}.
+
+**Task handle leakage.** A task handle can reveal workflow state or be used to poll for sensitive information. Opacity, unguessability, and the authorization of every Task Handle operation are at {{task-handle-leakage}} and {{authorization-and-authentication}}. Authorization to submit the original request or to act for the Subject does not by itself authorize cancelling a pending request; the separate cancellation authorization is at {{cancellation}}.
+
+**PEP-facing and end-client-facing surfaces.** Forwarding `task.status_endpoint` or `task.links.cancel` to an end client creates a direct channel to the Access Request Service that bypasses the PEP's enforcement, and forwarding `approval.id` or `approval.state` lets an end client attempt to inject the approval reference into other PEPs or other evaluations. The separation of machine surfaces from human-facing ones, and the handling of `task.links.review`, are at {{pep-facing-surfaces}}.
+
+## Operational and Integration
+
+**Callback security.** Callback endpoints can be abused for spoofing, replay, request forgery, and server-side request forgery. Destination validation, notification authentication, and the PEP-side checks are at {{callback-completion}}.
+
+**PEP acting on behalf of the Subject.** A PEP typically acts for the Subject of the denied evaluation and sometimes for a longer delegation chain. An Access Request Service that accepted unverified actor claims would let a PEP assert authority it cannot demonstrate. The verification and rejection rules are at {{actor-source-verification}} and {{delegation}}. The rule that the service verifies the caller's authorization to submit or view a request for the supplied Subject, Resource, and Action is at {{endpoint-protection}}.
+
+**Idempotency-key abuse.** Idempotency keys can be used to correlate requests. Scoping and retention guidance is at {{idempotency-key-abuse}}.
+
+**Availability.** Approval workflows introduce latency and dependence on external systems. Fail-closed behavior for PEPs and rate limiting for Access Request Services are at {{availability}}; endpoint protection is at {{endpoint-protection}}.
 
 # Privacy Considerations {#privacy-considerations}
 
@@ -2022,3 +2050,5 @@ The author thanks the OpenID AuthZEN Working Group for discussion and review.
 -00
 
 * Initial version (draft-mcguinness-authzen-access-request)
+
+

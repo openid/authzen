@@ -38,3 +38,11 @@ task-lifecycle-details	(new)	-	0	18	0	new: Section 18 heading; cited from the ta
 shared-state-deployments	(new)	-	0	11	0	new in A2.1: Section 11 heading; cited from the reworded lead-ins at the denial-binding forms, the approval-reference patterns, and the verification rules
 approval-scope-extensions	(new)	-	0	13	0	new in A2.1: Section 13 heading; cited from the reworded approval-scope lead-in
 protocol-overview	(new)	-	0	1	0	new in A2.1: Protocol Overview subsection; cited from the Introduction in place of the removed six-step list
+trusting-urls	(new)	-	0	5	0	new in A2.2: Section 5 subsection; cited from Security Considerations
+availability	(new)	-	0	7	0	new in A2.2: Section 7 subsection; cited from Security Considerations
+actor-source-verification	(new)	-	0	6	0	new in A2.2: Section 6 subsection; cited from Security Considerations
+idempotency-key-abuse	(new)	-	0	6	0	new in A2.2: Section 6 level-3 subsection; cited from Security Considerations
+pep-facing-surfaces	(new)	-	0	7	0	new in A2.2: Section 7 level-3 subsection; cited from Security Considerations
+ars-processing-rules	(new)	-	0	10	0	new in A2.2: Section 10 subsection holding the Access Request Service conformance list; cited from Security Considerations for the task-binding rule
+endpoint-protection	(new)	-	0	4	0	new in A2.2: Section 4 subsection; cited from Security Considerations
+denial-binding-alternatives	(new)	-	0	12	0	new in A2.2: Section 12 heading; cited from Security Considerations
