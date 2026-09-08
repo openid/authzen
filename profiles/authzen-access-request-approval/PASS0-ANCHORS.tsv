@@ -1,0 +1,37 @@
+anchor	current_heading	lines	rows_in_own_range	dest	ref_count	note
+discovery	Discovery	194-224	7	4	4	majority of rows in own range
+requestable-denial-context	Requestable Denial Context	225-305	21	5	7	majority of rows in own range
+evaluation-identifier	Evaluation Identifier	290-305	7	5	5	all rows 292-304 now in 5; 261 and 1082 resolve
+machine-readable-forms	Machine-Readable Forms	306-322	9	20	3	majority of rows in own range
+access-request-submission	Access Request Submission	329-501	52	6	4	majority of rows in own range
+access-request-response	Access Request Response	502-610	34	6	7	retarget 655, 689, 691, 787, 801 (aggregation rule) to section-14-bulk
+task-status-endpoint	Task Status Endpoint	611-790	7	7	1	617 -> 18, 744 -> 17 leave; anchor stays with the endpoint definition
+task-status	Task Status Values	632-712	11	7	6	majority of rows in own range
+state-transitions	State Transitions	659-694	12	7	1	majority of rows in own range
+status-mapping	Mapping Backend States	695-712	5	C	1	SHOULD at 711 moves to 7; 1845 resolves to the illustrative table (G19)
+completed-task-response	Completed Task Response	733-768	11	7	3	majority of rows in own range
+cancellation	Cancellation	769-790	11	17	3	785 -> 7 and 787 -> 14 leave
+completion-semantics	Completion Semantics	791-913	51	8	16	majority of rows in own range
+callback-completion	Callback Completion	914-954	10	16	3	majority of rows in own range
+error-responses	Error Responses	955-995	10	9	2	majority of rows in own range
+extensibility	Extensibility and Profiles	996-1050	1	21	4	majority of rows in own range
+extension-naming	Naming Extensions	1023-1032	5	21	2	majority of rows in own range
+pep-processing-rules	PEP Processing Rules	1051-1071	17	10	1	majority of rows in own range
+authorization-and-authentication	Authorization and Authentication	1107-1140	6	7	1	own rows 1109-1119: 2 to 4, 4 to 7; Delegation excluded
+delegation	Delegation and On-Behalf-Of	1121-1140	10	19	4	1131 stays in 19 (consolidation deferred), so 860, 1180, 1181 resolve to the normalization permission they cite
+privacy-considerations	Privacy Considerations	1141-1148	4	23	1	majority of rows in own range
+binding-token-integrity	Binding Token Integrity	1167-1205	28	5	4	retarget 1096 (structural comparison) to structural-comparison; 153, 258, 1925 cite claim-list content
+overbroad-approval	Overbroad Approval	1212-1215	1	10	1	its only row (1214) goes to 10; anchor on the same Section 10 subsection; 1937 resolves
+approver-eligibility	Approver Eligibility and Separation of Duties	1216-1219	1	10	1	both 1104 and 1218 land in 10, uncombined; anchor on the level-3 subsection Approver Eligibility and Separation of Duties under Policy and Approver Hygiene
+task-handle-leakage	Task Handle Leakage	1232-1235	1	7	1	on the level-3 subsection Task Handle Leakage under Task Handle Authorization (which carries authorization-and-authentication); 1244 cites it and also goes to 7
+openid-foundation-registry-considerations	OpenID Foundation Registry Considerations	1276-1403	0	-	1	majority of rows in own range
+iana-member-names	AuthZEN Access Request Member Names Registry	1326-1368	9	25	2	majority of rows in own range
+iana-reeval-reasons	AuthZEN Access Request Re-evaluation Denial Reason Registry	1369-1403	9	25	1	majority of rows in own range
+impl-considerations	Implementation Considerations	1833-1885	0	-	5	majority of rows in own range
+design-rationale	Design Rationale	1886-1950	0	-	0	majority of rows in own range
+structural-comparison	(new)	-	0	5	0	new: Section 5 subsection holding 1184, placed ahead of Denial Binding Claims; target for the retargeted 1096 citation
+section-14-bulk	(new)	-	0	14	0	new: target for the retargeted 655, 689, 691, 787, 801 citations
+section-19-client-actor	(new)	-	0	19	0	new: target for the retargeted 1130 citation (client.actor definition moves here from 6)
+interoperability-baseline	(new)	-	0	4	0	new: Section 4 subsection holding 1204; cited from the Section 22 pointer list
+verifying-denial-binding	(new)	-	0	6	0	new: Section 6 subsection holding 1190 to 1198; cited from the Section 22 pointer list
+task-lifecycle-details	(new)	-	0	18	0	new: Section 18 heading; cited from the task pointer sentence in Section 6

@@ -1,0 +1,336 @@
+# Unit-level expectations for the A1 comparison script (Appendix X, script 1), over the 250 extractor units before actor expansion.
+# Outcomes: UNCHANGED (same heading text), STAY (unit stays in the section the plan maps its current top-level section to; heading renamed, so the script reports MOVED), MOVED (relocates elsewhere). No REMOVED: A1 performs no consolidation. Acknowledgements and Document History remain separate level-1 headings in A1.
+old_section	new_section	outcome	units
+(front matter)	(front matter)	UNCHANGED	1
+Access Request Endpoint	Bulk Submissions	MOVED	11
+Access Request Endpoint	Callback Completion	MOVED	1
+Access Request Endpoint	Delegation and Acting Parties	MOVED	9
+Access Request Endpoint	Submitting the Access Request	STAY	34
+Access Request Endpoint	Task Lifecycle Details	MOVED	5
+Access Request Service Processing Rules	Core Conformance	STAY	14
+Authorization and Authentication	Checking the Task	STAY	3
+Authorization and Authentication	Delegation and Acting Parties	MOVED	5
+Authorization and Authentication	PDP Metadata, Endpoint Protection, and Interoperability Baseline	MOVED	2
+Authorization and Authentication	Submitting the Access Request	MOVED	2
+Callback Completion	Callback Completion	UNCHANGED	7
+Completion Semantics	Approval and Re-evaluation	STAY	27
+Completion Semantics	Bulk Submissions	MOVED	1
+Design Rationale	Design Rationale	UNCHANGED	3
+Discovery	PDP Metadata, Endpoint Protection, and Interoperability Baseline	STAY	6
+Error Responses	Error Responses	UNCHANGED	1
+Extensibility and Profiles	Extensibility and Profiles	UNCHANGED	6
+Implementation Considerations	Implementation Considerations	UNCHANGED	3
+Machine-Readable Forms	Machine-Readable Forms	UNCHANGED	5
+OpenID Foundation Registry Considerations	OpenID Foundation Registry Considerations	UNCHANGED	1
+PDP Processing Rules	Core Conformance	STAY	11
+PEP Processing Rules	Core Conformance	STAY	16
+Privacy Considerations	Privacy Considerations	UNCHANGED	3
+Protocol Overview	Callback Completion	MOVED	1
+Protocol Overview	Introduction	STAY	1
+Requestable Denial Context	Machine-Readable Forms	MOVED	2
+Requestable Denial Context	Requestable Denial	STAY	16
+Security Considerations	Approval and Re-evaluation	MOVED	4
+Security Considerations	Callback Completion	MOVED	1
+Security Considerations	Checking the Task	MOVED	4
+Security Considerations	Core Conformance	MOVED	2
+Security Considerations	Delegation and Acting Parties	MOVED	1
+Security Considerations	Denial Binding Alternatives	MOVED	4
+Security Considerations	Introduction	MOVED	1
+Security Considerations	PDP Metadata, Endpoint Protection, and Interoperability Baseline	MOVED	1
+Security Considerations	Requestable Denial	MOVED	10
+Security Considerations	Submitting the Access Request	MOVED	3
+Task Status Endpoint	Bulk Submissions	MOVED	1
+Task Status Endpoint	Cancellation	MOVED	7
+Task Status Endpoint	Checking the Task	STAY	9
+Task Status Endpoint	Task Lifecycle Details	MOVED	2
+Terminology	Terminology	UNCHANGED	3
+
+# Per-unit detail
+start	end	old_section	new_section	outcome	keyword_occurrences
+74	74	(front matter)	(front matter)	UNCHANGED	1
+134	135	Terminology	Terminology	UNCHANGED	1
+148	149	Terminology	Terminology	UNCHANGED	1
+151	151	Terminology	Terminology	UNCHANGED	2
+188	188	Protocol Overview	Introduction	STAY	1
+192	192	Protocol Overview	Callback Completion	MOVED	1
+196	196	Discovery	PDP Metadata, Endpoint Protection, and Interoperability Baseline	STAY	2
+198	198	Discovery	PDP Metadata, Endpoint Protection, and Interoperability Baseline	STAY	1
+202	202	Discovery	PDP Metadata, Endpoint Protection, and Interoperability Baseline	STAY	1
+204	204	Discovery	PDP Metadata, Endpoint Protection, and Interoperability Baseline	STAY	2
+206	206	Discovery	PDP Metadata, Endpoint Protection, and Interoperability Baseline	STAY	1
+223	223	Discovery	PDP Metadata, Endpoint Protection, and Interoperability Baseline	STAY	2
+227	227	Requestable Denial Context	Requestable Denial	STAY	1
+229	229	Requestable Denial Context	Requestable Denial	STAY	2
+233	234	Requestable Denial Context	Requestable Denial	STAY	2
+236	237	Requestable Denial Context	Requestable Denial	STAY	2
+239	240	Requestable Denial Context	Requestable Denial	STAY	2
+242	243	Requestable Denial Context	Requestable Denial	STAY	6
+245	246	Requestable Denial Context	Requestable Denial	STAY	2
+248	249	Requestable Denial Context	Machine-Readable Forms	MOVED	1
+251	252	Requestable Denial Context	Machine-Readable Forms	MOVED	2
+256	256	Requestable Denial Context	Requestable Denial	STAY	2
+258	258	Requestable Denial Context	Requestable Denial	STAY	2
+261	261	Requestable Denial Context	Requestable Denial	STAY	2
+263	263	Requestable Denial Context	Requestable Denial	STAY	1
+294	294	Requestable Denial Context	Requestable Denial	STAY	1
+298	298	Requestable Denial Context	Requestable Denial	STAY	5
+300	300	Requestable Denial Context	Requestable Denial	STAY	1
+302	302	Requestable Denial Context	Requestable Denial	STAY	1
+304	304	Requestable Denial Context	Requestable Denial	STAY	1
+308	308	Machine-Readable Forms	Machine-Readable Forms	UNCHANGED	2
+313	313	Machine-Readable Forms	Machine-Readable Forms	UNCHANGED	5
+315	315	Machine-Readable Forms	Machine-Readable Forms	UNCHANGED	2
+319	319	Machine-Readable Forms	Machine-Readable Forms	UNCHANGED	1
+321	321	Machine-Readable Forms	Machine-Readable Forms	UNCHANGED	1
+335	336	Access Request Endpoint	Submitting the Access Request	STAY	1
+338	339	Access Request Endpoint	Submitting the Access Request	STAY	2
+341	342	Access Request Endpoint	Submitting the Access Request	STAY	2
+344	345	Access Request Endpoint	Bulk Submissions	MOVED	2
+347	347	Access Request Endpoint	Bulk Submissions	MOVED	1
+348	348	Access Request Endpoint	Bulk Submissions	MOVED	1
+349	349	Access Request Endpoint	Bulk Submissions	MOVED	1
+350	350	Access Request Endpoint	Bulk Submissions	MOVED	1
+352	353	Access Request Endpoint	Submitting the Access Request	STAY	3
+355	356	Access Request Endpoint	Submitting the Access Request	STAY	1
+359	359	Access Request Endpoint	Submitting the Access Request	STAY	1
+361	361	Access Request Endpoint	Submitting the Access Request	STAY	1
+363	363	Access Request Endpoint	Submitting the Access Request	STAY	1
+365	366	Access Request Endpoint	Submitting the Access Request	STAY	2
+371	372	Access Request Endpoint	Callback Completion	MOVED	1
+374	375	Access Request Endpoint	Submitting the Access Request	STAY	2
+377	377	Access Request Endpoint	Submitting the Access Request	STAY	1
+378	378	Access Request Endpoint	Submitting the Access Request	STAY	1
+379	379	Access Request Endpoint	Delegation and Acting Parties	MOVED	2
+380	380	Access Request Endpoint	Delegation and Acting Parties	MOVED	1
+381	381	Access Request Endpoint	Delegation and Acting Parties	MOVED	1
+382	382	Access Request Endpoint	Delegation and Acting Parties	MOVED	1
+383	383	Access Request Endpoint	Delegation and Acting Parties	MOVED	1
+384	384	Access Request Endpoint	Delegation and Acting Parties	MOVED	2
+385	385	Access Request Endpoint	Delegation and Acting Parties	MOVED	1
+386	386	Access Request Endpoint	Delegation and Acting Parties	MOVED	1
+387	387	Access Request Endpoint	Delegation and Acting Parties	MOVED	1
+389	389	Access Request Endpoint	Submitting the Access Request	STAY	1
+393	394	Access Request Endpoint	Submitting the Access Request	STAY	4
+396	397	Access Request Endpoint	Submitting the Access Request	STAY	1
+399	400	Access Request Endpoint	Submitting the Access Request	STAY	2
+402	403	Access Request Endpoint	Submitting the Access Request	STAY	1
+405	406	Access Request Endpoint	Submitting the Access Request	STAY	3
+408	409	Access Request Endpoint	Submitting the Access Request	STAY	1
+413	413	Access Request Endpoint	Submitting the Access Request	STAY	1
+415	415	Access Request Endpoint	Submitting the Access Request	STAY	2
+417	417	Access Request Endpoint	Submitting the Access Request	STAY	1
+419	419	Access Request Endpoint	Submitting the Access Request	STAY	2
+421	421	Access Request Endpoint	Submitting the Access Request	STAY	3
+504	504	Access Request Endpoint	Submitting the Access Request	STAY	1
+508	509	Access Request Endpoint	Submitting the Access Request	STAY	1
+511	512	Access Request Endpoint	Submitting the Access Request	STAY	2
+514	514	Access Request Endpoint	Submitting the Access Request	STAY	2
+518	519	Access Request Endpoint	Submitting the Access Request	STAY	3
+521	522	Access Request Endpoint	Submitting the Access Request	STAY	1
+524	525	Access Request Endpoint	Submitting the Access Request	STAY	3
+527	528	Access Request Endpoint	Task Lifecycle Details	MOVED	1
+530	530	Access Request Endpoint	Task Lifecycle Details	MOVED	1
+531	531	Access Request Endpoint	Task Lifecycle Details	MOVED	1
+532	532	Access Request Endpoint	Task Lifecycle Details	MOVED	1
+533	533	Access Request Endpoint	Task Lifecycle Details	MOVED	2
+535	536	Access Request Endpoint	Submitting the Access Request	STAY	1
+538	539	Access Request Endpoint	Submitting the Access Request	STAY	1
+541	542	Access Request Endpoint	Submitting the Access Request	STAY	2
+548	549	Access Request Endpoint	Bulk Submissions	MOVED	2
+551	551	Access Request Endpoint	Bulk Submissions	MOVED	1
+552	552	Access Request Endpoint	Bulk Submissions	MOVED	1
+553	553	Access Request Endpoint	Bulk Submissions	MOVED	1
+554	554	Access Request Endpoint	Bulk Submissions	MOVED	2
+562	562	Access Request Endpoint	Bulk Submissions	MOVED	3
+617	617	Task Status Endpoint	Task Lifecycle Details	MOVED	1
+630	630	Task Status Endpoint	Checking the Task	STAY	5
+654	655	Task Status Endpoint	Checking the Task	STAY	2
+657	657	Task Status Endpoint	Checking the Task	STAY	2
+693	693	Task Status Endpoint	Task Lifecycle Details	MOVED	1
+711	711	Task Status Endpoint	Checking the Task	STAY	1
+737	737	Task Status Endpoint	Checking the Task	STAY	1
+738	738	Task Status Endpoint	Checking the Task	STAY	3
+739	739	Task Status Endpoint	Checking the Task	STAY	2
+740	740	Task Status Endpoint	Checking the Task	STAY	1
+742	742	Task Status Endpoint	Checking the Task	STAY	1
+744	744	Task Status Endpoint	Cancellation	MOVED	1
+771	771	Task Status Endpoint	Cancellation	MOVED	3
+773	773	Task Status Endpoint	Cancellation	MOVED	1
+775	776	Task Status Endpoint	Cancellation	MOVED	1
+778	779	Task Status Endpoint	Cancellation	MOVED	1
+783	783	Task Status Endpoint	Cancellation	MOVED	3
+787	787	Task Status Endpoint	Bulk Submissions	MOVED	1
+789	789	Task Status Endpoint	Cancellation	MOVED	1
+797	797	Completion Semantics	Approval and Re-evaluation	STAY	4
+801	801	Completion Semantics	Bulk Submissions	MOVED	1
+803	803	Completion Semantics	Approval and Re-evaluation	STAY	1
+805	805	Completion Semantics	Approval and Re-evaluation	STAY	3
+806	806	Completion Semantics	Approval and Re-evaluation	STAY	1
+807	807	Completion Semantics	Approval and Re-evaluation	STAY	2
+809	809	Completion Semantics	Approval and Re-evaluation	STAY	3
+811	811	Completion Semantics	Approval and Re-evaluation	STAY	3
+813	813	Completion Semantics	Approval and Re-evaluation	STAY	4
+820	820	Completion Semantics	Approval and Re-evaluation	STAY	2
+822	822	Completion Semantics	Approval and Re-evaluation	STAY	2
+824	824	Completion Semantics	Approval and Re-evaluation	STAY	6
+826	826	Completion Semantics	Approval and Re-evaluation	STAY	1
+828	828	Completion Semantics	Approval and Re-evaluation	STAY	1
+830	830	Completion Semantics	Approval and Re-evaluation	STAY	2
+832	832	Completion Semantics	Approval and Re-evaluation	STAY	1
+834	834	Completion Semantics	Approval and Re-evaluation	STAY	1
+835	835	Completion Semantics	Approval and Re-evaluation	STAY	1
+839	839	Completion Semantics	Approval and Re-evaluation	STAY	2
+840	840	Completion Semantics	Approval and Re-evaluation	STAY	3
+841	841	Completion Semantics	Approval and Re-evaluation	STAY	1
+848	848	Completion Semantics	Approval and Re-evaluation	STAY	1
+850	850	Completion Semantics	Approval and Re-evaluation	STAY	1
+852	852	Completion Semantics	Approval and Re-evaluation	STAY	2
+860	860	Completion Semantics	Approval and Re-evaluation	STAY	3
+867	867	Completion Semantics	Approval and Re-evaluation	STAY	1
+869	869	Completion Semantics	Approval and Re-evaluation	STAY	4
+871	871	Completion Semantics	Approval and Re-evaluation	STAY	1
+916	916	Callback Completion	Callback Completion	UNCHANGED	1
+920	921	Callback Completion	Callback Completion	UNCHANGED	3
+923	924	Callback Completion	Callback Completion	UNCHANGED	1
+926	927	Callback Completion	Callback Completion	UNCHANGED	1
+929	929	Callback Completion	Callback Completion	UNCHANGED	4
+931	931	Callback Completion	Callback Completion	UNCHANGED	3
+935	935	Callback Completion	Callback Completion	UNCHANGED	3
+957	957	Error Responses	Error Responses	UNCHANGED	2
+1002	1002	Extensibility and Profiles	Extensibility and Profiles	UNCHANGED	2
+1021	1021	Extensibility and Profiles	Extensibility and Profiles	UNCHANGED	2
+1025	1025	Extensibility and Profiles	Extensibility and Profiles	UNCHANGED	1
+1028	1028	Extensibility and Profiles	Extensibility and Profiles	UNCHANGED	1
+1035	1035	Extensibility and Profiles	Extensibility and Profiles	UNCHANGED	3
+1041	1041	Extensibility and Profiles	Extensibility and Profiles	UNCHANGED	1
+1055	1055	PEP Processing Rules	Core Conformance	STAY	1
+1056	1056	PEP Processing Rules	Core Conformance	STAY	1
+1057	1057	PEP Processing Rules	Core Conformance	STAY	2
+1058	1058	PEP Processing Rules	Core Conformance	STAY	4
+1059	1059	PEP Processing Rules	Core Conformance	STAY	2
+1060	1060	PEP Processing Rules	Core Conformance	STAY	1
+1061	1061	PEP Processing Rules	Core Conformance	STAY	2
+1062	1062	PEP Processing Rules	Core Conformance	STAY	1
+1063	1063	PEP Processing Rules	Core Conformance	STAY	1
+1064	1064	PEP Processing Rules	Core Conformance	STAY	1
+1065	1065	PEP Processing Rules	Core Conformance	STAY	1
+1066	1066	PEP Processing Rules	Core Conformance	STAY	1
+1067	1067	PEP Processing Rules	Core Conformance	STAY	1
+1068	1068	PEP Processing Rules	Core Conformance	STAY	1
+1069	1069	PEP Processing Rules	Core Conformance	STAY	1
+1070	1070	PEP Processing Rules	Core Conformance	STAY	1
+1076	1076	PDP Processing Rules	Core Conformance	STAY	1
+1077	1077	PDP Processing Rules	Core Conformance	STAY	1
+1078	1078	PDP Processing Rules	Core Conformance	STAY	1
+1079	1079	PDP Processing Rules	Core Conformance	STAY	1
+1080	1080	PDP Processing Rules	Core Conformance	STAY	1
+1081	1081	PDP Processing Rules	Core Conformance	STAY	2
+1082	1082	PDP Processing Rules	Core Conformance	STAY	1
+1083	1083	PDP Processing Rules	Core Conformance	STAY	2
+1084	1084	PDP Processing Rules	Core Conformance	STAY	1
+1085	1085	PDP Processing Rules	Core Conformance	STAY	1
+1086	1086	PDP Processing Rules	Core Conformance	STAY	1
+1092	1092	Access Request Service Processing Rules	Core Conformance	STAY	1
+1093	1093	Access Request Service Processing Rules	Core Conformance	STAY	1
+1094	1094	Access Request Service Processing Rules	Core Conformance	STAY	1
+1095	1095	Access Request Service Processing Rules	Core Conformance	STAY	2
+1096	1096	Access Request Service Processing Rules	Core Conformance	STAY	1
+1097	1097	Access Request Service Processing Rules	Core Conformance	STAY	1
+1098	1098	Access Request Service Processing Rules	Core Conformance	STAY	1
+1099	1099	Access Request Service Processing Rules	Core Conformance	STAY	1
+1100	1100	Access Request Service Processing Rules	Core Conformance	STAY	1
+1101	1101	Access Request Service Processing Rules	Core Conformance	STAY	1
+1102	1102	Access Request Service Processing Rules	Core Conformance	STAY	1
+1103	1103	Access Request Service Processing Rules	Core Conformance	STAY	1
+1104	1104	Access Request Service Processing Rules	Core Conformance	STAY	1
+1105	1105	Access Request Service Processing Rules	Core Conformance	STAY	1
+1109	1109	Authorization and Authentication	PDP Metadata, Endpoint Protection, and Interoperability Baseline	MOVED	2
+1111	1111	Authorization and Authentication	PDP Metadata, Endpoint Protection, and Interoperability Baseline	MOVED	2
+1115	1115	Authorization and Authentication	Checking the Task	STAY	1
+1117	1117	Authorization and Authentication	Checking the Task	STAY	1
+1119	1119	Authorization and Authentication	Checking the Task	STAY	1
+1125	1125	Authorization and Authentication	Delegation and Acting Parties	MOVED	2
+1130	1130	Authorization and Authentication	Delegation and Acting Parties	MOVED	1
+1131	1131	Authorization and Authentication	Delegation and Acting Parties	MOVED	2
+1133	1133	Authorization and Authentication	Submitting the Access Request	MOVED	3
+1135	1135	Authorization and Authentication	Submitting the Access Request	MOVED	2
+1137	1137	Authorization and Authentication	Delegation and Acting Parties	MOVED	1
+1139	1139	Authorization and Authentication	Delegation and Acting Parties	MOVED	1
+1143	1143	Privacy Considerations	Privacy Considerations	UNCHANGED	1
+1145	1145	Privacy Considerations	Privacy Considerations	UNCHANGED	2
+1147	1147	Privacy Considerations	Privacy Considerations	UNCHANGED	1
+1155	1155	Security Considerations	Introduction	MOVED	1
+1159	1159	Security Considerations	Approval and Re-evaluation	MOVED	2
+1163	1163	Security Considerations	Approval and Re-evaluation	MOVED	1
+1165	1165	Security Considerations	Approval and Re-evaluation	MOVED	2
+1169	1169	Security Considerations	Requestable Denial	MOVED	3
+1171	1171	Security Considerations	Requestable Denial	MOVED	1
+1174	1174	Security Considerations	Requestable Denial	MOVED	2
+1175	1175	Security Considerations	Requestable Denial	MOVED	1
+1176	1176	Security Considerations	Requestable Denial	MOVED	1
+1178	1178	Security Considerations	Requestable Denial	MOVED	1
+1179	1179	Security Considerations	Requestable Denial	MOVED	1
+1180	1180	Security Considerations	Requestable Denial	MOVED	2
+1181	1181	Security Considerations	Requestable Denial	MOVED	1
+1186	1186	Security Considerations	Denial Binding Alternatives	MOVED	1
+1188	1188	Security Considerations	Denial Binding Alternatives	MOVED	1
+1198	1198	Security Considerations	Submitting the Access Request	MOVED	5
+1200	1200	Security Considerations	Denial Binding Alternatives	MOVED	1
+1202	1202	Security Considerations	Denial Binding Alternatives	MOVED	1
+1204	1204	Security Considerations	PDP Metadata, Endpoint Protection, and Interoperability Baseline	MOVED	3
+1208	1208	Security Considerations	Approval and Re-evaluation	MOVED	2
+1214	1214	Security Considerations	Core Conformance	MOVED	1
+1218	1218	Security Considerations	Core Conformance	MOVED	2
+1222	1222	Security Considerations	Delegation and Acting Parties	MOVED	2
+1230	1230	Security Considerations	Requestable Denial	MOVED	3
+1234	1234	Security Considerations	Checking the Task	MOVED	2
+1244	1244	Security Considerations	Checking the Task	MOVED	1
+1252	1252	Security Considerations	Checking the Task	MOVED	2
+1258	1258	Security Considerations	Callback Completion	MOVED	3
+1262	1262	Security Considerations	Submitting the Access Request	MOVED	1
+1266	1266	Security Considerations	Submitting the Access Request	MOVED	1
+1270	1270	Security Considerations	Checking the Task	MOVED	2
+1378	1379	OpenID Foundation Registry Considerations	OpenID Foundation Registry Considerations	UNCHANGED	1
+1845	1845	Implementation Considerations	Implementation Considerations	UNCHANGED	1
+1859	1859	Implementation Considerations	Implementation Considerations	UNCHANGED	4
+1861	1861	Implementation Considerations	Implementation Considerations	UNCHANGED	2
+1904	1904	Design Rationale	Design Rationale	UNCHANGED	1
+1925	1925	Design Rationale	Design Rationale	UNCHANGED	1
+1929	1929	Design Rationale	Design Rationale	UNCHANGED	1
+
+# Keyword-occurrence totals (Appendix X, script 3): old and new by top-level section. The abstract contributes 1 to (front matter); the counter script reports 408 because it starts at the first level-1 heading.
+section	old_total	new_total
+(front matter)	1	1
+Access Request Endpoint	91	0
+Access Request Service Processing Rules	15	0
+Approval and Re-evaluation	0	64
+Authorization and Authentication	19	0
+Bulk Submissions	0	18
+Callback Completion	16	21
+Cancellation	0	11
+Checking the Task	0	28
+Completion Semantics	58	0
+Core Conformance	0	53
+Delegation and Acting Parties	0	20
+Denial Binding Alternatives	0	4
+Design Rationale	3	3
+Discovery	9	0
+Error Responses	2	2
+Extensibility and Profiles	10	10
+Implementation Considerations	7	7
+Introduction	0	2
+Machine-Readable Forms	11	14
+OpenID Foundation Registry Considerations	1	1
+PDP Metadata, Endpoint Protection, and Interoperability Baseline	0	16
+PDP Processing Rules	13	0
+PEP Processing Rules	22	0
+Privacy Considerations	4	4
+Protocol Overview	2	0
+Requestable Denial	0	49
+Requestable Denial Context	36	0
+Security Considerations	53	0
+Submitting the Access Request	0	69
+Task Lifecycle Details	0	8
+Task Status Endpoint	32	0
+Terminology	4	4
+TOTAL	409	409
