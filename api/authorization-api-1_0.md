@@ -1394,24 +1394,24 @@ The following table provides an overview of the API endpoints defined in this bi
 
 ### JSON Serialization {#transport-https-json-serialization}
 
-This section specifies the serialization of the information model entities and API schemas defined in this document to the JSON format {{RFC8259}}. The top-level element of all request and response bodies MUST be a JSON object ({{Section 4 of RFC8259}}). Implementations SHOULD also adhere to the security recommendations in JSON Payload Considerations ({{security-json}}).
+This section specifies the serialization of the information model entities and API schemas defined in this document to the JSON format {{RFC8259}}. The top-level element of all request and response bodies MUST be a JSON object (Section 4 of {{RFC8259}}). Implementations SHOULD also adhere to the security recommendations in JSON Payload Considerations ({{security-json}}).
 
 The data types defined in this specification are mapped to JSON types as follows:
 
 Object:
-: Represented as a JSON object ({{Section 4 of RFC8259}}). The values of its members can be any valid JSON value as defined in {{Section 3 of RFC8259}}, including other objects and arrays, unless specified otherwise.
+: Represented as a JSON object (Section 4 of {{RFC8259}}). The values of its members can be any valid JSON value as defined in Section 3 of {{RFC8259}}, including other objects and arrays, unless specified otherwise.
 
 Array:
-: Represented as a JSON array ({{Section 5 of RFC8259}}).
+: Represented as a JSON array (Section 5 of {{RFC8259}}).
 
 String:
-: Represented as a JSON string ({{Section 7 of RFC8259}}).
+: Represented as a JSON string (Section 7 of {{RFC8259}}).
 
 Integer:
-: Represented as a JSON number ({{Section 6 of RFC8259}}). Note the recommendation in {{security-json}} to not encode values that exceed IEEE 754 double-precision.
+: Represented as a JSON number (Section 6 of {{RFC8259}}). Note the recommendation in {{security-json}} to not encode values that exceed IEEE 754 double-precision.
 
 Boolean:
-: Represented as the JSON literals `true` or `false` ({{Section 3 of RFC8259}}).
+: Represented as the JSON literals `true` or `false` (Section 3 of {{RFC8259}}).
 
 If a required attribute in the information model is omitted, the server MUST return a "Bad Request" error, as defined in {{error-responses}}.
 
