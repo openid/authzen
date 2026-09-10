@@ -470,7 +470,7 @@ The Access Evaluation API Request builds on the information model presented in {
 
 To send multiple access evaluation requests in a single message, the PEP MAY add an `evaluations` key to the request. The `evaluations` key is an array which contains a list of objects, each typed as the object as defined in the Access Evaluation Request ({{access-evaluation-request}}), and specifying a discrete request.
 
-If an `evaluations` array is NOT present or is empty, the Access Evaluations Request behaves in a backwards-compatible manner with the (single) Access Evaluation API Request ({{access-evaluation-request}}).
+If an `evaluations` array is NOT present or is empty, the Access Evaluations Request behaves in a backwards-compatible manner with the (single) Access Evaluation API Request ({{access-evaluation-request}}), and the PDP responds with an Access Evaluation Response ({{access-evaluation-response}}) rather than an Access Evaluations Response ({{access-evaluations-response}}).
 
 If an `evaluations` array IS present and contains one or more objects, these form distinct requests that the PDP will evaluate. These requests are independent from each other, and may be executed sequentially or in parallel, left to the discretion of each implementation.
 
