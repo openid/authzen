@@ -56,6 +56,7 @@ normative:
     date: 2014
 informative:
   RFC8259:
+  RFC9396:
   XACML:
     title: "eXtensible Access Control Markup Language (XACML) Version 3.0"
     target: http://docs.oasis-open.org/xacml/3.0/xacml-3.0-core-spec-os-en.html
@@ -104,6 +105,7 @@ Common examples include:
 - **Multi-Factor Authentication / Trust Elevation**: redirecting a user to an additional authentication step after an initial decision (e.g., requiring a higher assurance authentication method).
 - **Data Transformation**: watermarking a document before it is returned to a user, or masking PII or other sensitive attributes in fetched data.
 - **Requesting Human Approval**: for human-in-the-loop use cases, where a human must approve an action or an access request before it is considered final.
+- **Constrained Approval**: approving an action or request only subject to a restriction the PEP must enforce on the result (e.g., approving a funds transfer only up to a maximum amount, or approving a query only when a further filter is applied to the returned records).
 
 These requirements are commonly grouped under the term "obligations" in prior authorization standards such as {{XACML}}. This specification, the AuthZEN Obligations Profile, defines an analogous, but AuthZEN-native, mechanism. It is designed to be backward compatible with implementations of the base AuthZEN specification that are unaware of this profile: obligations are carried exclusively inside the existing, open-ended `context` member of an AuthZEN response, and PDPs that do not implement this profile simply never populate that member with obligations.
 
@@ -343,6 +345,43 @@ The following is a non-normative example of a `session_termination` obligation:
 ~~~
 {: #fig-obligation-session-termination title="Non-normative example of a session_termination obligation"}
 
+## filter {#obligation-filter}
+
+The `filter` obligation requires the PEP to apply an implementation-defined filter, constraint, or restriction to any result it returns to the client as a consequence of the decision, before that result is returned or the associated action is allowed to proceed. Unlike Obligation Types that trigger a discrete side effect (e.g., `notification`, `session_termination`), a `filter` Obligation constrains the substance of what the PEP itself returns or subsequently permits.
+
+The syntax and semantics of the filter's content are left entirely to the discretion of the implementer. A `filter` Obligation is interoperable only between a PDP and a PEP that have separately agreed, out-of-band, on how to interpret the `filter` member's content -- for example, a shared field-masking language, a query-constraint DSL, or a constraint object modeled on OAuth 2.0 Rich Authorization Requests {{RFC9396}} `authorization_details`. This specification places no requirement on that content beyond it being a JSON value.
+
+Obligation-specific members:
+
+filter:
+
+: REQUIRED. A JSON value (object, array, string, number, or boolean) carrying the filter, constraint, or restriction the PEP MUST apply. Its internal structure is opaque to this specification and MUST be agreed upon bilaterally between the PDP and PEP.
+
+### filter on PERMIT Decisions
+
+When a `filter` Obligation accompanies `"decision": true`, the PDP is signaling that the requested access, or action, is approved *only* subject to enforcement of the filter. Per {{obligation-object}} through {{non-compliance}}: if the PEP is able to apply the filter, it MUST do so to every result it returns as a consequence of the decision, and honors the decision as thereby filtered; if the PEP cannot apply the filter (e.g., it does not understand the filter's syntax, or the filter is malformed), it MUST treat the response as a DENY, per {{non-compliance}}.
+
+### filter on DENY Decisions {#obligation-filter-deny}
+
+A `filter` Obligation attached to a `"decision": false` response has no defined meaning under this specification: a DENY, by definition, means the PEP returns no result to the client for the filter to operate on, outside of the Search case addressed below. This specification does not define the combination of a `filter` Obligation with `"decision": false` for non-Search requests, and considers it an unsupported combination. A PDP MUST NOT issue a `filter` Obligation alongside `"decision": false` in a non-Search request. A PEP that nonetheless receives this combination MUST still enforce the DENY, and MAY ignore the `filter` Obligation's content, since there is no returned result for it to act on and the outcome is unaffected either way.
+
+For Search-shaped requests, a `filter` Obligation attached to an individual result carries the same meaning as a `filter` Obligation on a PERMIT decision, since every result returned by a Search is implicitly permitted (see {{search-requests}}): the PEP MUST apply the filter to that result before including it in the response; if it cannot, it MUST instead exclude that result from the result set, per {{search-requests}}.
+
+The following is a non-normative example of a `filter` obligation attached to a PERMIT decision, requiring the PEP to redact a set of fields before returning a record:
+
+~~~ json
+{
+  "type": "filter",
+  "id": "obl-5",
+  "properties": {
+    "filter": {
+      "redact_fields": ["ssn", "date_of_birth"]
+    }
+  }
+}
+~~~
+{: #fig-obligation-filter title="Non-normative example of a filter obligation"}
+
 ## custom {#obligation-custom}
 
 The `custom` Obligation Type allows a PDP and a tightly-coupled PEP to exchange Obligation instances whose semantics are agreed bilaterally and are out of scope of this specification. A `custom` Obligation MAY carry any additional members beyond `type` and `id`.
@@ -378,6 +417,7 @@ The following is a non-normative example of a metadata fragment:
     "step-up",
     "notification",
     "session_termination",
+    "filter",
     "custom"
   ]
 }
@@ -440,6 +480,40 @@ The following is a non-normative example of an AuthZEN response granting access 
 }
 ~~~
 {: #fig-example-grant-transform title="PERMIT response with a data transformation obligation"}
+
+## Example: PERMIT with a Filter Obligation (Constrained Approval)
+
+The following is a non-normative example of an AuthZEN response approving a funds-transfer request, but constraining the transaction to a maximum amount lower than what the client requested. The `filter` Obligation's content is modeled on an OAuth 2.0 Rich Authorization Requests {{RFC9396}} `authorization_details` object; the PEP MUST enforce this constraint on the transaction before it is executed:
+
+~~~ json
+{
+  "decision": true,
+  "context": {
+    "obligations": [
+      {
+        "type": "filter",
+        "id": "obl-6",
+        "properties": {
+          "filter": {
+            "authorization_details": [
+              {
+                "type": "payment_initiation",
+                "instructedAmount": {
+                  "currency": "USD",
+                  "amount": "500.00"
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
+~~~
+{: #fig-example-filter-rar title="PERMIT response constraining a payment via a filter obligation"}
+
+A PEP that cannot enforce an `instructedAmount` cap on the underlying payment operation cannot comply with this Obligation, and per {{non-compliance}} MUST treat the response as a DENY rather than executing the transfer at the originally requested, unconstrained amount. As discussed in {{obligation-filter-deny}}, this Obligation Type has no defined meaning when paired with `"decision": false` outside of Search requests, since a DENY implies no transaction is executed for the filter to constrain.
 
 ## Example: DENY with a Step-Up Obligation
 
@@ -518,7 +592,8 @@ A PEP unable to perform a notification mid-Search MUST return `doc-1` and `doc-3
   "supported_obligations": [
     "step-up",
     "notification",
-    "session_termination"
+    "session_termination",
+    "filter"
   ]
 }
 ~~~
@@ -543,6 +618,8 @@ A PEP unable to perform a notification mid-Search MUST return `doc-1` and `doc-3
 Obligations that are silently dropped or only partially executed by a non-conformant PEP can create a false sense of enforcement (e.g., an access is granted, and appears in the PDP's policy audit as having been logged or watermarked, while the PEP in fact failed to do so). Implementers of PDPs that rely on Obligations for critical controls (accountability logging, step-up authentication, or data transformation) SHOULD, where possible, independently verify or audit PEP compliance out-of-band, rather than relying solely on the PEP's self-reported behavior, since this profile has no built-in mechanism for a PEP to attest, within the AuthZEN protocol itself, that an Obligation was in fact executed.
 
 A malicious or compromised PDP could attempt to abuse the `notification` Obligation Type to cause a PEP to relay attacker-controlled content to an arbitrary destination (e.g., using the PEP's trusted mail relay to send spam or phishing content). PEPs SHOULD treat `to` and `body` values in `notification` Obligations as untrusted input, and SHOULD apply the same validation, rate-limiting, and content-safety controls they would apply to any other externally influenced message-sending operation.
+
+Because the content of a `filter` Obligation is opaque to this specification and its syntax is agreed bilaterally between a PDP and a PEP, neither this specification nor a generic PEP implementation can independently verify that a given filter is well-formed or that the PEP's enforcement of it faithfully reflects the PDP's intent (e.g., a payment-constraining filter that is misapplied, or silently dropped by a non-conformant PEP, could result in a transaction proceeding at an unintended, unconstrained amount). Implementers using `filter` Obligations for high-stakes constraints SHOULD apply the same out-of-band verification and auditing recommendations given earlier in this section, and SHOULD ensure the filter syntax they agree upon is unambiguous and fails closed (i.e., an unparseable or partially-understood filter is treated as non-compliance per {{non-compliance}}, rather than silently ignored).
 
 The negotiation mechanism of {{negotiation}} is advisory only. A PEP MUST NOT assume that declaring `supported_obligations` in a request guarantees the PDP will avoid issuing an unsupported Obligation Type; the PDP retains discretion per {{negotiation}}, and the PEP MUST still be prepared to apply the compliance rules of {{non-compliance}} to any response it receives, including one containing Obligation Types it did not declare support for.
 
@@ -572,6 +649,7 @@ This specification requests the following initial registrations:
 | step-up | Requires the PEP to force the subject through additional authentication to reach a specified ACR. | {{obligation-step-up}} |
 | notification | Requires the PEP to transmit a message to a destination. | {{obligation-notification}} |
 | session_termination | Requires the PEP to terminate all sessions of a subject. | {{obligation-session-termination}} |
+| filter | Requires the PEP to apply an implementation-defined filter or constraint to any result it returns. | {{obligation-filter}} |
 | custom | Reserved for bilaterally agreed obligations outside this specification's scope. | {{obligation-custom}} |
 {: #tab-iana-registrations title="Initial AuthZEN Obligation Types registrations"}
 
