@@ -38,10 +38,10 @@
   "devDependencies": {
     "@types/cli-color": "^2.0.6",
     "@types/express": "^5.0.6",
-    "@types/node": "^26.4.1",
+    "@types/node": "^26.5.1",
     "@types/sqlite3": "^5.1.0",
-    "@typescript-eslint/eslint-plugin": "^8.69.0",
-    "@typescript-eslint/parser": "^8.69.0",
+    "@typescript-eslint/eslint-plugin": "^8.70.0",
+    "@typescript-eslint/parser": "^8.70.0",
     "eslint": "^10.10.0",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
