@@ -9,14 +9,14 @@
     "buffer": "^6.0.3",
     "js-base64": "^3.9.3",
     "oidc-react": "^4.0.1",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "react-select": "^5.10.2",
     "react-toastify": "^11.1.0",
     "todomvc-app-css": "^2.4.2",
     "typescript": "^7.0.2",
     "uuidv4": "^6.2.12",
-    "vite": "^8.2.2",
+    "vite": "^8.3.0",
     "vite-plugin-svgr": "^5.2.0",
     "vite-tsconfig-paths": "^6.1.1"
   },
@@ -39,9 +39,9 @@
   },
   "packageManager": "yarn@1.22.19",
   "devDependencies": {
-    "@types/node": "^26.4.1",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.7",
+    "@types/node": "^26.5.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react-swc": "^4.3.3"
   }
 }
