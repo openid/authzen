@@ -76,7 +76,7 @@ A PDP MAY certify at one or more of the following levels. Each level has sub-lev
 | **Basic** | Core | Access Evaluation | Single decision using required fields only |
 | **Basic** | Properties | Access Evaluation | Single decision using entity properties |
 | **Batch** | Core | Access Evaluations | Multiple decisions using required fields only |
-| **Batch** | Properties | Access Evaluations | Multiple decisions using entity properties and default value merging |
+| **Batch** | Properties | Access Evaluations | Multiple decisions using entity properties and default value inheritance |
 | **Search** | Core | Subject, Resource, Action Search | Discovery using required fields only |
 | **Search** | Properties | Subject, Resource, Action Search | Discovery using entity properties |
 | **Discovery** | — | PDP Metadata | Well-known configuration endpoint |
