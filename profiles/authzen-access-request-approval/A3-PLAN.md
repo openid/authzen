@@ -24,4 +24,4 @@ Build clean; all cross-references resolve; `git diff --check` clean; plan counte
 
 ## Not done here
 
-The G20 force question and Context naming, G21, G22, and everything in register Part A. The companion-split proposal is a separate document, `COMPANION-SPLIT-PROPOSAL.md`, for the working group.
+The G20 force question and Context naming, G21, G22, and everything in register Part A. The profile-family proposal is a separate document, `PROFILE-FAMILY-PROPOSAL.md` (version 2, superseding the companion-split proposal after the feedback on issue #520), for the working group.

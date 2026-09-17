@@ -207,7 +207,7 @@ Filing the register as working-group issues is deferred by the editor's decision
 | G13, G17 | C | none | not filed |
 | G15, G14, G20 remainder, G22 | B | G15: Examples | not filed |
 
-Six editor's notes in the specification cite this file by name. They cannot ship; when the issues are filed, each note is replaced by an issue reference or removed.
+`PROFILE-FAMILY-PROPOSAL.md` proposes a layered family with a colocated core; if adopted, entries G1, G2, G4, G9, G10, and the stateless case of G3 move with the Distributed Deployment profile, G14 with Forms, G12 with Bulk, and G18 with Callbacks. Six editor's notes in the specification cite this file by name. They cannot ship; when the issues are filed, each note is replaced by an issue reference or removed.
 
 ## Appendix. Candidate designs recorded during review
 
