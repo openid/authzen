@@ -1,0 +1,233 @@
+{
+  "title": "AuthZEN Access Request Approval binding_hash conformance vectors",
+  "specification": "../authzen-access-request-approval-profile-1_0.md#binding-token-integrity",
+  "canonicalization": "RFC 8785 JSON Canonicalization Scheme (JCS)",
+  "digest": "SHA-256",
+  "encoding": "base64url without padding",
+  "vectors": [
+    {
+      "id": "single-basic",
+      "description": "Single-item baseline; excludes subject.properties.act and selects only the authorization-relevant tenant context member.",
+      "kind": "single",
+      "binding_context_members": ["tenant"],
+      "request": {
+        "subject": {
+          "type": "user",
+          "id": "alice@example.com",
+          "properties": {
+            "department": "engineering",
+            "act": { "sub": "delegating-client" }
+          }
+        },
+        "resource": {
+          "type": "document",
+          "id": "quarterly-plan",
+          "properties": { "classification": "internal" }
+        },
+        "action": { "name": "read" },
+        "context": {
+          "tenant": "acme",
+          "time": "2026-07-13T10:00:00Z",
+          "evaluation_id": "eval-123"
+        }
+      },
+      "hash_input": {
+        "subject": {
+          "type": "user",
+          "id": "alice@example.com",
+          "properties": { "department": "engineering" }
+        },
+        "resource": {
+          "type": "document",
+          "id": "quarterly-plan",
+          "properties": { "classification": "internal" }
+        },
+        "action": { "name": "read" },
+        "context": { "tenant": "acme" }
+      },
+      "jcs": "{\"action\":{\"name\":\"read\"},\"context\":{\"tenant\":\"acme\"},\"resource\":{\"id\":\"quarterly-plan\",\"properties\":{\"classification\":\"internal\"},\"type\":\"document\"},\"subject\":{\"id\":\"alice@example.com\",\"properties\":{\"department\":\"engineering\"},\"type\":\"user\"}}",
+      "sha256_hex": "974ba013696ea4397354213e4711fbfef9e98af0c3919e7ce5558c0741c937f7",
+      "binding_hash": "l0ugE2lupDlzVCE-RxH7_vnpivDDkZ585VWMB0HJN_c"
+    },
+    {
+      "id": "single-empty-context",
+      "description": "An empty binding_context_members array binds Subject, Resource, and Action with an empty context object.",
+      "kind": "single",
+      "binding_context_members": [],
+      "request": {
+        "subject": { "type": "service", "id": "reporting-agent" },
+        "resource": { "type": "report", "id": "sales-2026" },
+        "action": { "name": "generate" },
+        "context": {
+          "time": "2026-07-13T10:00:00Z",
+          "reason": "quarterly reporting"
+        }
+      },
+      "hash_input": {
+        "subject": { "type": "service", "id": "reporting-agent" },
+        "resource": { "type": "report", "id": "sales-2026" },
+        "action": { "name": "generate" },
+        "context": {}
+      },
+      "jcs": "{\"action\":{\"name\":\"generate\"},\"context\":{},\"resource\":{\"id\":\"sales-2026\",\"type\":\"report\"},\"subject\":{\"id\":\"reporting-agent\",\"type\":\"service\"}}",
+      "sha256_hex": "c051460ea7999778840f3f52eb0bc5a95c098018301c709efea6ace8ec588ed5",
+      "binding_hash": "wFFGDqeZl3iEDz9S6wvFqVwJgBgwHHCe_qas6OxYjtU"
+    },
+    {
+      "id": "single-context-member-absent",
+      "description": "A selected context member that is absent remains absent from the projected context.",
+      "kind": "single",
+      "binding_context_members": ["risk"],
+      "request": {
+        "subject": { "type": "user", "id": "bob@example.com" },
+        "resource": { "type": "account", "id": "A-123" },
+        "action": { "name": "transfer" },
+        "context": { "tenant": "acme" }
+      },
+      "hash_input": {
+        "subject": { "type": "user", "id": "bob@example.com" },
+        "resource": { "type": "account", "id": "A-123" },
+        "action": { "name": "transfer" },
+        "context": {}
+      },
+      "jcs": "{\"action\":{\"name\":\"transfer\"},\"context\":{},\"resource\":{\"id\":\"A-123\",\"type\":\"account\"},\"subject\":{\"id\":\"bob@example.com\",\"type\":\"user\"}}",
+      "sha256_hex": "95fd2fd8a2b287c341127d75591c6a2aa12c7292b2b0489c009f03d9159e9735",
+      "binding_hash": "lf0v2KKyh8NBEn11WRxqKqEscpKysEicAJ8D2RWelzU"
+    },
+    {
+      "id": "single-context-member-null",
+      "description": "A selected context member present as null is retained and hashes differently from the absent form.",
+      "kind": "single",
+      "binding_context_members": ["risk"],
+      "request": {
+        "subject": { "type": "user", "id": "bob@example.com" },
+        "resource": { "type": "account", "id": "A-123" },
+        "action": { "name": "transfer" },
+        "context": { "tenant": "acme", "risk": null }
+      },
+      "hash_input": {
+        "subject": { "type": "user", "id": "bob@example.com" },
+        "resource": { "type": "account", "id": "A-123" },
+        "action": { "name": "transfer" },
+        "context": { "risk": null }
+      },
+      "jcs": "{\"action\":{\"name\":\"transfer\"},\"context\":{\"risk\":null},\"resource\":{\"id\":\"A-123\",\"type\":\"account\"},\"subject\":{\"id\":\"bob@example.com\",\"type\":\"user\"}}",
+      "sha256_hex": "661201831fc5a14b694440baf9841de66abde83e5bff6e9566aa1b344f810cf6",
+      "binding_hash": "ZhIBgx_FoUtpREC6-YQd5mq96D5b_26VZqobNE-BDPY"
+    },
+    {
+      "id": "single-number-canonicalization",
+      "description": "JCS number serialization normalizes exponent form, trailing zeroes, negative zero, and IEEE-754 rounding.",
+      "kind": "single",
+      "binding_context_members": ["metrics"],
+      "request": {
+        "subject": { "type": "user", "id": "carol@example.com" },
+        "resource": { "type": "model", "id": "forecast-v2" },
+        "action": { "name": "invoke" },
+        "context": {
+          "metrics": {
+            "large": 1E30,
+            "small": 2e-3,
+            "negative_zero": -0,
+            "rounded": 333333333.33333329,
+            "trailing_zero": 4.50
+          }
+        }
+      },
+      "hash_input": {
+        "subject": { "type": "user", "id": "carol@example.com" },
+        "resource": { "type": "model", "id": "forecast-v2" },
+        "action": { "name": "invoke" },
+        "context": {
+          "metrics": {
+            "large": 1e+30,
+            "small": 0.002,
+            "negative_zero": -0,
+            "rounded": 333333333.3333333,
+            "trailing_zero": 4.5
+          }
+        }
+      },
+      "jcs": "{\"action\":{\"name\":\"invoke\"},\"context\":{\"metrics\":{\"large\":1e+30,\"negative_zero\":0,\"rounded\":333333333.3333333,\"small\":0.002,\"trailing_zero\":4.5}},\"resource\":{\"id\":\"forecast-v2\",\"type\":\"model\"},\"subject\":{\"id\":\"carol@example.com\",\"type\":\"user\"}}",
+      "sha256_hex": "2e34dcbf799454dbc39a298318ae33e876c38b487bd49055ccd579d10634aff7",
+      "binding_hash": "LjTcv3mUVNvDmimDGK4z6HbDi0h71JBVzNV50QY0r_c"
+    },
+    {
+      "id": "single-array-order",
+      "description": "Array element order, including a null element, is preserved inside authorization-relevant context.",
+      "kind": "single",
+      "binding_context_members": ["approval_chain"],
+      "request": {
+        "subject": { "type": "user", "id": "dana@example.com" },
+        "resource": { "type": "deployment", "id": "prod-eu" },
+        "action": { "name": "promote" },
+        "context": {
+          "approval_chain": ["security", null, "operations"]
+        }
+      },
+      "hash_input": {
+        "subject": { "type": "user", "id": "dana@example.com" },
+        "resource": { "type": "deployment", "id": "prod-eu" },
+        "action": { "name": "promote" },
+        "context": {
+          "approval_chain": ["security", null, "operations"]
+        }
+      },
+      "jcs": "{\"action\":{\"name\":\"promote\"},\"context\":{\"approval_chain\":[\"security\",null,\"operations\"]},\"resource\":{\"id\":\"prod-eu\",\"type\":\"deployment\"},\"subject\":{\"id\":\"dana@example.com\",\"type\":\"user\"}}",
+      "sha256_hex": "ffa07ea81e8ffa6c9d2310fc281e95a49f81f9c943702f1e18bb643c30b0d72b",
+      "binding_hash": "_6B-qB6P-mydIxD8KB6VpJ-B-clDcC8eGLtkPDCw1ys"
+    },
+    {
+      "id": "bulk-item-order",
+      "description": "Bulk binding preserves the bound item order while projecting each item to resource and action.",
+      "kind": "bulk",
+      "binding_context_members": ["tenant", "region"],
+      "request": {
+        "subject": {
+          "type": "service",
+          "id": "deployment-agent",
+          "properties": {
+            "act": { "sub": "release-manager" },
+            "environment": "production"
+          }
+        },
+        "items": [
+          {
+            "resource": { "type": "service", "id": "api" },
+            "action": { "name": "deploy", "properties": { "version": "2.1.0" } }
+          },
+          {
+            "resource": { "type": "database", "id": "primary" },
+            "action": { "name": "migrate", "properties": { "revision": 42 } }
+          }
+        ],
+        "context": {
+          "region": "eu-west-1",
+          "tenant": "acme",
+          "time": "2026-07-13T10:00:00Z"
+        }
+      },
+      "hash_input": {
+        "subject": {
+          "type": "service",
+          "id": "deployment-agent",
+          "properties": { "environment": "production" }
+        },
+        "items": [
+          {
+            "resource": { "type": "service", "id": "api" },
+            "action": { "name": "deploy", "properties": { "version": "2.1.0" } }
+          },
+          {
+            "resource": { "type": "database", "id": "primary" },
+            "action": { "name": "migrate", "properties": { "revision": 42 } }
+          }
+        ],
+        "context": { "tenant": "acme", "region": "eu-west-1" }
+      },
+      "jcs": "{\"context\":{\"region\":\"eu-west-1\",\"tenant\":\"acme\"},\"items\":[{\"action\":{\"name\":\"deploy\",\"properties\":{\"version\":\"2.1.0\"}},\"resource\":{\"id\":\"api\",\"type\":\"service\"}},{\"action\":{\"name\":\"migrate\",\"properties\":{\"revision\":42}},\"resource\":{\"id\":\"primary\",\"type\":\"database\"}}],\"subject\":{\"id\":\"deployment-agent\",\"properties\":{\"environment\":\"production\"},\"type\":\"service\"}}",
+      "sha256_hex": "9adaa09631f41d0aa2758f2fce98ba12a32321b0f137c3df957a842043895982",
+      "binding_hash": "mtqgljH0HQqidY8vzpi6EqMjIbDxN8PflXqEIEOJWYI"
+    }
+  ]
+}
