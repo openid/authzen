@@ -1,6 +1,6 @@
 # Gaps Register: AuthZEN Access Request and Approval Profile
 
-Version 9. Status: register for the working group. This is not a design.
+Version 10. Status: register for the working group. This is not a design. Version 10 records that PR A3 (branch `arap-restructure-a3`) folded the duplicate applicability check named in G20, and adds a tracking list under Coordination for the issues to be filed; no entry is resolved.
 
 The register is organized in three parts. Part A lists protocol contracts that two independently implemented parties cannot complete from the current text and that need a working-group decision. Part B lists editorial and example corrections: the protocol is defined, but the text can be read wrongly or the examples do not follow it. Part C lists optional capabilities: behaviors the profile does not provide and could, without anything currently defined being broken. Entry numbers are stable identifiers from earlier versions and are not renumbered when an entry moves between parts.
 
@@ -164,7 +164,7 @@ Version 9, from the end-to-end review of the A2 wording pass: G10 gains the thre
 
 **Evidence.** The completion section and the material relocated beside it from the old Security Considerations state binding obligations six times. Three are complementary obligations on different operations and are not defects: 1099 binds the task at submission (Access Request Service: "Subject, Resource, Action, Context, denial, requester, and client"), 1159 binds requests and results generally (implementations: "Subject, Resource, Action, Context, task, and requester"), and 811 binds the approval at re-evaluation (PDP). Their differing member lists follow from their different purposes; the identity question they share, who "requester", "client", and "caller" are, stays under G6. Two are the same operation: 813 (the PDP MUST verify the reference "is applicable to the authenticated caller or requester, current Subject, Resource, Action, relevant Context, approval scope, and approval expiry") and 1163 (PDPs MUST "confirm that it is bound to" the same list "before using it as an input to an allow decision") restate one check; the A2 wording pass left both because the trailing condition at 1163 makes them not identical. One differs in force for the same operation: 811 makes the PDP's binding of the approval to the tuple a MUST, while 1208 says "Re-evaluation Mode SHOULD bind approval references to the original request tuple". Across all six, the bound Context is called "Context", "relevant Context", and "authorization-relevant Context", although the Terminology entry (148) defines only the last.
 
-**Correction.** Decide whether 1208's SHOULD is intended alongside 811's MUST. Fold 813 and 1163 into one statement, keeping the 1163 condition. Use the Terminology name for the bound Context wherever it is meant. The complementary obligations at 1099, 1159, and 811 stay as they are. The force decision needs working-group visibility; the other two are editorial.
+**Correction.** Decide whether 1208's SHOULD is intended alongside 811's MUST. The fold of 813 and 1163 into one statement, keeping the 1163 condition, was applied in PR A3 (see `A3-PLAN.md`, item 1); the rest of this entry remains open. Use the Terminology name for the bound Context wherever it is meant. The complementary obligations at 1099, 1159, and 811 stay as they are. The force decision needs working-group visibility; the other two are editorial.
 
 ### G22. Audit correlation by `evaluation_id` alone is ambiguous after reuse
 
@@ -190,6 +190,24 @@ Version 9, from the end-to-end review of the A2 wording pass: G10 gains the thre
 
 - **Order, by cost to fix and by dependency, not by severity.** (1) Part B corrections G8, G7, G12, G19: editorial, no design. (2) G6 with its acting-party test case, before any binding rule. (3) G1, G2, G4, and G10's force question as one conversation about what an independent Access Request Service can verify and how the claim list's force is expressed; a negotiation mechanism such as a capability URN belongs here. (4) G9. (5) G5 as an issue; the candidate design in the appendix is input, not a proposal. (6) G3. (7) G11, G18, and G10's error precedence as short individual issues. (8) Part C, if the working group wants either capability. (9) G15 after (3) and (4) settle; G14's guidance whenever convenient.
 - **The Access Request OAuth Profile** deploys the PEP and PDP roles in more than one place (its line 125): the authorization server may evaluate and defer its own token request, a protected resource may assert the denial as a signed challenge, or both may act as PEP. Its mapping (line 639 onward) consumes the `approval` object at `context.approval` as input to the issuance-time re-evaluation, binds `binding_token` and `evaluation_id` in issuer state without exposing them to the client, and uses `approved_until` as the bound on token lifetime. Resolutions of G2, G3, G6, G8, G9, and G11 must be checked against all three placements.
+
+## Tracking
+
+Filing the register as working-group issues is deferred by the editor's decision of 2026-09-17; this list tracks what will be filed, in the order above, so nothing is lost meanwhile. Status for every entry: not filed.
+
+| Entry | Part | Editor's note in the text | Status |
+|---|---|---|---|
+| G8, G7, G12, G19 | B | G8: Terminology entry Authorization-Relevant Context | not filed |
+| G6 with G16 | A | Approval and Re-evaluation, after the approval record rule; Security Considerations, confused-deputy paragraph | not filed |
+| G1, G2, G4, G10 force | A | G4: PDP Metadata; G10: Verifying the Denial Binding | not filed |
+| G9 | A | Approval and Re-evaluation, after the approval record rule | not filed |
+| G5 | A | Verifying the Denial Binding | not filed |
+| G3 | A | Approval and Re-evaluation, after the approval record rule | not filed |
+| G11, G18, G10 precedence, G21 | A | none | not filed |
+| G13, G17 | C | none | not filed |
+| G15, G14, G20 remainder, G22 | B | G15: Examples | not filed |
+
+Six editor's notes in the specification cite this file by name. They cannot ship; when the issues are filed, each note is replaced by an issue reference or removed.
 
 ## Appendix. Candidate designs recorded during review
 
