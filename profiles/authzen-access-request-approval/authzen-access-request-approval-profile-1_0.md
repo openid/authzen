@@ -1968,6 +1968,8 @@ Content-Type: application/json
 
 # Motivation and Use Cases
 
+This appendix collects the motivation for the profile and the design goals it was written against.  It is non-normative; the scenarios illustrate the need the core sections address, and the design goals record what the profile set out to preserve.
+
 Modern systems increasingly require authorization decisions to evolve during ongoing execution due to delegation, dynamic resource discovery, scope expansion, and long-running agent activity:
 
 * An AI agent executing a multi-step task discovers, mid-execution, that it needs to read a document, query a record, or post to a channel that was not declared when the agent was deployed.  Each previously unseen resource produces a denial, and the same agent may produce many such denials over the course of a single task.
@@ -2114,6 +2116,10 @@ The base profile is opinionated about PDP-authoritative-at-enforcement (Re-evalu
 ## Why are catalog-backed form fields defined in a companion profile rather than in this specification?
 Resolving form fields from backing catalogs (applications, entitlements, roles, cost centers) requires its own document format, endpoint protocol, pagination, scoping, and authorization rules, and it matters only to deployments whose request schemas draw values from such catalogs.  Keeping that machinery in the AuthZEN Access Request Catalog Profile {{CATALOG}} lets this specification stay a thin wire format for requestable denials, submissions, task handles, and re-evaluation, and lets the catalog protocol evolve on its own cadence.  The `context.access_request` extension point ({{extensibility}}) is what allows the companion profile to add its `request_catalogs_url` member without a revision of this document.
 
+## Why does this document present signed denial binding and signed approval state first, and shared state as the alternative?
+
+The two signed artifacts are what let the PDP retain no decision state between the denial and the re-evaluation, and what let the Access Request Service be operated independently of the PDP.  They are the mechanism an implementer has to understand to build either role for a deployment they do not fully control.  Where trusted shared or delegated state is available, deployments can use the corresponding by-reference alternatives, separately or together with the signed forms.  Those alternatives depend on state-access arrangements that independently implemented roles cannot assume.  Presenting the signed form first teaches the trust model once, in the core sections, and lets a deployment that shares state read the by-reference alternatives as substitutions rather than as a second protocol.
+
 # Acknowledgements
 
 The author thanks the OpenID AuthZEN Working Group for discussion and review.
@@ -2123,3 +2129,8 @@ The author thanks the OpenID AuthZEN Working Group for discussion and review.
 -00
 
 * Initial version (draft-mcguinness-authzen-access-request)
+
+-01
+
+* Editorial restructure.  The core protocol (requestable denial, submission, task status, approval and re-evaluation) is presented first, with signed denial binding and signed approval state as the primary mechanisms; shared-state alternatives and optional features (bulk submissions, callbacks, cancellation, delegation and acting parties, machine-readable forms) follow in their own sections; security considerations name threats and point to the rules that sit beside the mechanisms they protect.  Requirements were relocated and restated without change in force, and duplicated restatements were consolidated.
+* Catalog references moved to the companion AuthZEN Access Request Catalog Profile.
