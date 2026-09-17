@@ -946,7 +946,7 @@ The `page` object in a Search API Request consists of the following keys:
 
 Apart from the `token`, all values from the initial request MUST remain identical for subsequent pages. If a different value is provided mid-pagination the PDP SHOULD return an error.
 
-Additional keys MAY be included in the `page` object. If they are, they MUST be defined in a specification referenced in the AuthZEN Policy Decision Point Capabilities Registry ({{iana-pdp-capabilities-registry}}). Furthermore, the PDP MUST declare support for the corresponding capability URN in its `supported_capabilities` metadata ({{pdp-metadata-data-capabilities}}).
+Additional keys MAY be included in the `page` object. If they are, they MUST be defined in a specification referenced in the AuthZEN Policy Decision Point Capabilities Registry ({{iana-pdp-capabilities-registry}}). Furthermore, the PDP MUST declare support for the corresponding capability URN in its `capabilities` metadata ({{pdp-metadata-data-capabilities}}).
 
 ### Paginated Responses {#search-pagination-response}
 
@@ -1379,7 +1379,7 @@ Requests MUST include a `Content-Type` header with the value `application/json`,
 
 A successful response is an HTTPS response with a status code of `200` and a `Content-Type` of `application/json`. Its body is a JSON object that conforms to the corresponding response structure, as defined in {{table-api-endpoints}}.
 
-The request URL MUST be the value of the corresponding endpoint parameter, as defined in {{table-api-endpoints}}, if it is provided in the Policy Decision Point metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the default path, as defined in {{table-api-endpoints}}, to the PDP's base URL (which is the `policy_decision_point` value from the Policy Decision Point metadata, if available.
+The request URL MUST be the value of the corresponding endpoint parameter, as defined in {{table-api-endpoints}}, if it is provided in the Policy Decision Point metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the default path, as defined in {{table-api-endpoints}}, to the PDP's base URL (which is the `policy_decision_point` value from the Policy Decision Point metadata, if available).
 
 The following table provides an overview of the API endpoints defined in this binding:
 
