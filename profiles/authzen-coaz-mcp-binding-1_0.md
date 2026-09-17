@@ -223,6 +223,7 @@ the authorization decision:
   }
 }
 ~~~
+{: #fig-client-example-schema title="Input Schema for client usage of COAZ mapping"}
 
 Without the mapping, a client that has only the report name may omit `report_id`,
 causing the call to fail authorization because the PDP cannot resolve the resource.
@@ -251,6 +252,7 @@ before invoking the tool:
   }
 }
 ~~~
+{: #fig-client-example-mapping title="Client usage of COAZ Mapping"}
 
 The client can now provide `report_id` on the first attempt rather than discovering
 through a denial that the name alone is insufficient. This is purely an efficiency
