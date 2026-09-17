@@ -204,6 +204,59 @@ In both shapes, carrying the mapping in `tools/list` also makes it available to
 the MCP client, so that the client (or the LLM driving it) can understand how a
 call will be authorized and shape tool arguments appropriately.
 
+The following non-normative example illustrates this benefit. A `get_report` tool
+accepts two parameters — `report_name` (a human-readable label such as
+`"Q3 Financial Summary"`) and `report_id` (the canonical internal identifier) —
+and its `inputSchema` description alone does not indicate which parameter drives
+the authorization decision:
+
+~~~ json
+{
+  "name": "get_report",
+  "description": "Retrieve a financial report by name or ID",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "report_name": { "type": "string", "description": "Human-readable report label" },
+      "report_id":   { "type": "string", "description": "Canonical report identifier" }
+    }
+  }
+}
+~~~
+
+Without the mapping, a client that has only the report name may omit `report_id`,
+causing the call to fail authorization because the PDP cannot resolve the resource.
+With the declared mapping shown below, the client learns that `resource.id` is
+drawn from `report_id`, and therefore knows it must resolve and supply that value
+before invoking the tool:
+
+~~~ json
+{
+  "name": "get_report",
+  "description": "Retrieve a financial report by name or ID",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "report_name": { "type": "string", "description": "Human-readable report label" },
+      "report_id":   { "type": "string", "description": "Canonical report identifier" }
+    },
+    "x-authzen-mapping": {
+      "evaluation": {
+        "subject":  { "type": "identity", "id": "$token.sub" },
+        "action":   { "name": "get_report" },
+        "resource": { "type": "report", "id": "$params.arguments.report_id" },
+        "context":  { "agent": "$token.?client_id" }
+      }
+    }
+  }
+}
+~~~
+
+The client can now provide `report_id` on the first attempt rather than discovering
+through a denial that the name alone is insufficient. This is purely an efficiency
+gain: the PDP enforces the same policy regardless of whether the client has read
+the mapping, so no additional privilege is conferred by this knowledge.
+
 When an MCP message is processed, the PEP — the MCP gateway or the MCP server
 itself — selects the applicable mapping (declared, if present for the tool;
 otherwise the default mapping for the method), constructs the corresponding
