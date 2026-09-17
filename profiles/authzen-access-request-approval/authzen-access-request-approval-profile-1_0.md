@@ -223,13 +223,18 @@ Two further members of this object, `form_url` and `request_schema_url`, are def
 : OPTIONAL.  HTTPS URI.  The endpoint to which the PEP submits the access request.  If omitted, the PEP MUST use the `access_request_endpoint` from PDP metadata ({{discovery}}).
 
 `template`:
-: OPTIONAL.  String.  An opaque template identifier that can guide the Access Request Service.  Implementations typically map `template` to a stable identifier of the approval workflow, request schema, governance policy, or categorical source code that applies to this denial.  The value is not a policy language and MUST NOT be interpreted by the PEP except for display or request submission.
+: OPTIONAL.  String.  An opaque template identifier that can guide the Access Request Service.  The value is not a policy language and MUST NOT be interpreted by the PEP except for display or request submission.
 
 `expires_at`:
-: REQUIRED.  String containing an {{RFC3339}} timestamp.  Indicates when the requestable denial hint expires.  The PEP echoes this value as `denial.expires_at` when submitting the Access Request.  The Access Request Service MUST reject submissions received after this time, after applying any clock-skew tolerance it has configured (see {{impl-considerations}}).
+: REQUIRED.  String containing an {{RFC3339}} timestamp.  Indicates when the requestable denial hint expires.  The PEP echoes this value as `denial.expires_at` when submitting the Access Request.  Enforcement of this deadline is defined with the submitted `denial.expires_at` in {{access-request-submission}} and in the freshness rules at {{verifying-denial-binding}}.
 
 `binding_token`:
-: OPTIONAL in same-service or shared-state deployments, and REQUIRED when the Access Request Service is independent of the PDP (see the denial-binding forms in this section and in {{shared-state-deployments}}).  String.  Opaque context to be returned to the Access Request Service when submitting the access request.  The PEP MUST NOT decode, modify, or interpret this value.  The PEP returns it unchanged as `denial.binding_token` when submitting the Access Request ({{access-request-submission}}).  When present, the value MUST be integrity protected in a way the Access Request Service can verify, and SHOULD be a JSON Web Signature (JWS) {{RFC7515}} in compact serialization, signed by the PDP, with a payload (such as a JWT {{RFC7519}}) that the Access Request Service can verify and bind to the original denied evaluation.  JSON Web Encryption (JWE) {{RFC7516}} MAY be used in addition to integrity protection when the payload contains information that must not be visible to the PEP, for example by encrypting a signed payload.
+: OPTIONAL in same-service or shared-state deployments, and REQUIRED when the Access Request Service is independent of the PDP (see the denial-binding forms in this section and in {{shared-state-deployments}}).  String.  Opaque context to be returned to the Access Request Service when submitting the access request.
+
+  * The PEP MUST NOT decode, modify, or interpret this value.
+  * The PEP returns it unchanged as `denial.binding_token` when submitting the Access Request ({{access-request-submission}}).
+  * When present, the value MUST be integrity protected in a way the Access Request Service can verify, and SHOULD be a JSON Web Signature (JWS) {{RFC7515}} in compact serialization, signed by the PDP, with a payload (such as a JWT {{RFC7519}}) that the Access Request Service can verify and bind to the original denied evaluation.
+  * JSON Web Encryption (JWE) {{RFC7516}} MAY be used in addition to integrity protection when the payload contains information that must not be visible to the PEP, for example by encrypting a signed payload.
 
 `display`:
 : OPTIONAL.  Object.  Localizable user-interface hints such as title, description, or recommended call-to-action text.  The PEP MAY ignore this member.
@@ -339,7 +344,10 @@ The request body is a JSON object with the following members:
 : REQUIRED when `items` is absent; MUST be omitted when `items` is present.  The AuthZEN Action from the denied evaluation.
 
 `context`:
-: OPTIONAL.  The AuthZEN Context from the denied evaluation, augmented with submission-time fields such as business justification.  Submission-time augmentations MUST NOT change or remove authorization-relevant context from the denied evaluation.  When the Access Request Service needs to distinguish original evaluation context from submission-time input, deployments SHOULD place the latter in well-defined extension members rather than overwriting original context members.
+: OPTIONAL.  The AuthZEN Context from the denied evaluation, augmented with submission-time fields such as business justification.
+
+  * Submission-time augmentations MUST NOT change or remove authorization-relevant context from the denied evaluation.
+  * When the Access Request Service needs to distinguish original evaluation context from submission-time input, deployments SHOULD place the latter in well-defined extension members rather than overwriting original context members.
 
 `denial`:
 : Object binding the Access Request to the denied AuthZEN Decision.  REQUIRED in either of two cases:
@@ -371,7 +379,10 @@ The request body is a JSON object with the following members:
 The `denial` object has the following members.  Each field maps directly to a single member of the PDP's denied evaluation response; the `denial` object does not echo the full AuthZEN Decision because the binding material (`evaluation_id` and `binding_token`) provides stronger evidence of the denial than a verbatim JSON echo could.
 
 `evaluation_id`:
-: REQUIRED when `denial.binding_token` is absent; otherwise RECOMMENDED.  A stable identifier for the denied evaluation, captured by the PEP from `context.evaluation_id` in the AuthZEN Decision and echoed unchanged here ({{evaluation-identifier}}).  The Access Request Service MUST be able to resolve or validate `evaluation_id` before relying on it as denial-binding material.  `evaluation_id` provides the strongest audit binding between the original denial and the submitted Access Request and SHOULD be preferred over `evaluated_at` alone.
+: REQUIRED when `denial.binding_token` is absent; otherwise RECOMMENDED.  A stable identifier for the denied evaluation, captured by the PEP from `context.evaluation_id` in the AuthZEN Decision and echoed unchanged here ({{evaluation-identifier}}).
+
+  * The Access Request Service MUST be able to resolve or validate `evaluation_id` before relying on it as denial-binding material.
+  * `evaluation_id` provides the strongest audit binding between the original denial and the submitted Access Request and SHOULD be preferred over `evaluated_at` alone.
 
 `evaluated_at`:
 : OPTIONAL.  {{RFC3339}} timestamp indicating when the denial was produced, echoed from `context.evaluated_at` of the denied evaluation.
@@ -504,7 +515,9 @@ The `progress` member of this object is described in {{task-lifecycle-details}} 
 : REQUIRED.  Current task status.  Values are defined in {{task-status}}.
 
 `status_endpoint`:
-: REQUIRED.  HTTPS URI used to retrieve task status.  An intermediate enforcer (such as an OAuth Authorization Server or other gateway acting as PEP) MAY proxy or re-present this endpoint to its own callers; the value advertised to such callers MAY differ from the value the PEP itself uses, provided the proxied endpoint observes the authorization rules defined for the original endpoint.
+: REQUIRED.  HTTPS URI used to retrieve task status.
+
+  * An intermediate enforcer (such as an OAuth Authorization Server or other gateway acting as PEP) MAY proxy or re-present this endpoint to its own callers; the value advertised to such callers MAY differ from the value the PEP itself uses, provided the proxied endpoint observes the authorization rules defined for the original endpoint.
 
 `expires_at`:
 : OPTIONAL.  {{RFC3339}} timestamp after which the task handle is no longer valid.
@@ -648,7 +661,10 @@ The following task status values are defined:
 : The request could not be completed due to an error.
 
 `partial`:
-: All items in a bulk task ({{section-14-bulk}}) reached terminal status, but with mixed outcomes (for example, some items approved while others denied).  This status is only valid for tasks containing an `items` array.  A PEP receiving `partial` MUST consult `task.items[].status` to determine per-item outcomes and MUST NOT infer aggregate access permission.
+: All items in a bulk task ({{section-14-bulk}}) reached terminal status, but with mixed outcomes (for example, some items approved while others denied).  This status is only valid for tasks containing an `items` array.
+
+  * A PEP receiving `partial` MUST consult `task.items[].status` to determine per-item outcomes.
+  * A PEP receiving `partial` MUST NOT infer aggregate access permission.
 
 The `partial` status applies only to bulk submissions; see {{section-14-bulk}}.
 
@@ -2087,7 +2103,7 @@ In the bound-reference pattern a signed `approval.state` already carries the app
 Absolute RFC 3339 timestamps appear at every time-bounded value in the spec: `task.expires_at`, `approved_until`, `approved_at`, `evaluated_at`, `context.access_request.expires_at`, `denial.expires_at`, `requested_access.requested_until`.  Some specifications use relative durations (`expires_in`, OAuth-style) alongside absolute timestamps; this profile uses absolute timestamps throughout because two forms for the same concept create reconciliation logic at every consumer and a precedence rule at the wire.  Clock skew between hosts is addressed by tolerance guidance in {{impl-considerations}}.
 
 ## Why is `template` an opaque free-form string rather than a constrained enumeration?
-Workflow categorization is deployment-specific.  An IGA platform's workflow names, an ITSM ticket-class identifier, an AI-supervisor source code, and a custom governance system's policy identifier all play the same role.  Constraining `template` to an enumeration would either pick winners or grow indefinitely; leaving it opaque lets profiles register their own well-known values without revising the base.  The Overbroad Approval rule ({{overbroad-approval}}) ensures `template` is treated as routing input, not as authorization policy.
+Workflow categorization is deployment-specific.  An IGA platform's workflow names, an ITSM ticket-class identifier, an AI-supervisor source code, and a custom governance system's policy identifier all play the same role.  Constraining `template` to an enumeration would either pick winners or grow indefinitely; leaving it opaque lets profiles register their own well-known values without revising the base.  The Overbroad Approval rule ({{overbroad-approval}}) ensures `template` is treated as routing input, not as authorization policy.  Implementations typically map `template` to a stable identifier of the approval workflow, request schema, governance policy, or categorical source code that applies to this denial.
 
 ## Why does the spec deliberately not define a workflow engine, approval policy language, or user interface?
 These exist in many incompatible forms across IGA, ITSM, governance, chat-approval, and custom platforms.  Standardizing them in this profile would either pick a single vendor model or define a surface so broad it carries no semantic value.  The protocol layer between authorization enforcement and whatever workflow runs underneath is the interoperable seam; everything below it is implementation choice.  This positioning is what lets deployments adopt the profile alongside existing approval infrastructure without rewriting the workflow.
@@ -2107,6 +2123,3 @@ The author thanks the OpenID AuthZEN Working Group for discussion and review.
 -00
 
 * Initial version (draft-mcguinness-authzen-access-request)
-
-
-
