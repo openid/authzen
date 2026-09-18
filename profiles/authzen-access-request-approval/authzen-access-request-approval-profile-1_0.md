@@ -154,8 +154,6 @@ Authorization-Relevant Context:
 
     The rules that fix this set for a given evaluation are in {{structural-comparison}}.
 
-Editor's note: the membership of the machinery list above is the subject of PROTOCOL-GAPS.md G8.
-
 # Roles, Trust, and Keys
 
 Three roles take part in this profile:
@@ -211,8 +209,6 @@ The following is a non-normative metadata example:
 ~~~
 
 The `access_request_endpoint` MAY be hosted by the PDP itself, by a service trusted by the PDP, or by an independent service operating with delegated authority from the PDP.  When hosted by a different service, the PDP metadata MUST identify the endpoint actually used by the PEP to submit access requests.
-
-Editor's note: identifier values for `iss` and `aud` and key-to-issuer association are the subject of PROTOCOL-GAPS.md G4.
 
 ## Endpoint Protection {#endpoint-protection}
 
@@ -522,8 +518,6 @@ The following rules govern the freshness deadline of a submission:
 * When `denial_expires_at` or equivalent protected binding material is present, the Access Request Service MUST verify that `denial.expires_at` matches the protected value before relying on it.
 * When no protected denial-expiry value is present, the Access Request Service MUST rely on `exp` only if it is no later than the echoed `denial.expires_at`; otherwise the binding material is insufficient to prove the freshness window and the submission MUST be rejected with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
 * A submission whose freshness deadline has passed MUST be rejected with `urn:openid:authzen:access-request:error:expired_denial`.
-
-Editor's note: the precedence among the idempotency, replay, and freshness rules is the subject of PROTOCOL-GAPS.md G5, and the relationship between the freshness sentences above is the subject of G10.
 
 ## Access Request Response {#access-request-response}
 
@@ -887,8 +881,6 @@ When the PDP denies a re-evaluation that presented an `approval` reference, it S
 ## Approval Lifetime and Current Status {#approval-lifetime}
 
 The PDP MUST check current approval status during re-evaluation, including whether the approval has been revoked, cancelled, superseded, or otherwise invalidated before `approved_until`.  The `approved_until` timestamp is a PEP-side maximum reuse and enforcement bound; it does not prevent the PDP from denying earlier because of revocation, cancellation, policy change, risk change, or other current state.
-
-Editor's note: how a PDP without shared state performs this check is the subject of PROTOCOL-GAPS.md G3; the requester and client binding at the approval record is the subject of G6; the relationship between artifact expiry and `approved_until` is the subject of G9.
 
 When the re-evaluation response indicates an approval expiry (typically as `context.approval.approved_until`), the PEP MUST NOT enforce access past that timestamp.  PEPs that issue downstream credentials on the basis of the approved evaluation (for example, an OAuth Authorization Server issuing access tokens) MUST bound the lifetime of those credentials by the earlier of the approval expiry in the Approval Result and any approval expiry returned by the PDP during re-evaluation.
 
@@ -1388,8 +1380,6 @@ This section describes threats and cites their mitigations.  It introduces no re
 
 **Confused deputy and request substitution.** An attacker could substitute a Subject or Resource, or reorder a bundle.  The service compares the submission with the signed denial ({{verifying-denial-binding}}) or, when no token is present, the recorded evaluation ({{shared-state-deployments}}).  Bundle binding preserves item coverage and order ({{bulk-denial-binding}}).  Task binding also covers the denial, requester, and client ({{ars-processing-rules}}); the PDP checks approval applicability and scope at re-evaluation ({{approval-verification}} and {{approval-scope}}).
 
-Editor's note: how the requester and client identities are compared is the subject of PROTOCOL-GAPS.md G6.
-
 **Binding-token integrity.** A buggy or hostile PEP could alter or fabricate PDP-issued state to influence approval routing or scope.  Integrity protection and binding claims ({{binding-token-integrity}}), submission verification and freshness checks ({{verifying-denial-binding}}), and equivalent checks for alternative formats ({{denial-binding-alternatives}}) protect this round trip.
 
 **Approval reference substitution and replay.** A compromised PEP could present another request's approval or replay an expired or otherwise inapplicable reference.  Approval verification checks applicability and binding; by-value material is verified for integrity, issuer, audience, and expiry, while backing records are protected against unauthorized lookup and mutation ({{completion-semantics}}).  An approval reference is not a bearer grant.
@@ -1564,8 +1554,6 @@ Change Controller for all initial entries: OpenID Foundation AuthZEN Working Gro
 --- back
 
 # Examples
-
-Editor's note: the example tokens do not carry the `aud` claim that the binding-token claim list calls for in JWT form, nor the per-item objects that the bulk binding rules call for; see PROTOCOL-GAPS.md G15.
 
 ## End-to-End Manager Approval
 

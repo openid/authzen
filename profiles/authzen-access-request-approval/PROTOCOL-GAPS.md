@@ -1,6 +1,6 @@
 # Gaps Register: AuthZEN Access Request and Approval Profile
 
-Version 10. Status: register for the working group. This is not a design. Version 10 records that PR A3 (branch `arap-restructure-a3`) folded the duplicate applicability check named in G20, and adds a tracking list under Coordination for the issues to be filed; no entry is resolved.
+Version 11. Status: register for the working group. This is not a design. Version 11 records removal of the six gap-reference editor's notes from the specification; all gap entries remain here and no entry is resolved. Version 10 records that PR A3 (branch `arap-restructure-a3`) folded the duplicate applicability check named in G20, and adds a tracking list under Coordination for the issues to be filed; no entry is resolved.
 
 The register is organized in three parts. Part A lists protocol contracts that two independently implemented parties cannot complete from the current text and that need a working-group decision. Part B lists editorial and example corrections: the protocol is defined, but the text can be read wrongly or the examples do not follow it. Part C lists optional capabilities: behaviors the profile does not provide and could, without anything currently defined being broken. Entry numbers are stable identifiers from earlier versions and are not renumbered when an entry moves between parts.
 
@@ -195,7 +195,7 @@ Version 9, from the end-to-end review of the A2 wording pass: G10 gains the thre
 
 Filing the register as working-group issues is deferred by the editor's decision of 2026-09-17; this list tracks what will be filed, in the order above, so nothing is lost meanwhile. Status for every entry: not filed.
 
-| Entry | Part | Editor's note in the text | Status |
+| Entry | Part | Former editor's note location (notes removed) | Status |
 |---|---|---|---|
 | G8, G7, G12, G19 | B | G8: Terminology entry Authorization-Relevant Context | not filed |
 | G6 with G16 | A | Approval and Re-evaluation, after the approval record rule; Security Considerations, confused-deputy paragraph | not filed |
@@ -207,7 +207,9 @@ Filing the register as working-group issues is deferred by the editor's decision
 | G13, G17 | C | none | not filed |
 | G15, G14, G20 remainder, G22 | B | G15: Examples | not filed |
 
-`PROFILE-FAMILY-PROPOSAL.md` proposes a layered family with a colocated core; if adopted, entries G1, G2, G4, G9, G10, and the stateless case of G3 move with the Distributed Deployment profile, G14 with Forms, G12 with Bulk, and G18 with Callbacks. Six editor's notes in the specification cite this file by name. They cannot ship; when the issues are filed, each note is replaced by an issue reference or removed.
+`PROFILE-FAMILY-PROPOSAL.md` proposes a layered family with a colocated core; if adopted, entries G1, G2, G4, G9, G10, and the stateless case of G3 move with the Distributed Deployment profile, G14 with Forms, G12 with Bulk, and G18 with Callbacks.
+
+The six editor's notes referring to this register were removed from the specification on 2026-09-18 so the specification stands alone. Their locations are retained above for traceability. The gaps remain open in this register; removing the notes changes no protocol requirement and resolves no gap.
 
 ## Appendix. Candidate designs recorded during review
 
