@@ -30,6 +30,22 @@ author:
     email: public@karlmcguinness.com
 
 normative:
+  BULK:
+    title: "AuthZEN Bulk Access Requests Profile 1.0"
+    target: "https://openid.github.io/authzen/authzen-access-request-bulk-profile-1_0.html"
+    author:
+      -
+        ins: K. McGuinness
+        name: Karl McGuinness
+    date: 2026
+  CALLBACK:
+    title: "AuthZEN Callback Notifications Profile 1.0"
+    target: "https://openid.github.io/authzen/authzen-access-request-callback-profile-1_0.html"
+    author:
+      -
+        ins: K. McGuinness
+        name: Karl McGuinness
+    date: 2026
   RFC9110:
   RFC9457:
   RFC3339:
@@ -81,7 +97,7 @@ The AuthZEN Authorization API lets a Policy Enforcement Point (PEP) ask a Policy
 
 When authority is fixed at provisioning time through roles, scopes, or service-account grants, a runtime denial typically ends the interaction.  When approval is possible during execution, a requestable denial lets the PEP submit an Access Request to an approval workflow.  In the base completion mode, the PEP re-evaluates access against current policy after approval.
 
-This profile standardizes that handoff for autonomous callers and user-facing applications ({{protocol-overview}}).
+This profile standardizes that handoff for autonomous callers and user-facing applications ({{protocol-overview}}).  Companion profiles define bulk Access Requests ({{BULK}}), callback notifications ({{CALLBACK}}), and catalog-backed request input ({{CATALOG}}).
 
 Workflow engines, approval policy languages, ticketing systems, entitlement catalogs, user interfaces, and approver-facing inbox or enumeration APIs are out of scope.  The PDP or Access Request Service supplies these capabilities, including how human or automated evaluators discover and act on pending requests.
 
@@ -119,7 +135,7 @@ The presence of `context.access_request` does not weaken the AuthZEN Authorizati
 
 Steps 1 and 6 use the AuthZEN Access Evaluation API.  Step 6 is a new evaluation, not a resumption of the denied operation.  The PEP MUST NOT permit the requested operation based only on the presence of `context.access_request`.
 
-In step 5 the PEP can poll the task, receive a callback ({{callback-completion}}), or otherwise use the Task Handle to determine completion.
+In step 5 the PEP can poll the task, receive a callback ({{CALLBACK}}), or otherwise use the Task Handle to determine completion.
 
 # Requirements Notation and Conventions
 
@@ -320,11 +336,11 @@ The PEP submits an Access Request using the HTTP `POST` method as defined in {{R
 
 A PEP MUST submit an Access Request only for an AuthZEN Decision with `decision` equal to `false` and a `context.access_request` object present in the Decision Context.
 
-A PEP SHOULD include an `Idempotency-Key` header, following the conventions described in {{I-D.ietf-httpapi-idempotency-key-header}}.  The Idempotency-Key covers the entire submission body, including all members of the `items` array when present.
+A PEP SHOULD include an `Idempotency-Key` header, following the conventions described in {{I-D.ietf-httpapi-idempotency-key-header}}.
 
 ### Request Body {#submission-request-body}
 
-For a single-item submission (`items` absent), the request body is a JSON object with the following members.  {{bulk-request-body}} defines the changes for bulk submissions.
+For a single-item submission (`items` absent), the request body is a JSON object with the following members.  {{BULK}} defines the changes for bulk submissions.
 
 `subject`:
 : REQUIRED.  The AuthZEN Subject from the denied evaluation.
@@ -344,7 +360,7 @@ For a single-item submission (`items` absent), the request body is a JSON object
   * Submission-time augmentations MUST NOT change or remove authorization-relevant context from the denied evaluation.
   * When the Access Request Service needs to distinguish original evaluation context from submission-time input, deployments SHOULD place the latter in well-defined extension members rather than overwriting original context members.
 
-The body can also carry `requested_access` and `client` ({{submission-additional-information}}), and `callback` ({{callback-completion}}).
+The body can also carry `requested_access` and `client` ({{submission-additional-information}}), and `callback` ({{CALLBACK}}).
 
 ### The `denial` Object {#submission-denial-object}
 
@@ -526,7 +542,7 @@ The `task` object has the following members:
 : OPTIONAL.  Object containing user-interface hints for the pending request.
 
 `progress`:
-: OPTIONAL.  Object describing approval workflow progress for tasks with multi-step approvals.  When `items` is present, `progress` describes aggregate workflow progress for the bundled task; per-item progress is tracked in `task.items[]`.  The following members are defined:
+: OPTIONAL.  Object describing approval workflow progress for tasks with multi-step approvals.  The following members are defined:
 
   * `current_step`: OPTIONAL.  Integer.  One-based index of the step currently in progress.
   * `total_steps`: OPTIONAL.  Integer.  Total number of approval steps configured for the task.
@@ -540,7 +556,7 @@ The `task` object has the following members:
   * `review`: URL where an approver or administrator can review or act on the request.
   * `cancel`: URL where the PEP can cancel the request, when PEP-initiated cancellation is supported.
 
-The `items` member of this object, present for bulk submissions, is defined in {{bulk-submissions}}.
+The `items` member of this object, present for bulk submissions, is defined in {{BULK}}.
 
 ## Task Status Endpoint {#task-status-endpoint}
 
@@ -557,13 +573,14 @@ Accept: application/json
 
 A successful response returns a JSON object containing a `task` member.  Completed task responses include a `result` member according to the rules in {{completed-task-response}}.
 
-The following rules govern polling and completion notification:
+The following rules govern polling:
 
 * When a task is `pending`, a PEP MAY poll the Task Status Endpoint to determine completion.
 * PEPs SHOULD use exponential backoff: a starting interval of several seconds, growing to no more than one minute, with jitter applied to spread load across many concurrent pollers.
 * If the Access Request Service returns the `Retry-After` HTTP header (Section 10.2.3 of {{RFC9110}}), the PEP MUST wait at least the indicated duration before issuing the next poll.
 * The PEP MUST stop polling once `task.expires_at` is reached or the task reaches a terminal status ({{state-transitions}}).
-* PEPs subscribed to per-task callbacks ({{callback-completion}}) or to deployment-level event subscriptions MAY skip polling entirely and rely on push notification, falling back to a single status retrieval after each notification to obtain any enforceable `result`.
+
+Completion notification is defined by {{CALLBACK}}.
 
 ## Task Handle Authorization {#authorization-and-authentication}
 
@@ -627,11 +644,7 @@ The following task status values are defined:
 `failed`:
 : The request could not be completed due to an error.
 
-`partial`:
-: All items in a bulk task ({{bulk-submissions}}) reached terminal status, but with mixed outcomes (for example, some items approved while others denied).  This status is only valid for tasks containing an `items` array.
-
-  * A PEP receiving `partial` MUST consult `task.items[].status` to determine per-item outcomes.
-  * A PEP receiving `partial` MUST NOT infer aggregate access permission.
+The `partial` status for bulk tasks is defined by {{BULK}}.
 
 Implementations MAY define additional status values.  A PEP that receives an unknown status value MUST treat the task as not approved.
 
@@ -653,7 +666,7 @@ The following transitions are defined from `pending`:
 | `cancelled` | The request is cancelled by the requester, approver, administrator, or PEP using the cancellation endpoint ({{cancellation}}). |
 | `failed` | A system error prevents the request from completing. |
 
-The `partial` status, which applies only to bulk tasks, is described in {{bulk-submissions}}.
+The `partial` status, which applies only to bulk tasks, is described in {{BULK}}.
 
 Implementations that define additional status values ({{task-status}}) extend the state machine.  Such extensions SHOULD specify the transitions into and out of the new state and document them alongside the value definition.
 
@@ -682,7 +695,6 @@ Content-Type: application/json
 A completed task response includes result information as follows:
 
 * When `task.status` is `approved` and the task does not contain an `items` array, the response MUST include a top-level `result` object.
-* When `task.status` is `approved` and the task contains an `items` array, each approved item in `task.items[]` MUST include its own `result` object.  The response MAY also include a top-level `result` object for aggregate workflow information, but a PEP MUST NOT use that top-level `result` to authorize an individual item unless the same result is also present in that item's `result` member.
 * For any other terminal status, the response MAY include a `result` object for diagnostic or workflow information, but the PEP MUST NOT treat it as approval.
 * When present, the `result` object MUST use one of the completion forms defined in {{completion-semantics}}.
 
@@ -713,17 +725,15 @@ Content-Type: application/json
 
 ### Completion Handling for PEPs {#pep-completion-handling}
 
-This non-normative table summarizes the existing completion rules.  For bundled tasks, use the per-item rules rather than treating the aggregate as a single-item outcome.
+This non-normative table summarizes single-task completion.  {{BULK}} defines per-item handling for bundled tasks.
 
 | Condition | PEP handling | Rules |
 |---|---|---|
 | Submission completes synchronously | Handle the returned terminal status and result without polling. | {{access-request-response}} |
-| Task is `pending` | Polling is available, with recommended backoff; honor `Retry-After` when returned.  Subscribed PEPs can use notifications instead. | {{task-status-endpoint}} |
-| Single task or item is `approved`, with an enforceable result | Follow `result.mode`; in the base mode, re-evaluate with the unchanged `approval` object. | {{completion-semantics}} |
-| Task contains `items` | Inspect each item's status and result; re-evaluate approved items separately.  Aggregate status alone does not authorize an item. | {{bulk-aggregation}}, {{bulk-submissions}} |
-| Single task or item is `denied`, `expired`, `cancelled`, or `failed` | Do not treat its result as approval. | {{completed-task-response}}, {{bulk-submissions}} |
+| Task is `pending` | Polling is available, with recommended backoff; honor `Retry-After` when returned. | {{task-status-endpoint}} |
+| Task is `approved`, with an enforceable result | Follow `result.mode`; in the base mode, re-evaluate with the unchanged `approval` object. | {{completion-semantics}} |
+| Task is `denied`, `expired`, `cancelled`, or `failed` | Do not treat its result as approval. | {{completed-task-response}} |
 | Task status or `result.mode` is unknown | Treat it as not approved. | {{task-status}}, {{completion-semantics}} |
-| Callback reports `approved` without an enforceable result | Retrieve task status before enforcing access; callback authentication and validation still apply. | {{callback-completion}} |
 
 ## Availability {#availability}
 
@@ -1008,7 +1018,7 @@ Binding claims identify the original denied evaluation using either of the follo
 
 Implementations that use the hashed form MUST use exactly this construction so that a PDP and an independently implemented Access Request Service compute identical digests.
 
-The bulk construction is defined in {{bulk-denial-binding}}.
+The bulk construction is defined in {{BULK}}.
 
 ### Verifying the Denial Binding {#verifying-denial-binding}
 
@@ -1091,7 +1101,7 @@ The default approval scope is the original denied Subject, Resource, Action, and
 
 In the bound-reference topology, where the verifying PDP does not share recorded state with the Access Request Service, the verifiable approval material (for example, a `binding_context_members`-equivalent claim in `approval.state`) MUST convey the authorization-relevant Context member set so the PDP applies the same set.
 
-The exact-match baseline is the default unless the Access Request Service or PDP records a broader or narrower approval scope ({{approval-scope-extensions}}).  For a bundled Access Request, the default approval scope for each approved item is that item's Subject, Resource, Action, and relevant Context.  This default scope is not serialized in the Approval Result unless a profile or deployment defines a representation for it.
+The exact-match baseline is the default unless the Access Request Service or PDP records a broader or narrower approval scope ({{approval-scope-extensions}}).  This default scope is not serialized in the Approval Result unless a profile or deployment defines a representation for it.
 
 The PDP MUST only consider an Approval Result applicable when the current evaluation request is within the approval scope recorded for that Approval Result.
 
@@ -1100,162 +1110,6 @@ The PDP MUST only consider an Approval Result applicable when the current evalua
 Broader approvals can cover a resource class, role, entitlement, or time-bounded tool class.  Their representation and matching are deployment-specific or defined by downstream profiles, not portable across policy engines.  This profile does not define context-constraint matching.
 
 The Access Request Service's workflow policy determines approval breadth, subject to this profile's integrity, expiry, and audit requirements.
-
-# Bulk Submissions {#bulk-submissions}
-
-## Bulk Request Body {#bulk-request-body}
-
-Bulk submissions use the top-level members defined in {{submission-request-body}} and {{submission-additional-information}}, with these changes:
-
-* When `items` is present, the top-level `resource` MUST be omitted.
-* When `items` is present, the top-level `action` MUST be omitted.
-* The top-level `denial` is REQUIRED when any item lacks a per-item `denial`.  It is a bundle denial; its coverage rules are in {{bulk-denial-binding}}.
-* The top-level `denial` is OPTIONAL when every item carries its own per-item `denial`.
-
-## Request Items
-
-`items`:
-: OPTIONAL.  Array.  Multiple `(resource, action)` items submitted as a single bundled Access Request.  When present, `resource` and `action` MUST be omitted at the top level.  Each item is an object with the following members:
-
-  * `resource`: REQUIRED.  The AuthZEN Resource for this item.
-  * `action`: REQUIRED.  The AuthZEN Action for this item.
-  * `requested_access`: OPTIONAL.  Per-item `requested_access` overrides; merged with the top-level `requested_access` with item values taking precedence.
-  * `denial`: OPTIONAL.  Per-item denial binding when items came from separate AuthZEN Authorization API evaluations.  A per-item `denial` uses the same members as the top-level `denial` object.  See {{submission-denial-object}} and {{submission-denial-metadata}} for denial members and {{bulk-denial-binding}} for bulk coverage rules.
-
-Non-normative bulk-submission example:
-
-~~~ http
-POST /access/v1/requests HTTP/1.1
-Host: pdp.example.com
-Authorization: Bearer 2YotnFZFEjr1zCsicMWpAA
-Content-Type: application/json
-Idempotency-Key: 7b8d0f0d-65a1-4af1-9fd3-a684f08a5d14
-
-{
-  "subject": {
-    "type": "user",
-    "id": "alice@example.com"
-  },
-  "items": [
-    {
-      "resource": {"type": "document", "id": "q4-plan"},
-      "action": {"name": "can_read"}
-    },
-    {
-      "resource": {"type": "channel", "id": "engineering"},
-      "action": {"name": "can_post"}
-    }
-  ],
-  "context": {
-    "business_justification": "Onboarding to the renewal review project"
-  },
-  "requested_access": {
-    "requested_until": "2026-05-14T20:15:00Z"
-  },
-  "denial": {
-    "evaluation_id": "eval_01HX4Y2P8BQ4Y3F0V0K9D6Z7M2",
-    "evaluated_at": "2026-04-30T20:15:00Z",
-    "expires_at": "2026-04-30T20:25:00Z",
-    "reason": "approval_required",
-    "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJidW5kbGVfaWQiOiJidW5fMDFIWDVTVUJNMSIsIml0ZW1zIjpbeyJyZXNvdXJjZSI6ImRvY3VtZW50OnE0LXBsYW4iLCJhY3Rpb24iOiJjYW5fcmVhZCJ9LHsicmVzb3VyY2UiOiJjaGFubmVsOmVuZ2luZWVyaW5nIiwiYWN0aW9uIjoiY2FuX3Bvc3QifV19.bXBfc2lnbmF0dXJl",
-    "template": "onboarding_bundle"
-  }
-}
-~~~
-
-## Denial Binding for Bulk Submissions {#bulk-denial-binding}
-
-When `items` is present and any item lacks a per-item `denial`, the top-level `denial` is a bundle denial whose verifiable binding material MUST cover the Subject, authorization-relevant Context, and every Resource and Action in `items`.
-
-The top-level `denial` presence rules are in {{bulk-request-body}}; the binding claims are defined in {{binding-token-integrity}}.  For bulk submissions, those claims cover the entire `items` array and authorization-relevant Context:
-
-* Inline bulk binding claims list each submitted item, including the full Resource and Action objects for that item, in the same order as the bound Access Request.
-* A bulk `binding_hash` is the base64url-encoded (without padding) SHA-256 digest of the JCS serialization of the JSON object `{"subject": <Subject>, "items": [{"resource": <Resource>, "action": <Action>}, ...], "context": <authorization-relevant Context>}`, where `<Subject>` is the bound Subject with `subject.properties.act` removed and the `items` array order is the order bound by the denial.  Implementations that use a bulk hashed form MUST use exactly this construction.
-
-When every item carries its own per-item `denial`, each per-item binding is verified using the single-item rules instead of this bundle construction.
-
-## Response Items and Aggregation {#bulk-aggregation}
-
-`items`:
-: REQUIRED when the original submission carried an `items` array; otherwise OPTIONAL.  Array.  Per-item progress for bundled Access Requests.  Each element corresponds positionally to the submission's `items` member and has the following members:
-
-  * `resource`: REQUIRED.  The AuthZEN Resource for this item, echoing the submission.
-  * `action`: REQUIRED.  The AuthZEN Action for this item.
-  * `status`: REQUIRED.  Per-item status using the values defined in {{task-status}}.
-  * `result`: OPTIONAL before the item reaches a terminal status; REQUIRED when the item status is `approved`.  Per-item completion result with the same shape as the top-level `result` ({{completion-semantics}}).
-
-When the `items` member is present, the aggregate `task.status` is computed from per-item statuses as follows:
-
-* If any item is `pending` or in an implementation-defined non-terminal status ({{task-status}}), the aggregate is `pending`.
-* Otherwise, if all items share the same terminal status, the aggregate is that status.
-* Otherwise, with two or more distinct terminal statuses present across items, the aggregate is `partial`.
-
-A PEP processing a bundled task MUST consult `task.items[].status` and `task.items[].result` to determine per-item outcomes; the PEP MUST NOT infer per-item outcomes from the aggregate `task.status` alone.  A top-level `result` MUST NOT be used to authorize any individual item in a bundled task unless the same result is also present in that item's `result` member.
-
-## Bulk Status, Cancellation, and Re-evaluation
-
-Each item follows the base state machine independently.  The aggregate `task.status` follows {{bulk-aggregation}}, reaching `partial` when all items reach terminal status with two or more distinct terminal statuses present.
-
-Cancellation cancels every `pending` item and leaves terminal items unchanged.  Behavior for implementation-defined non-terminal statuses is implementation-defined; an Access Request Service that defines additional non-terminal statuses SHOULD document whether cancellation transitions those items to `cancelled` or leaves them unchanged.
-
-The aggregate status is then recomputed: `cancelled` when no item completed before cancellation, or `partial` when some items reached other terminal statuses first.  If every item was already terminal, cancellation returns `409 Conflict` with `urn:openid:authzen:access-request:error:invalid_task_state`.
-
-For a task containing an `items` array, each approved item MUST include a per-item `result` that is independently enforceable according to its own `result.mode`.
-
-When the original submission carried an `items` array, the PEP re-evaluates each approved item separately, including that item's `result.approval` at `context.approval` in the item's re-evaluation request as described in {{completion-semantics}}.  This profile does not define an aggregate re-evaluation that covers multiple items in one AuthZEN Authorization API call.
-
-# Callback Completion {#callback-completion}
-
-`callback`:
-: OPTIONAL.  Object describing a callback endpoint where the Access Request Service can send completion notifications.
-
-A PEP MAY request callback notification by including a `callback` object in the Access Request submission.
-
-The `callback` object has the following members:
-
-`endpoint`:
-: REQUIRED.  HTTPS URI to which the Access Request Service sends completion notifications.
-
-  * The Access Request Service MUST validate that the endpoint is authorized for the authenticated PEP, either by matching a pre-registered callback URI or by applying an explicit deployment allowlist.
-  * The Access Request Service MUST reject callback endpoints that resolve to loopback, link-local, private-use, or otherwise internal network addresses unless the deployment has explicitly allowed that destination.
-
-  In-cluster or same-trust-domain deployments allowlist specific internal destinations rather than disabling this protection against server-side request forgery.
-
-`state`:
-: OPTIONAL.  Opaque value supplied by the PEP and returned unmodified in the callback.
-
-`events`:
-: OPTIONAL.  Array of event names requested by the PEP.  Defined event names are `approved`, `denied`, `expired`, `cancelled`, `failed`, and `partial`.
-
-Callback notifications MUST contain a `task` member and MAY contain a `result` member.  When present, the `result` object MUST use one of the completion forms defined in {{completion-semantics}}.  A callback whose `task.status` is `approved` but that does not contain an enforceable `result` is only a notification; the PEP MUST retrieve the Task Status Endpoint response before enforcing access.
-
-The Access Request Service MUST authenticate to the callback endpoint using a mechanism agreed between the PEP and Access Request Service.  This specification does not mandate a single callback authentication mechanism, but implementations SHOULD use one of the following: an OAuth 2.0 bearer token {{RFC6750}} issued to the Access Request Service, mutual TLS, or an HMAC signature over the request body using a pre-shared key.  Unauthenticated callbacks MUST NOT be accepted.
-
-Callback delivery is a notification optimization.  The Task Status Endpoint remains authoritative unless the callback contains an enforceable completion result under {{completion-semantics}}.
-
-Implementations MAY satisfy completion notification through deployment-level event subscriptions (for example, organization-scoped webhooks or event-streaming bindings defined by companion specifications) rather than per-task callbacks.  When a deployment relies on such a subscription, the PEP MAY omit the `callback` member from the Access Request submission.  Deployment-level event subscriptions deliver the same Task Handle and lifecycle information to subscribed receivers; they are a notification channel and MUST NOT be treated as enforcement unless paired with a separate enforceable result.
-
-Non-normative notification-only callback: no `result` is included, so the PEP retrieves task status before enforcing access.
-
-~~~ http
-POST /callbacks/access-requests HTTP/1.1
-Host: pep.example.com
-Authorization: Bearer mF_9.B5f-4.1JqM
-Content-Type: application/json
-
-{
-  "state": "b3Blbi1kb2N1bWVudC1mbG93",
-  "task": {
-    "id": "arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V4",
-    "status": "approved",
-    "status_endpoint": "https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V4"
-  }
-}
-~~~
-
-PEPs SHOULD verify callback origin, bind callbacks to expected task identifiers and state values, and treat callbacks as notifications unless they contain an enforceable result under this profile.
-
-The Access Request Service MAY additionally publish lifecycle events for governance, audit, and analytics consumers through deployment-level event subscriptions defined by companion specifications.  Such channels are independent of the per-task callback and are not used for enforcement.
 
 # Cancellation {#cancellation}
 
@@ -1330,9 +1184,21 @@ This profile does not define an agent protocol surface.  Deployments serving age
 
 Extension points allow profiles and deployments to adapt the wire format to upstream protocols, governance platforms, and request interfaces.
 
+## Companion-Defined Members {#companion-profiles}
+
+The following protocol members and status value are defined by normative reference to companion profiles.  Their presence, processing, and validation rules are specified in those profiles.
+
+| Location | Member or value | Specification |
+|---|---|---|
+| Access Request submission | `items` | Bulk Access Requests {{BULK}} |
+| Task Handle | `items`; `partial` value of `status` | Bulk Access Requests {{BULK}} |
+| Access Request submission | `callback` | Callback Notifications {{CALLBACK}} |
+
+These are defined protocol names, not unrecognized extension names under the forward-compatibility rule.  The companion definitions do not open the submission or Task Handle to arbitrary additional members.
+
 ## Extension Points
 
-Additional members beyond those defined in this document MAY appear only at the following locations, and those members MUST follow the naming rules in {{extension-naming}}.  No other object members may be extended without a revision of this specification or a profile that explicitly redefines them.
+Additional members beyond those defined in this document or by {{companion-profiles}} MAY appear only at the following locations, and those members MUST follow the naming rules in {{extension-naming}}.  No other object members may be extended without a revision of this specification or a profile that explicitly redefines them.
 
 * `context.access_request`: additional members of the requestable denial, such as URLs of profile-defined companion documents the PEP consults when constructing a submission.
 * `context.access_request.display`: user-interface hints in a requestable denial.
@@ -1475,13 +1341,12 @@ This section describes threats and cites their mitigations.  It introduces no re
 
 **Denial remains denial.** Treating `context.access_request` as permission would grant access without an allow decision.  The PEP rules in {{pep-processing-rules}} preserve denial and treat unknown task statuses and completion modes as not approved.
 
-**Confused deputy and request substitution.** An attacker could substitute a Subject or Resource, or reorder a bundle.  Submission checks compare signed denial claims ({{verifying-denial-binding}}) or, when no token is present, recorded state ({{shared-state-deployments}}); bundle binding covers item contents and order ({{bulk-denial-binding}}).  Task binding covers the denial, requester, and client ({{ars-processing-rules}}), and re-evaluation checks approval applicability and scope ({{approval-verification}} and {{approval-scope}}).
+**Confused deputy and request substitution.** An attacker could substitute a Subject or Resource.  Submission checks compare signed denial claims ({{verifying-denial-binding}}) or, when no token is present, recorded state ({{shared-state-deployments}}).  Task binding covers the denial, requester, and client ({{ars-processing-rules}}), and re-evaluation checks approval applicability and scope ({{approval-verification}} and {{approval-scope}}).
 
 **Binding-token integrity.** A buggy or hostile PEP could alter or fabricate PDP-issued state to influence approval routing or scope.  {{binding-token-integrity}} and {{verifying-denial-binding}} define integrity, binding, and freshness checks; {{denial-binding-alternatives}} covers other formats.
 
 **Approval reference substitution and replay.** A compromised PEP could present another request's approval or replay an expired or inapplicable reference.  {{approval-verification}} defines applicability checks; {{decision-and-binding-integrity}} defines verification of by-value material and protection of backing records.  An approval reference is not a bearer grant.
 
-**Bulk bundle escalation.** An aggregate status or result could be mistaken for approval of every item.  {{bulk-submissions}} requires per-item status and results and limits use of a top-level result for item authorization.
 
 ## Policy and Approver Hygiene
 
@@ -1501,7 +1366,6 @@ This section describes threats and cites their mitigations.  It introduces no re
 
 ## Operational and Integration
 
-**Callback security.** Callbacks expose spoofing, replay, and request-forgery risks, including server-side request forgery.  {{callback-completion}} defines destination validation, notification authentication, and PEP-side checks.
 
 **PEP acting on behalf of the Subject.** Accepting unverified actor claims would let a PEP assert authority it cannot demonstrate.  {{actor-source-verification}} and {{delegation}} govern chain verification; {{endpoint-protection}} requires caller authorization to submit or view the request for the supplied Subject, Resource, and Action.
 
@@ -1838,247 +1702,6 @@ Content-Type: application/json
 }
 ~~~
 
-## End-to-End Agent Tool Discovery
-
-This non-normative example shows an agent requesting access to a tool discovered mid-task.  A broad-scope approval covers related invocations without a new Access Request for each call.
-
-### Initial Evaluation Request
-
-The agent attempts to invoke a CRM search tool while assembling a renewal report.
-
-~~~ http
-POST /access/v1/evaluation HTTP/1.1
-Host: pdp.example.com
-Authorization: Bearer 2YotnFZFEjr1zCsicMWpAA
-Content-Type: application/json
-
-{
-  "subject": {
-    "type": "user",
-    "id": "alice@example.com",
-    "properties": {
-      "act": {
-        "iss": "https://agents.example.com",
-        "sub": "agent_renewal_assistant_v3",
-        "sub_profile": "ai_agent"
-      }
-    }
-  },
-  "resource": {
-    "type": "tool",
-    "id": "crm.search_accounts"
-  },
-  "action": {
-    "name": "invoke"
-  },
-  "context": {
-    "time": "2026-05-12T15:00:00Z"
-  }
-}
-~~~
-
-### Requestable Denial
-
-The PDP returns a denial requesting broad-scope approval for the agent to call CRM tools.
-
-~~~ http
-HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-  "decision": false,
-  "context": {
-    "evaluation_id": "eval_01HX6A9D2M7N0F4G3K2T9P1B8X",
-    "evaluated_at": "2026-05-12T15:00:00Z",
-    "reason": "agent_authority_missing",
-    "access_request": {
-      "template": "agent_tool_class_approval",
-      "expires_at": "2026-05-12T15:10:00Z",
-      "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJldmFsdWF0aW9uX2lkIjoiZXZhbF8wMUhYNkE5RDJNN04wRjRHM0syVDlQMUI4WCIsImNsYXNzIjoiY3JtX3Rvb2xzIn0.aGFzaA",
-      "request_schema_url": "https://requests.example.com/schemas/agent_tool_class_approval.json"
-    }
-  }
-}
-~~~
-
-### Submitting the Access Request
-
-The runtime supplies actor and source members to route approval to the agent's owner and record the originating session.  It persists the Task Handle and continues other work while approval proceeds, resuming this operation when the callback arrives.
-
-~~~ http
-POST /access/v1/requests HTTP/1.1
-Host: pdp.example.com
-Authorization: Bearer 2YotnFZFEjr1zCsicMWpAA
-Content-Type: application/json
-Idempotency-Key: 9c1f5d12-2a18-4cba-8a5e-e0e8e2b6b5c7
-
-{
-  "subject": {
-    "type": "user",
-    "id": "alice@example.com"
-  },
-  "resource": {
-    "type": "tool",
-    "id": "crm.search_accounts"
-  },
-  "action": {
-    "name": "invoke"
-  },
-  "context": {
-    "business_justification": "Assembling Q2 renewal report for customer ACME-1042"
-  },
-  "requested_access": {
-    "requested_until": "2026-05-19T15:00:00Z"
-  },
-  "client": {
-    "id": "renewal_assistant",
-    "actor": {
-      "id": "agent_renewal_assistant_v3",
-      "issuer": "https://agents.example.com",
-      "type": "ai_agent"
-    },
-    "source": {
-      "session_id": "session_01HX69WJ8Q0K7P4F0V0K9D6Z7N"
-    }
-  },
-  "callback": {
-    "endpoint": "https://agents.example.com/callbacks/access-requests",
-    "state": "session_01HX69WJ8Q0K7P4F0V0K9D6Z7N",
-    "events": ["approved", "denied", "expired"]
-  },
-  "denial": {
-    "evaluation_id": "eval_01HX6A9D2M7N0F4G3K2T9P1B8X",
-    "evaluated_at": "2026-05-12T15:00:00Z",
-    "expires_at": "2026-05-12T15:10:00Z",
-    "reason": "agent_authority_missing",
-    "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJldmFsdWF0aW9uX2lkIjoiZXZhbF8wMUhYNkE5RDJNN04wRjRHM0syVDlQMUI4WCIsImNsYXNzIjoiY3JtX3Rvb2xzIn0.aGFzaA",
-    "template": "agent_tool_class_approval"
-  }
-}
-~~~
-
-### Task Handle
-
-~~~ http
-HTTP/1.1 202 Accepted
-Content-Type: application/json
-Location: https://pdp.example.com/access/v1/requests/arq_01HX6AAB3J7Y56W2F9H8Q8C1V7
-
-{
-  "task": {
-    "id": "arq_01HX6AAB3J7Y56W2F9H8Q8C1V7",
-    "status": "pending",
-    "status_endpoint": "https://pdp.example.com/access/v1/requests/arq_01HX6AAB3J7Y56W2F9H8Q8C1V7",
-    "expires_at": "2026-05-20T00:00:00Z"
-  }
-}
-~~~
-
-### Approval Callback
-
-Hours later, after the agent's owner approves the request, the Access Request Service notifies the agent's callback endpoint.  The callback is notification-only; the agent retrieves the Task Status Endpoint before enforcing access.
-
-~~~ http
-POST /callbacks/access-requests HTTP/1.1
-Host: agents.example.com
-Authorization: Bearer mF_9.B5f-4.1JqM
-Content-Type: application/json
-
-{
-  "state": "session_01HX69WJ8Q0K7P4F0V0K9D6Z7N",
-  "task": {
-    "id": "arq_01HX6AAB3J7Y56W2F9H8Q8C1V7",
-    "status": "approved",
-    "status_endpoint": "https://pdp.example.com/access/v1/requests/arq_01HX6AAB3J7Y56W2F9H8Q8C1V7"
-  }
-}
-~~~
-
-### Completed Task
-
-The completed task provides a seven-day approval for the CRM tool class.  The PDP verifies `approval.state` during re-evaluation rather than relying only on an `approval.id` lookup.
-
-~~~ http
-HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-  "task": {
-    "id": "arq_01HX6AAB3J7Y56W2F9H8Q8C1V7",
-    "status": "approved"
-  },
-  "result": {
-    "mode": "reevaluate",
-    "approval": {
-      "id": "apr_01HX6BCEF8K3Z2X7P0K4JE6WVK",
-      "approved_at": "2026-05-12T17:30:00Z",
-      "approved_until": "2026-05-19T17:30:00Z",
-      "state": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJhcHByb3ZhbF9pZCI6ImFwcl8wMUhYNkJDRUY4SzNaMlg3UDBLNEpFNldWSyIsInNjb3BlIjoiY3JtX3Rvb2xzIiwiZXhwIjoxNzc5MjEwMDAwfQ.c2lnbmF0dXJl"
-    }
-  }
-}
-~~~
-
-### Re-evaluation After Approval
-
-The agent re-evaluates the original tool invocation; the PDP authorizes it against the approval reference.  Subsequent same-class CRM tool invocations within the approval lifetime are also authorized without a new Access Request.
-
-The re-evaluation request does not repeat the original `evaluation_id`.  The PDP resolves the `approval.id` (and `approval.state`, when present) to the approved Access Request task, original denied evaluation, and approved CRM tool-class scope.
-
-~~~ http
-POST /access/v1/evaluation HTTP/1.1
-Host: pdp.example.com
-Authorization: Bearer 2YotnFZFEjr1zCsicMWpAA
-Content-Type: application/json
-
-{
-  "subject": {
-    "type": "user",
-    "id": "alice@example.com",
-    "properties": {
-      "act": {
-        "iss": "https://agents.example.com",
-        "sub": "agent_renewal_assistant_v3",
-        "sub_profile": "ai_agent"
-      }
-    }
-  },
-  "resource": {
-    "type": "tool",
-    "id": "crm.search_accounts"
-  },
-  "action": {
-    "name": "invoke"
-  },
-  "context": {
-    "time": "2026-05-12T17:31:00Z",
-    "approval": {
-      "id": "apr_01HX6BCEF8K3Z2X7P0K4JE6WVK",
-      "approved_at": "2026-05-12T17:30:00Z",
-      "approved_until": "2026-05-19T17:30:00Z",
-      "state": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJhcHByb3ZhbF9pZCI6ImFwcl8wMUhYNkJDRUY4SzNaMlg3UDBLNEpFNldWSyIsInNjb3BlIjoiY3JtX3Rvb2xzIiwiZXhwIjoxNzc5MjEwMDAwfQ.c2lnbmF0dXJl"
-    }
-  }
-}
-~~~
-
-### Final Decision
-
-~~~ http
-HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-  "decision": true,
-  "context": {
-    "approval": {
-      "id": "apr_01HX6BCEF8K3Z2X7P0K4JE6WVK",
-      "approved_until": "2026-05-19T17:30:00Z"
-    }
-  }
-}
-~~~
-
 ## Submission Variants {#submission-variants}
 
 ### Submission with Additional Request Information
@@ -2217,10 +1840,6 @@ Provisioning changes platform state; re-evaluation reads that state.  Implementa
 
 When translating proprietary forms, distinguish submission data from vendor-specific widgets and metadata.  `request_schema_url` describes the input an autonomous PEP needs; `form_url` preserves richer rendering.  The AuthZEN Access Request Catalog Profile {{CATALOG}} handles fields whose values come from catalog APIs.
 
-## Notification Channels
-
-Existing webhook subscriptions or event-streaming bindings can provide completion notification instead of per-task callbacks ({{callback-completion}}).
-
 ## Time and Clock Skew
 
 The {{RFC3339}} timestamps in `context.evaluated_at`, `context.access_request.expires_at`, `denial.expires_at`, `task.expires_at`, `approval.approved_at`, and `approval.approved_until` may be checked on a host other than their producer.  Clock skew can therefore cause incorrect freshness or expiry decisions.
@@ -2262,7 +1881,6 @@ Implementations map backend lifecycle states to the canonical Task Status Endpoi
 | Closed, time-bounded request elapsed before completion | `expired` |
 | Closed, requester or administrator stopped the request | `cancelled` |
 | Closed, system error prevented completion | `failed` |
-| Closed, items in a bulk task reached two or more distinct terminal statuses | `partial` |
 
 # Design Rationale {#design-rationale}
 
@@ -2296,10 +1914,6 @@ Neither signing infrastructure nor shared state is forced on every deployment.
 ## Why echo selected denial fields? {#why-does-the-submissions-denial-object-carry-only-key-fields-not-the-full-authzen-decision}
 
 Signed or server-resolvable binding material is stronger evidence than a PEP-supplied JSON echo.  Other denial members, such as `endpoint`, `display`, and `form_url`, guide the PEP rather than the Access Request Service.  The submission carries only the fields the service uses.
-
-## Why support bundle and per-item denials? {#why-does-the-denial-object-support-both-a-top-level-and-per-item-form-for-bulk-submissions}
-
-A batch evaluation can produce one denial covering multiple Resource/Action pairs; separate evaluations produce separate denials.  Top-level binding supports the first case, and per-item binding the second.  Both allow a bundled submission without requiring the PEP to fabricate a bundle binding or submit each request separately.
 
 ## Why separate `approval.state` from `binding_token`? {#why-is-approvalstate-distinct-from-bindingtoken-when-both-are-opaque-round-trip-slots}
 
@@ -2345,5 +1959,6 @@ The author thanks the OpenID AuthZEN Working Group for discussion and review.
 
 -01
 
-* Editorial restructure.  The core protocol (requestable denial, submission, task status, approval and re-evaluation) is presented first, followed by binding and verification rules that place signed mechanisms beside their shared-state alternatives; optional features (bulk submissions, callbacks, cancellation, delegation and acting parties, machine-readable forms) follow in their own sections; security considerations name threats and point to the rules that sit beside the mechanisms they protect.  Requirements were relocated and restated without change in force, and duplicated restatements were consolidated.
+* Editorial restructure.  The core protocol (requestable denial, submission, task status, approval and re-evaluation) is presented first, followed by binding and verification rules that place signed mechanisms beside their shared-state alternatives; cancellation, delegation and acting parties, and machine-readable forms follow in their own sections; security considerations name threats and point to the rules that sit beside the mechanisms they protect.  Requirements were relocated and restated without change in force, and duplicated restatements were consolidated.
 * Catalog references moved to the companion AuthZEN Access Request Catalog Profile.
+* Bulk submission and callback notification requirements, feature-specific security considerations, and examples moved to companion profiles, with the core retaining normative references to their defined members and processing rules.

@@ -21,6 +21,8 @@ The HTML version is available [here](https://openid.github.io/authzen/authzen-ac
 
 A companion [Access Request Catalog Profile](https://openid.github.io/authzen/authzen-access-request-catalog-profile-1_0.html) defines how request form fields backed by catalogs (applications, entitlements, roles) are described and resolved.
 
+Companion [Bulk Access Requests](https://openid.github.io/authzen/authzen-access-request-bulk-profile-1_0.html) and [Callback Notifications](https://openid.github.io/authzen/authzen-access-request-callback-profile-1_0.html) profiles define multi-item requests and authenticated completion notifications.
+
 ## Draft OAuth 2.0 Token Issuance Profile
 
 A profile for using the AuthZEN Authorization API to externalize an authorization server's decision to issue a token, and to let the decision response shape what is issued. It is at `profiles/authzen-oauth/authzen-oauth-token-issuance-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-oauth-token-issuance-1_0.html).

@@ -132,6 +132,34 @@ jobs:
             authzen-access-request-catalog-profile-1_0.html
             profiles/authzen-access-request-approval/authzen-access-request-catalog-profile-1_0.xml
 
+      - name: Convert Bulk Access Requests Profile to rfc xml
+        run: kramdown-rfc2629 profiles/authzen-access-request-approval/authzen-access-request-bulk-profile-1_0.md > profiles/authzen-access-request-approval/authzen-access-request-bulk-profile-1_0.xml
+      - name: Render Bulk Access Requests Profile HTML
+        run: xml2rfc profiles/authzen-access-request-approval/authzen-access-request-bulk-profile-1_0.xml --html -o authzen-access-request-bulk-profile-1_0.html
+      - name: Render Bulk Access Requests Profile Text
+        run: xml2rfc profiles/authzen-access-request-approval/authzen-access-request-bulk-profile-1_0.xml --text
+      - name: Upload Bulk Access Requests Profile artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: access-request-bulk-profile
+          path: |
+            authzen-access-request-bulk-profile-1_0.html
+            profiles/authzen-access-request-approval/authzen-access-request-bulk-profile-1_0.xml
+
+      - name: Convert Callback Notifications Profile to rfc xml
+        run: kramdown-rfc2629 profiles/authzen-access-request-approval/authzen-access-request-callback-profile-1_0.md > profiles/authzen-access-request-approval/authzen-access-request-callback-profile-1_0.xml
+      - name: Render Callback Notifications Profile HTML
+        run: xml2rfc profiles/authzen-access-request-approval/authzen-access-request-callback-profile-1_0.xml --html -o authzen-access-request-callback-profile-1_0.html
+      - name: Render Callback Notifications Profile Text
+        run: xml2rfc profiles/authzen-access-request-approval/authzen-access-request-callback-profile-1_0.xml --text
+      - name: Upload Callback Notifications Profile artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: access-request-callback-profile
+          path: |
+            authzen-access-request-callback-profile-1_0.html
+            profiles/authzen-access-request-approval/authzen-access-request-callback-profile-1_0.xml
+
       - name: Convert Obligations Profile to rfc xml
         run: kramdown-rfc2629 profiles/authzen-obligations-profile-1_0.md > profiles/authzen-obligations-profile-1_0.xml
       - name: Render Obligations Profile HTML
@@ -243,6 +271,14 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: access-request-catalog-profile
+      - name: Download artifact - Bulk Access Requests profile
+        uses: actions/download-artifact@v8
+        with:
+          name: access-request-bulk-profile
+      - name: Download artifact - Callback Notifications profile
+        uses: actions/download-artifact@v8
+        with:
+          name: access-request-callback-profile
       - name: Download artifact - Obligations profile
         uses: actions/download-artifact@v8
         with:
