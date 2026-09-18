@@ -318,34 +318,112 @@ The Access Request Endpoint accepts a submission and returns a Task Handle.  Its
 
 The PEP submits an Access Request using the HTTP `POST` method as defined in {{RFC9110}}.
 
+A PEP MUST submit an Access Request only for an AuthZEN Decision with `decision` equal to `false` and a `context.access_request` object present in the Decision Context.
+
+A PEP SHOULD include an `Idempotency-Key` header, following the conventions described in {{I-D.ietf-httpapi-idempotency-key-header}}.  The Idempotency-Key covers the entire submission body, including all members of the `items` array when present.
+
 ### Request Body {#submission-request-body}
 
-Without `items`, the body carries `subject`, `resource`, `action`, and `denial`.  Bulk submissions use `items` in place of top-level `resource` and `action`; the member definitions below cover both shapes.
-
-The request body is a JSON object with the following members:
+For a single-item submission (`items` absent), the request body is a JSON object with the following members.  {{bulk-request-body}} defines the changes for bulk submissions.
 
 `subject`:
 : REQUIRED.  The AuthZEN Subject from the denied evaluation.
 
 `resource`:
-: REQUIRED when `items` ({{bulk-submissions}}) is absent; MUST be omitted when `items` is present.  The AuthZEN Resource from the denied evaluation.
+: REQUIRED.  The AuthZEN Resource from the denied evaluation.
 
 `action`:
-: REQUIRED when `items` is absent; MUST be omitted when `items` is present.  The AuthZEN Action from the denied evaluation.
+: REQUIRED.  The AuthZEN Action from the denied evaluation.
 
 `denial`:
-: Object binding the Access Request to the denied AuthZEN Decision.  REQUIRED in either of two cases:
-
-    * `items` is absent: the `denial` binds the single submitted Subject, Resource, Action, and authorization-relevant Context.
-    * `items` is present and any item lacks a per-item `denial`: the top-level `denial` is a bundle denial; its coverage rules are in {{bulk-submissions}}.
-
-  OPTIONAL when `items` is present and every item carries its own per-item `denial`.
+: REQUIRED.  Object binding the Access Request to the denied AuthZEN Decision.  It binds the submitted Subject, Resource, Action, and authorization-relevant Context.  Its members are defined in {{submission-denial-object}}.
 
 `context`:
 : OPTIONAL.  The AuthZEN Context from the denied evaluation, augmented with submission-time fields such as business justification.
 
   * Submission-time augmentations MUST NOT change or remove authorization-relevant context from the denied evaluation.
   * When the Access Request Service needs to distinguish original evaluation context from submission-time input, deployments SHOULD place the latter in well-defined extension members rather than overwriting original context members.
+
+The body can also carry `requested_access` and `client` ({{submission-additional-information}}), and `callback` ({{callback-completion}}).
+
+### The `denial` Object {#submission-denial-object}
+
+The `denial` object echoes selected members of the PDP's denied evaluation response.  The table maps their sources; the definitions below specify presence and handling.
+
+| Source in the denied evaluation response | Submission member |
+|---|---|
+| `context.access_request.expires_at` | `denial.expires_at` |
+| `context.evaluation_id` | `denial.evaluation_id` |
+| `context.access_request.binding_token` | `denial.binding_token` |
+
+`expires_at`:
+: REQUIRED.  {{RFC3339}} timestamp indicating when the requestable denial hint expires, echoed unchanged.
+
+`evaluation_id`:
+: REQUIRED when `denial.binding_token` is absent; otherwise RECOMMENDED.  A stable identifier for the denied evaluation, captured by the PEP and echoed unchanged ({{evaluation-identifier}}).
+
+  `evaluation_id` provides the strongest audit binding between the original denial and the submitted Access Request and SHOULD be preferred over `evaluated_at` alone.
+
+`binding_token`:
+: REQUIRED when `denial.evaluation_id` is absent; otherwise OPTIONAL.  String.  Integrity-protected binding material echoed unchanged ({{requestable-denial-context}}).  The PEP MUST NOT decode, modify, or interpret this value; it returns the original PDP-issued value byte-for-byte.
+
+Additional denial members for audit and routing are defined in {{submission-denial-metadata}}.
+
+### Request and Response Example {#submission-example}
+
+This standalone, non-normative exchange assumes the denied evaluation has no authorization-relevant Context and the denial specifies neither a template nor schema-required input.  `<binding_token>` stands for the original PDP-issued token copied unchanged, not a literal value to submit.
+
+~~~ http
+POST /access/v1/requests HTTP/1.1
+Host: pdp.example.com
+Authorization: Bearer 2YotnFZFEjr1zCsicMWpAA
+Content-Type: application/json
+Idempotency-Key: 7b8d0f0d-65a1-4af1-9fd3-a684f08a5d13
+
+{
+  "subject": {"type": "user", "id": "alice@example.com"},
+  "resource": {"type": "document", "id": "q4-plan"},
+  "action": {"name": "can_read"},
+  "denial": {
+    "expires_at": "2026-04-30T20:25:00Z",
+    "evaluation_id": "eval_01HX4Y2P8BQ4Y3F0V0K9D6Z7M1",
+    "binding_token": "<binding_token>"
+  }
+}
+~~~
+
+~~~ http
+HTTP/1.1 202 Accepted
+Content-Type: application/json
+
+{
+  "task": {
+    "id": "arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V4",
+    "status": "pending",
+    "status_endpoint": "https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V4"
+  }
+}
+~~~
+
+## Access Request Response {#access-request-response}
+
+A successful Access Request submission returns HTTP status code `201 Created` or `202 Accepted` and a JSON object containing a `task` member.  The `task.status_endpoint` member is authoritative for subsequent status retrieval.  A response MAY also include an HTTP `Location` header equal to `task.status_endpoint`.
+
+The response object has the following top-level members:
+
+`task`:
+: REQUIRED.  Task Handle returned for the submitted Access Request ({{task-handle-object}}).
+
+`result`:
+: OPTIONAL except where required by {{completed-task-response}}.  Completion result for the task.  A PEP MUST NOT treat this member as approval unless the task is approved and the result is enforceable under {{completion-semantics}}.
+
+When the Access Request Service is able to resolve the request synchronously (for example, when policy auto-approves and provisioning completes within the request), the Access Request Service SHOULD return `201 Created` with `task.status` already set to a terminal value and a populated `result` member ({{completion-semantics}}).  PEPs MUST handle this synchronous-completion case without polling; the Task Status Endpoint remains usable for later retrieval but is not on the critical path.
+
+A synchronous-completion example is provided in {{synchronous-submission-example}}.
+
+## Additional Request Information {#submission-additional-information}
+
+The following top-level members supplement the request body in {{submission-request-body}}.
 
 `requested_access`:
 : OPTIONAL.  Object containing request-specific information such as requested duration, requested role, requested entitlement, or requested scope.  This object does not define policy semantics and is interpreted by the Access Request Service.  The following well-known optional members are defined; additional members MAY be included subject to {{extension-naming}}:
@@ -363,33 +441,17 @@ The request body is a JSON object with the following members:
 
   The `actor` and `source` objects are supplied for authorization, routing, and audit correlation.
 
-Additional submission members are `items` for {{bulk-submissions}} and `callback` for {{callback-completion}}.
-
 When the denial includes `request_schema_url`, the PEP uses the referenced JSON Schema to determine the additional members of `context` and `requested_access` ({{machine-readable-forms}}).
 
-### The `denial` Object {#submission-denial-object}
+### Denial Metadata {#submission-denial-metadata}
 
-The `denial` object echoes selected members of the PDP's denied evaluation response.  The table maps their sources; the definitions below specify presence and handling.
+The following optional members of the `denial` object carry audit and routing information from the denied evaluation response.
 
 | Source in the denied evaluation response | Submission member |
 |---|---|
-| `context.access_request.expires_at` | `denial.expires_at` |
-| `context.evaluation_id` | `denial.evaluation_id` |
-| `context.access_request.binding_token` | `denial.binding_token` |
 | `context.evaluated_at` | `denial.evaluated_at` |
 | `context.reason` | `denial.reason` |
 | `context.access_request.template` | `denial.template` |
-
-`expires_at`:
-: REQUIRED.  {{RFC3339}} timestamp indicating when the requestable denial hint expires, echoed unchanged.
-
-`evaluation_id`:
-: REQUIRED when `denial.binding_token` is absent; otherwise RECOMMENDED.  A stable identifier for the denied evaluation, captured by the PEP and echoed unchanged ({{evaluation-identifier}}).
-
-  `evaluation_id` provides the strongest audit binding between the original denial and the submitted Access Request and SHOULD be preferred over `evaluated_at` alone.
-
-`binding_token`:
-: REQUIRED when `denial.evaluation_id` is absent; otherwise OPTIONAL.  String.  Integrity-protected binding material echoed unchanged ({{requestable-denial-context}}).  The PEP MUST NOT decode, modify, or interpret this value; it returns the original PDP-issued value byte-for-byte.
 
 `evaluated_at`:
 : OPTIONAL.  {{RFC3339}} timestamp indicating when the denial was produced.
@@ -400,9 +462,7 @@ The `denial` object echoes selected members of the PDP's denied evaluation respo
 `template`:
 : OPTIONAL.  String.  Echoed unchanged when the PDP provided one.  The Access Request Service uses this value to route the request to the appropriate workflow.
 
-### Idempotency {#submission-idempotency}
-
-A PEP SHOULD include an `Idempotency-Key` header, following the conventions described in {{I-D.ietf-httpapi-idempotency-key-header}}.  The Idempotency-Key covers the entire submission body, including all members of the `items` array when present.
+## Idempotency and Retries {#submission-idempotency}
 
 The Access Request Service SHOULD treat a repeated submission with the same `Idempotency-Key`, the same authenticated requester, and an equivalent submission body as the same request, returning the same Task Handle while the original request remains available.  A submission with the same `Idempotency-Key` and authenticated requester but a materially different submission body MUST be rejected with `urn:openid:authzen:access-request:error:duplicate_request`.
 
@@ -412,63 +472,39 @@ The Access Request Service SHOULD retain Idempotency-Key state at least until `t
 
 After the retention window elapses, the Access Request Service MAY reclaim the Idempotency-Key; a submission presenting a previously seen Idempotency-Key whose state has been reclaimed is processed as a new submission.
 
-#### Idempotency Key Abuse {#idempotency-key-abuse}
+### Idempotency Key Abuse {#idempotency-key-abuse}
 
 Implementations SHOULD scope idempotency keys to the authenticated caller and avoid storing them longer than necessary.
 
-### Submission Example
+## Submission Processing {#submission-processing}
 
-Non-normative example:
+The submitted `denial` object for each requested item MUST include either `denial.binding_token` or `denial.evaluation_id`.  The Access Request Service MUST reject a submission that lacks verifiable denial-binding material with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
 
-~~~ http
-POST /access/v1/requests HTTP/1.1
-Host: pdp.example.com
-Authorization: Bearer 2YotnFZFEjr1zCsicMWpAA
-Content-Type: application/json
-Idempotency-Key: 7b8d0f0d-65a1-4af1-9fd3-a684f08a5d13
+An Access Request whose denial binding does not cover the submitted Subject, Resource, Action, and authorization-relevant Context (for every item when `items` is present) MUST be rejected with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
 
-{
-  "subject": {
-    "type": "user",
-    "id": "alice@example.com"
-  },
-  "resource": {
-    "type": "document",
-    "id": "q4-plan"
-  },
-  "action": {
-    "name": "can_read"
-  },
-  "context": {
-    "business_justification": "Needed for customer renewal review"
-  },
-  "requested_access": {
-    "requested_until": "2026-05-01T00:15:00Z"
-  },
-  "denial": {
-    "evaluation_id": "eval_01HX4Y2P8BQ4Y3F0V0K9D6Z7M1",
-    "evaluated_at": "2026-04-30T20:15:00Z",
-    "expires_at": "2026-04-30T20:25:00Z",
-    "reason": "approval_required",
-    "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJldmFsdWF0aW9uX2lkIjoiZXZhbF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNMSJ9.bXBfc2lnbmF0dXJl",
-    "template": "manager_approval"
-  }
-}
-~~~
+The Access Request Service MUST be able to resolve or validate `denial.evaluation_id` before relying on it as denial-binding material.
 
-## Access Request Response {#access-request-response}
+The Access Request Service MUST reject submissions received after `denial.expires_at`, after applying any clock-skew tolerance it has configured (see {{impl-considerations}}).
 
-A successful Access Request submission returns HTTP status code `201 Created` or `202 Accepted` and a JSON object containing a `task` member.  The `task.status_endpoint` member is authoritative for subsequent status retrieval.  A response MAY also include an HTTP `Location` header equal to `task.status_endpoint`.
+The Access Request Service MUST NOT rely on `client.actor` or `client.source` as authorization input unless the values are independently verified by the service.
 
-The response object has the following top-level members:
+{{actor-source-verification}} and {{verifying-denial-binding}} define the actor and denial-binding verification procedures.
 
-`task`:
-: REQUIRED.  Task Handle returned for the submitted Access Request.
+## Actor and Source Verification {#actor-source-verification}
 
-`result`:
-: OPTIONAL except where required by {{completed-task-response}}.  Completion result for the task.  A PEP MUST NOT treat this member as approval unless the task is approved and the result is enforceable under {{completion-semantics}}.
+When authenticating a submission, the Access Request Service:
 
-When the Access Request Service is able to resolve the request synchronously (for example, when policy auto-approves and provisioning completes within the request), the Access Request Service SHOULD return `201 Created` with `task.status` already set to a terminal value and a populated `result` member ({{completion-semantics}}).  PEPs MUST handle this synchronous-completion case without polling; the Task Status Endpoint remains usable for later retrieval but is not on the critical path.
+* MUST authenticate the PEP using the deployment's chosen mechanism (typically an OAuth 2.0 bearer token, mutual TLS certificate, or signed assertion).
+* When the submission claims an actor or actor chain in `client.actor`, MUST verify that the authenticated caller's credential authorizes the entire claimed chain, not only the immediate actor.  Mechanisms commonly used to provide such authorization include {{RFC8693}} OAuth 2.0 Token Exchange (where the access token names the Subject as the on-behalf-of party and the chain via `act` claims), signed assertions from a trusted issuer, or deployment-specific authentication policies.
+* MUST reject submissions whose claimed chain cannot be verified against the caller's credential or against trusted issuers identified in the deployment.
+
+Unverified `client.actor` content MAY be retained as audit metadata only; the rule that it is not authorization input is stated in {{submission-processing}}.
+
+{{delegation}} describes the delegation model and credentials; {{client-actor-source}} defines the `client.actor` and `client.source` members.
+
+# Checking the Task
+
+## Task Handle {#task-handle-object}
 
 The `task` object has the following members:
 
@@ -505,83 +541,6 @@ The `task` object has the following members:
   * `cancel`: URL where the PEP can cancel the request, when PEP-initiated cancellation is supported.
 
 The `items` member of this object, present for bulk submissions, is defined in {{bulk-submissions}}.
-
-Non-normative example:
-
-~~~ http
-HTTP/1.1 202 Accepted
-Content-Type: application/json
-Location: https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V4
-
-{
-  "task": {
-    "id": "arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V4",
-    "status": "pending",
-    "status_endpoint": "https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V4",
-    "expires_at": "2026-04-30T23:00:00Z",
-    "links": {
-      "cancel": "https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V4/cancel"
-    },
-    "display": {
-      "title": "Access request submitted",
-      "description": "Your manager has been asked to approve access."
-    }
-  }
-}
-~~~
-
-Non-normative synchronous-completion example, where policy auto-approved the request:
-
-~~~ http
-HTTP/1.1 201 Created
-Content-Type: application/json
-Location: https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V5
-
-{
-  "task": {
-    "id": "arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V5",
-    "status": "approved",
-    "status_endpoint": "https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V5"
-  },
-  "result": {
-    "mode": "reevaluate",
-    "approval": {
-      "id": "apr_01HX4Y8E2NE3Y2X7P0K4JE6WVJ",
-      "approved_until": "2026-05-01T00:42:00Z"
-    }
-  }
-}
-~~~
-
-## Submission Processing {#submission-processing}
-
-A PEP MUST submit an Access Request only for an AuthZEN Decision with `decision` equal to `false` and a `context.access_request` object present in the Decision Context.
-
-The submitted `denial` object for each requested item MUST include either `denial.binding_token` or `denial.evaluation_id`.  The Access Request Service MUST reject a submission that lacks verifiable denial-binding material with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
-
-An Access Request whose denial binding does not cover the submitted Subject, Resource, Action, and authorization-relevant Context (for every item when `items` is present) MUST be rejected with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
-
-The Access Request Service MUST be able to resolve or validate `denial.evaluation_id` before relying on it as denial-binding material.
-
-The Access Request Service MUST reject submissions received after `denial.expires_at`, after applying any clock-skew tolerance it has configured (see {{impl-considerations}}).
-
-The Access Request Service MUST NOT rely on `client.actor` or `client.source` as authorization input unless the values are independently verified by the service.
-
-{{actor-source-verification}} and {{verifying-denial-binding}} define the actor and denial-binding verification procedures.
-
-## Actor and Source Verification {#actor-source-verification}
-
-When authenticating a submission, the Access Request Service:
-
-* MUST authenticate the PEP using the deployment's chosen mechanism (typically an OAuth 2.0 bearer token, mutual TLS certificate, or signed assertion).
-* When the submission claims an actor or actor chain in `client.actor`, MUST verify that the authenticated caller's credential authorizes the entire claimed chain, not only the immediate actor.  Mechanisms commonly used to provide such authorization include {{RFC8693}} OAuth 2.0 Token Exchange (where the access token names the Subject as the on-behalf-of party and the chain via `act` claims), signed assertions from a trusted issuer, or deployment-specific authentication policies.
-* MUST reject submissions whose claimed chain cannot be verified against the caller's credential or against trusted issuers identified in the deployment.
-
-Unverified `client.actor` content MAY be retained as audit metadata only; the rule that it is not authorization input is stated in {{submission-processing}}.
-
-{{delegation}} describes the delegation model and credentials; {{client-actor-source}} defines the `client.actor` and `client.source` members.
-
-# Checking the Task
 
 ## Task Status Endpoint {#task-status-endpoint}
 
@@ -700,7 +659,7 @@ Implementations that define additional status values ({{task-status}}) extend th
 
 ## Pending Task Response
 
-A response with `task.status: pending` echoes the submission's Task Handle ({{access-request-response}}).  Polls use the same shape, updating status, progress, and links as the task advances.  {{completed-task-response}} defines the response at terminal status.
+A response with `task.status: pending` echoes the submission's Task Handle ({{task-handle-object}}).  Polls use the same shape, updating status, progress, and links as the task advances.  {{completed-task-response}} defines the response at terminal status.
 
 Non-normative example:
 
@@ -866,7 +825,7 @@ A PEP MAY cache or retain an Approval Result, but MUST NOT independently infer t
 | Deadline | Meaning for the PEP | Rules |
 |---|---|---|
 | `denial.expires_at` | Echo the denial's expiry at submission; the Access Request Service checks freshness. | {{access-request-submission}}, {{verifying-denial-binding}} |
-| `task.expires_at` | When supplied, limits Task Handle validity.  Polling stops at expiry or terminal status. | {{access-request-response}}, {{task-status-endpoint}} |
+| `task.expires_at` | When supplied, limits Task Handle validity.  Polling stops at expiry or terminal status. | {{task-handle-object}}, {{task-status-endpoint}} |
 | `approval.approved_until` | Bounds approval reuse and enforcement, not a guarantee of access until that time. | {{approval-result}}, {{approval-lifetime}} |
 
 {{approval-lifetime}} also covers expiry returned by the PDP and downstream credential lifetimes.  Clock-skew qualifications remain in {{impl-considerations}}.  Expiry inside an opaque artifact is checked by its verifier, not extracted by the PEP ({{verifying-denial-binding}}, {{approval-verification}}).
@@ -932,7 +891,7 @@ The following problem types are defined:
 : HTTP `400 Bad Request`.  The submitted Access Request cannot be bound to the denied AuthZEN Decision.
 
 `urn:openid:authzen:access-request:error:duplicate_request`:
-: HTTP `409 Conflict`.  The `Idempotency-Key` was reused by the same requester with a submission body that is not equivalent to the original request (see {{access-request-submission}}).
+: HTTP `409 Conflict`.  The `Idempotency-Key` was reused by the same requester with a submission body that is not equivalent to the original request (see {{submission-idempotency}}).
 
 `urn:openid:authzen:access-request:error:unknown_task`:
 : HTTP `404 Not Found`.  The task handle is unknown or unavailable to the caller.
@@ -1144,6 +1103,15 @@ The Access Request Service's workflow policy determines approval breadth, subjec
 
 # Bulk Submissions {#bulk-submissions}
 
+## Bulk Request Body {#bulk-request-body}
+
+Bulk submissions use the top-level members defined in {{submission-request-body}} and {{submission-additional-information}}, with these changes:
+
+* When `items` is present, the top-level `resource` MUST be omitted.
+* When `items` is present, the top-level `action` MUST be omitted.
+* The top-level `denial` is REQUIRED when any item lacks a per-item `denial`.  It is a bundle denial; its coverage rules are in {{bulk-denial-binding}}.
+* The top-level `denial` is OPTIONAL when every item carries its own per-item `denial`.
+
 ## Request Items
 
 `items`:
@@ -1152,7 +1120,7 @@ The Access Request Service's workflow policy determines approval breadth, subjec
   * `resource`: REQUIRED.  The AuthZEN Resource for this item.
   * `action`: REQUIRED.  The AuthZEN Action for this item.
   * `requested_access`: OPTIONAL.  Per-item `requested_access` overrides; merged with the top-level `requested_access` with item values taking precedence.
-  * `denial`: OPTIONAL.  Per-item denial binding when items came from separate AuthZEN Authorization API evaluations.  A per-item `denial` uses the same members as the top-level `denial` object.  See the top-level `denial` definition in {{access-request-submission}} and the bulk coverage rules in {{bulk-denial-binding}}.
+  * `denial`: OPTIONAL.  Per-item denial binding when items came from separate AuthZEN Authorization API evaluations.  A per-item `denial` uses the same members as the top-level `denial` object.  See {{submission-denial-object}} and {{submission-denial-metadata}} for denial members and {{bulk-denial-binding}} for bulk coverage rules.
 
 Non-normative bulk-submission example:
 
@@ -1199,7 +1167,7 @@ Idempotency-Key: 7b8d0f0d-65a1-4af1-9fd3-a684f08a5d14
 
 When `items` is present and any item lacks a per-item `denial`, the top-level `denial` is a bundle denial whose verifiable binding material MUST cover the Subject, authorization-relevant Context, and every Resource and Action in `items`.
 
-The top-level `denial` presence rules are in {{access-request-submission}}; the binding claims are defined in {{binding-token-integrity}}.  For bulk submissions, those claims cover the entire `items` array and authorization-relevant Context:
+The top-level `denial` presence rules are in {{bulk-request-body}}; the binding claims are defined in {{binding-token-integrity}}.  For bulk submissions, those claims cover the entire `items` array and authorization-relevant Context:
 
 * Inline bulk binding claims list each submitted item, including the full Resource and Action objects for that item, in the same order as the bound Access Request.
 * A bulk `binding_hash` is the base64url-encoded (without padding) SHA-256 digest of the JCS serialization of the JSON object `{"subject": <Subject>, "items": [{"resource": <Resource>, "action": <Action>}, ...], "context": <authorization-relevant Context>}`, where `<Subject>` is the bound Subject with `subject.properties.act` removed and the `items` array order is the order bound by the denial.  Implementations that use a bulk hashed form MUST use exactly this construction.
@@ -1493,7 +1461,7 @@ An Access Request Service implementing this profile:
 
 This profile does not define an approval policy language.  Implementations MUST NOT treat the `template`, `requested_access`, or `display` fields as sufficient authorization policy.  Actual approval scope and enforcement semantics are determined by the PDP and Access Request Service.
 
-The `requested_access.emergency` member ({{access-request-submission}}) is a request signal, not an authorization override.  Implementations that support emergency or break-glass access SHOULD require a business justification, apply the shortest practical approval or access lifetime, notify appropriate owners or security personnel, and require post-use review.  Emergency requests and approvals SHOULD be retained and auditable according to the deployment's security and compliance policy.
+The `requested_access.emergency` member ({{submission-additional-information}}) is a request signal, not an authorization override.  Implementations that support emergency or break-glass access SHOULD require a business justification, apply the shortest practical approval or access lifetime, notify appropriate owners or security personnel, and require post-use review.  Emergency requests and approvals SHOULD be retained and auditable according to the deployment's security and compliance policy.
 
 ### Approver Eligibility and Separation of Duties {#approver-eligibility}
 
@@ -2106,6 +2074,99 @@ Content-Type: application/json
     "approval": {
       "id": "apr_01HX6BCEF8K3Z2X7P0K4JE6WVK",
       "approved_until": "2026-05-19T17:30:00Z"
+    }
+  }
+}
+~~~
+
+## Submission Variants {#submission-variants}
+
+### Submission with Additional Request Information
+
+Non-normative example:
+
+~~~ http
+POST /access/v1/requests HTTP/1.1
+Host: pdp.example.com
+Authorization: Bearer 2YotnFZFEjr1zCsicMWpAA
+Content-Type: application/json
+Idempotency-Key: 7b8d0f0d-65a1-4af1-9fd3-a684f08a5d13
+
+{
+  "subject": {
+    "type": "user",
+    "id": "alice@example.com"
+  },
+  "resource": {
+    "type": "document",
+    "id": "q4-plan"
+  },
+  "action": {
+    "name": "can_read"
+  },
+  "context": {
+    "business_justification": "Needed for customer renewal review"
+  },
+  "requested_access": {
+    "requested_until": "2026-05-01T00:15:00Z"
+  },
+  "denial": {
+    "evaluation_id": "eval_01HX4Y2P8BQ4Y3F0V0K9D6Z7M1",
+    "evaluated_at": "2026-04-30T20:15:00Z",
+    "expires_at": "2026-04-30T20:25:00Z",
+    "reason": "approval_required",
+    "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJldmFsdWF0aW9uX2lkIjoiZXZhbF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNMSJ9.bXBfc2lnbmF0dXJl",
+    "template": "manager_approval"
+  }
+}
+~~~
+
+### Task Handle with Display and Links
+
+Non-normative example:
+
+~~~ http
+HTTP/1.1 202 Accepted
+Content-Type: application/json
+Location: https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V4
+
+{
+  "task": {
+    "id": "arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V4",
+    "status": "pending",
+    "status_endpoint": "https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V4",
+    "expires_at": "2026-04-30T23:00:00Z",
+    "links": {
+      "cancel": "https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V4/cancel"
+    },
+    "display": {
+      "title": "Access request submitted",
+      "description": "Your manager has been asked to approve access."
+    }
+  }
+}
+~~~
+
+### Synchronous Completion {#synchronous-submission-example}
+
+Non-normative synchronous-completion example, where policy auto-approved the request:
+
+~~~ http
+HTTP/1.1 201 Created
+Content-Type: application/json
+Location: https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V5
+
+{
+  "task": {
+    "id": "arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V5",
+    "status": "approved",
+    "status_endpoint": "https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C1V5"
+  },
+  "result": {
+    "mode": "reevaluate",
+    "approval": {
+      "id": "apr_01HX4Y8E2NE3Y2X7P0K4JE6WVJ",
+      "approved_until": "2026-05-01T00:42:00Z"
     }
   }
 }
