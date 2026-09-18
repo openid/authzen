@@ -137,6 +137,9 @@ Access Request:
 Access Request Service:
 : A role that receives Access Request submissions and manages the resulting approval task.  This role MAY be played by the PDP itself (logically part of the PDP), by a service trusted by the PDP (such as a governance platform), or by an independent service operating with delegated authority from the PDP.
 
+Independent Access Request Service:
+: For denial binding, an Access Request Service without trusted access to denied-evaluation state shared with or delegated by the PDP.  Independence describes state access, not organizational ownership or absence of trust between the roles.
+
 Requestable Denial:
 : An AuthZEN Authorization API Decision with `decision` set to `false` and a Decision Context indicating that the denied access can be requested through an Access Request Endpoint.
 
@@ -161,9 +164,22 @@ Three roles take part in this profile:
 * The PDP decides and remains authoritative at enforcement time.
 * The Access Request Service runs the approval workflow.
 
-For the signed forms, the PDP signs `binding_token` ({{binding-token-integrity}}), and the Access Request Service, or the PDP acting through it, signs `approval.state` ({{completion-semantics}}).  Other integrity-protected formats are described in {{interoperability-baseline}} and {{denial-binding-alternatives}}, and by-reference alternatives in {{shared-state-deployments}}.
-
 The protocol surface, authorization rules, and binding requirements apply to whichever entity plays the Access Request Service role, whether the PDP itself, a trusted service, or an independent service with delegated authority.
+
+## Binding Model {#binding-model}
+
+Both exchanges carry binding material through the PEP.  The signed-proof and trusted-state verification patterns are:
+
+| Exchange | Signed proof | Trusted-state lookup |
+|---|---|---|
+| Denial: PDP to Access Request Service | Self-contained `binding_token`, signed by the PDP | `evaluation_id`, resolved by the Access Request Service |
+| Approval: Access Request Service to PDP | `approval.state`, signed by the service or the PDP acting through it | `approval.id`, resolved by the PDP |
+
+These are verification patterns, not mutually exclusive members.  With a `binding_token`, an accompanying `evaluation_id` serves only correlation and audit.  `approval.id` remains present alongside signed `approval.state`.  The `state` member also permits other verifier state, not only signed proof ({{approval-result}}).
+
+Denial claims are defined in {{binding-token-integrity}} and checked at submission under {{verifying-denial-binding}}.  Approval verification is defined in {{approval-verification}}; both lookup alternatives are in {{shared-state-deployments}}.  Other integrity-protected formats are covered by {{interoperability-baseline}} and {{denial-binding-alternatives}}.
+
+Stateless PDP evaluation means retaining no prior decisions, not dispensing with the current-approval-status check in {{approval-lifetime}}.
 
 ## PDP Metadata {#discovery}
 
@@ -1996,7 +2012,7 @@ The profile addresses missing authority, not missing information.  Supplying att
 This profile has the following design goals:
 
 * Preserve the AuthZEN Authorization API's allow/deny decision model.
-* Preserve stateless PDP evaluation, with durable request, approval, and denial-binding state in the Access Request Service role.
+* Permit PDP evaluation without retaining prior decisions; support signed bindings where the PDP and Access Request Service do not share denial or approval records.  Durable request, approval, and denial-binding state lives in the Access Request Service role.
 * Provide a common handoff to human, automated, or hybrid governance evaluators without replacing existing approval infrastructure.
 * Support high-volume callers through broad-scope approvals, auto-approval, pre-approval, and bulk approval.
 * Make requestability explicit and machine-readable so autonomous PEPs can construct a conformant submission without human intervention at submission time.
