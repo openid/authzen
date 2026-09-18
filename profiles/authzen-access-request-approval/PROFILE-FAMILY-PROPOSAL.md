@@ -1,67 +1,79 @@
-# Proposal: A Layered Profile Family with a Colocated Core
+# Proposal: A Layered Profile Family with a Trusted-State Core
 
-Version 2, 2026-09-17. Status: proposal for the working group, drafted at the editor's request. Version 1 (2026-09-17, as `COMPANION-SPLIT-PROPOSAL.md`) proposed moving bulk submissions and callback completion to companion profiles. Version 2 supersedes it after the feedback on issue #520 (Alex, Vatsal): the core becomes the simplest deployment, and every other capability, including signed denial binding and signed approval state, is a profile layered on it. This document changes nothing until the working group decides. Word and keyword counts are measured on the restructured text at PR A3 (`arap-restructure-a3`, 00db206) and are estimates where a heading must be split at unit level.
+Version 4, 2026-09-18. Status: proposal for the working group, drafted at the editor's request. Version 4 corrects version 3 after the editor's review: the move map is measured on the current text, with bulk and callbacks already extracted; common semantics that version 3 still placed in the signed layer (`approval_unverifiable`, the opaque `approval.state` member, the shared-state half of G10) are split out explicitly; the G21 direction no longer offers an extension-point rule as an answer for silently ignored callbacks; and the sequencing defines the normative transition before any relocation. Version 3 corrected version 2 after the editor's review: the layers are named for what they bind rather than for topology; denial-side and approval-side signed binding are separate boundaries; the PEP has its own common conformance rather than relying on reserved member names; the common core keeps every rule that trusted-state resolution needs; the capability URN is given advertisement semantics; and the claim that signed-layer implementations interoperate is withdrawn in favour of what the register still has to settle. Version 1 proposed moving bulk and callbacks out, which has since been done on `arap-restructure`. This document changes nothing until the working group decides. Counts are measured on the text at 0c20d5a.
+
+## Framing
+
+Three layers:
+
+- **Common PEP protocol and security invariants.** The wire format for the requestable denial, the submission, the Task Handle, and the approval object; the PEP's conditional presence rules and opaque forwarding of `binding_token` and `approval.state`; expiry enforcement; tuple and Context comparison; caller binding; approval applicability; the current-status check; task-handle authorization. Every deployment implements this, and a conforming PEP works against either backend below without knowing which it is.
+- **Trusted-state backend binding.** The PDP records the denied evaluation and returns a stable `evaluation_id`; the Access Request Service resolves it against state shared with or delegated by the PDP; the PDP verifies an approval by looking up `approval.id`. This is the simplest complete deployment. The profile does not standardize the shared-state interface, so two independently built products that both claim only this layer are not thereby interoperable with each other; a conforming PEP is interoperable with either.
+- **Portable signed binding.** Two separately claimable capabilities: signed denial binding (`binding_token` issued by the PDP and verified by the service) for a service that cannot resolve the PDP's denial state, and signed approval state (`approval.state` issued by the service and verified by the PDP) for a PDP that cannot resolve the approval record. A deployment may need one, both, or neither; independence on one side does not imply it on the other.
 
 ## The decision requested
 
-Whether the core specification should define only the colocated deployment, in which the PDP and the Access Request Service correlate a denial and its Access Request by `evaluation_id` and the Task Handle, with all other capabilities defined in companion profiles that hook in through the core's extension points.
+Whether the profile should define these as separately claimed conformance targets, so that a deployment using only trusted-state binding is conformant without implementing signed-artifact verification, and whether the signed capabilities are a later part of this document or a companion profile.
 
-## Why the layered core is better for implementers and adoption
+## What changes and what does not
 
-- **The PEP is the same in every layer.** A PEP echoes the denial, holds a Task Handle, and re-submits an approval object. Whether the members it carries are opaque signed tokens or bare identifiers changes nothing it does. PEPs are the many implementations; PDPs and Access Request Services are the few. The layering costs PEP implementers nothing and gives them one short document.
-- **The first implementers are colocated.** A PDP vendor that also runs the workflow, or a governance product that plays both roles, can implement the colocated case in days. Today it must also implement JWS issuance, verification, and key publication to conform, for a topology it does not have (Interoperability Baseline, two MUSTs).
-- **The open protocol questions are all in the signed layer.** Register entries G1, G2, G4, G9, and G10 are what block an independent PDP and Access Request Service from interoperating. The colocated core has no blocking entry. Layering lets the core stabilize while the signed layer is settled.
-- **It is the pattern already chosen.** The catalog split, the extension points, and the member registry exist so that features hook in from outside.
-- **Size.** Part I falls from about 10,100 words and 284 keywords to roughly 6,000 words and 170 keywords. The four flow sections each fit on a screen or two.
+Today the Interoperability Baseline requires every Access Request Service to support verifying a JWS `binding_token` and every PDP to support verifying a JWS `approval.state`, without a trusted-state exception. Layering the document editorially (PR A4) does not change that: a conformance claim covers the whole document, and a rule that moves behind an optional claim changes its applicability even when every sentence moves verbatim. This is therefore a normative decision, to be made before the extraction is described as mechanical.
 
-## Two guardrails
+If adopted, the three sentences that move behind the signed claims are the Interoperability Baseline's two MUSTs, the `jwks_uri` publication rule, and the rule that an independent service requires `binding_token`, which becomes the applicability statement of signed denial binding. The baseline's JWS compact serialization becomes the mandatory-to-implement format within each signed capability.
 
-1. **Reserve the wire members in the core.** `binding_token` and `approval.state` stay in the core as opaque members with the PEP rules that already exist: the PEP does not decode, modify, or interpret them, and echoes them unchanged. The core says only that a profile defines their content and verification. A core PEP then works unchanged against a colocated or a distributed backend, and the layering is invisible on the PEP side. The same holds for `items`, `callback`, `form_url`, and `request_schema_url`: registered names, defined by their profiles.
-2. **Name the layers.** Each profile declares a capability URN in PDP metadata, as the core already does with `urn:openid:authzen:capability:access-request`, and carries its own conformance section. A product then says which layers it supports, and "supports ARAP" is not ambiguous. Without this, layering fragments: two products claim support and cannot interoperate.
+If not adopted, the interim statement stands: shared-state deployments need not exchange signed artifacts, but conforming Access Request Services and PDPs must support their respective JWS verification paths, and section placement does not waive that.
+
+## What the common core keeps regardless
+
+Expiry enforcement on `denial.expires_at`, `task.expires_at`, and `approved_until`; structural comparison of Subject, Resource, Action, and authorization-relevant Context; binding of the task to the caller, requester, and client; the PDP's applicability check at re-evaluation; the current-approval-status check; and task-handle authorization. Only artifact construction and artifact verification are exclusive to the signed capabilities. Register entry G6, the identity-binding question, is not about signatures and remains a core question; extraction does not make the core publication-ready on its own.
+
+## Capability advertisement
+
+Each capability is declared by a URN in the PDP metadata `capabilities` array, alongside the existing `urn:openid:authzen:capability:access-request`, for example one URN for signed denial binding and one for signed approval state. The profile must define what a declaration means: that the deployment has the capability enabled for the roles the PDP speaks for, not merely that the product could support it; which role each URN covers; and that absence means the capability is not offered, so a PEP or peer does not expect the corresponding artifact. Without these semantics a URN names a contract without completing it.
+
+## What a URN does not settle
+
+A common mandatory-to-implement format gives two signed-capability implementations a common verification path. It does not by itself give them compatible issuance: algorithms, payload claims, issuer and audience identities, key-to-issuer trust, and current-status handling are register entries G1, G2, G4, G9, and G3. Cross-vendor interoperability of the signed capabilities is complete when those are settled, not when the URN is defined.
 
 ## The family
 
-| Document | Answers the question | Built from |
+| Document | Answers the question | Status |
 |---|---|---|
-| Core | there was a deny; how does the caller find out what to do next, with the PDP and Access Request Service correlating by `evaluation_id` and the Task Handle | Part I minus the signed layer; Deployment Alternatives' shared-state text becomes the main text |
-| Distributed Deployment | the PDP and the Access Request Service share no state | the signed layer listed below |
-| Forms | the PEP cannot build the request from the denial alone | Machine-Readable Forms, Trusting URLs, the PEP schema rule |
-| Catalog | form fields come from a backing catalog | exists |
-| Bulk | many items in one request | Bulk Submissions and the bulk conditions in Part I |
-| Callbacks | push instead of poll | Callback Completion and the subscribed-PEP exception |
+| Core | there was a deny; how does the caller find out what to do next, correlating by `evaluation_id` and the Task Handle | this document after PR A4 |
+| Binding Artifacts | a role cannot resolve the other role's state, or a deployment chooses portable proof | Part II of this document; two separately claimable capabilities if the decision is adopted |
+| Forms | the PEP cannot build the request from the denial alone | Part III today; a companion if the working group prefers |
+| Catalog | form fields come from a backing catalog | published companion |
+| Bulk | many items in one request | companion, extracted 2026-09-18 |
+| Callbacks | push instead of poll | companion, extracted 2026-09-18 |
 
-## Move map, by heading
+## Move map, if the decision is adopted
 
-Headings marked "split" contain units for more than one document; the split is made at unit level from `PASS0-INVENTORY.tsv`, which already tags every requirement by actor and feature.
+Measured on the text at 0c20d5a. Units marked "split" have both a common and an artifact-specific part.
 
-**Distributed Deployment (about 2,800 words, 65 keywords).** Interoperability Baseline (50 words, 3 keywords, whole). Denial Binding Claims (597, 13, whole). Verifying the Denial Binding (259, 5, whole). Denial Binding Alternatives (309, 4, whole except the bulk construction, which goes to Bulk). The `jwks_uri` rules in PDP Metadata (split, about half of 262 and 9). The `binding_token` definition and the by-value paragraph in Requestable Denial Context (split, about 150 and 6). The hashed form and the `binding_context_members` bullet in Structural Comparison (split). In Approval and Re-evaluation, the `approval.state` definition, the JWS verification rules, the bound-reference pattern, and the carried-by-value sentence of Decision and Binding Integrity (split, about 1,100 and 26). The signature-related bullets in the three conformance lists (split, about 10 keywords). The Denial and Approval Integrity threat paragraphs on binding-token integrity and approval-reference substitution. The registry rows for `jwks_uri` and the `approval_unverifiable` reason. Register entries G1, G2, G4, G9, G10, and G3's stateless case go with it.
+**Common core keeps.** Everything in Part I of the A4 layout, including: the opaque `approval.state` member definition and the PEP's preservation rule (766 to 768), because a common PEP forwards it whatever the backend; the `binding_token` presence rule and opacity bullets (255 to 258); `approval_unverifiable` (799) and `expired_denial` (897 to 898), which cover unresolved `approval.id` and the trusted-state deadline as well as artifact failures; Structural Comparison including the `binding_context_members` bullet, which applies whenever a `binding_token` is used; Decision and Binding Integrity, including the by-value sentence (960), which is triggered by use; the PDP rule at 1300, which names both forms; the shared-state half of G10 (which value governs when the recorded and echoed deadlines differ).
 
-**Forms (about 600 words, 17 keywords).** Machine-Readable Forms (442, 12, whole). Trusting URLs from the Requestable Denial (123, 3, whole; the `endpoint` sentence stays in the core). The `form_url` and `request_schema_url` pointer in Requestable Denial Context and the PEP schema bullet in PEP Processing Rules (split). The Information Disclosure threat paragraph on trusting URLs. Register entry G14.
+**Signed denial binding capability (about 1,900 words, 40 keywords).** Interoperability Baseline's service clause; the `jwks_uri` publication rule as it applies to `binding_token`; the integrity and JWE bullets (259 to 260); Denial Binding (964 to 974) including the Independent Access Request Service requirement, which becomes this capability's applicability statement; Denial Binding Claims, JWT Claim Reference, Binding the Denied Request, Hash Construction, Verifying the Denial Binding, Denial Binding Alternatives (976 to 1052); the conformance bullet 1302 and the artifact clauses of 1313 to 1317; the binding-token threat paragraph; register entries G1, G4 (denial side), G9 (denial side), and the issuer-side force question of G10.
 
-**Bulk (about 1,300 words, 34 keywords).** Bulk Submissions (617, 19, whole). The `items` conditions on `resource`, `action`, and `denial`, the bundle-denial rules, and the Idempotency-Key sentence in Access Request Submission (split). The `partial` status, its transition, and the completed-task bullet for items (split across Task Status Values, State Transitions, Completed Task Response). The per-item re-evaluation paragraph in Approval and Re-evaluation. The bulk construction in Denial Binding Alternatives. The bulk-bundle threat paragraph. The registry rows for `items` and `partial`. Register entry G12.
-
-**Callbacks (about 800 words, 24 keywords).** Callback Completion (508, 19, whole). The subscribed-PEP exception in Task Status Endpoint, the callback mention in Protocol Overview and Forward Compatibility (split). The callback threat paragraph. The registry row for `callback`. Register entry G18.
-
-**Core (about 14,000 words including appendices; Part I about 6,000 words, 170 keywords).** Everything else: the Introduction and overview, Terminology, Roles, Endpoint Protection, the `access_request` object with `endpoint`, `template`, `expires_at`, `display`, and the reserved opaque members, Evaluation Identifier, Structural Comparison's inline rule, Access Request Submission and Response, Actor and Source Verification, Checking the Task, Approval and Re-evaluation by lookup with `approval.id`, Error Responses, Core Conformance, Cancellation, Delegation, Extensibility, the threat paragraphs on denial remains denial, confused deputy by shared state, task-handle leakage, approver hygiene, availability, Privacy, the registries, and the appendices. Shared-State Deployments stops being an alternative and becomes the main text of Sections 5 and 8. Register entries G5, G6, G8, G11, G13, G15, G17, G19, G20, G21, G22 stay with the core.
+**Signed approval state capability (about 900 words, 25 keywords).** Interoperability Baseline's PDP clause; the `jwks_uri` rule as it applies to `approval.state`; Approval State (1056 to 1066), whose first sentence becomes this capability's applicability statement; the bound-reference sentences (748, 1082, 1102); the identifier cross-check (1074), which is triggered by use of a state artifact carrying an identifier; the approval-substitution threat paragraph's by-value clause; register entries G2, G4 (approval side), G9 (approval side), and G3's stateless case.
 
 ## What the core must say for the layers to work
 
 - A one-paragraph reading guide: which profile a deployment needs, by the question it answers.
-- The reserved opaque members and the PEP courier rules for them.
+- Common PEP conformance: the conditional presence rules for `binding_token` and `approval.state` and the opaque-forwarding rules, stated for every PEP so a core PEP accepts either backend. Reserving the member names is not sufficient on its own.
 - The rule that implementations MAY define additional status values and that a PEP treats an unknown status as not approved, so Bulk can define `partial` without a core change.
-- The response of a core-only Access Request Service to a member it does not implement (register entry G21). With the layering, the natural answer is the extension-point rule plus one problem type.
+- The response of a core-only Access Request Service to a member it does not implement (register entry G21). For `items` a named problem type suffices. For `callback` it does not: a service that accepts the submission and ignores the member leaves a PEP that skips polling with no signal, so the answer is an acceptance or rejection signal, which is G18.
 - The capability URN pattern and the requirement that a profile declare one.
 
 ## The cost
 
-Cross-vendor interoperability between an independent PDP and Access Request Service becomes a property of implementing the Distributed Deployment profile, not of the core. The Design Rationale entry that presents the signed form first is rewritten to say why the signed form is a layer. Four new documents to build, publish, and maintain, each through the CI checklist the catalog split already exercised. A reader who wants the whole picture reads five documents instead of one; the family reading guide and cross-references by section name mitigate this.
+Cross-vendor interoperability between an independent PDP and Access Request Service becomes a property of both roles claiming the relevant capability, not of the core, and is complete only when the register's artifact entries are settled. The Design Rationale entry on presentation order is rewritten. Two more conformance targets to name, test, and explain, and a reader who wants the whole picture reads Part II as well as Part I; the reading guide mitigates this.
 
 ## Sequencing
 
-1. Merge the PR A stack as it stands. Its inventory, isolated sections, threat statements, and register are what make the split cheap and provable; the layering does not undo any of it.
-2. PR B, one pull request per companion, each a verbatim relocation performed with the Pass 0 tooling (inventory, generated line map, unit comparison, anchor check), so the working group can confirm nothing changed in force. Order: Distributed Deployment first, because it moves the most and settles the shape of the core; then Forms; then Bulk and Callbacks.
-3. The core's reading guide, reserved-member paragraph, capability URNs, and G21 answer as one small normative pull request after the relocations, since they are the only new text.
-4. Register Part A entries are worked in their own profiles after that.
+1. Merge `arap-restructure` (PR A, including the A4 layout). Its inventory, isolated sections, threat statements, and register make the split cheap and provable; the layering does not undo any of it.
+2. The working group decides the conformance question.
+3. If adopted, one normative pull request defines the transition before anything moves: the scope conditions of the Interoperability Baseline and `jwks_uri` rule; the two capability URNs with their advertisement semantics (enabled behaviour, role covered, meaning of absence); the common PEP conformance statement; the G21 answer for `items`. A capability must be defined before a rule can be placed behind it.
+4. Then the relocation, as a verbatim move with the Pass 0 tooling, into Part II of this document or into a companion, as decided in step 2.
+5. Register Part A entries are worked in the layer that owns them, per the move map.
 
 ## Not proposed
 

@@ -54,7 +54,7 @@ The terms PEP, PDP, Subject, Resource, Action, Context, Access Request, Access R
 
 ## Bulk Request Body {#bulk-request-body}
 
-Bulk submissions use the top-level members defined in [Request Body](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#submission-request-body) and [Additional Request Information](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#submission-additional-information), with these changes:
+Bulk submissions use the top-level members defined in [Request Body](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#submission-request-body) and [Additional Request Members](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#submission-additional-information), with these changes:
 
 * When `items` is present, the top-level `resource` MUST be omitted.
 * When `items` is present, the top-level `action` MUST be omitted.
@@ -71,7 +71,7 @@ The Idempotency-Key covers the entire submission body, including all members of 
   * `resource`: REQUIRED.  The AuthZEN Resource for this item.
   * `action`: REQUIRED.  The AuthZEN Action for this item.
   * `requested_access`: OPTIONAL.  Per-item `requested_access` overrides; merged with the top-level `requested_access` with item values taking precedence.
-  * `denial`: OPTIONAL.  Per-item denial binding when items came from separate AuthZEN Authorization API evaluations.  A per-item `denial` uses the same members as the top-level `denial` object.  See [The denial Object](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#submission-denial-object) and [Denial Metadata](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#submission-denial-metadata) for denial members and {{bulk-denial-binding}} for bulk coverage rules.
+  * `denial`: OPTIONAL.  Per-item denial binding when items came from separate AuthZEN Authorization API evaluations.  A per-item `denial` uses the same members as the top-level `denial` object.  See [The denial Object](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#submission-denial-object) for denial members and {{bulk-denial-binding}} for bulk coverage rules.
 
 Non-normative bulk-submission example:
 
@@ -132,7 +132,7 @@ When every item carries its own per-item `denial`, each per-item binding is veri
 
   * `resource`: REQUIRED.  The AuthZEN Resource for this item, echoing the submission.
   * `action`: REQUIRED.  The AuthZEN Action for this item.
-  * `status`: REQUIRED.  Per-item status using the values defined in [Task Status Values](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#task-status).
+  * `status`: REQUIRED.  Per-item status using the values defined in [Task Status and Transitions](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#task-status).
   * `result`: OPTIONAL before the item reaches a terminal status; REQUIRED when the item status is `approved`.  Per-item completion result with the same shape as the top-level `result` ([Approval and Re-evaluation](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#completion-semantics)).
 
 When `items` is present, `progress` describes aggregate workflow progress for the bundled task; per-item progress is tracked in `task.items[]`.
@@ -141,7 +141,7 @@ When `task.status` is `approved` and the task contains an `items` array, each ap
 
 When the `items` member is present, the aggregate `task.status` is computed from per-item statuses as follows:
 
-* If any item is `pending` or in an implementation-defined non-terminal status ([Task Status Values](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#task-status)), the aggregate is `pending`.
+* If any item is `pending` or in an implementation-defined non-terminal status ([Task Status and Transitions](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#task-status)), the aggregate is `pending`.
 * Otherwise, if all items share the same terminal status, the aggregate is that status.
 * Otherwise, with two or more distinct terminal statuses present across items, the aggregate is `partial`.
 
