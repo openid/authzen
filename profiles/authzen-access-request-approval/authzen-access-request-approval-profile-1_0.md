@@ -71,21 +71,19 @@ informative:
 
 --- abstract
 
-This specification defines an extension profile for the OpenID AuthZEN Authorization API that allows a Policy Enforcement Point (PEP) to submit an access request when an authorization decision is denied but requestable.  The profile preserves the AuthZEN Authorization API decision model: a denied decision remains a denial and MUST NOT be treated as access.  It adds a requestable denial context, an access request endpoint, a task handle for the asynchronous workflow that resolves a denial, and a re-evaluation completion mode that lets the Policy Decision Point remain authoritative at enforcement time after approval.
+This profile extends the OpenID AuthZEN Authorization API so a Policy Enforcement Point (PEP) can submit an access request after a requestable denial.  The profile preserves the AuthZEN Authorization API decision model: a denied decision remains a denial and MUST NOT be treated as access.  It defines denial context, an access request endpoint, a task handle for the asynchronous workflow, and re-evaluation after approval to keep the Policy Decision Point authoritative at enforcement time.
 
 --- middle
 
 # Introduction
 
-The AuthZEN Authorization API enables a Policy Enforcement Point (PEP) to ask a Policy Decision Point (PDP) whether a Subject may perform an Action on a Resource within a Context.  The PDP returns a Decision indicating whether the operation is allowed or denied.
+The AuthZEN Authorization API lets a Policy Enforcement Point (PEP) ask a Policy Decision Point (PDP) whether a Subject may perform an Action on a Resource within a Context.  The PDP returns an allow or deny Decision.
 
-In deployments where authority is fixed at provisioning time through roles, scopes, or service-account grants, a runtime denial typically ends the interaction.
+When authority is fixed at provisioning time through roles, scopes, or service-account grants, a runtime denial typically ends the interaction.  When approval is possible during execution, a requestable denial lets the PEP submit an Access Request to an approval workflow.  In the base completion mode, the PEP re-evaluates access against current policy after approval.
 
-Other deployments require approval during execution.  A requestable denial lets the PEP hand the request to an approval workflow.  In the base completion mode, the PEP then re-evaluates access against current policy before permitting the operation.
+This profile standardizes that handoff for autonomous callers and user-facing applications ({{protocol-overview}}).
 
-This profile standardizes that handoff for autonomous callers and user-facing approval flows.  {{protocol-overview}} shows the flow.
-
-Workflow engines, approval policy languages, ticketing systems, entitlement catalogs, user interfaces, and approver-facing inbox or enumeration APIs are out of scope.  The PDP or Access Request Service supplies these capabilities; this profile does not standardize how approvers discover and act on pending requests.  The evaluator behind the handoff can be human or automated.
+Workflow engines, approval policy languages, ticketing systems, entitlement catalogs, user interfaces, and approver-facing inbox or enumeration APIs are out of scope.  The PDP or Access Request Service supplies these capabilities, including how human or automated evaluators discover and act on pending requests.
 
 The presence of `context.access_request` does not weaken the AuthZEN Authorization API decision.  A PEP MUST NOT grant access based on a requestable denial.  Access is permitted only after an approved completion result is enforced according to this profile.
 
@@ -119,7 +117,7 @@ The presence of `context.access_request` does not weaken the AuthZEN Authorizati
      |<----------------------------------|                                 |
 ~~~
 
-The access evaluation in step 1 uses the existing AuthZEN Access Evaluation API.  The denial in step 2 is still a denial.  The PEP MUST NOT permit the requested operation based only on the presence of `context.access_request`.  Step 6 is a new AuthZEN Authorization API evaluation against the PDP so the PDP remains authoritative at enforcement time.
+Steps 1 and 6 use the AuthZEN Access Evaluation API.  Step 6 is a new evaluation, not a resumption of the denied operation.  The PEP MUST NOT permit the requested operation based only on the presence of `context.access_request`.
 
 In step 5 the PEP can poll the task, receive a callback ({{callback-completion}}), or otherwise use the Task Handle to determine completion.
 
@@ -162,11 +160,11 @@ Three roles take part in this profile:
 * The PDP decides and remains authoritative at enforcement time.
 * The Access Request Service runs the approval workflow.
 
-The protocol surface, authorization rules, and binding requirements apply to whichever entity plays the Access Request Service role, whether the PDP itself, a trusted service, or an independent service with delegated authority.
+The protocol, authorization, and binding requirements apply regardless of which entity plays the Access Request Service role.
 
 ## Binding Model {#binding-model}
 
-Both exchanges carry binding material through the PEP.  The signed-proof and trusted-state verification patterns are:
+Denial and approval binding material passes through the PEP for verification by the receiving role:
 
 | Exchange | Signed proof | Trusted-state lookup |
 |---|---|---|
@@ -175,7 +173,7 @@ Both exchanges carry binding material through the PEP.  The signed-proof and tru
 
 These are verification patterns, not mutually exclusive members.  With a `binding_token`, an accompanying `evaluation_id` serves only correlation and audit.  `approval.id` remains present alongside signed `approval.state`.  The `state` member also permits other verifier state, not only signed proof ({{approval-result}}).
 
-Denial claims are defined in {{binding-token-integrity}} and checked at submission under {{verifying-denial-binding}}.  Approval verification is defined in {{approval-verification}}; both lookup alternatives are in {{shared-state-deployments}}.  Other integrity-protected formats are covered by {{interoperability-baseline}} and {{denial-binding-alternatives}}.
+See {{binding-token-integrity}} for denial claims, {{verifying-denial-binding}} for submission checks, and {{approval-verification}} for approval checks.  {{shared-state-deployments}} defines the lookup alternatives; {{interoperability-baseline}} and {{denial-binding-alternatives}} cover other integrity-protected formats.
 
 Stateless PDP evaluation means retaining no prior decisions, not dispensing with the current-approval-status check in {{approval-lifetime}}.
 
@@ -187,13 +185,15 @@ A PDP supporting this profile SHOULD include the following capability URN in the
 
 `urn:openid:authzen:capability:access-request`
 
-A PDP that issues or verifies signed values for use under this profile (for example, a JWS-signed `binding_token` or a JWS `approval.state`, defined in {{completion-semantics}}) MUST publish a `jwks_uri` in PDP metadata.  The value is an HTTPS URI of a JWK Set {{RFC7517}} document containing the verification keys for the signed artifacts this profile defines: PDP-issued `binding_token` values and `approval.state` values signed by the PDP's Access Request Service.  Keys are distinguished by their `kid` and by the JWS `iss`.
+A PDP that issues or verifies signed values for use under this profile (for example, a JWS-signed `binding_token` or a JWS `approval.state`, defined in {{completion-semantics}}) MUST publish a `jwks_uri` in PDP metadata.
+
+The value is an HTTPS URI of a JWK Set {{RFC7517}} document containing the verification keys for the signed artifacts this profile defines: PDP-issued `binding_token` values and `approval.state` values signed by the PDP's Access Request Service.  Keys are distinguished by their `kid` and by the JWS `iss`.
 
 Each JWK in the set SHOULD include a `kid` parameter so JWS signatures issued with a `kid` header can be resolved to the corresponding verification key, and SHOULD include a `use` parameter distinguishing signing keys (`use: "sig"`) from any other keys advertised.
 
 Verifiers cache the JWK Set per HTTP cache headers and refresh it on key-rotation events.  An unrecognized `kid` SHOULD cause the verifier to refresh the JWK Set before rejecting the input.
 
-The following is a non-normative metadata example:
+Non-normative metadata example:
 
 ~~~ json
 {
@@ -254,17 +254,19 @@ The `access_request` object has the following members:
 
 Two further members of this object, `form_url` and `request_schema_url`, are defined in {{machine-readable-forms}}.
 
-The Decision's reason (why the evaluation returned `false`) is conveyed in the Decision Context.  The AuthZEN Authorization API treats the contents of the Decision Context as implementation-defined; this profile uses `context.reason` as a machine-readable reason code, which the PEP echoes as `denial.reason` when submitting an Access Request.
+AuthZEN leaves Decision Context implementation-defined.  This profile uses `context.reason` for the machine-readable denial reason, which the PEP echoes as `denial.reason` in the Access Request.
 
 The PDP MUST provide enough denial-binding material for the Access Request Service to verify that a submitted Access Request corresponds to the denied evaluation and is still fresh.  A requestable denial MUST include `expires_at` and at least one of two denial-binding forms: `binding_token` by value, defined below, or `evaluation_id` by reference, defined in {{shared-state-deployments}}.
 
-**`binding_token` (by value).**  An integrity-protected token that protects or constrains the requestable-denial expiry.  The PDP signs it and retains no state.  This form works in any topology, and is REQUIRED when the Access Request Service does not share state with the PDP (an independent Access Request Service).  For that independent topology the `binding_token` MUST be self-contained: it carries the denied Subject, Resource, Action, and authorization-relevant Context by value (inline or as a `binding_hash`) and the Access Request Service verifies it offline against the PDP's published key, per {{binding-token-integrity}}.  A `binding_token` that only references shared state, for example one carrying `evaluation_id` alone, does not satisfy the independent-Access-Request-Service requirement.
+**`binding_token` (by value).**  An integrity-protected token that protects or constrains the requestable-denial expiry.  The PDP signs it and retains no state.  This form works in any topology, and is REQUIRED when the Access Request Service does not share state with the PDP (an independent Access Request Service).
+
+For that independent topology the `binding_token` MUST be self-contained: it carries the denied Subject, Resource, Action, and authorization-relevant Context by value (inline or as a `binding_hash`) and the Access Request Service verifies it offline against the PDP's published key, per {{binding-token-integrity}}.  A `binding_token` that only references shared state, for example one carrying `evaluation_id` alone, does not satisfy the independent-Access-Request-Service requirement.
 
 A PDP MAY emit both forms.  When a `binding_token` is present it is the authoritative denial binding, and any accompanying `evaluation_id` serves only as a correlation and audit identifier rather than a second binding form; the Access Request Service resolves `evaluation_id` as a binding form only when no `binding_token` is present.  This is why a PDP MAY follow the conformance recommendation to return a stable `context.evaluation_id` ({{evaluation-identifier}}) even when it also emits a `binding_token`.
 
 The durable denial-binding record lives in the Access Request Service role, not the PDP.  This is the denial-side mirror of the re-evaluation rule that requires `approval.state` when the PDP cannot resolve `approval.id` from shared or delegated state ({{completion-semantics}}).  When neither binding form is available, or when the Access Request Service cannot determine that the binding is unexpired, the PDP MUST NOT include `context.access_request` in the Decision Context.
 
-The following is a non-normative example:
+Non-normative example:
 
 ~~~ json
 {
@@ -297,7 +299,9 @@ Re-evaluation uses the `approval` object, not `evaluation_id` ({{completion-sema
 
 A PDP returns `evaluation_id` as a member of the AuthZEN Decision Context: `context.evaluation_id`, a string.  The PEP echoes the captured identifier as `denial.evaluation_id` when submitting an Access Request.
 
-`evaluation_id` MUST be stable for a given evaluation: subsequent retrievals or echoes of the same evaluation MUST return the same identifier.  PDPs SHOULD generate identifiers that are unique within the PDP's namespace (for example, ULIDs or UUIDs).  An identifier MAY be reused across distinct evaluations only after the original evaluation's binding window has expired.  The binding window is the period during which the Access Request Service can resolve or validate the identifier for Access Request submission; it MUST NOT extend beyond `context.access_request.expires_at`.
+`evaluation_id` MUST be stable for a given evaluation: subsequent retrievals or echoes of the same evaluation MUST return the same identifier.  PDPs SHOULD generate identifiers that are unique within the PDP's namespace (for example, ULIDs or UUIDs).
+
+An identifier MAY be reused across distinct evaluations only after the original evaluation's binding window has expired.  The binding window is the period during which the Access Request Service can resolve or validate the identifier for Access Request submission; it MUST NOT extend beyond `context.access_request.expires_at`.
 
 A PDP that returns `context.access_request` without an integrity-protected `binding_token` MUST include `evaluation_id` so the Access Request Service has verifiable denial-binding material; this is the by-reference form and applies only to shared-state deployments ({{requestable-denial-context}}).
 
@@ -356,9 +360,7 @@ PEPs MUST NOT submit credentials to a host that is not trusted to receive them.
 
 # Submitting the Access Request
 
-The Access Request Endpoint accepts an Access Request submission and returns a Task Handle.
-
-The endpoint is identified by the `access_request_endpoint` PDP metadata parameter or by the `context.access_request.endpoint` value returned in a requestable denial.  The endpoint path is deployment-specific.
+The Access Request Endpoint accepts a submission and returns a Task Handle.  Its deployment-specific URL comes from `access_request_endpoint` in PDP metadata or `context.access_request.endpoint` in the denial.
 
 ## Access Request Submission {#access-request-submission}
 
@@ -430,9 +432,9 @@ The `denial` object echoes selected members of the PDP's denied evaluation respo
 `template`:
 : OPTIONAL.  String.  Echoed unchanged from `context.access_request.template` of the denied evaluation, when the PDP provided one.  The Access Request Service uses this value to route the request to the appropriate workflow.
 
-Two further submission members are defined later: `items`, for bulk submissions ({{bulk-submissions}}), and `callback`, for callback completion ({{callback-completion}}).
+Additional submission members are `items` for {{bulk-submissions}} and `callback` for {{callback-completion}}.
 
-The PEP determines the additional members of the `context` and `requested_access` objects from the JSON Schema referenced by the requestable denial's `request_schema_url` ({{machine-readable-forms}}), when present.
+When the denial includes `request_schema_url`, the PEP uses the referenced JSON Schema to determine the additional members of `context` and `requested_access` ({{machine-readable-forms}}).
 
 A PEP MUST submit an Access Request only for an AuthZEN Decision with `decision` equal to `false` and a `context.access_request` object present in the Decision Context.
 
@@ -442,7 +444,7 @@ A PEP SHOULD include an `Idempotency-Key` header, following the conventions desc
 
 The Access Request Service SHOULD treat a repeated submission with the same `Idempotency-Key`, the same authenticated requester, and an equivalent submission body as the same request, returning the same Task Handle while the original request remains available.  A submission with the same `Idempotency-Key` and authenticated requester but a materially different submission body MUST be rejected with `urn:openid:authzen:access-request:error:duplicate_request`.
 
-Bodies are equivalent when identical under a deterministic comparison chosen by the Access Request Service; otherwise they are materially different.  For example, a stable JSON canonicalization can ignore insignificant whitespace and object-member ordering, excluding the `Idempotency-Key` header itself.  The service that records the key also evaluates retries, so this comparison need not be interoperable across implementations.
+Bodies are equivalent when identical under the Access Request Service's deterministic comparison; otherwise they are materially different.  For example, stable JSON canonicalization can ignore insignificant whitespace and object-member ordering; the `Idempotency-Key` header is outside the body.  The same service records keys and evaluates retries, so the comparison need not be interoperable across implementations.
 
 The Access Request Service SHOULD retain Idempotency-Key state at least until `task.expires_at` and SHOULD continue to retain it for at least 24 hours after the task reaches a terminal status.  This window lets retries from delayed PEP restarts find the original task rather than spawning a duplicate.
 
@@ -665,7 +667,7 @@ The following members are for PEP interactions with the Access Request Service o
 
 PEPs SHOULD NOT forward these members to end clients or other non-PEP callers.  Exposing them enables direct service calls that bypass the PEP or attempts to inject approval references into other evaluations.  Possession is not authorization: Task Handle operations require caller authorization ({{authorization-and-authentication}}), and the PDP checks approval applicability ({{approval-verification}}).
 
-Human-facing surfaces are conveyed separately and are intended to be rendered only to callers authorized for the corresponding human workflow:
+Human-facing members are intended only for callers authorized for the corresponding workflow:
 
 * `task.links.ticket`: URL where the requester (Subject) can view the request and its status.
 * `task.links.review`: URL where an approver or administrator can review or act on the request.
@@ -677,7 +679,7 @@ When a PEP renders requester-facing status to an end client, it SHOULD do so by 
 
 The Task Handle survives PEP restart, replacement, or handoff to another runtime instance.  A caller MAY interact with the Task Handle, such as polling status or initiating cancellation, even if that caller is not the original submitting PEP, provided the caller is authorized for the original Subject, Resource, Action, task, and requested operation.
 
-For example, an agent runtime can persist the Task Handle from step 4 of {{protocol-overview}}, pause while approval proceeds, and resume at step 5 or 6 from a fresh process.  Handles can pass through a conversation thread, session store, or workflow orchestrator without preserving the original session.
+For example, an agent can persist the Task Handle at step 4 of {{protocol-overview}} and resume at step 5 or 6 from a fresh process.  A conversation thread, session store, or workflow orchestrator can carry the handle without preserving the original session.
 
 This profile defines neither pause/resume orchestration nor an API to enumerate a Subject's tasks.  Task Handles are exchanged through the channels that delivered the original Access Request response.
 
@@ -735,7 +737,7 @@ Implementations that define additional status values ({{task-status}}) extend th
 
 ## Pending Task Response
 
-A response with `task.status: pending` echoes the Task Handle returned at submission ({{access-request-response}}).  Subsequent polls return the same response shape with status, progress, and link members updated as the task advances; when the task reaches a terminal status, the response form is governed by {{completed-task-response}}.
+A response with `task.status: pending` echoes the submission's Task Handle ({{access-request-response}}).  Polls use the same shape, updating status, progress, and links as the task advances.  {{completed-task-response}} defines the response at terminal status.
 
 Non-normative example:
 
@@ -793,9 +795,9 @@ PEPs SHOULD fail closed when task status cannot be determined.  Access Request S
 
 # Approval and Re-evaluation {#completion-semantics}
 
-This profile defines a single completion mode, identified by `result.mode`: `reevaluate`.  The mode instructs the PEP to perform a new AuthZEN Access Evaluation after approval, so the PDP remains authoritative at enforcement time.
+The only base completion mode, `result.mode: "reevaluate"`, directs the PEP to perform a new AuthZEN Access Evaluation after approval.  The PDP evaluates current policy and state, rather than resuming the original denial, and remains authoritative at enforcement time.
 
-Re-evaluation is a new evaluation against current policy and state, not a resumption of the original denial.  The PEP supplies the approval as an input attribute at `context.approval`; the PDP need not retain the original decision.
+The PEP supplies the approval at `context.approval`; the PDP need not retain the original decision.
 
 The binding topology determines which PDP can verify the approval: an integrity-protected `approval.state` can be verified using the issuer's verification key, while lookup of `approval.id` requires access to the backing state.
 
@@ -833,7 +835,7 @@ At re-evaluation, the PDP:
 * MUST resolve or verify the approval reference presented in `context.approval` and confirm that it is applicable to the authenticated caller or requester, current Subject, Resource, Action, relevant Context, approval scope, and approval expiry before using it as an input to an allow decision.
 * MUST ignore or reject a swapped, replayed, expired, or otherwise non-applicable approval reference, and MUST evaluate the request as not approved by that reference.
 
-An approval reference has two deployment patterns.  In the bound reference, described here, the PDP verifies `approval.state`, which carries integrity-protected proof or verifier state.  The lookup pattern is described in {{shared-state-deployments}}.
+In the bound-reference pattern, the PDP verifies `approval.state`, carrying integrity-protected proof or verifier state.  {{shared-state-deployments}} defines the lookup alternative.
 
 Deployments MAY use both patterns together.  In all cases, the PDP MUST verify the approval against trusted state or integrity-protected binding material; neither `approval.id` nor `approval.state` is a bearer grant by itself.
 
@@ -868,7 +870,9 @@ When the PDP denies a re-evaluation that presented an `approval` reference, it S
   * A PEP that receives `next_action: "request"` without `context.access_request` MUST NOT submit a new Access Request and treats the denial as `none`.
   * A PEP that receives no `next_action`, or an unrecognized value, falls back first to the default next action for a recognized `reason`, then to the requestable-denial signal.
   * When the fallback action is `request`, the PEP treats the denial as `request` only when `context.access_request` is present; otherwise it treats the denial as `none`.
-* `retry_after`: RECOMMENDED when `next_action` is `retry`.  Integer.  Number of seconds the PEP waits before re-evaluating the same request.  This has the same value semantics as the delta-seconds form of the HTTP `Retry-After` field (Section 10.2.3 of {{RFC9110}}), but is carried in the Decision Context because the Access Evaluation response itself is a successful protocol response.  A PEP that receives `next_action: "retry"` without `retry_after` SHOULD apply bounded exponential backoff with jitter, starting at several seconds and growing to no more than one minute between attempts, and MUST stop retrying once the approval expires.
+* `retry_after`: RECOMMENDED when `next_action` is `retry`.  Integer.  Number of seconds the PEP waits before re-evaluating the same request.  Its value has the delta-seconds semantics of HTTP `Retry-After` (Section 10.2.3 of {{RFC9110}}); it appears in Decision Context because an Access Evaluation denial is a successful protocol response.
+
+  A PEP that receives `next_action: "retry"` without `retry_after` SHOULD apply bounded exponential backoff with jitter, starting at several seconds and growing to no more than one minute between attempts, and MUST stop retrying once the approval expires.
 * `reason`: OPTIONAL.  String.  A machine-readable reason code for UX and audit.  This profile defines the following well-known re-evaluation denial reason codes with their default `next_action`:
     * `approval_expired` (`request`): the approval is no longer valid because `approved_until` has passed or it was revoked, cancelled, or superseded.
     * `out_of_scope` (`request`): the approval is valid but the current evaluation falls outside its approval scope.
@@ -886,9 +890,7 @@ When the re-evaluation response indicates an approval expiry (typically as `cont
 
 ## Approval Scope and Reuse {#approval-scope}
 
-An approval can cover future evaluations, avoiding a new Access Request for each operation.  For example, an entitlement, role, or time-bounded grant can cover repeated access to a resource class, subject to the PDP's current policy.
-
-Approval scope describes the Access Evaluations for which an approval may be considered.  This profile defines an exact-match baseline; broader matching is deployment-specific or defined by downstream profiles ({{approval-scope-extensions}}).
+Approval scope determines which Access Evaluations may use an approval, subject to current PDP policy.  Reusing an approval avoids a new Access Request for each operation.  This profile defines exact-match scope; broader matching, such as a resource-class or role grant, is deployment-specific or defined by downstream profiles ({{approval-scope-extensions}}).
 
 The default approval scope is the original denied Subject, Resource, Action, and authorization-relevant Context bound to the Access Request.  An evaluation is within this scope when its Subject, Resource, Action, and authorization-relevant Context are equal, member by member, to the bound values, using the structural comparison, authorization-relevant Context set, and `subject.properties.act` exclusion defined in {{structural-comparison}}.  This baseline is engine-neutral, and two independently implemented PDP and Access Request Service pairs MUST interoperate on it.
 
@@ -1077,13 +1079,13 @@ When the PDP and Access Request Service share state, or the service operates wit
 
 ### Denial Binding by Reference
 
-In the by-reference form, `evaluation_id` is a stable identifier ({{evaluation-identifier}}) that the Access Request Service resolves against state shared with, or delegated by, the PDP, within a server-side binding window.  This form applies only to same-service or shared-state deployments, because a stateless PDP retains no decision state for an independent service to fetch.
+The Access Request Service resolves `evaluation_id` against state shared with, or delegated by, the PDP, within the binding window defined in {{evaluation-identifier}}.  This form applies only to same-service or shared-state deployments: a stateless PDP retains no decision state to fetch.
 
 When `denial.binding_token` is absent, the Access Request Service MUST resolve or validate `denial.evaluation_id`, retrieve the Subject, Resource, Action, authorization-relevant Context, and `expires_at` recorded for that evaluation in shared state, verify the Subject, Resource, Action, and Context match the submission using the structural comparison defined in {{structural-comparison}} (rejecting a mismatch with `urn:openid:authzen:access-request:error:invalid_denial_binding`), and enforce freshness against the recorded `expires_at` rather than the PEP-echoed `denial.expires_at`.
 
 ### Approval Reference by Lookup
 
-In the lookup pattern, the PDP resolves `approval.id` in trusted server-side state.  The bound-reference pattern, in which the PDP verifies `approval.state`, is defined in {{completion-semantics}}.
+The PDP resolves `approval.id` in trusted server-side state.  {{approval-verification}} defines the bound-reference alternative using `approval.state`.
 
 ## Denial Binding Alternatives {#denial-binding-alternatives}
 
@@ -1224,7 +1226,7 @@ Callback delivery is a notification optimization.  The Task Status Endpoint rema
 
 Implementations MAY satisfy completion notification through deployment-level event subscriptions (for example, organization-scoped webhooks or event-streaming bindings defined by companion specifications) rather than per-task callbacks.  When a deployment relies on such a subscription, the PEP MAY omit the `callback` member from the Access Request submission.  Deployment-level event subscriptions deliver the same Task Handle and lifecycle information to subscribed receivers; they are a notification channel and MUST NOT be treated as enforcement unless paired with a separate enforceable result.
 
-Non-normative callback example.  This callback is notification-only because it does not include a `result`; the PEP polls the Task Status Endpoint before enforcing access.
+Non-normative notification-only callback: no `result` is included, so the PEP retrieves task status before enforcing access.
 
 ~~~ http
 POST /callbacks/access-requests HTTP/1.1
@@ -1309,7 +1311,7 @@ When a deployment expects autonomous PEP submissions, the requestable denial SHO
 
 Implementations using proprietary form languages MAY publish a JSON Schema derived from their native form description.  Translation can lose rendering details; the JSON Schema referenced by `request_schema_url` SHOULD provide enough information for an autonomous PEP to construct a conformant submission, while richer rendering, widget, and interaction details remain in `form_url`.
 
-The AuthZEN Access Request Catalog Profile {{CATALOG}} defines how a PEP resolves catalog-backed fields such as applications, entitlements, roles, or cost centers.  The requestable denial references a catalogs document defined by that profile, keeping catalog resolution separate from the form schema's data shape.
+The companion Catalog Profile {{CATALOG}} defines how a PEP resolves fields backed by application, entitlement, role, or cost-center catalogs.  The denial references a Catalogs Document; the form schema defines the data shape.
 
 This profile does not define a UI rendering vocabulary.  Deployments that need richer rendering hints (such as widget selection, layout, or conditional display) MAY layer a UI vocabulary, identified out of band, typically keyed by `template`.
 
@@ -1358,7 +1360,7 @@ An implementation receiving a member or value it does not recognize at an extens
 
 ## Profiles
 
-A profile of this specification is a separate document that defines a coherent set of extensions for a particular use case.  Examples include a profile binding this specification to OAuth 2.0 token requests, a profile carrying Rich Authorization Requests {{?RFC9396}}, or a profile describing integration with a specific governance platform.
+A profile is a separate specification defining extensions for a use case, such as OAuth 2.0 token requests, Rich Authorization Requests {{?RFC9396}}, or integration with a governance platform.
 
 A profile SHOULD:
 
@@ -1378,11 +1380,11 @@ This section describes threats and cites their mitigations.  It introduces no re
 
 **Denial remains denial.** Treating `context.access_request` as permission would grant access without an allow decision.  The PEP rules in {{pep-processing-rules}} preserve denial and treat unknown task statuses and completion modes as not approved.
 
-**Confused deputy and request substitution.** An attacker could substitute a Subject or Resource, or reorder a bundle.  The service compares the submission with the signed denial ({{verifying-denial-binding}}) or, when no token is present, the recorded evaluation ({{shared-state-deployments}}).  Bundle binding preserves item coverage and order ({{bulk-denial-binding}}).  Task binding also covers the denial, requester, and client ({{ars-processing-rules}}); the PDP checks approval applicability and scope at re-evaluation ({{approval-verification}} and {{approval-scope}}).
+**Confused deputy and request substitution.** An attacker could substitute a Subject or Resource, or reorder a bundle.  Submission checks compare signed denial claims ({{verifying-denial-binding}}) or, when no token is present, recorded state ({{shared-state-deployments}}); bundle binding covers item contents and order ({{bulk-denial-binding}}).  Task binding covers the denial, requester, and client ({{ars-processing-rules}}), and re-evaluation checks approval applicability and scope ({{approval-verification}} and {{approval-scope}}).
 
-**Binding-token integrity.** A buggy or hostile PEP could alter or fabricate PDP-issued state to influence approval routing or scope.  Integrity protection and binding claims ({{binding-token-integrity}}), submission verification and freshness checks ({{verifying-denial-binding}}), and equivalent checks for alternative formats ({{denial-binding-alternatives}}) protect this round trip.
+**Binding-token integrity.** A buggy or hostile PEP could alter or fabricate PDP-issued state to influence approval routing or scope.  {{binding-token-integrity}} and {{verifying-denial-binding}} define integrity, binding, and freshness checks; {{denial-binding-alternatives}} covers other formats.
 
-**Approval reference substitution and replay.** A compromised PEP could present another request's approval or replay an expired or otherwise inapplicable reference.  Approval verification checks applicability and binding; by-value material is verified for integrity, issuer, audience, and expiry, while backing records are protected against unauthorized lookup and mutation ({{completion-semantics}}).  An approval reference is not a bearer grant.
+**Approval reference substitution and replay.** A compromised PEP could present another request's approval or replay an expired or inapplicable reference.  {{completion-semantics}} defines applicability and binding checks, verification of by-value material, and protection of backing records.  An approval reference is not a bearer grant.
 
 **Bulk bundle escalation.** An aggregate status or result could be mistaken for approval of every item.  {{bulk-submissions}} requires per-item status and results and limits use of a top-level result for item authorization.
 
@@ -1404,13 +1406,13 @@ This section describes threats and cites their mitigations.  It introduces no re
 
 ## Operational and Integration
 
-**Callback security.** Callback endpoints can be abused for spoofing, replay, request forgery, and server-side request forgery. Destination validation, notification authentication, and the PEP-side checks are at {{callback-completion}}.
+**Callback security.** Callbacks expose spoofing, replay, and request-forgery risks, including server-side request forgery.  {{callback-completion}} defines destination validation, notification authentication, and PEP-side checks.
 
 **PEP acting on behalf of the Subject.** Accepting unverified actor claims would let a PEP assert authority it cannot demonstrate.  {{actor-source-verification}} and {{delegation}} govern chain verification; {{endpoint-protection}} requires caller authorization to submit or view the request for the supplied Subject, Resource, and Action.
 
 **Idempotency-key abuse.** Caller-supplied keys consume server-side state and are matched against retries.  {{idempotency-key-abuse}} gives scoping and retention guidance.
 
-**Availability.** Approval workflows introduce latency and dependence on external systems. Fail-closed behavior for PEPs and rate limiting for Access Request Services are at {{availability}}; endpoint protection is at {{endpoint-protection}}.
+**Availability.** Approval workflows introduce latency and dependencies on external systems.  {{availability}} covers fail-closed behavior and rate limiting; {{endpoint-protection}} covers endpoint authentication and authorization.
 
 # Privacy Considerations {#privacy-considerations}
 
@@ -1473,7 +1475,7 @@ Change Controller:
 Specification Document:
 : This document.
 
-The capability URN registered above and the problem-type URNs used for error responses ({{error-responses}}) both use the `urn:openid:authzen:` namespace administered by the OpenID Foundation, rather than the `urn:ietf:params:authzen:` sub-namespace that the AuthZEN Authorization API registers for capabilities ({{AuthZEN}}).  This is an intentional OpenID Foundation profile convention; the `capabilities` array remains a list of URNs as defined by {{AuthZEN}}.
+The capability and problem-type URNs ({{error-responses}}) use the OpenID Foundation's `urn:openid:authzen:` namespace, not AuthZEN's `urn:ietf:params:authzen:` capability sub-namespace.  This profile convention leaves the AuthZEN `capabilities` array as a list of URNs ({{AuthZEN}}).
 
 ## AuthZEN Access Request Member Names Registry {#iana-member-names}
 
@@ -1539,7 +1541,7 @@ Change Controller:
 Specification Document:
 : The document defining the value.
 
-Initial entries registered by this specification.  The semantics and default next actions of these values are defined in {{completion-semantics}}; this table registers the names and summarizes them:
+Initial entries, summarizing the semantics and default next actions defined in {{reevaluation-denials}}:
 
 | Reason | Default Next Action | Description |
 |---|---|---|
@@ -1993,9 +1995,9 @@ Authority may need to change during execution:
 * An API gateway encounters an operation beyond a user's standing role and routes it to an owner for approval.
 * A Security Token Service discovers that a downstream resource requires per-call approval beyond the upstream token's authority.
 
-In each case, denial can lead to a workflow that grants new authority.  Autonomous callers need a machine-readable handoff because no human may be present to interpret the denial.  User-facing applications have the same need: without a common protocol, they rely on custom approval prompts, out-of-band tickets, and vendor-specific governance integrations.
+These denials can lead to workflows that grant new authority.  A machine-readable handoff serves autonomous callers without a human present and replaces custom approval prompts, out-of-band tickets, and vendor-specific integrations in user-facing applications.
 
-The profile addresses missing authority, not missing information.  Supplying attributes the caller already holds, or using partial evaluation to identify conditions it can satisfy locally, addresses missing information.  A requestable denial instead calls for a workflow to create authority that does not yet exist.  The two mechanisms can be used together.
+The profile addresses missing authority, not missing information.  Supplying known attributes or using partial evaluation to identify locally satisfiable conditions addresses missing information.  A requestable denial instead calls for a workflow to create authority.  The mechanisms can be combined.
 
 This profile has the following design goals:
 
@@ -2003,11 +2005,11 @@ This profile has the following design goals:
 * Permit PDP evaluation without retaining prior decisions; support signed bindings where the PDP and Access Request Service do not share denial or approval records.  Durable request, approval, and denial-binding state lives in the Access Request Service role.
 * Provide a common handoff to human, automated, or hybrid governance evaluators without replacing existing approval infrastructure.
 * Support high-volume callers through broad-scope approvals, auto-approval, pre-approval, and bulk approval.
-* Make requestability explicit and machine-readable so autonomous PEPs can construct a conformant submission without human intervention at submission time.
-* Provide an opaque task handle suitable for the asynchronous workflow that resolves a denial.
+* Make requestability machine-readable so autonomous PEPs can construct conformant submissions without human input.
+* Provide an opaque handle for the asynchronous approval task.
 * Avoid embedding a workflow policy language in the authorization response.
 * Support re-evaluation after approval so the PDP remains authoritative at enforcement time.
-* Provide enough audit correlation to bind the original denial, submitted request, approver action, and final authorization result.
+* Correlate the denial, submission, approver action, and final authorization result for audit.
 
 # Implementation Considerations {#impl-considerations}
 
@@ -2015,13 +2017,13 @@ This appendix describes common deployment patterns and is non-normative.
 
 ## Identity Governance and Approval Platforms
 
-An existing identity-governance, ITSM, or approval platform can map to this profile as follows:
+An identity-governance, ITSM, or approval platform can implement the roles as follows:
 
-* The platform itself acts as the Access Request Service.  Its task or request entity becomes the Task Handle and its approval workflow runs unchanged.
-* A PDP evaluates current platform state and emits requestable denials when access is missing and an approval workflow exists.
-* The PEP is an enforcing application, request interface, or agent.  It can react to an attempted operation or evaluate access proactively, as in a request portal.
+* The platform acts as the Access Request Service, exposing its task or request as a Task Handle while retaining its approval workflow.
+* The PDP evaluates platform state and emits requestable denials when access is missing and an approval workflow exists.
+* The PEP enforces access in an application, request interface, or agent, either reacting to an attempted operation or evaluating proactively, as in a request portal.
 
-Re-evaluation Mode aligns directly with this pattern: provisioning changes platform state, and a subsequent AuthZEN Authorization API evaluation reflects that state.  Implementations mapping their richer task lifecycle states onto the canonical statuses defined in this profile SHOULD follow the guidance in {{status-mapping}}.
+Provisioning changes platform state; re-evaluation reads that state.  Implementations mapping their richer task lifecycle states onto the canonical statuses defined in this profile SHOULD follow the guidance in {{status-mapping}}.
 
 ## Form Translation
 
@@ -2033,7 +2035,7 @@ Existing webhook subscriptions or event-streaming bindings can provide completio
 
 ## Time and Clock Skew
 
-This profile uses {{RFC3339}} timestamps in multiple places: `context.evaluated_at`, `context.access_request.expires_at`, `denial.expires_at`, `task.expires_at`, `approval.approved_at`, and `approval.approved_until`.  Each timestamp is produced on one host (PDP, Access Request Service, or PEP) and may be compared against a clock on another host, so clock skew between hosts can produce incorrect freshness or expiry decisions.
+The {{RFC3339}} timestamps in `context.evaluated_at`, `context.access_request.expires_at`, `denial.expires_at`, `task.expires_at`, `approval.approved_at`, and `approval.approved_until` may be checked on a host other than their producer.  Clock skew can therefore cause incorrect freshness or expiry decisions.
 
 Implementations SHOULD allow a small skew tolerance when comparing a remote-host timestamp against the local clock.  A tolerance of 30 seconds is typical; tolerances above 60 seconds are NOT RECOMMENDED.  A PEP comparing `approval.approved_until` to local time MAY treat the approval as valid until `approved_until` plus the tolerance.  An Access Request Service comparing `denial.expires_at` (the PEP-echoed requestable-denial hint expiry) to its local clock MAY accept submissions arriving up to the tolerance after that timestamp, after verifying the echoed value against the denial-binding material.
 
@@ -2041,28 +2043,28 @@ Hosts that produce timestamps SHOULD synchronize their clocks against a reliable
 
 ## Evaluators and Workflow Design
 
-The Access Request Service determines what kind of evaluator processes a given submission.  Evaluators commonly include:
+The Access Request Service selects evaluators for each submission, such as:
 
-* Human approvers acting through a user interface (an owner, manager, security reviewer, or delegate).
-* Automated policy engines that apply static or dynamic rules (separation-of-duties checks, ownership rules, conflict-of-interest constraints, organizational policy).
-* Risk engines that score the request against runtime signals and approve, deny, or escalate based on score thresholds.
-* AI supervisors or LLM-based evaluators that summarize requested authority, reason about stated intent, and approve, deny, or hand off to another evaluator.
-* Hybrid pipelines that combine these (for example, an automated risk check that escalates to a human reviewer only for non-trivial cases).
+* Human approvers: owners, managers, security reviewers, or delegates acting through a user interface.
+* Policy engines: static or dynamic rules for ownership, separation of duties, conflicts of interest, or organizational policy.
+* Risk engines: runtime signals scored against approval, denial, or escalation thresholds.
+* AI supervisors: evaluators that summarize requested authority, assess stated intent, and approve, deny, or hand off.
+* Hybrid pipelines: combinations such as risk checks that escalate non-trivial cases to a human.
 
-Deployments choose and combine evaluators freely.  Completion, notification, and re-evaluation semantics apply uniformly, as do the eligibility, self-approval, and separation-of-duties requirements in {{approver-eligibility}}, whether the evaluator is human or automated.
+Deployments can combine evaluators freely.  The same completion, notification, re-evaluation, and approver-eligibility rules ({{approver-eligibility}}) apply to human and automated evaluators.
 
-High-volume callers can overwhelm human reviewers if every submission needs interactive review.  Workflow patterns that reduce review load include:
+To avoid overwhelming human reviewers, high-volume deployments can use:
 
-* Auto-approval rules that resolve low-risk requests synchronously, returning `201 Created` with a populated `result` and never engaging a human reviewer (see {{access-request-response}}).
-* Broad-scope approvals that grant a class of future evaluations from a single decision (for example, "approve agent X to call tool Y for the next 30 days"), so subsequent same-class submissions either auto-approve or are unnecessary because re-evaluation already permits the access.
-* Bulk approval, where an evaluator acts on a batch of related submissions in a single workflow step.
-* Pre-approval or standing grants established out of band (for example, when an agent is provisioned), so the caller never reaches a denial that requires interactive approval.
+* Auto-approval: resolve low-risk requests synchronously with `201 Created` and a populated `result`, without human review ({{access-request-response}}).
+* Broad-scope approval: approve a class of operations, such as "agent X may call tool Y for 30 days."  Subsequent submissions can auto-approve or become unnecessary because re-evaluation permits access.
+* Bulk approval: act on related submissions in one workflow step.
+* Pre-approval or standing grants: establish authority out of band, such as at agent provisioning, to avoid denials requiring interactive review.
 
-The Access Request Service implements evaluator policy and routing using the profile's bulk submission, idempotency, synchronous-completion, and approval-expiry mechanisms.
+Bulk submission, idempotency, synchronous completion, and approval expiry support these workflows.
 
 ## Mapping Backend States {#status-mapping}
 
-Backend lifecycle models often distinguish open/closed, processing/waiting, escalation, and auto-approval states.  Implementations map these to the canonical statuses in {{task-status}} for the Task Status Endpoint.  This non-normative mapping is a starting point:
+Implementations map backend lifecycle states to the canonical Task Status Endpoint values ({{task-status}}).  This non-normative table gives a starting point:
 
 | Backend state | Canonical status |
 |---|---|
@@ -2078,23 +2080,23 @@ Backend lifecycle models often distinguish open/closed, processing/waiting, esca
 
 This non-normative appendix explains design choices; the rules in the body of the specification govern.
 
-## Why a profile of the AuthZEN Authorization API, rather than a standalone specification?
+## Why reuse AuthZEN? {#why-a-profile-of-the-authzen-authorization-api-rather-than-a-standalone-specification}
 
 Reusing AuthZEN's evaluation model avoids a second authorization interface.  The profile keeps its Subject, Resource, Action, Context, and Decision concepts, adds `context.access_request` to denials, and carries `context.approval` through the existing evaluation endpoint.
 
-## Why is Re-evaluation Mode the only base completion mode?
+## Why re-evaluate after approval? {#why-is-re-evaluation-mode-the-only-base-completion-mode}
 
 Approval can take minutes or days; policy, subject status, risk, and approval validity can change meanwhile.  A new PDP decision checks those conditions at use, rather than freezing them at approval.  Issuance flows in which a token or credential represents the decision define their own `result.mode` ({{completion-semantics}}).
 
-## Why does the approval round-trip through the PEP rather than direct PDP-to-Access-Request-Service communication?
+## Why carry approval through the PEP? {#why-does-the-approval-round-trip-through-the-pep-rather-than-direct-pdp-to-access-request-service-communication}
 
 Carrying `result.approval` through a normal evaluation avoids requiring a back channel or shared state.  A PDP with access to trusted state can resolve `approval.id`; an independent PDP can verify integrity-protected `approval.state`.  The PEP uses the same wire shape in either topology.
 
-## Why one Access Request Endpoint per deployment, rather than per-resource or per-tenant?
+## Why discover one Access Request Endpoint? {#why-one-access-request-endpoint-per-deployment-rather-than-per-resource-or-per-tenant}
 
 A metadata-discovered endpoint avoids resource- or tenant-specific URL construction in the PEP.  The payload's `template`, Subject, Resource, Action, and Context support routing by workflow, tenant, or resource family.  Intermediate enforcers (an OAuth Authorization Server or other gateway acting as PEP) MAY proxy the endpoint and present a different URL to their own callers while preserving the protocol surface.
 
-## Why are there two binding patterns (`evaluation_id` and `binding_token`)?
+## Why support two denial-binding forms? {#why-are-there-two-binding-patterns-evaluationid-and-bindingtoken}
 
 The patterns support different trust and state arrangements:
 
@@ -2103,45 +2105,45 @@ The patterns support different trust and state arrangements:
 
 Neither signing infrastructure nor shared state is forced on every deployment.
 
-## Why does the submission's `denial` object carry only key fields, not the full AuthZEN Decision?
+## Why echo selected denial fields? {#why-does-the-submissions-denial-object-carry-only-key-fields-not-the-full-authzen-decision}
 
 Signed or server-resolvable binding material is stronger evidence than a PEP-supplied JSON echo.  Other denial members, such as `endpoint`, `display`, and `form_url`, guide the PEP rather than the Access Request Service.  The submission carries only the fields the service uses.
 
-## Why does the `denial` object support both a top-level and per-item form for bulk submissions?
+## Why support bundle and per-item denials? {#why-does-the-denial-object-support-both-a-top-level-and-per-item-form-for-bulk-submissions}
 
 A batch evaluation can produce one denial covering multiple Resource/Action pairs; separate evaluations produce separate denials.  Top-level binding supports the first case, and per-item binding the second.  Both allow a bundled submission without requiring the PEP to fabricate a bundle binding or submit each request separately.
 
-## Why is `approval.state` distinct from `binding_token` when both are opaque round-trip slots?
+## Why separate `approval.state` from `binding_token`? {#why-is-approvalstate-distinct-from-bindingtoken-when-both-are-opaque-round-trip-slots}
 
 The direction and constraints differ.  `binding_token` is PDP-issued and service-verified; it MUST be integrity-protected, typically as a JWS, with claim recommendations in {{binding-token-integrity}}.  `approval.state` is service-issued (or PDP-issued through the service) and PDP-verified, and can carry a signed token, lookup reference, or deployment-specific state.  Separate names distinguish these roles.
 
-## Why does the `approval` object always carry `id`, even when `approval.state` is signed?
+## Why require `approval.id` with signed state? {#why-does-the-approval-object-always-carry-id-even-when-approvalstate-is-signed}
 
 `approval.id` is REQUIRED as a uniform correlation handle: a lookup key in shared-state deployments and an identifier for logs, callbacks, and tasks without parsing signed state.  When signed state carries an identifier, the PDP cross-checks it against `approval.id` to detect mismatched pairs.
 
-## Why are timestamps always absolute, never relative durations?
+## Why use absolute timestamps? {#why-are-timestamps-always-absolute-never-relative-durations}
 
 Absolute RFC 3339 timestamps give consumers a common deadline.  Offering both absolute and relative expiry would require reconciliation and precedence rules.  {{impl-considerations}} addresses clock-skew tolerance.
 
-## Why is `template` an opaque free-form string rather than a constrained enumeration?
+## Why leave `template` unconstrained? {#why-is-template-an-opaque-free-form-string-rather-than-a-constrained-enumeration}
 
-Workflow categories vary by deployment.  An opaque string accommodates workflow names, ticket classes, policy identifiers, and profile-defined values without revising the base specification.  Implementations typically map `template` to a stable workflow, schema, policy, or source-code identifier.  It remains routing input, not authorization policy ({{overbroad-approval}}).
+Workflow categories vary by deployment.  An opaque `template` can map to a stable workflow, ticket class, schema, policy, source-code identifier, or profile-defined value without revising this specification.  It remains routing input, not authorization policy ({{overbroad-approval}}).
 
-## Why does the spec deliberately not define a workflow engine, approval policy language, or user interface?
+## Why leave workflows out of scope? {#why-does-the-spec-deliberately-not-define-a-workflow-engine-approval-policy-language-or-user-interface}
 
 Standardizing the handoff, rather than the workflow, lets deployments retain their existing IGA, ITSM, chat-approval, or custom infrastructure.  A common workflow language or interface would force incompatible platforms into one model.
 
-## Why is `result.mode` extensible at all, given the base defines only one mode?
+## Why allow other completion modes? {#why-is-resultmode-extensible-at-all-given-the-base-defines-only-one-mode}
 
 Token-issuance, credential-issuance, and direct-decision flows may consume approval without re-evaluation.  The extension point lets profiles define those flows without changing the base wire shape or its PDP-authoritative completion mode.
 
-## Why are catalog-backed form fields defined in a companion profile rather than in this specification?
+## Why put catalogs in a companion profile? {#why-are-catalog-backed-form-fields-defined-in-a-companion-profile-rather-than-in-this-specification}
 
 Catalog resolution needs its own document format, endpoints, pagination, scoping, and authorization, but only some deployments need it.  The companion profile {{CATALOG}} can evolve independently, adding `request_catalogs_url` through the `context.access_request` extension point without revising this specification.
 
-## Why does this document present signed denial binding and signed approval state first, and shared state as the alternative?
+## Why present signed artifacts first? {#why-does-this-document-present-signed-denial-binding-and-signed-approval-state-first-and-shared-state-as-the-alternative}
 
-Signed artifacts support a stateless PDP and an independently operated Access Request Service without assuming shared-state access.  Presenting them first explains that trust model before introducing by-reference substitutions for deployments with trusted shared or delegated state.  Either reference alternative can be used separately or alongside the signed forms.
+Signed artifacts explain the trust model for a stateless PDP and an independent Access Request Service before introducing shared-state alternatives.  Deployments with trusted shared or delegated state can use either reference alternative separately or alongside the signed forms.
 
 # Acknowledgements
 
