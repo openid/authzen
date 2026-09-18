@@ -946,7 +946,7 @@ The `page` object in a Search API Request consists of the following keys:
 
 Apart from the `token`, all values from the initial request MUST remain identical for subsequent pages. If a different value is provided mid-pagination the PDP SHOULD return an error.
 
-Additional keys MAY be included in the `page` object. If they are, they MUST be defined in a specification referenced in the AuthZEN Policy Decision Point Capabilities Registry ({{iana-pdp-capabilities-registry}}). Furthermore, the PDP MUST declare support for the corresponding capability URN in its `supported_capabilities` metadata ({{pdp-metadata-data-capabilities}}).
+Additional keys MAY be included in the `page` object. If they are, they MUST be defined in a specification referenced in the AuthZEN Policy Decision Point Capabilities Registry ({{iana-pdp-capabilities-registry}}). Furthermore, the PDP MUST declare support for the corresponding capability URN in its `capabilities` metadata ({{pdp-metadata-data-capabilities}}).
 
 ### Paginated Responses {#search-pagination-response}
 
