@@ -215,10 +215,6 @@ Stateless PDP evaluation means retaining no prior decisions, not dispensing with
 
 A PDP supporting this profile MUST publish an `access_request_endpoint` in PDP metadata.  The endpoint value MUST be an HTTPS URI.
 
-A PDP supporting this profile SHOULD include the following capability URN in the `capabilities` array:
-
-`urn:openid:authzen:capability:access-request`
-
 A PDP that issues or verifies signed values for use under this profile (for example, a JWS-signed `binding_token` or a JWS `approval.state`, defined in {{completion-semantics}}) MUST publish a `jwks_uri` in PDP metadata.
 
 The value is an HTTPS URI of a JWK Set {{RFC7517}} document containing the verification keys for the signed artifacts this profile defines: PDP-issued `binding_token` values and `approval.state` values signed by the PDP's Access Request Service.  Keys are distinguished by their `kid` and by the JWS `iss`.
@@ -226,6 +222,10 @@ The value is an HTTPS URI of a JWK Set {{RFC7517}} document containing the verif
 Each JWK in the set SHOULD include a `kid` parameter so JWS signatures issued with a `kid` header can be resolved to the corresponding verification key, and SHOULD include a `use` parameter distinguishing signing keys (`use: "sig"`) from any other keys advertised.
 
 Verifiers cache the JWK Set per HTTP cache headers and refresh it on key-rotation events.  An unrecognized `kid` SHOULD cause the verifier to refresh the JWK Set before rejecting the input.
+
+A PDP supporting this profile SHOULD include the following capability URN in the `capabilities` array:
+
+`urn:openid:authzen:capability:access-request`
 
 Non-normative metadata example:
 
@@ -266,12 +266,6 @@ The presence of `context.access_request` is the signal that the denial is reques
 
 The `access_request` object has the following members:
 
-`endpoint`:
-: OPTIONAL.  HTTPS URI.  The endpoint to which the PEP submits the access request.  If omitted, the PEP MUST use the `access_request_endpoint` from PDP metadata ({{discovery}}).
-
-`template`:
-: OPTIONAL.  String.  An opaque template identifier that can guide the Access Request Service.  The value is not a policy language and MUST NOT be interpreted by the PEP except for display or request submission.
-
 `expires_at`:
 : REQUIRED.  String containing an {{RFC3339}} timestamp.  Indicates when the requestable denial hint expires.  The PEP echoes this value as `denial.expires_at` when submitting the Access Request.  Enforcement of this deadline is defined with the submitted `denial.expires_at` in {{access-request-submission}} and in the freshness rules at {{verifying-denial-binding}}.
 
@@ -282,6 +276,12 @@ The `access_request` object has the following members:
   * The PEP returns it unchanged as `denial.binding_token` when submitting the Access Request ({{access-request-submission}}).
   * When present, the value MUST be integrity protected in a way the Access Request Service can verify, and SHOULD be a JSON Web Signature (JWS) {{RFC7515}} in compact serialization, signed by the PDP, with a payload (such as a JWT {{RFC7519}}) that the Access Request Service can verify and bind to the original denied evaluation.
   * JSON Web Encryption (JWE) {{RFC7516}} MAY be used in addition to integrity protection when the payload contains information that must not be visible to the PEP, for example by encrypting a signed payload.
+
+`endpoint`:
+: OPTIONAL.  HTTPS URI.  The endpoint to which the PEP submits the access request.  If omitted, the PEP MUST use the `access_request_endpoint` from PDP metadata ({{discovery}}).
+
+`template`:
+: OPTIONAL.  String.  An opaque template identifier that can guide the Access Request Service.  The value is not a policy language and MUST NOT be interpreted by the PEP except for display or request submission.
 
 `display`:
 : OPTIONAL.  Object.  Localizable user-interface hints such as title, description, or recommended call-to-action text.  The PEP MAY ignore this member.
@@ -374,15 +374,15 @@ When the payload contains information that must not be visible to the PEP, the P
 
 This profile does not mandate a specific JWS payload; the contents are deployment-specific.  Implementations that issue `binding_token` as a JWT SHOULD include the following claims to provide sound token hygiene and confused-deputy protection:
 
-* `iss`: PDP identifier.  Lets the Access Request Service select the correct verification key from the PDP's JWK Set ({{discovery}}).
 * `aud`: REQUIRED.  Access Request Service identifier, or an array of identifiers including the Access Request Service.  An array supports multiple verifiers of the same JWT; audience validation prevents replay to an unintended service.  The Access Request Service MUST reject a `binding_token` JWT that lacks `aud` or whose `aud` does not include the Access Request Service's identifier.
-* `iat`, `exp`: issued-at and expiry.  Expiry SHOULD be short (typically minutes, aligned with the requestable-denial hint lifetime).
-* `jti`: unique token identifier.  The Access Request Service SHOULD track recently-seen `jti` values until the token's `exp` to detect replay of an otherwise valid token.
-* `denial_expires_at`: the `context.access_request.expires_at` value from the requestable denial, unless the token's `exp` is no later than that value.  This lets the Access Request Service verify the PEP-echoed `denial.expires_at` value or enforce the token expiry as an equal-or-stricter freshness deadline.
 * `binding_context_members`: the array of `context` member names that constitute the authorization-relevant Context for this evaluation (see the Terminology definition of Authorization-Relevant Context).  Present (and MAY be an empty array) whenever any binding claim covers context; the Access Request Service uses exactly this integrity-protected set when comparing or hashing the authorization-relevant Context, and binds only Subject, Resource, and Action when it is absent.
 * Binding claims that identify the original denied evaluation.  For interoperability across independently implemented PDPs and Access Request Services, the inline form is RECOMMENDED, because it is compared structurally and requires no agreed byte canonicalization.  Either:
     * Inline (RECOMMENDED): the Subject, Resource, Action, and authorization-relevant Context of the denied evaluation, which the Access Request Service compares structurally, member by member, against the submission, using the comparison rules in {{structural-comparison}}.
     * Hashed: a `binding_hash` whose value is the base64url-encoded (without padding) SHA-256 digest of the {{RFC8785}} JSON Canonicalization Scheme (JCS) serialization of the JSON object `{"subject": <Subject>, "resource": <Resource>, "action": <Action>, "context": <authorization-relevant Context>}`, where `<Subject>` is the bound Subject with `subject.properties.act` removed (matching the exclusion in {{structural-comparison}}) and `<authorization-relevant Context>` is the enumerated set, which the Access Request Service recomputes from the submission.  Implementations that use the hashed form MUST use exactly this construction so that a PDP and an independently implemented Access Request Service compute identical digests.
+* `iss`: PDP identifier.  Lets the Access Request Service select the correct verification key from the PDP's JWK Set ({{discovery}}).
+* `iat`, `exp`: issued-at and expiry.  Expiry SHOULD be short (typically minutes, aligned with the requestable-denial hint lifetime).
+* `jti`: unique token identifier.  The Access Request Service SHOULD track recently-seen `jti` values until the token's `exp` to detect replay of an otherwise valid token.
+* `denial_expires_at`: the `context.access_request.expires_at` value from the requestable denial, unless the token's `exp` is no later than that value.  This lets the Access Request Service verify the PEP-echoed `denial.expires_at` value or enforce the token expiry as an equal-or-stricter freshness deadline.
 * `evaluation_id`: the PDP's identifier for the evaluation, when present in `context.evaluation_id` ({{evaluation-identifier}}).
 
 ## Trusting URLs from the Requestable Denial {#trusting-urls}
@@ -413,12 +413,6 @@ The request body is a JSON object with the following members:
 `action`:
 : REQUIRED when `items` is absent; MUST be omitted when `items` is present.  The AuthZEN Action from the denied evaluation.
 
-`context`:
-: OPTIONAL.  The AuthZEN Context from the denied evaluation, augmented with submission-time fields such as business justification.
-
-  * Submission-time augmentations MUST NOT change or remove authorization-relevant context from the denied evaluation.
-  * When the Access Request Service needs to distinguish original evaluation context from submission-time input, deployments SHOULD place the latter in well-defined extension members rather than overwriting original context members.
-
 `denial`:
 : Object binding the Access Request to the denied AuthZEN Decision.  REQUIRED in either of two cases:
 
@@ -428,6 +422,12 @@ The request body is a JSON object with the following members:
   OPTIONAL when `items` is present and every item carries its own per-item `denial`.
 
   An Access Request whose denial binding does not cover the submitted Subject, Resource, Action, and authorization-relevant Context (for every item when `items` is present) MUST be rejected with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
+
+`context`:
+: OPTIONAL.  The AuthZEN Context from the denied evaluation, augmented with submission-time fields such as business justification.
+
+  * Submission-time augmentations MUST NOT change or remove authorization-relevant context from the denied evaluation.
+  * When the Access Request Service needs to distinguish original evaluation context from submission-time input, deployments SHOULD place the latter in well-defined extension members rather than overwriting original context members.
 
 `requested_access`:
 : OPTIONAL.  Object containing request-specific information such as requested duration, requested role, requested entitlement, or requested scope.  This object does not define policy semantics and is interpreted by the Access Request Service.  The following well-known optional members are defined; additional members MAY be included subject to {{extension-naming}}:
@@ -447,23 +447,23 @@ The request body is a JSON object with the following members:
 
 The `denial` object echoes selected members of the PDP's denied evaluation response:
 
+`expires_at`:
+: REQUIRED.  {{RFC3339}} timestamp indicating when the requestable denial hint expires, echoed unchanged from `context.access_request.expires_at` of the denied evaluation.  The Access Request Service MUST reject submissions received after this time, after applying any clock-skew tolerance it has configured (see {{impl-considerations}}).
+
 `evaluation_id`:
 : REQUIRED when `denial.binding_token` is absent; otherwise RECOMMENDED.  A stable identifier for the denied evaluation, captured by the PEP from `context.evaluation_id` in the AuthZEN Decision and echoed unchanged here ({{evaluation-identifier}}).
 
   * The Access Request Service MUST be able to resolve or validate `evaluation_id` before relying on it as denial-binding material.
   * `evaluation_id` provides the strongest audit binding between the original denial and the submitted Access Request and SHOULD be preferred over `evaluated_at` alone.
 
+`binding_token`:
+: REQUIRED when `denial.evaluation_id` is absent; otherwise OPTIONAL.  String.  Integrity-protected binding material echoed unchanged from `context.access_request.binding_token` of the denied evaluation ({{requestable-denial-context}}).  The PEP MUST NOT decode, modify, or interpret this value; it returns the original PDP-issued value byte-for-byte.
+
 `evaluated_at`:
 : OPTIONAL.  {{RFC3339}} timestamp indicating when the denial was produced, echoed from `context.evaluated_at` of the denied evaluation.
 
-`expires_at`:
-: REQUIRED.  {{RFC3339}} timestamp indicating when the requestable denial hint expires, echoed unchanged from `context.access_request.expires_at` of the denied evaluation.  The Access Request Service MUST reject submissions received after this time, after applying any clock-skew tolerance it has configured (see {{impl-considerations}}).
-
 `reason`:
 : OPTIONAL.  String.  Machine-readable reason code for the denial, echoed unchanged from `context.reason` of the denied evaluation.
-
-`binding_token`:
-: REQUIRED when `denial.evaluation_id` is absent; otherwise OPTIONAL.  String.  Integrity-protected binding material echoed unchanged from `context.access_request.binding_token` of the denied evaluation ({{requestable-denial-context}}).  The PEP MUST NOT decode, modify, or interpret this value; it returns the original PDP-issued value byte-for-byte.
 
 `template`:
 : OPTIONAL.  String.  Echoed unchanged from `context.access_request.template` of the denied evaluation, when the PDP provided one.  The Access Request Service uses this value to route the request to the appropriate workflow.
@@ -866,8 +866,8 @@ Approval platforms can use this mode by changing backing state that the next eva
 When `result.mode` is `reevaluate`, the result MUST include an `approval` member.  The `approval` object identifies the approval that completed the Access Request task and has the following members:
 
 * `id`: REQUIRED.  String.  Stable, opaque, and unguessable identifier of the approval.  The value MUST contain sufficient entropy to prevent practical guessing and MUST NOT encode semantics that a PEP is expected to parse.
-* `approved_at`: OPTIONAL.  {{RFC3339}} timestamp indicating when the approval completed.
 * `approved_until`: REQUIRED.  {{RFC3339}} timestamp indicating the latest time through which the approval remains valid.  The PEP MUST NOT use the approval for re-evaluation after this timestamp.
+* `approved_at`: OPTIONAL.  {{RFC3339}} timestamp indicating when the approval completed.
 
 The `approval` object MAY additionally include a `state` member.  `state` is an opaque JSON value populated by the Access Request Service or PDP, carrying proof or verifier state the PDP needs at re-evaluation time (for example, a signed reference, an extended lookup token, or deployment-specific state).
 
