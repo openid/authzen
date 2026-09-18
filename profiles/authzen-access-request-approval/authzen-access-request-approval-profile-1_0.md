@@ -121,40 +121,6 @@ Steps 1 and 6 use the AuthZEN Access Evaluation API.  Step 6 is a new evaluation
 
 In step 5 the PEP can poll the task, receive a callback ({{callback-completion}}), or otherwise use the Task Handle to determine completion.
 
-## PEP Implementation Guide {#pep-guide}
-
-This non-normative guide maps the base re-evaluation flow to PEP implementation tasks.  It defines no additional conformance class; the cited sections govern.
-
-1. **Recognize a requestable denial.** Read the `context.access_request` signal and endpoint selection rules ({{requestable-denial-context}}, {{discovery}}), including URL trust ({{trusting-urls}}).
-2. **Construct the submission.** Build from the denied evaluation, echo its binding material, and supply any additional input ({{access-request-submission}}).  Endpoint authentication is covered by {{endpoint-protection}}.
-3. **Obtain completion.** Handle a synchronous result or retain the Task Handle and follow its lifecycle ({{access-request-response}}, {{task-status-endpoint}}).  {{pep-completion-handling}} summarizes the branches.
-4. **Re-evaluate after approval.** In the base completion mode, carry the returned `approval` object to the PDP ({{completion-semantics}}).  A further denial follows {{pep-reevaluation-handling}}.
-5. **Enforce the PDP decision.** Approval alone does not grant access.  Apply the lifetime and reuse rules in {{approval-lifetime}} and {{approval-scope}}.
-
-For schema-driven input, see {{machine-readable-forms}}; for multiple items, {{bulk-submissions}}; for notifications, {{callback-completion}}; for cancellation, {{cancellation}}; and for acting parties, {{delegation}}.  These are reading pointers, not permissions to ignore received members.  {{pep-processing-rules}} provides the PEP checklist; {{error-responses}} defines endpoint errors.
-
-### Values to Carry and Values to Interpret {#pep-value-handling}
-
-| Material | PEP handling | Rules |
-|---|---|---|
-| `binding_token` | Return unchanged as `denial.binding_token`; do not decode or interpret it. | {{requestable-denial-context}}, {{access-request-submission}} |
-| Task identifier | Treat as opaque; retrieve status at the advertised `task.status_endpoint`. | {{access-request-response}}, {{task-status-endpoint}} |
-| `approval.state` | Preserve its JSON value exactly; do not modify or interpret it. | {{approval-result}} |
-| Whole `approval` object | Carry unchanged to `context.approval`, including timestamps and any `state`. | {{approval-verification}} |
-| Status, completion mode, deadlines, and URLs | Apply the PEP's processing, lifetime, and trust rules; these values are not opaque. | {{pep-processing-rules}}, {{pep-deadlines}}, {{trusting-urls}} |
-
-Artifact signatures, binding claims, and approval scope are checked by the receiving Access Request Service or PDP ({{binding-model}}).  Carrying opaque values does not replace the PEP's authentication, URL-trust, callback-validation, or enforcement responsibilities.
-
-### Deadline Reference {#pep-deadlines}
-
-| Deadline | Meaning for the PEP | Rules |
-|---|---|---|
-| `denial.expires_at` | Echo the denial's expiry at submission; the Access Request Service checks freshness. | {{access-request-submission}}, {{verifying-denial-binding}} |
-| `task.expires_at` | When supplied, limits Task Handle validity.  Polling stops at expiry or terminal status. | {{access-request-response}}, {{task-status-endpoint}} |
-| `approval.approved_until` | Bounds approval reuse and enforcement, not a guarantee of access until that time. | {{approval-result}}, {{approval-lifetime}} |
-
-{{approval-lifetime}} also covers expiry returned by the PDP and downstream credential lifetimes.  Clock-skew qualifications remain in {{impl-considerations}}.  Expiry inside an opaque artifact is checked by its verifier, not extracted by the PEP ({{verifying-denial-binding}}, {{approval-verification}}).
-
 # Requirements Notation and Conventions
 
 {::boilerplate bcp14-tagged}
@@ -207,15 +173,15 @@ Denial and approval binding material passes through the PEP for verification by 
 
 These are verification patterns, not mutually exclusive members.  With a `binding_token`, an accompanying `evaluation_id` serves only correlation and audit.  `approval.id` remains present alongside signed `approval.state`.  The `state` member also permits other verifier state, not only signed proof ({{approval-result}}).
 
-See {{binding-token-integrity}} for denial claims, {{verifying-denial-binding}} for submission checks, and {{approval-verification}} for approval checks.  {{shared-state-deployments}} defines the lookup alternatives; {{interoperability-baseline}} and {{denial-binding-alternatives}} cover other integrity-protected formats.
+See {{binding-token-integrity}} for denial claims, {{verifying-denial-binding}} for submission checks, and {{approval-verification}} for approval checks.  {{shared-state-deployments}} and {{approval-reference-lookup}} define the lookup alternatives; {{interoperability-baseline}} and {{denial-binding-alternatives}} cover other integrity-protected formats.
 
-Stateless PDP evaluation means retaining no prior decisions, not dispensing with the current-approval-status check in {{approval-lifetime}}.
+Stateless PDP evaluation means retaining no prior decisions, not dispensing with the current-approval-status check in {{approval-current-status}}.
 
 ## PDP Metadata {#discovery}
 
 A PDP supporting this profile MUST publish an `access_request_endpoint` in PDP metadata.  The endpoint value MUST be an HTTPS URI.
 
-A PDP that issues or verifies signed values for use under this profile (for example, a JWS-signed `binding_token` or a JWS `approval.state`, defined in {{completion-semantics}}) MUST publish a `jwks_uri` in PDP metadata.
+A PDP that issues or verifies signed values for use under this profile (for example, a JWS-signed `binding_token` or a JWS `approval.state`, defined in {{approval-state}}) MUST publish a `jwks_uri` in PDP metadata.
 
 The value is an HTTPS URI of a JWK Set {{RFC7517}} document containing the verification keys for the signed artifacts this profile defines: PDP-issued `binding_token` values and `approval.state` values signed by the PDP's Access Request Service.  Keys are distinguished by their `kid` and by the JWS `iss`.
 
@@ -252,7 +218,7 @@ The Access Request Service MUST authenticate the PEP or caller before accepting 
 
 ## Interoperability Baseline {#interoperability-baseline}
 
-For cross-vendor interoperability, an Access Request Service MUST support verifying a `binding_token` presented as a JWS in compact serialization, and a PDP MUST support verifying an `approval.state` presented as a JWS in compact serialization ({{completion-semantics}}).
+For cross-vendor interoperability, an Access Request Service MUST support verifying a `binding_token` presented as a JWS in compact serialization, and a PDP MUST support verifying an `approval.state` presented as a JWS in compact serialization ({{approval-state}}).
 
 Other integrity-protected formats MAY be used when both the issuer and the verifier support them.
 
@@ -267,7 +233,7 @@ The presence of `context.access_request` is the signal that the denial is reques
 The `access_request` object has the following members:
 
 `expires_at`:
-: REQUIRED.  String containing an {{RFC3339}} timestamp.  Indicates when the requestable denial hint expires.  The PEP echoes this value as `denial.expires_at` when submitting the Access Request.  Enforcement of this deadline is defined with the submitted `denial.expires_at` in {{access-request-submission}} and in the freshness rules at {{verifying-denial-binding}}.
+: REQUIRED.  String containing an {{RFC3339}} timestamp.  Indicates when the requestable denial hint expires.  The PEP echoes this value as `denial.expires_at` when submitting the Access Request.  Enforcement of this deadline is defined in {{submission-processing}} and in the freshness rules at {{verifying-denial-binding}}.
 
 `binding_token`:
 : OPTIONAL in same-service or shared-state deployments ({{shared-state-deployments}}), and REQUIRED when the Access Request Service is independent of the PDP.  String.  Opaque context to be returned to the Access Request Service when submitting the access request.
@@ -290,15 +256,7 @@ Two further members of this object, `form_url` and `request_schema_url`, are def
 
 AuthZEN leaves Decision Context implementation-defined.  This profile uses `context.reason` for the machine-readable denial reason, which the PEP echoes as `denial.reason` in the Access Request.
 
-The PDP MUST provide enough denial-binding material for the Access Request Service to verify that a submitted Access Request corresponds to the denied evaluation and is still fresh.  A requestable denial MUST include `expires_at` and at least one of two denial-binding forms: `binding_token` by value, defined below, or `evaluation_id` by reference, defined in {{shared-state-deployments}}.
-
-**`binding_token` (by value).**  An integrity-protected token that protects or constrains the requestable-denial expiry.  The PDP signs it and retains no state.  This form works in any topology, and is REQUIRED when the Access Request Service does not share state with the PDP (an independent Access Request Service).
-
-For that independent topology the `binding_token` MUST be self-contained: it carries the denied Subject, Resource, Action, and authorization-relevant Context by value (inline or as a `binding_hash`) and the Access Request Service verifies it offline against the PDP's published key, per {{binding-token-integrity}}.  A `binding_token` that only references shared state, for example one carrying `evaluation_id` alone, does not satisfy the independent-Access-Request-Service requirement.
-
-A PDP MAY emit both forms.  When a `binding_token` is present it is the authoritative denial binding, and any accompanying `evaluation_id` serves only as a correlation and audit identifier rather than a second binding form; the Access Request Service resolves `evaluation_id` as a binding form only when no `binding_token` is present.  This is why a PDP MAY follow the conformance recommendation to return a stable `context.evaluation_id` ({{evaluation-identifier}}) even when it also emits a `binding_token`.
-
-The durable denial-binding record lives in the Access Request Service role, not the PDP.  This is the denial-side mirror of the re-evaluation rule that requires `approval.state` when the PDP cannot resolve `approval.id` from shared or delegated state ({{completion-semantics}}).  When neither binding form is available, or when the Access Request Service cannot determine that the binding is unexpired, the PDP MUST NOT include `context.access_request` in the Decision Context.
+The PDP MUST provide enough denial-binding material for the Access Request Service to verify that a submitted Access Request corresponds to the denied evaluation and is still fresh.  A requestable denial MUST include `expires_at` and at least one of two denial-binding forms: `binding_token` by value, defined in {{denial-binding}}, or `evaluation_id` by reference, defined in {{shared-state-deployments}}.
 
 Non-normative example:
 
@@ -343,48 +301,6 @@ Profiles that bridge to specifications using a transaction-binding identifier (f
 
 A PDP MAY return `evaluated_at` as a member of the AuthZEN Decision Context: `context.evaluated_at`, an {{RFC3339}} timestamp indicating when the Decision was produced.  The PEP echoes the captured timestamp as `denial.evaluated_at` when submitting an Access Request.
 
-## Structural Comparison {#structural-comparison}
-
-Throughout this profile, structural comparison requires the same JSON type and applies these rules:
-
-* Numbers are equal under their {{RFC8785}} canonical form.
-* Strings are equal codepoint-for-codepoint.
-* Arrays are equal element-by-element in order.
-* Objects have the same set of member names with recursively equal values.
-* An absent member is distinct from a member whose value is `null`.
-
-These rules apply wherever the profile compares Subject, Resource, Action, or authorization-relevant Context, including inline denial binding and approval-scope matching ({{completion-semantics}}).
-
-For inline denial binding and exact-match approval-scope matching, Subject, Resource, and Action comparison includes the full AuthZEN Authorization API objects, including any `properties` members present in the bound values, except that `subject.properties.act` is excluded because the PEP MAY normalize the actor to `client.actor` (see {{pep-processing-rules}} and {{client-actor-source}}).  Context comparison includes each member of the authorization-relevant Context and excludes profile machinery members.
-
-Denial binding, approval-scope matching, and idempotent-submission comparison all compare the authorization-relevant Context, so when any member is authorization-relevant the PDP MUST make it explicit and integrity-protected, and the Access Request Service MUST use exactly that set:
-
-- with a `binding_token`, the token carries the set as a `binding_context_members` claim ({{binding-token-integrity}});
-- with `evaluation_id`, the set is recorded for that evaluation in shared state and resolved server-side.
-
-Absent an integrity-protected or server-resolved set, the authorization-relevant Context is empty and only Subject, Resource, and Action bind.
-
-## Denial Binding Claims {#binding-token-integrity}
-
-**Audience: PDP issuers and Access Request Service verifiers.**  PEP handling is summarized in {{pep-value-handling}}.
-
-The `binding_token` member round-trips PDP-issued state through the PEP to the Access Request Service.  PDPs MUST integrity-protect `binding_token` using a mechanism the Access Request Service can verify and SHOULD issue it as a JWS so the Access Request Service can prove the value was produced by the PDP and bound to the original denied evaluation.
-
-When the payload contains information that must not be visible to the PEP, the PDP MAY use JWE in addition to integrity protection, for example by encrypting a signed payload.
-
-This profile does not mandate a specific JWS payload; the contents are deployment-specific.  Implementations that issue `binding_token` as a JWT SHOULD include the following claims to provide sound token hygiene and confused-deputy protection:
-
-* `aud`: REQUIRED.  Access Request Service identifier, or an array of identifiers including the Access Request Service.  An array supports multiple verifiers of the same JWT; audience validation prevents replay to an unintended service.  The Access Request Service MUST reject a `binding_token` JWT that lacks `aud` or whose `aud` does not include the Access Request Service's identifier.
-* `binding_context_members`: the array of `context` member names that constitute the authorization-relevant Context for this evaluation (see the Terminology definition of Authorization-Relevant Context).  Present (and MAY be an empty array) whenever any binding claim covers context; the Access Request Service uses exactly this integrity-protected set when comparing or hashing the authorization-relevant Context, and binds only Subject, Resource, and Action when it is absent.
-* Binding claims that identify the original denied evaluation.  For interoperability across independently implemented PDPs and Access Request Services, the inline form is RECOMMENDED, because it is compared structurally and requires no agreed byte canonicalization.  Either:
-    * Inline (RECOMMENDED): the Subject, Resource, Action, and authorization-relevant Context of the denied evaluation, which the Access Request Service compares structurally, member by member, against the submission, using the comparison rules in {{structural-comparison}}.
-    * Hashed: a `binding_hash` whose value is the base64url-encoded (without padding) SHA-256 digest of the {{RFC8785}} JSON Canonicalization Scheme (JCS) serialization of the JSON object `{"subject": <Subject>, "resource": <Resource>, "action": <Action>, "context": <authorization-relevant Context>}`, where `<Subject>` is the bound Subject with `subject.properties.act` removed (matching the exclusion in {{structural-comparison}}) and `<authorization-relevant Context>` is the enumerated set, which the Access Request Service recomputes from the submission.  Implementations that use the hashed form MUST use exactly this construction so that a PDP and an independently implemented Access Request Service compute identical digests.
-* `iss`: PDP identifier.  Lets the Access Request Service select the correct verification key from the PDP's JWK Set ({{discovery}}).
-* `iat`, `exp`: issued-at and expiry.  Expiry SHOULD be short (typically minutes, aligned with the requestable-denial hint lifetime).
-* `jti`: unique token identifier.  The Access Request Service SHOULD track recently-seen `jti` values until the token's `exp` to detect replay of an otherwise valid token.
-* `denial_expires_at`: the `context.access_request.expires_at` value from the requestable denial, unless the token's `exp` is no later than that value.  This lets the Access Request Service verify the PEP-echoed `denial.expires_at` value or enforce the token expiry as an equal-or-stricter freshness deadline.
-* `evaluation_id`: the PDP's identifier for the evaluation, when present in `context.evaluation_id` ({{evaluation-identifier}}).
-
 ## Trusting URLs from the Requestable Denial {#trusting-urls}
 
 The following checks apply to `endpoint`, `form_url`, `request_schema_url`, and any URL a profile adds to the requestable denial or to a document fetched from it.
@@ -401,6 +317,10 @@ The Access Request Endpoint accepts a submission and returns a Task Handle.  Its
 ## Access Request Submission {#access-request-submission}
 
 The PEP submits an Access Request using the HTTP `POST` method as defined in {{RFC9110}}.
+
+### Request Body {#submission-request-body}
+
+Without `items`, the body carries `subject`, `resource`, `action`, and `denial`.  Bulk submissions use `items` in place of top-level `resource` and `action`; the member definitions below cover both shapes.
 
 The request body is a JSON object with the following members:
 
@@ -420,8 +340,6 @@ The request body is a JSON object with the following members:
     * `items` is present and any item lacks a per-item `denial`: the top-level `denial` is a bundle denial; its coverage rules are in {{bulk-submissions}}.
 
   OPTIONAL when `items` is present and every item carries its own per-item `denial`.
-
-  An Access Request whose denial binding does not cover the submitted Subject, Resource, Action, and authorization-relevant Context (for every item when `items` is present) MUST be rejected with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
 
 `context`:
 : OPTIONAL.  The AuthZEN Context from the denied evaluation, augmented with submission-time fields such as business justification.
@@ -443,38 +361,46 @@ The request body is a JSON object with the following members:
 
   The `actor` and `source` members of this object are defined in {{client-actor-source}}.
 
-  The `actor` and `source` objects are supplied for authorization, routing, and audit correlation.  The Access Request Service MUST NOT rely on `client.actor` or `client.source` as authorization input unless the values are independently verified by the service.
-
-The `denial` object echoes selected members of the PDP's denied evaluation response:
-
-`expires_at`:
-: REQUIRED.  {{RFC3339}} timestamp indicating when the requestable denial hint expires, echoed unchanged from `context.access_request.expires_at` of the denied evaluation.  The Access Request Service MUST reject submissions received after this time, after applying any clock-skew tolerance it has configured (see {{impl-considerations}}).
-
-`evaluation_id`:
-: REQUIRED when `denial.binding_token` is absent; otherwise RECOMMENDED.  A stable identifier for the denied evaluation, captured by the PEP from `context.evaluation_id` in the AuthZEN Decision and echoed unchanged here ({{evaluation-identifier}}).
-
-  * The Access Request Service MUST be able to resolve or validate `evaluation_id` before relying on it as denial-binding material.
-  * `evaluation_id` provides the strongest audit binding between the original denial and the submitted Access Request and SHOULD be preferred over `evaluated_at` alone.
-
-`binding_token`:
-: REQUIRED when `denial.evaluation_id` is absent; otherwise OPTIONAL.  String.  Integrity-protected binding material echoed unchanged from `context.access_request.binding_token` of the denied evaluation ({{requestable-denial-context}}).  The PEP MUST NOT decode, modify, or interpret this value; it returns the original PDP-issued value byte-for-byte.
-
-`evaluated_at`:
-: OPTIONAL.  {{RFC3339}} timestamp indicating when the denial was produced, echoed from `context.evaluated_at` of the denied evaluation.
-
-`reason`:
-: OPTIONAL.  String.  Machine-readable reason code for the denial, echoed unchanged from `context.reason` of the denied evaluation.
-
-`template`:
-: OPTIONAL.  String.  Echoed unchanged from `context.access_request.template` of the denied evaluation, when the PDP provided one.  The Access Request Service uses this value to route the request to the appropriate workflow.
+  The `actor` and `source` objects are supplied for authorization, routing, and audit correlation.
 
 Additional submission members are `items` for {{bulk-submissions}} and `callback` for {{callback-completion}}.
 
 When the denial includes `request_schema_url`, the PEP uses the referenced JSON Schema to determine the additional members of `context` and `requested_access` ({{machine-readable-forms}}).
 
-A PEP MUST submit an Access Request only for an AuthZEN Decision with `decision` equal to `false` and a `context.access_request` object present in the Decision Context.
+### The `denial` Object {#submission-denial-object}
 
-The submitted `denial` object for each requested item MUST include either `denial.binding_token` or `denial.evaluation_id`.  The Access Request Service MUST reject a submission that lacks verifiable denial-binding material with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
+The `denial` object echoes selected members of the PDP's denied evaluation response.  The table maps their sources; the definitions below specify presence and handling.
+
+| Source in the denied evaluation response | Submission member |
+|---|---|
+| `context.access_request.expires_at` | `denial.expires_at` |
+| `context.evaluation_id` | `denial.evaluation_id` |
+| `context.access_request.binding_token` | `denial.binding_token` |
+| `context.evaluated_at` | `denial.evaluated_at` |
+| `context.reason` | `denial.reason` |
+| `context.access_request.template` | `denial.template` |
+
+`expires_at`:
+: REQUIRED.  {{RFC3339}} timestamp indicating when the requestable denial hint expires, echoed unchanged.
+
+`evaluation_id`:
+: REQUIRED when `denial.binding_token` is absent; otherwise RECOMMENDED.  A stable identifier for the denied evaluation, captured by the PEP and echoed unchanged ({{evaluation-identifier}}).
+
+  `evaluation_id` provides the strongest audit binding between the original denial and the submitted Access Request and SHOULD be preferred over `evaluated_at` alone.
+
+`binding_token`:
+: REQUIRED when `denial.evaluation_id` is absent; otherwise OPTIONAL.  String.  Integrity-protected binding material echoed unchanged ({{requestable-denial-context}}).  The PEP MUST NOT decode, modify, or interpret this value; it returns the original PDP-issued value byte-for-byte.
+
+`evaluated_at`:
+: OPTIONAL.  {{RFC3339}} timestamp indicating when the denial was produced.
+
+`reason`:
+: OPTIONAL.  String.  Machine-readable reason code for the denial, echoed unchanged.
+
+`template`:
+: OPTIONAL.  String.  Echoed unchanged when the PDP provided one.  The Access Request Service uses this value to route the request to the appropriate workflow.
+
+### Idempotency {#submission-idempotency}
 
 A PEP SHOULD include an `Idempotency-Key` header, following the conventions described in {{I-D.ietf-httpapi-idempotency-key-header}}.  The Idempotency-Key covers the entire submission body, including all members of the `items` array when present.
 
@@ -485,6 +411,12 @@ Bodies are equivalent when identical under the Access Request Service's determin
 The Access Request Service SHOULD retain Idempotency-Key state at least until `task.expires_at` and SHOULD continue to retain it for at least 24 hours after the task reaches a terminal status.  This window lets retries from delayed PEP restarts find the original task rather than spawning a duplicate.
 
 After the retention window elapses, the Access Request Service MAY reclaim the Idempotency-Key; a submission presenting a previously seen Idempotency-Key whose state has been reclaimed is processed as a new submission.
+
+#### Idempotency Key Abuse {#idempotency-key-abuse}
+
+Implementations SHOULD scope idempotency keys to the authenticated caller and avoid storing them longer than necessary.
+
+### Submission Example
 
 Non-normative example:
 
@@ -523,41 +455,6 @@ Idempotency-Key: 7b8d0f0d-65a1-4af1-9fd3-a684f08a5d13
   }
 }
 ~~~
-
-### Idempotency Key Abuse {#idempotency-key-abuse}
-
-Implementations SHOULD scope idempotency keys to the authenticated caller and avoid storing them longer than necessary.
-
-## Actor and Source Verification {#actor-source-verification}
-
-When authenticating a submission, the Access Request Service:
-
-* MUST authenticate the PEP using the deployment's chosen mechanism (typically an OAuth 2.0 bearer token, mutual TLS certificate, or signed assertion).
-* When the submission claims an actor or actor chain in `client.actor`, MUST verify that the authenticated caller's credential authorizes the entire claimed chain, not only the immediate actor.  Mechanisms commonly used to provide such authorization include {{RFC8693}} OAuth 2.0 Token Exchange (where the access token names the Subject as the on-behalf-of party and the chain via `act` claims), signed assertions from a trusted issuer, or deployment-specific authentication policies.
-* MUST reject submissions whose claimed chain cannot be verified against the caller's credential or against trusted issuers identified in the deployment.
-
-Unverified `client.actor` content MAY be retained as audit metadata only; the rule that it is not authorization input is stated with the `client` member ({{access-request-submission}}).
-
-{{delegation}} describes the delegation model and credentials; {{client-actor-source}} defines the `client.actor` and `client.source` members.
-
-## Verifying the Denial Binding {#verifying-denial-binding}
-
-**Audience: Access Request Service implementers.**  These are submission-verification checks, not PEP token-decoding steps.
-
-When `binding_token` is a JWS-signed JWT using the claims defined in {{binding-token-integrity}}, the Access Request Service, on receipt:
-
-1. parses the JWS header and resolves the verification key from the JWK Set at the PDP's `jwks_uri`;
-2. verifies the signature, the `aud` claim, and the expiry;
-3. checks `jti` against recently-seen tokens to detect replay;
-4. compares the binding claims (inline or hashed) against the submission's Subject, Resource, Action, and authorization-relevant Context (or per-item for bulk submissions), rejecting a mismatch with `urn:openid:authzen:access-request:error:invalid_denial_binding`;
-5. enforces freshness (the earlier of the token `exp` and `denial.expires_at`), rejecting a submission past that deadline with `urn:openid:authzen:access-request:error:expired_denial`.
-
-The following rules govern the freshness deadline of a submission:
-
-* When the `binding_token` carries its own expiry (`exp`) and the submitted denial also carries `denial.expires_at`, the Access Request Service MUST enforce the earlier of the two as the freshness deadline for the submission.
-* When `denial_expires_at` or equivalent protected binding material is present, the Access Request Service MUST verify that `denial.expires_at` matches the protected value before relying on it.
-* When no protected denial-expiry value is present, the Access Request Service MUST rely on `exp` only if it is no later than the echoed `denial.expires_at`; otherwise the binding material is insufficient to prove the freshness window and the submission MUST be rejected with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
-* A submission whose freshness deadline has passed MUST be rejected with `urn:openid:authzen:access-request:error:expired_denial`.
 
 ## Access Request Response {#access-request-response}
 
@@ -655,6 +552,34 @@ Location: https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C
   }
 }
 ~~~
+
+## Submission Processing {#submission-processing}
+
+A PEP MUST submit an Access Request only for an AuthZEN Decision with `decision` equal to `false` and a `context.access_request` object present in the Decision Context.
+
+The submitted `denial` object for each requested item MUST include either `denial.binding_token` or `denial.evaluation_id`.  The Access Request Service MUST reject a submission that lacks verifiable denial-binding material with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
+
+An Access Request whose denial binding does not cover the submitted Subject, Resource, Action, and authorization-relevant Context (for every item when `items` is present) MUST be rejected with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
+
+The Access Request Service MUST be able to resolve or validate `denial.evaluation_id` before relying on it as denial-binding material.
+
+The Access Request Service MUST reject submissions received after `denial.expires_at`, after applying any clock-skew tolerance it has configured (see {{impl-considerations}}).
+
+The Access Request Service MUST NOT rely on `client.actor` or `client.source` as authorization input unless the values are independently verified by the service.
+
+{{actor-source-verification}} and {{verifying-denial-binding}} define the actor and denial-binding verification procedures.
+
+## Actor and Source Verification {#actor-source-verification}
+
+When authenticating a submission, the Access Request Service:
+
+* MUST authenticate the PEP using the deployment's chosen mechanism (typically an OAuth 2.0 bearer token, mutual TLS certificate, or signed assertion).
+* When the submission claims an actor or actor chain in `client.actor`, MUST verify that the authenticated caller's credential authorizes the entire claimed chain, not only the immediate actor.  Mechanisms commonly used to provide such authorization include {{RFC8693}} OAuth 2.0 Token Exchange (where the access token names the Subject as the on-behalf-of party and the chain via `act` claims), signed assertions from a trusted issuer, or deployment-specific authentication policies.
+* MUST reject submissions whose claimed chain cannot be verified against the caller's credential or against trusted issuers identified in the deployment.
+
+Unverified `client.actor` content MAY be retained as audit metadata only; the rule that it is not authorization input is stated in {{submission-processing}}.
+
+{{delegation}} describes the delegation model and credentials; {{client-actor-source}} defines the `client.actor` and `client.source` members.
 
 # Checking the Task
 
@@ -873,37 +798,7 @@ The `approval` object MAY additionally include a `state` member.  `state` is an 
 
 The PEP MUST preserve the JSON value exactly and MUST NOT modify or interpret the contents of `approval.state`.
 
-## Approval Verification {#approval-verification}
-
-**Audience: primarily PDP and Access Request Service implementers.**  The PEP's unchanged-approval round-trip rule appears below and in {{pep-processing-rules}}; {{pep-value-handling}} summarizes it.
-
-The `approval` object, not the original `evaluation_id`, links re-evaluation to the approved Access Request and original denial.
-
-The PDP MUST be able to resolve or verify `approval.id`, `approval.state`, or both, and bind the approval to the Access Request task, the original denied evaluation when recorded, the approved Subject, Resource, Action, relevant Context, approval scope, and approval expiry.
-
-When both `approval.id` and an integrity-protected `approval.state` are present and `approval.state` carries its own approval identifier, the PDP MUST verify that the two identifiers match, and MUST reject the re-evaluation on mismatch.
-
-At re-evaluation, the PDP:
-
-* MUST NOT authorize a re-evaluation solely because the request contains a known `approval.id`.
-* MUST resolve or verify the approval reference presented in `context.approval` and confirm that it is applicable to the authenticated caller or requester, current Subject, Resource, Action, relevant Context, approval scope, and approval expiry before using it as an input to an allow decision.
-* MUST ignore or reject a swapped, replayed, expired, or otherwise non-applicable approval reference, and MUST evaluate the request as not approved by that reference.
-
-In the bound-reference pattern, the PDP verifies `approval.state`, carrying integrity-protected proof or verifier state.  {{shared-state-deployments}} defines the lookup alternative.
-
-Deployments MAY use both patterns together.  In all cases, the PDP MUST verify the approval against trusted state or integrity-protected binding material; neither `approval.id` nor `approval.state` is a bearer grant by itself.
-
-When the PDP cannot resolve `approval.id` from trusted server-side state shared with, or delegated by, the Access Request Service, the Approval Result MUST include `approval.state` or another profile-defined PDP-verifiable artifact.  An Access Request Service MUST NOT return a Re-evaluation Mode result that the PDP cannot verify without trusting PEP-supplied assertions.
-
-When `approval.state` is carried by value as a JWS:
-
-* The verifying PDP MUST be able to discover the signer's verification key.
-* The JWS MUST carry an `iss` claim identifying the signer (the Access Request Service, or the PDP acting through it) and SHOULD carry a `kid` header.
-* The deployment publishes the Access Request Service's approval-state verification keys in the PDP's `jwks_uri` JWK Set ({{discovery}}); the PDP selects the key by `iss` and `kid`.
-* A JWS `approval.state` MUST carry an `aud` (or equivalent intended-recipient) claim identifying the verifying PDP, which the PDP MUST verify, so the value cannot be replayed to a different PDP that shares the signer's key.
-* A PDP that cannot resolve the signer's key, or resolves it to a key not trusted for the claimed `iss`, MUST reject the `approval.state`.
-
-The approval record or verifiable binding material MUST contain, or allow the PDP to determine, at least the approval identifier, Access Request task identifier, original denied evaluation identifier when available, approved Subject, approved Resource and Action or approval scope, requester and client binding, approval status, `approved_at` when available, `approved_until`, and any revocation or cancellation state.
+## Re-evaluation Request {#approval-reevaluation-request}
 
 The PEP MUST include the `approval` object unchanged at `context.approval` inside the AuthZEN Authorization API re-evaluation request.  This includes its `id`, timestamps, and any `state`.
 
@@ -948,29 +843,33 @@ This non-normative table summarizes the fallback order defined above.  Use the f
 
 Whether explicit or selected by fallback, `request` becomes `none` if `context.access_request` is absent.  `retry` means re-evaluate after a delay; the `retry_after` and expiry rules above govern timing.  `none` means no retry or new Access Request for this approval.
 
-## Approval Lifetime and Current Status {#approval-lifetime}
+## Approval Lifetime and Enforcement {#approval-lifetime}
 
-The PDP MUST check current approval status during re-evaluation, including whether the approval has been revoked, cancelled, superseded, or otherwise invalidated before `approved_until`.  The `approved_until` timestamp is a PEP-side maximum reuse and enforcement bound; it does not prevent the PDP from denying earlier because of revocation, cancellation, policy change, risk change, or other current state.
+The `approved_until` timestamp is a PEP-side maximum reuse and enforcement bound; it does not prevent the PDP from denying earlier because of revocation, cancellation, policy change, risk change, or other current state.
 
 When the re-evaluation response indicates an approval expiry (typically as `context.approval.approved_until`), the PEP MUST NOT enforce access past that timestamp.  PEPs that issue downstream credentials on the basis of the approved evaluation (for example, an OAuth Authorization Server issuing access tokens) MUST bound the lifetime of those credentials by the earlier of the approval expiry in the Approval Result and any approval expiry returned by the PDP during re-evaluation.
 
-## Approval Scope and Reuse {#approval-scope}
+The PDP's current-status check is defined in {{approval-current-status}}.
 
-Approval scope determines which Access Evaluations may use an approval, subject to current PDP policy.  Reusing an approval avoids a new Access Request for each operation.  This profile defines exact-match scope; broader matching, such as a resource-class or role grant, is deployment-specific or defined by downstream profiles ({{approval-scope-extensions}}).
+## Approval Reuse {#approval-reuse}
 
-The default approval scope is the original denied Subject, Resource, Action, and authorization-relevant Context bound to the Access Request.  An evaluation is within this scope when its Subject, Resource, Action, and authorization-relevant Context are equal, member by member, to the bound values, using the structural comparison, authorization-relevant Context set, and `subject.properties.act` exclusion defined in {{structural-comparison}}.  This baseline is engine-neutral, and two independently implemented PDP and Access Request Service pairs MUST interoperate on it.
-
-In the bound-reference topology, where the verifying PDP does not share recorded state with the Access Request Service, the verifiable approval material (for example, a `binding_context_members`-equivalent claim in `approval.state`) MUST convey the authorization-relevant Context member set so the PDP applies the same set.
-
-The exact-match baseline is the default unless the Access Request Service or PDP records a broader or narrower approval scope ({{approval-scope-extensions}}).  For a bundled Access Request, the default approval scope for each approved item is that item's Subject, Resource, Action, and relevant Context.  This default scope is not serialized in the Approval Result unless a profile or deployment defines a representation for it.
-
-The PDP MUST only consider an Approval Result applicable when the current evaluation request is within the approval scope recorded for that Approval Result.
+The PDP determines whether an approval applies to each evaluation ({{approval-scope}}).
 
 A PEP MUST NOT treat an Approval Result as authorizing any future Access Evaluation solely on the basis that the Access Request was approved.
 
 A PEP MAY include the Approval Result in a subsequent Access Evaluation (by placing the `approval` object at `context.approval`), but the PDP remains responsible for determining whether the Approval Result applies under current policy.
 
 A PEP MAY cache or retain an Approval Result, but MUST NOT independently infer that a future request is covered by that approval unless directed by the PDP or by a profile-defined mechanism.
+
+## Deadline Reference {#pep-deadlines}
+
+| Deadline | Meaning for the PEP | Rules |
+|---|---|---|
+| `denial.expires_at` | Echo the denial's expiry at submission; the Access Request Service checks freshness. | {{access-request-submission}}, {{verifying-denial-binding}} |
+| `task.expires_at` | When supplied, limits Task Handle validity.  Polling stops at expiry or terminal status. | {{access-request-response}}, {{task-status-endpoint}} |
+| `approval.approved_until` | Bounds approval reuse and enforcement, not a guarantee of access until that time. | {{approval-result}}, {{approval-lifetime}} |
+
+{{approval-lifetime}} also covers expiry returned by the PDP and downstream credential lifetimes.  Clock-skew qualifications remain in {{impl-considerations}}.  Expiry inside an opaque artifact is checked by its verifier, not extracted by the PEP ({{verifying-denial-binding}}, {{approval-verification}}).
 
 ## Re-evaluation Example {#reevaluation-example}
 
@@ -1017,16 +916,6 @@ Non-normative re-evaluation response:
 }
 ~~~
 
-## Decision and Binding Integrity
-
-Implementations MUST bind Access Requests and approval results to the Subject, Resource, Action, Context, task, and requester.  PDPs MUST validate this binding during re-evaluation.
-
-Possession of a valid-looking approval identifier is insufficient to authorize access; the applicability check is stated in {{approval-verification}}.
-
-When approval state is carried by reference, the PDP or Access Request Service MUST protect the backing approval record against unauthorized lookup and mutation.  When approval binding material is carried by value, for example in `approval.state`, the PDP MUST verify integrity, issuer, audience or intended recipient, expiry, and binding before accepting it.
-
-Approval results MUST expire.  Re-evaluation Mode SHOULD bind approval references to the original request tuple.  Profiles of this specification that define token-based completion modes are responsible for defining the token's audience restriction, lifetime, and binding to the approved request.
-
 # Error Responses {#error-responses}
 
 HTTP error responses from the Access Request Endpoint and Task Status Endpoint MUST use `application/problem+json` as defined by {{RFC9457}} when returning one of the problem types defined by this specification.  The problem type URI MUST appear in the `type` member.
@@ -1068,111 +957,124 @@ Content-Type: application/problem+json
 }
 ~~~
 
-# Core Conformance
+# Binding and Verification {#deployment-alternatives}
 
-## PEP Processing Rules {#pep-processing-rules}
+Denial binding connects an Access Request to the denied evaluation; approval binding connects a re-evaluation to the approved request.  Both use the comparison rules below.
 
-The rules for a PEP implementing this profile are grouped by lifecycle phase.  The linked sections provide the detailed processing rules.
+## Structural Comparison {#structural-comparison}
 
-### Recognize Requestability
+Throughout this profile, structural comparison requires the same JSON type and applies these rules:
 
-See {{requestable-denial-context}}.
+* Numbers are equal under their {{RFC8785}} canonical form.
+* Strings are equal codepoint-for-codepoint.
+* Arrays are equal element-by-element in order.
+* Objects have the same set of member names with recursively equal values.
+* An absent member is distinct from a member whose value is `null`.
 
-* MUST treat `decision: false` as a denial, even when the Decision Context contains an `access_request` object.
-* MUST NOT submit an Access Request unless the denied Decision contains a `context.access_request` object.
+These rules apply wherever the profile compares Subject, Resource, Action, or authorization-relevant Context, including inline denial binding and approval-scope matching ({{approval-scope}}).
 
-### Construct the Submission
+For inline denial binding and exact-match approval-scope matching, Subject, Resource, and Action comparison includes the full AuthZEN Authorization API objects, including any `properties` members present in the bound values, except that `subject.properties.act` is excluded because the PEP MAY normalize the actor to `client.actor` (see {{pep-processing-rules}} and {{client-actor-source}}).  Context comparison includes each member of the authorization-relevant Context and excludes profile machinery members.
 
-See {{access-request-submission}}, {{trusting-urls}}, and {{machine-readable-forms}}.
+Denial binding, approval-scope matching, and idempotent-submission comparison all compare the authorization-relevant Context, so when any member is authorization-relevant the PDP MUST make it explicit and integrity-protected, and the Access Request Service MUST use exactly that set:
 
-* MUST use the `endpoint` from the denial context when present; otherwise it MUST use the `access_request_endpoint` from PDP metadata.
-* MUST preserve the principal identity of the Subject, and MUST preserve the Resource, Action, and relevant Context of the denied evaluation when submitting the Access Request.  When the original evaluation conveyed an actor identity in the Subject (for example, via `subject.properties.act`), the PEP MAY preserve the actor in the submission's `subject` or normalize it to `client.actor`; the actor identity itself MUST NOT be dropped.
-* When the requestable denial includes `request_schema_url`, MUST construct the augmentations to the submission's `context` and `requested_access` objects according to {{machine-readable-forms}}.  If the schema requires information the PEP cannot obtain or is not authorized to supply, the PEP MUST NOT fabricate values or submit an incomplete request; it MUST either surface the request for additional input, hand it to another authorized component, or treat the denial as not requestable by that PEP.
-* MUST include `denial.expires_at` from `context.access_request.expires_at`.
-* MUST include `denial.evaluation_id` when `denial.binding_token` is absent, and SHOULD include it when the PDP returned an evaluation identifier.
-* SHOULD include an idempotency key for Access Request submissions.
+- with a `binding_token`, the token carries the set as a `binding_context_members` claim ({{binding-token-integrity}});
+- with `evaluation_id`, the set is recorded for that evaluation in shared state and resolved server-side.
 
-### Handle the Task
+Absent an integrity-protected or server-resolved set, the authorization-relevant Context is empty and only Subject, Resource, and Action bind.
 
-See {{access-request-response}}, {{task-status-endpoint}}, and {{completed-task-response}}.
+## Decision and Binding Integrity {#decision-and-binding-integrity}
 
-* MUST treat a Task Handle as opaque.
-* MUST NOT infer approval from a task identifier, link, or display text.
-* MUST treat unknown task status values as not approved.
+Implementations MUST bind Access Requests and approval results to the Subject, Resource, Action, Context, task, and requester.  PDPs MUST validate this binding during re-evaluation.
 
-### Re-evaluate and Enforce
+Possession of a valid-looking approval identifier is insufficient to authorize access; the applicability check is stated in {{approval-verification}}.
 
-See {{completion-semantics}}, {{approval-lifetime}}, and {{approval-scope}}.
+When approval state is carried by reference, the PDP or Access Request Service MUST protect the backing approval record against unauthorized lookup and mutation.  When approval binding material is carried by value, for example in `approval.state`, the PDP MUST verify integrity, issuer, audience or intended recipient, expiry, and binding before accepting it.
 
-* MUST enforce an approved result only according to {{completion-semantics}}.
-* MUST treat unknown `result.mode` values as not approved.
-* When using Re-evaluation Mode, MUST include the returned `approval` object unchanged at `context.approval` inside the AuthZEN Authorization API re-evaluation request.
-* MUST re-evaluate access through the AuthZEN Access Evaluation API after approval, unless a profile-defined completion mode applies (for example, a profile binding to OAuth token issuance).
-* MUST NOT treat an Approval Result as authorizing any future Access Evaluation solely on the basis that the Access Request task reached `approved`; applicability is determined by the PDP at each subsequent evaluation.
+Approval results MUST expire.  Re-evaluation Mode SHOULD bind approval references to the original request tuple.  Profiles of this specification that define token-based completion modes are responsible for defining the token's audience restriction, lifetime, and binding to the approved request.
 
-## PDP Processing Rules
+## Denial Binding {#denial-binding}
 
-A PDP implementing this profile:
+Denial binding uses `binding_token` by value or `evaluation_id` by reference.
 
-* MAY include `context.access_request` in a denied AuthZEN Decision when the denied access is eligible for approval.
-* MUST NOT include `context.access_request` unless an Access Request Endpoint is available to process the request.
-* SHOULD include a stable machine-readable reason code when returning a requestable denial.
-* MUST include an expiration time for the requestable denial hint as `context.access_request.expires_at`.
-* MUST provide verifiable denial-binding material when returning `context.access_request`: an integrity-protected `context.access_request.binding_token`, or a stable `context.evaluation_id` the Access Request Service can resolve against state shared with, or delegated by, the PDP.  When the Access Request Service is independent of the PDP, the PDP MUST provide the `binding_token` form ({{requestable-denial-context}}).
-* SHOULD return a stable evaluation identifier as `context.evaluation_id` ({{evaluation-identifier}}) that the PEP can supply as `denial.evaluation_id` when submitting an Access Request.
-* When including `context.access_request.binding_token`, MUST integrity-protect it using a mechanism the Access Request Service can verify and SHOULD issue it as a JWS in compact serialization.
-* MUST validate approval references presented during re-evaluation.
-* MUST only consider an Approval Result applicable when the current evaluation request is within the approval scope recorded for that Approval Result.
-* MUST ensure that approval does not override policy conditions that remain mandatory at enforcement time, such as subject status, resource sensitivity, action constraints, environmental risk, and approval expiry.
+**`binding_token` (by value).**  An integrity-protected token that protects or constrains the requestable-denial expiry.  The PDP signs it and retains no state.  This form works in any topology, and is REQUIRED when the Access Request Service does not share state with the PDP (an independent Access Request Service).
 
-## Access Request Service Processing Rules {#ars-processing-rules}
+For that independent topology the `binding_token` MUST be self-contained: it carries the denied Subject, Resource, Action, and authorization-relevant Context by value (inline or as a `binding_hash`) and the Access Request Service verifies it offline against the PDP's published key, per {{binding-token-integrity}}.  A `binding_token` that only references shared state, for example one carrying `evaluation_id` alone, does not satisfy the independent-Access-Request-Service requirement.
 
-An Access Request Service implementing this profile:
+A PDP MAY emit both forms.  When a `binding_token` is present it is the authoritative denial binding, and any accompanying `evaluation_id` serves only as a correlation and audit identifier rather than a second binding form; the Access Request Service resolves `evaluation_id` as a binding form only when no `binding_token` is present.  This is why a PDP MAY follow the conformance recommendation to return a stable `context.evaluation_id` ({{evaluation-identifier}}) even when it also emits a `binding_token`.
 
-* MUST authenticate and authorize the PEP before accepting Access Request submissions.
-* MUST validate that the submission is based on a requestable denial, rejecting a submission that is not with `urn:openid:authzen:access-request:error:not_requestable`.
-* MUST verify the denial-binding material for every requested item, applying the following rules:
-    * When `denial.binding_token` is present, the service MUST verify its integrity.  When the value is a JWS, the service MUST verify the signature using a key resolved from the JWK Set advertised at the PDP's `jwks_uri` ({{discovery}}); JWS `kid` headers are matched against JWK `kid` parameters.
-    * When `denial.binding_token` is absent, the service MUST apply the `evaluation_id` verification path defined in {{shared-state-deployments}}.
-    * The service MUST reject submissions received after the verified `denial.expires_at` with `urn:openid:authzen:access-request:error:expired_denial`, after applying any clock-skew tolerance it has configured (see {{impl-considerations}}).
-    * The service MUST reject submissions whose binding material cannot be verified, or whose claims do not bind to the submitted denial, with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
-* MUST bind the task to the submitted Subject, Resource, Action, Context, denial, requester, and client.
-* MUST return an opaque Task Handle for accepted requests.
-* SHOULD support idempotent request submission using the `Idempotency-Key` header.
-* MUST expire Access Requests and approvals according to local policy.
-* MUST NOT return `approved` unless the configured approval workflow has completed successfully.
-* MUST evaluate approver eligibility, including self-approval, delegation, separation-of-duties, and conflict-of-interest policy, before treating an approval workflow as successfully completed.
-* MUST retain sufficient audit records to reconstruct the request, approval, denial, and completion result.
+The durable denial-binding record lives in the Access Request Service role, not the PDP.  This is the denial-side mirror of the re-evaluation rule that requires `approval.state` when the PDP cannot resolve `approval.id` from shared or delegated state ({{approval-state}}).  When neither binding form is available, or when the Access Request Service cannot determine that the binding is unexpired, the PDP MUST NOT include `context.access_request` in the Decision Context.
 
-## Policy and Approver Hygiene {#overbroad-approval}
+### Denial Binding Claims {#binding-token-integrity}
 
-This profile does not define an approval policy language.  Implementations MUST NOT treat the `template`, `requested_access`, or `display` fields as sufficient authorization policy.  Actual approval scope and enforcement semantics are determined by the PDP and Access Request Service.
+The PDP issues `binding_token` as proof of the denied evaluation.  The PEP carries it unchanged to the Access Request Service, which verifies the binding and freshness ({{verifying-denial-binding}}).
 
-The `requested_access.emergency` member ({{access-request-submission}}) is a request signal, not an authorization override.  Implementations that support emergency or break-glass access SHOULD require a business justification, apply the shortest practical approval or access lifetime, notify appropriate owners or security personnel, and require post-use review.  Emergency requests and approvals SHOULD be retained and auditable according to the deployment's security and compliance policy.
+PDPs MUST integrity-protect `binding_token` using a mechanism the Access Request Service can verify and SHOULD issue it as a JWS so the Access Request Service can prove the value was produced by the PDP and bound to the original denied evaluation.
 
-### Approver Eligibility and Separation of Duties {#approver-eligibility}
+When the payload contains information that must not be visible to the PEP, the PDP MAY use JWE in addition to integrity protection, for example by encrypting a signed payload.
 
-Access Request Services MUST evaluate approver eligibility before returning `approved`, including self-approval restrictions, delegated approver authority, separation-of-duties constraints, ownership rules, and conflict-of-interest policy.  A workflow step completed by an ineligible approver MUST NOT be treated as successful approval unless local policy explicitly allows that exception and records it for audit.
+This profile does not mandate a specific JWS payload; the contents are deployment-specific.  Implementations that issue `binding_token` as a JWT SHOULD include the claims described in {{denial-jwt-claims}} and {{denial-request-binding}} to provide sound token hygiene and confused-deputy protection.
 
-# Deployment Alternatives {#deployment-alternatives}
+#### JWT Claim Reference {#denial-jwt-claims}
 
-The signed forms work in any topology.  Alternatives include shared-state references, other integrity-protected formats, and approval scopes broader than the denied tuple.
+* `aud`: REQUIRED.  Access Request Service identifier, or an array of identifiers including the Access Request Service.  An array supports multiple verifiers of the same JWT; audience validation prevents replay to an unintended service.  The Access Request Service MUST reject a `binding_token` JWT that lacks `aud` or whose `aud` does not include the Access Request Service's identifier.
+* `iss`: PDP identifier.  Lets the Access Request Service select the correct verification key from the PDP's JWK Set ({{discovery}}).
+* `iat`, `exp`: issued-at and expiry.  Expiry SHOULD be short (typically minutes, aligned with the requestable-denial hint lifetime).
+* `jti`: unique token identifier.  The Access Request Service SHOULD track recently-seen `jti` values until the token's `exp` to detect replay of an otherwise valid token.
+* `denial_expires_at`: the `context.access_request.expires_at` value from the requestable denial, unless the token's `exp` is no later than that value.  This lets the Access Request Service verify the PEP-echoed `denial.expires_at` value or enforce the token expiry as an equal-or-stricter freshness deadline.
+* `evaluation_id`: the PDP's identifier for the evaluation, when present in `context.evaluation_id` ({{evaluation-identifier}}).
 
-## Shared-State Deployments {#shared-state-deployments}
+#### Binding the Denied Request {#denial-request-binding}
 
-When the PDP and Access Request Service share state, or the service operates with state delegated by the PDP, denial binding and approval references can refer to that state instead of carrying binding material by value.
+The `binding_context_members` claim is the array of `context` member names that constitute the authorization-relevant Context for this evaluation (see the Terminology definition of Authorization-Relevant Context).  It is present (and MAY be an empty array) whenever any binding claim covers context; the Access Request Service uses exactly this integrity-protected set when comparing or hashing the authorization-relevant Context, and binds only Subject, Resource, and Action when it is absent.
 
-### Denial Binding by Reference
+Binding claims identify the original denied evaluation using either of the following representations.  For interoperability across independently implemented PDPs and Access Request Services, the inline form is RECOMMENDED, because it is compared structurally and requires no agreed byte canonicalization.
+
+* Inline (RECOMMENDED): the Subject, Resource, Action, and authorization-relevant Context of the denied evaluation, which the Access Request Service compares structurally, member by member, against the submission, using the comparison rules in {{structural-comparison}}.
+* Hashed: a `binding_hash` constructed as defined in {{denial-binding-hash}}.
+
+#### Hash Construction {#denial-binding-hash}
+
+`binding_hash` is the base64url-encoded (without padding) SHA-256 digest of the {{RFC8785}} JSON Canonicalization Scheme (JCS) serialization of this JSON object.  Angle-bracketed values are placeholders, not literal strings:
+
+~~~
+{
+  "subject": <Subject>,
+  "resource": <Resource>,
+  "action": <Action>,
+  "context": <authorization-relevant Context>
+}
+~~~
+
+`<Subject>` is the bound Subject with `subject.properties.act` removed (matching the exclusion in {{structural-comparison}}).  `<authorization-relevant Context>` is the set enumerated by `binding_context_members`, which the Access Request Service recomputes from the submission.
+
+Implementations that use the hashed form MUST use exactly this construction so that a PDP and an independently implemented Access Request Service compute identical digests.
+
+The bulk construction is defined in {{bulk-denial-binding}}.
+
+### Verifying the Denial Binding {#verifying-denial-binding}
+
+When `binding_token` is a JWS-signed JWT using the claims defined in {{binding-token-integrity}}, the Access Request Service, on receipt:
+
+1. parses the JWS header and resolves the verification key from the JWK Set at the PDP's `jwks_uri`;
+2. verifies the signature, the `aud` claim, and the expiry;
+3. checks `jti` against recently-seen tokens to detect replay;
+4. compares the binding claims (inline or hashed) against the submission's Subject, Resource, Action, and authorization-relevant Context (or per-item for bulk submissions), rejecting a mismatch with `urn:openid:authzen:access-request:error:invalid_denial_binding`;
+5. enforces freshness (the earlier of the token `exp` and `denial.expires_at`), rejecting a submission past that deadline with `urn:openid:authzen:access-request:error:expired_denial`.
+
+The following rules govern the freshness deadline of a submission:
+
+* When the `binding_token` carries its own expiry (`exp`) and the submitted denial also carries `denial.expires_at`, the Access Request Service MUST enforce the earlier of the two as the freshness deadline for the submission.
+* When `denial_expires_at` or equivalent protected binding material is present, the Access Request Service MUST verify that `denial.expires_at` matches the protected value before relying on it.
+* When no protected denial-expiry value is present, the Access Request Service MUST rely on `exp` only if it is no later than the echoed `denial.expires_at`; otherwise the binding material is insufficient to prove the freshness window and the submission MUST be rejected with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
+* A submission whose freshness deadline has passed MUST be rejected with `urn:openid:authzen:access-request:error:expired_denial`.
+
+### Denial Binding by Reference {#shared-state-deployments}
 
 The Access Request Service resolves `evaluation_id` against state shared with, or delegated by, the PDP, within the binding window defined in {{evaluation-identifier}}.  This form applies only to same-service or shared-state deployments: a stateless PDP retains no decision state to fetch.
 
 When `denial.binding_token` is absent, the Access Request Service MUST resolve or validate `denial.evaluation_id`, retrieve the Subject, Resource, Action, authorization-relevant Context, and `expires_at` recorded for that evaluation in shared state, verify the Subject, Resource, Action, and Context match the submission using the structural comparison defined in {{structural-comparison}} (rejecting a mismatch with `urn:openid:authzen:access-request:error:invalid_denial_binding`), and enforce freshness against the recorded `expires_at` rather than the PEP-echoed `denial.expires_at`.
 
-### Approval Reference by Lookup
-
-The PDP resolves `approval.id` in trusted server-side state.  {{approval-verification}} defines the bound-reference alternative using `approval.state`.
-
-## Denial Binding Alternatives {#denial-binding-alternatives}
+### Denial Binding Alternatives {#denial-binding-alternatives}
 
 PDPs MAY add deployment-specific claims (policy version, factors, risk score, tenant identifier) when the Access Request Service needs them for routing or audit.  When such claims must remain opaque to the PEP, the PDP wraps the signed payload in JWE encrypted to the Access Request Service.
 
@@ -1180,7 +1082,61 @@ When `binding_token` uses another integrity-protected format, the Access Request
 
 A single signed JWT MAY simultaneously satisfy this profile's claim recommendations and the requirements of another profile or specification that uses the same JWT, provided the union of required claims is present and consistent.  For example, the same JWT can appear as `context.access_request.binding_token` and as a profile-defined token elsewhere.  Verifiers process the claims they understand without rejecting additional profile-specific claims.
 
-## Approval Scope Extensions {#approval-scope-extensions}
+## Approval Binding {#approval-binding}
+
+### Approval State {#approval-state}
+
+When the PDP cannot resolve `approval.id` from trusted server-side state shared with, or delegated by, the Access Request Service, the Approval Result MUST include `approval.state` or another profile-defined PDP-verifiable artifact.  An Access Request Service MUST NOT return a Re-evaluation Mode result that the PDP cannot verify without trusting PEP-supplied assertions.
+
+When `approval.state` is carried by value as a JWS:
+
+* The verifying PDP MUST be able to discover the signer's verification key.
+* The JWS MUST carry an `iss` claim identifying the signer (the Access Request Service, or the PDP acting through it) and SHOULD carry a `kid` header.
+* The deployment publishes the Access Request Service's approval-state verification keys in the PDP's `jwks_uri` JWK Set ({{discovery}}); the PDP selects the key by `iss` and `kid`.
+* A JWS `approval.state` MUST carry an `aud` (or equivalent intended-recipient) claim identifying the verifying PDP, which the PDP MUST verify, so the value cannot be replayed to a different PDP that shares the signer's key.
+* A PDP that cannot resolve the signer's key, or resolves it to a key not trusted for the claimed `iss`, MUST reject the `approval.state`.
+
+### Approval Verification {#approval-verification}
+
+The `approval` object, not the original `evaluation_id`, links re-evaluation to the approved Access Request and original denial.
+
+The PDP MUST be able to resolve or verify `approval.id`, `approval.state`, or both, and bind the approval to the Access Request task, the original denied evaluation when recorded, the approved Subject, Resource, Action, relevant Context, approval scope, and approval expiry.
+
+When both `approval.id` and an integrity-protected `approval.state` are present and `approval.state` carries its own approval identifier, the PDP MUST verify that the two identifiers match, and MUST reject the re-evaluation on mismatch.
+
+At re-evaluation, the PDP:
+
+* MUST NOT authorize a re-evaluation solely because the request contains a known `approval.id`.
+* MUST resolve or verify the approval reference presented in `context.approval` and confirm that it is applicable to the authenticated caller or requester, current Subject, Resource, Action, relevant Context, approval scope, and approval expiry before using it as an input to an allow decision.
+* MUST ignore or reject a swapped, replayed, expired, or otherwise non-applicable approval reference, and MUST evaluate the request as not approved by that reference.
+
+In the bound-reference pattern, the PDP verifies `approval.state`, carrying integrity-protected proof or verifier state.  {{approval-reference-lookup}} defines the lookup alternative.
+
+Deployments MAY use both patterns together.  In all cases, the PDP MUST verify the approval against trusted state or integrity-protected binding material; neither `approval.id` nor `approval.state` is a bearer grant by itself.
+
+The approval record or verifiable binding material MUST contain, or allow the PDP to determine, at least the approval identifier, Access Request task identifier, original denied evaluation identifier when available, approved Subject, approved Resource and Action or approval scope, requester and client binding, approval status, `approved_at` when available, `approved_until`, and any revocation or cancellation state.
+
+### Approval Reference by Lookup {#approval-reference-lookup}
+
+The PDP resolves `approval.id` in trusted server-side state.  {{approval-verification}} defines the bound-reference alternative using `approval.state`.
+
+### Current Approval Status {#approval-current-status}
+
+The PDP MUST check current approval status during re-evaluation, including whether the approval has been revoked, cancelled, superseded, or otherwise invalidated before `approved_until`.
+
+### Approval Scope {#approval-scope}
+
+Approval scope determines which Access Evaluations may use an approval, subject to current PDP policy.  Reusing an approval avoids a new Access Request for each operation.  This profile defines exact-match scope; broader matching, such as a resource-class or role grant, is deployment-specific or defined by downstream profiles ({{approval-scope-extensions}}).
+
+The default approval scope is the original denied Subject, Resource, Action, and authorization-relevant Context bound to the Access Request.  An evaluation is within this scope when its Subject, Resource, Action, and authorization-relevant Context are equal, member by member, to the bound values, using the structural comparison, authorization-relevant Context set, and `subject.properties.act` exclusion defined in {{structural-comparison}}.  This baseline is engine-neutral, and two independently implemented PDP and Access Request Service pairs MUST interoperate on it.
+
+In the bound-reference topology, where the verifying PDP does not share recorded state with the Access Request Service, the verifiable approval material (for example, a `binding_context_members`-equivalent claim in `approval.state`) MUST convey the authorization-relevant Context member set so the PDP applies the same set.
+
+The exact-match baseline is the default unless the Access Request Service or PDP records a broader or narrower approval scope ({{approval-scope-extensions}}).  For a bundled Access Request, the default approval scope for each approved item is that item's Subject, Resource, Action, and relevant Context.  This default scope is not serialized in the Approval Result unless a profile or deployment defines a representation for it.
+
+The PDP MUST only consider an Approval Result applicable when the current evaluation request is within the approval scope recorded for that Approval Result.
+
+#### Approval Scope Extensions {#approval-scope-extensions}
 
 Broader approvals can cover a resource class, role, entitlement, or time-bounded tool class.  Their representation and matching are deployment-specific or defined by downstream profiles, not portable across policy engines.  This profile does not define context-constraint matching.
 
@@ -1457,6 +1413,92 @@ A profile SHOULD:
 
 This specification neither enumerates profiles nor requires declarative profile negotiation.  Conformance to a profile depends on the presence and processing of its registered or namespaced members.
 
+# Core Conformance
+
+## PEP Processing Rules {#pep-processing-rules}
+
+The rules for a PEP implementing this profile are grouped by lifecycle phase.  The linked sections provide the detailed processing rules.
+
+### Recognize Requestability
+
+See {{requestable-denial-context}}.
+
+* MUST treat `decision: false` as a denial, even when the Decision Context contains an `access_request` object.
+* MUST NOT submit an Access Request unless the denied Decision contains a `context.access_request` object.
+
+### Construct the Submission
+
+See {{access-request-submission}}, {{trusting-urls}}, and {{machine-readable-forms}}.
+
+* MUST use the `endpoint` from the denial context when present; otherwise it MUST use the `access_request_endpoint` from PDP metadata.
+* MUST preserve the principal identity of the Subject, and MUST preserve the Resource, Action, and relevant Context of the denied evaluation when submitting the Access Request.  When the original evaluation conveyed an actor identity in the Subject (for example, via `subject.properties.act`), the PEP MAY preserve the actor in the submission's `subject` or normalize it to `client.actor`; the actor identity itself MUST NOT be dropped.
+* When the requestable denial includes `request_schema_url`, MUST construct the augmentations to the submission's `context` and `requested_access` objects according to {{machine-readable-forms}}.  If the schema requires information the PEP cannot obtain or is not authorized to supply, the PEP MUST NOT fabricate values or submit an incomplete request; it MUST either surface the request for additional input, hand it to another authorized component, or treat the denial as not requestable by that PEP.
+* MUST include `denial.expires_at` from `context.access_request.expires_at`.
+* MUST include `denial.evaluation_id` when `denial.binding_token` is absent, and SHOULD include it when the PDP returned an evaluation identifier.
+* SHOULD include an idempotency key for Access Request submissions.
+
+### Handle the Task
+
+See {{access-request-response}}, {{task-status-endpoint}}, and {{completed-task-response}}.
+
+* MUST treat a Task Handle as opaque.
+* MUST NOT infer approval from a task identifier, link, or display text.
+* MUST treat unknown task status values as not approved.
+
+### Re-evaluate and Enforce
+
+See {{completion-semantics}}, {{approval-lifetime}}, and {{approval-reuse}}.
+
+* MUST enforce an approved result only according to {{completion-semantics}}.
+* MUST treat unknown `result.mode` values as not approved.
+* When using Re-evaluation Mode, MUST include the returned `approval` object unchanged at `context.approval` inside the AuthZEN Authorization API re-evaluation request.
+* MUST re-evaluate access through the AuthZEN Access Evaluation API after approval, unless a profile-defined completion mode applies (for example, a profile binding to OAuth token issuance).
+* MUST NOT treat an Approval Result as authorizing any future Access Evaluation solely on the basis that the Access Request task reached `approved`; applicability is determined by the PDP at each subsequent evaluation.
+
+## PDP Processing Rules
+
+A PDP implementing this profile:
+
+* MAY include `context.access_request` in a denied AuthZEN Decision when the denied access is eligible for approval.
+* MUST NOT include `context.access_request` unless an Access Request Endpoint is available to process the request.
+* SHOULD include a stable machine-readable reason code when returning a requestable denial.
+* MUST include an expiration time for the requestable denial hint as `context.access_request.expires_at`.
+* MUST provide verifiable denial-binding material when returning `context.access_request`: an integrity-protected `context.access_request.binding_token`, or a stable `context.evaluation_id` the Access Request Service can resolve against state shared with, or delegated by, the PDP.  When the Access Request Service is independent of the PDP, the PDP MUST provide the `binding_token` form ({{requestable-denial-context}}).
+* SHOULD return a stable evaluation identifier as `context.evaluation_id` ({{evaluation-identifier}}) that the PEP can supply as `denial.evaluation_id` when submitting an Access Request.
+* When including `context.access_request.binding_token`, MUST integrity-protect it using a mechanism the Access Request Service can verify and SHOULD issue it as a JWS in compact serialization.
+* MUST validate approval references presented during re-evaluation.
+* MUST only consider an Approval Result applicable when the current evaluation request is within the approval scope recorded for that Approval Result.
+* MUST ensure that approval does not override policy conditions that remain mandatory at enforcement time, such as subject status, resource sensitivity, action constraints, environmental risk, and approval expiry.
+
+## Access Request Service Processing Rules {#ars-processing-rules}
+
+An Access Request Service implementing this profile:
+
+* MUST authenticate and authorize the PEP before accepting Access Request submissions.
+* MUST validate that the submission is based on a requestable denial, rejecting a submission that is not with `urn:openid:authzen:access-request:error:not_requestable`.
+* MUST verify the denial-binding material for every requested item, applying the following rules:
+    * When `denial.binding_token` is present, the service MUST verify its integrity.  When the value is a JWS, the service MUST verify the signature using a key resolved from the JWK Set advertised at the PDP's `jwks_uri` ({{discovery}}); JWS `kid` headers are matched against JWK `kid` parameters.
+    * When `denial.binding_token` is absent, the service MUST apply the `evaluation_id` verification path defined in {{shared-state-deployments}}.
+    * The service MUST reject submissions received after the verified `denial.expires_at` with `urn:openid:authzen:access-request:error:expired_denial`, after applying any clock-skew tolerance it has configured (see {{impl-considerations}}).
+    * The service MUST reject submissions whose binding material cannot be verified, or whose claims do not bind to the submitted denial, with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
+* MUST bind the task to the submitted Subject, Resource, Action, Context, denial, requester, and client.
+* MUST return an opaque Task Handle for accepted requests.
+* SHOULD support idempotent request submission using the `Idempotency-Key` header.
+* MUST expire Access Requests and approvals according to local policy.
+* MUST NOT return `approved` unless the configured approval workflow has completed successfully.
+* MUST evaluate approver eligibility, including self-approval, delegation, separation-of-duties, and conflict-of-interest policy, before treating an approval workflow as successfully completed.
+* MUST retain sufficient audit records to reconstruct the request, approval, denial, and completion result.
+
+## Policy and Approver Hygiene {#overbroad-approval}
+
+This profile does not define an approval policy language.  Implementations MUST NOT treat the `template`, `requested_access`, or `display` fields as sufficient authorization policy.  Actual approval scope and enforcement semantics are determined by the PDP and Access Request Service.
+
+The `requested_access.emergency` member ({{access-request-submission}}) is a request signal, not an authorization override.  Implementations that support emergency or break-glass access SHOULD require a business justification, apply the shortest practical approval or access lifetime, notify appropriate owners or security personnel, and require post-use review.  Emergency requests and approvals SHOULD be retained and auditable according to the deployment's security and compliance policy.
+
+### Approver Eligibility and Separation of Duties {#approver-eligibility}
+
+Access Request Services MUST evaluate approver eligibility before returning `approved`, including self-approval restrictions, delegated approver authority, separation-of-duties constraints, ownership rules, and conflict-of-interest policy.  A workflow step completed by an ineligible approver MUST NOT be treated as successful approval unless local policy explicitly allows that exception and records it for audit.
+
 # Security Considerations
 
 This section describes threats and cites their mitigations.  It introduces no requirements.
@@ -1469,7 +1511,7 @@ This section describes threats and cites their mitigations.  It introduces no re
 
 **Binding-token integrity.** A buggy or hostile PEP could alter or fabricate PDP-issued state to influence approval routing or scope.  {{binding-token-integrity}} and {{verifying-denial-binding}} define integrity, binding, and freshness checks; {{denial-binding-alternatives}} covers other formats.
 
-**Approval reference substitution and replay.** A compromised PEP could present another request's approval or replay an expired or inapplicable reference.  {{completion-semantics}} defines applicability and binding checks, verification of by-value material, and protection of backing records.  An approval reference is not a bearer grant.
+**Approval reference substitution and replay.** A compromised PEP could present another request's approval or replay an expired or inapplicable reference.  {{approval-verification}} defines applicability checks; {{decision-and-binding-integrity}} defines verification of by-value material and protection of backing records.  An approval reference is not a bearer grant.
 
 **Bulk bundle escalation.** An aggregate status or result could be mistaken for approval of every item.  {{bulk-submissions}} requires per-item status and results and limits use of a top-level result for item authorization.
 
@@ -2242,5 +2284,5 @@ The author thanks the OpenID AuthZEN Working Group for discussion and review.
 
 -01
 
-* Editorial restructure.  The core protocol (requestable denial, submission, task status, approval and re-evaluation) is presented first, with signed denial binding and signed approval state as the primary mechanisms; shared-state alternatives and optional features (bulk submissions, callbacks, cancellation, delegation and acting parties, machine-readable forms) follow in their own sections; security considerations name threats and point to the rules that sit beside the mechanisms they protect.  Requirements were relocated and restated without change in force, and duplicated restatements were consolidated.
+* Editorial restructure.  The core protocol (requestable denial, submission, task status, approval and re-evaluation) is presented first, followed by binding and verification rules that place signed mechanisms beside their shared-state alternatives; optional features (bulk submissions, callbacks, cancellation, delegation and acting parties, machine-readable forms) follow in their own sections; security considerations name threats and point to the rules that sit beside the mechanisms they protect.  Requirements were relocated and restated without change in force, and duplicated restatements were consolidated.
 * Catalog references moved to the companion AuthZEN Access Request Catalog Profile.
