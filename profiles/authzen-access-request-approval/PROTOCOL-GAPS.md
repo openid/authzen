@@ -1,6 +1,6 @@
 # Gaps Register: AuthZEN Access Request and Approval Profile
 
-Version 13. Status: register for the working group. This is not a design. Version 13 records the two A4 example corrections under G15; the entry remains open. Version 12 records extraction of Bulk Access Requests and Callback Notifications into companion profiles; no entry is resolved. Version 11 records removal of the six gap-reference editor's notes from the specification; all gap entries remain here and no entry is resolved. Version 10 records that PR A3 (branch `arap-restructure-a3`) folded the duplicate applicability check named in G20, and adds a tracking list under Coordination for the issues to be filed; no entry is resolved.
+Version 15. Status: register for the working group. This is not a design. Version 15 adds four entries from an independent PEP-implementer read of the A4 layout (G23 to G26) and PEP-side evidence to G11; no entry is resolved. Version 14 records the editorial placement correction for G19; no protocol-design question is settled. Version 13 records the two A4 example corrections under G15; the entry remains open. Version 12 records extraction of Bulk Access Requests and Callback Notifications into companion profiles; no entry is resolved. Version 11 records removal of the six gap-reference editor's notes from the specification; all gap entries remain here and no entry is resolved. Version 10 records that PR A3 (branch `arap-restructure-a3`) folded the duplicate applicability check named in G20, and adds a tracking list under Coordination for the issues to be filed; no entry is resolved.
 
 The register is organized in three parts. Part A lists protocol contracts that two independently implemented parties cannot complete from the current text and that need a working-group decision. Part B lists editorial and example corrections: the protocol is defined, but the text can be read wrongly or the examples do not follow it. Part C lists optional capabilities: behaviors the profile does not provide and could, without anything currently defined being broken. Entry numbers are stable identifiers from earlier versions and are not renumbered when an entry moves between parts.
 
@@ -96,6 +96,8 @@ Version 9, from the end-to-end review of the A2 wording pass: G10 gains the thre
 
 ### G11. The response-side expiry has no defined location or shape
 
+PEP-side evidence (2026-09-18): the PEP rule to stop enforcing past "an approval expiry (typically as `context.approval.approved_until`)" and the retry stop rule both depend on this undefined member; see G24.
+
 **Evidence.** Line 852 hangs a MUST NOT on an expiry "typically as `context.approval.approved_until`" in the re-evaluation response. The examples at 906 to 910 and 1825 to 1828 return it. The registry at 1365 defines `approval` only as the request-side reference the PEP supplies.
 
 **What is missing.** Where and in what shape a PDP conveys approval expiry in a response, so that the PEP obligation at 852 and the OAuth companion's use of `approved_until` as a token-lifetime bound rest on a defined member. Making the member mandatory is one option, not a requirement.
@@ -113,6 +115,26 @@ Version 9, from the end-to-end review of the A2 wording pass: G10 gains the thre
 **Severity.** Significant for callback deployments.
 
 **Direction.** Define callback acceptance and rejection semantics and the meaning of an omitted `events`.
+
+### G23. The Context a PEP sends at re-evaluation is unspecified
+
+**Evidence.** The exact-match approval scope compares the current evaluation's authorization-relevant Context with the bound values (Approval Scope). The re-evaluation examples send only `context.time` and `context.approval`. No sentence tells the PEP to resend the original evaluation's Context, and the PEP cannot compute the authorization-relevant set, which the PDP fixes in the token or in shared state.
+
+**What is missing.** A rule for what Context the PEP includes at re-evaluation. A PEP that copies the examples is denied `out_of_scope` whenever the original evaluation had authorization-relevant Context.
+
+**Severity.** Significant: two conforming implementations can fail on the first re-evaluation.
+
+**Direction.** State that the PEP resends the original evaluation's Context, or that the PDP compares only members present in both, and make the examples match.
+
+### G24. Retry and polling bounds without an expiry
+
+**Evidence.** "MUST stop retrying once the approval expires" (Re-evaluation Denials) does not say whether the Approval Result's `approved_until` or an expiry returned by the PDP governs, and the response-side member is undefined (G11). "MUST stop polling once `task.expires_at` is reached" (Task Status Endpoint) has no counterpart when `task.expires_at`, which is OPTIONAL, is absent.
+
+**What is missing.** The governing expiry for retries, and a polling bound when the Task Handle carries none.
+
+**Severity.** Minor; a naive PEP polls or retries indefinitely.
+
+**Direction.** Name the expiry, and either require `task.expires_at` or state a PEP-side bound.
 
 ### G21. Whether Access Request Service support for `items` and `callback` is mandatory, and the response when it is absent
 
@@ -158,11 +180,19 @@ Version 9, from the end-to-end review of the A2 wording pass: G10 gains the thre
 
 **A4 partial correction (2026-09-18).** The former main Completed Task Response example, now under `artifact-completed-example`, includes `task.status_endpoint`. The re-evaluation request in End-to-End Manager Approval now echoes the exact `state` returned by its preceding completed-task response. The Completed Task response in that walkthrough now includes `task.status_endpoint`, matching its Part II copy. The new trusted-state examples contain no tokens; their completed Task Handles include `status_endpoint`, and the new end-to-end walkthrough explicitly states that its authorization-relevant Context is empty. These changes do not repair the illustrative JWT payloads, the other completed-task examples (including the original manager walkthrough), or the remaining context and expiry issues above. G15 remains open.
 
+### G25. The trusted-URL check assumes metadata the PEP may not have
+
+**Evidence.** Trusting URLs requires the PEP to compare denial-supplied URLs against the same origin as the Access Request Endpoint advertised in PDP metadata, or an allowlist. A PEP that takes `endpoint` from the denial is never told to fetch metadata, and the rule's actor, "an autonomous PEP", is undefined.
+
+**Correction.** Say that a PEP performing the origin check obtains the metadata endpoint, and define or replace "autonomous PEP". Editorial.
+
 ### G19. Appendix guidance with normative dependents
 
 **Evidence.** The clock-skew clauses at 240, 400, and 1097 condition MUST-rejects on "any clock-skew tolerance it has configured" and point to Implementation Considerations, which is declared non-normative at 1835 yet carries SHOULDs at 1855 to 1861.
 
 **Correction.** The configured-tolerance behavior is defined. What needs clarifying is the status of the appendix guidance: either move its normative sentences into the section that first needs them or reword them as non-normative.
+
+**Status after the PEP editorial review.** Placement corrected: Time and Clock Skew now appears under Approval Lifetime and Enforcement, outside the non-normative Implementation Considerations appendix. Its paragraphs, including the permissions and recommendations, moved verbatim. Submission rejection rules now cite that subsection directly. The deadline table remains explicitly non-normative. G19's placement issue is addressed; tolerance values and behavior are unchanged. G5 and G11 remain open.
 
 ### G20. One force difference, one duplicate, and naming drift among the binding statements in the completion section
 
@@ -175,6 +205,16 @@ Version 9, from the end-to-end review of the A2 wording pass: G10 gains the thre
 **Evidence.** Line 298 permits an identifier to be "reused across distinct evaluations only after the original evaluation's binding window has expired". Line 294 makes `evaluation_id` "the audit thread" and recommends the Access Request Service retain it in the approval record so the sequence "can be reconstructed for audit". An approval record outlives the binding window, so a record that retains only the identifier can match more than one evaluation. A record that also retains the task identity, the evaluation time, or an explicit link to the evaluation is not ambiguous.
 
 **Correction.** Guidance at 294 that audit reconstruction keys on the identifier together with the task or the evaluation time, not on the identifier alone. Withdrawing the reuse permission at 298 would be a protocol change and is not proposed here.
+
+### G26. The PEP's echo of `binding_token` is OPTIONAL when an identifier is present
+
+**Evidence.** The submission `binding_token` member is "REQUIRED when `denial.evaluation_id` is absent; otherwise OPTIONAL". A PEP that holds both may therefore omit the token and remain conformant, while an Independent Access Request Service requires it and rejects the submission. The PDP-side rule (a token is REQUIRED for an independent service) and the PEP-side presence rule do not compose.
+
+**What is missing.** A PEP-side rule that the token is echoed whenever the PDP supplied it. Making it a MUST changes force, so it is a working-group decision, not an editorial fix; the A5 plan keeps the current force and records this entry.
+
+**Severity.** Minor in practice, since PEPs echo what they receive, but a conformance checker reads the letter.
+
+**Direction.** Make the PEP echo unconditional for every `denial` member the PDP supplied.
 
 ## Part C. Optional capabilities
 
@@ -201,7 +241,8 @@ Filing the register as working-group issues is deferred by the editor's decision
 
 | Entry | Part | Former editor's note location (notes removed) | Status |
 |---|---|---|---|
-| G8, G7, G12, G19 | B | G8: Terminology entry Authorization-Relevant Context | not filed |
+| G8, G7, G12 | B | G8: Terminology entry Authorization-Relevant Context | not filed |
+| G19 | B | Implementation Considerations: Time and Clock Skew | editorial placement corrected; not filed |
 | G6 with G16 | A | Approval and Re-evaluation, after the approval record rule; Security Considerations, confused-deputy paragraph | not filed |
 | G1, G2, G4, G10 force | A | G4: PDP Metadata; G10: Verifying the Denial Binding | not filed |
 | G9 | A | Approval and Re-evaluation, after the approval record rule | not filed |
