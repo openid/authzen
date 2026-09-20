@@ -102,11 +102,18 @@ This profile extends the OpenID AuthZEN Authorization API so a Policy Enforcemen
 
 The AuthZEN Authorization API lets a Policy Enforcement Point (PEP) ask a Policy Decision Point (PDP) whether a Subject may perform an Action on a Resource within a Context.  The PDP returns an allow or deny Decision.
 
-When authority is fixed at provisioning time through roles, scopes, or service-account grants, a runtime denial typically ends the interaction.  When approval is possible during execution, a requestable denial lets the PEP submit an Access Request to an approval workflow.  In the base completion mode, the PEP re-evaluates access against current policy after approval.
+Beyond a bare allow or deny, a PEP has three ways to continue, and one outcome that needs none:
 
-This profile standardizes that handoff for autonomous callers and user-facing applications ({{protocol-overview}}).  Companion profiles define bulk Access Requests ({{BULK}}), callback notifications ({{CALLBACK}}), actor delegation ({{ACTOR}}), and catalog-backed request input ({{CATALOG}}).
+* An obligation is an action the PEP itself performs to honor a permit the PDP has already made.  No second evaluation follows.
+* A partial-evaluation residual is policy the caller completes locally.  No second evaluation follows.
+* An Access Request resolves a denial with an input the PEP cannot produce on its own: an approval or a grant recorded out of band.  The PDP evaluates again and remains authoritative.
+* A transient denial is retried after a delay with nothing changed ({{reevaluation-denials}}).
 
-Workflow engines, approval policy languages, ticketing systems, entitlement catalogs, user interfaces, and approver-facing inbox or enumeration APIs are out of scope.  The PDP or Access Request Service supplies these capabilities, including how human or automated evaluators discover and act on pending requests.
+Each fails closed.  An obligation the PEP cannot perform turns a permit into a deny; a residual or an Access Request the PEP cannot use leaves the denial standing.  How the three compose is defined by the profiles that carry them.
+
+This profile defines the Access Request.  When authority is fixed at provisioning time through roles, scopes, or service-account grants, a runtime denial ends the interaction.  When approval is possible during execution, a requestable denial lets the PEP submit an Access Request to an approval workflow, hold a Task Handle while the workflow runs, and re-evaluate access against current policy after approval ({{protocol-overview}}).  The profile serves autonomous callers and user-facing applications alike.  Companion profiles define bulk Access Requests ({{BULK}}), callback notifications ({{CALLBACK}}), actor delegation ({{ACTOR}}), and catalog-backed request input ({{CATALOG}}).
+
+An approval workflow modeled as an obligation under the AuthZEN Obligations profile is outside this profile: it carries no Task Handle, no denial binding, and no re-evaluation.  Where an approver's decision must be recorded and evaluated again, it is an Access Request.  Workflow engines, approval policy languages, ticketing systems, entitlement catalogs, user interfaces, and approver-facing inbox or enumeration APIs are also out of scope; the PDP or Access Request Service supplies them, including how human or automated evaluators discover and act on pending requests.
 
 The presence of `context.access_request` does not weaken the AuthZEN Authorization API decision.  A PEP MUST NOT grant access based on a requestable denial.  Access is permitted only after an approved completion result is enforced according to this profile.
 
@@ -576,7 +583,7 @@ When the PDP denies a re-evaluation that presented an `approval` reference, it c
 
 * `next_action`: RECOMMENDED.  String.  The action the PEP should take.  One of:
     * `request`: submit a new Access Request.
-    * `retry`: re-evaluate the same request after a delay; the denial is expected to be transient.
+    * `retry`: re-evaluate the same request after a delay; the denial is expected to be transient.  This is the transient-denial outcome of the Introduction: nothing is remediated and nothing changes in the request.
     * `none`: do not retry or re-request; the denial is terminal for this approval.
 * `retry_after`: RECOMMENDED when `next_action` is `retry`.  Integer.  Number of seconds the PEP waits before re-evaluating the same request.  Its value has the delta-seconds semantics of HTTP `Retry-After` (Section 10.2.3 of {{RFC9110}}); it appears in Decision Context because an Access Evaluation denial is a successful protocol response.
 * `reason`: OPTIONAL.  String.  A machine-readable reason code for UX and audit.  This profile defines the following well-known re-evaluation denial reason codes with their default `next_action`:
@@ -1956,7 +1963,7 @@ Authority may need to change during execution:
 
 These denials can lead to workflows that grant new authority.  A machine-readable handoff serves autonomous callers without a human present and replaces custom approval prompts, out-of-band tickets, and vendor-specific integrations in user-facing applications.
 
-The profile addresses missing authority, not missing information.  Supplying known attributes or using partial evaluation to identify locally satisfiable conditions addresses missing information.  A requestable denial instead calls for a workflow to create authority.  The mechanisms can be combined.
+The profile addresses missing authority, not missing information and not a missing action.  An obligation supplies an action the PEP performs to honor a permit; a residual supplies policy the caller completes locally; an Access Request supplies authority a third party creates, which the PDP then evaluates again (the lane test in the Introduction).  Supplying known attributes or using partial evaluation to identify locally satisfiable conditions addresses missing information.  A requestable denial instead calls for a workflow to create authority.  The mechanisms can be combined.
 
 This profile has the following design goals:
 
