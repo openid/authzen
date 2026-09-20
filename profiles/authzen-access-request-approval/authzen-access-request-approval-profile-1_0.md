@@ -313,6 +313,8 @@ The PEP submits an Access Request using the HTTP `POST` method as defined in {{R
 
 ### Request Body {#submission-request-body}
 
+{: #submission-additional-information}
+
 For a single-item submission (`items` absent), the request body is a JSON object with the following members.  {{BULK}} defines the changes for bulk submissions.
 
 `subject`:
@@ -332,7 +334,21 @@ For a single-item submission (`items` absent), the request body is a JSON object
 
   This is Context from the original Access Evaluation request, not the PDP's Decision Context.  Optional presence does not waive the preservation rule in {{pep-construct}}.
 
-The body can also carry `requested_access` and `client` ({{submission-additional-information}}), and `callback` ({{CALLBACK}}).
+`requested_access`:
+: OPTIONAL.  Object containing request-specific information such as requested duration, requested role, requested entitlement, or requested scope.  This object does not define policy semantics and is interpreted by the Access Request Service.  The following well-known optional members are defined; additional members MAY be included subject to {{extension-naming}}:
+
+  * `requested_until`: String.  {{RFC3339}} timestamp requesting access through a specific absolute time.
+  * `emergency`: Boolean.  When `true`, requests an expedited or emergency-access path subject to additional auditing.
+
+`client`:
+: OPTIONAL.  Object identifying the PEP or calling application submitting the Access Request, supplementing the authenticated caller identity.  The following members are defined; implementations MAY include additional members.
+
+  * `id`: OPTIONAL.  String.  Stable identifier for the calling application or PEP deployment.
+  * `name`: OPTIONAL.  String.  Human-readable name of the calling application.
+
+  The `actor` and `source` members of this object are defined by {{ACTOR}}.
+
+The body can also carry `callback` ({{CALLBACK}}).
 
 ### The `denial` Object {#submission-denial-object}
 
@@ -865,7 +881,7 @@ Human-facing members are intended only for callers authorized for the correspond
 
 When a PEP renders requester-facing status to an end client, it SHOULD do so by rendering `task.display` and `task.links.ticket` rather than by exposing the machine surfaces.  A PEP MUST NOT expose `task.links.review` to a requester or other end client unless that caller has been authenticated and authorized as an approver or administrator for the task.
 
-Cancellation ({{cancellation}}), actor delegation ({{ACTOR}}), machine-readable forms ({{machine-readable-forms}}), and additional request members ({{submission-additional-information}}) define further PEP rules where those mechanisms are used.
+Cancellation ({{cancellation}}), actor delegation ({{ACTOR}}), and machine-readable forms ({{machine-readable-forms}}) define further PEP rules where those mechanisms are used.
 
 # PDP Processing {#pdp-processing}
 
@@ -1077,7 +1093,7 @@ Task handles MUST be opaque, unguessable, and protected by authentication and au
 
 This profile does not define an approval policy language.  Implementations MUST NOT treat the `template`, `requested_access`, or `display` fields as sufficient authorization policy.  Actual approval scope and enforcement semantics are determined by the PDP and Access Request Service.
 
-The `requested_access.emergency` member ({{submission-additional-information}}) is a request signal, not an authorization override.  Implementations that support emergency or break-glass access SHOULD require a business justification, apply the shortest practical approval or access lifetime, notify appropriate owners or security personnel, and require post-use review.  Emergency requests and approvals SHOULD be retained and auditable according to the deployment's security and compliance policy.
+The `requested_access.emergency` member ({{submission-request-body}}) is a request signal, not an authorization override.  Implementations that support emergency or break-glass access SHOULD require a business justification, apply the shortest practical approval or access lifetime, notify appropriate owners or security personnel, and require post-use review.  Emergency requests and approvals SHOULD be retained and auditable according to the deployment's security and compliance policy.
 
 ### Approver Eligibility and Separation of Duties {#approver-eligibility}
 
@@ -1268,26 +1284,6 @@ The companion Catalog Profile {{CATALOG}} defines how a PEP resolves fields back
 This profile does not define a UI rendering vocabulary.  Deployments that need richer rendering hints (such as widget selection, layout, or conditional display) MAY layer a UI vocabulary, identified out of band, typically keyed by `template`.
 
 This profile does not define an agent protocol surface.  Deployments serving agentic PEPs MAY additionally expose Access Request submission through an agent protocol where the tool input schema corresponds to the JSON Schema referenced by `request_schema_url`.  Discovery of such surfaces is out of scope for this specification.
-
-# Additional Request Members {#submission-additional-information}
-
-The following top-level members supplement the request body in {{submission-request-body}}.
-
-`requested_access`:
-: OPTIONAL.  Object containing request-specific information such as requested duration, requested role, requested entitlement, or requested scope.  This object does not define policy semantics and is interpreted by the Access Request Service.  The following well-known optional members are defined; additional members MAY be included subject to {{extension-naming}}:
-
-  * `requested_until`: String.  {{RFC3339}} timestamp requesting access through a specific absolute time.
-  * `emergency`: Boolean.  When `true`, requests an expedited or emergency-access path subject to additional auditing.
-
-`client`:
-: OPTIONAL.  Object identifying the PEP or calling application submitting the Access Request, supplementing the authenticated caller identity.  The following members are defined; implementations MAY include additional members.
-
-  * `id`: OPTIONAL.  String.  Stable identifier for the calling application or PEP deployment.
-  * `name`: OPTIONAL.  String.  Human-readable name of the calling application.
-
-  The `actor` and `source` members of this object are defined by {{ACTOR}}.
-
-When the denial includes `request_schema_url`, the PEP uses the referenced JSON Schema to determine the additional members of `context` and `requested_access` ({{machine-readable-forms}}).
 
 # Extensibility and Profiles {#extensibility}
 
