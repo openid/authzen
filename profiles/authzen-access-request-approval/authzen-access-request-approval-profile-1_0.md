@@ -2025,80 +2025,69 @@ Implementations map backend lifecycle states to the canonical Task Status Endpoi
 
 # Design Rationale {#design-rationale}
 
-This non-normative appendix explains design choices; the rules in the body of the specification govern.
+This non-normative appendix explains design choices, grouped by the question a reader brings; the rules in the body of the specification govern.
 
-## Why a protocol rather than a remediation URL? {#why-not-a-remediation-url}
+## Scope
 
-Where the PDP already has the approval, in its own store or carried in as context, a denial with a remediation URL is enough: the PEP hands a human to the URL, the approval lands where the PDP can read it, and the next evaluation permits.  That crosses PEP and PDP vendors cleanly, since it is one field emitted and rendered.  This profile is for the case where neither works: a per-action approval the PDP can neither see in its own state nor take as a durable fact, because the party that granted it shares no vendor, no trust domain, and no prior wiring with it.  Three boundaries explain the difference.
+### Why a protocol rather than a remediation URL? {#why-not-a-remediation-url}
 
-* Interop.  The application and the approval system are different vendors.  A standing role can be provisioned across that line, but not a per-request approval bound to a specific denied action, and a URL only hands off a human.  One requestable-denial contract that any conforming Access Request Service accepts replaces a connector per customer.
-* Trust.  The verifying PDP shares no approval-record state with the service that granted the approval.  A signed `approval.state` lets it confirm that the approval matches this exact request against the approver's key, without reading that store; that is issuer trust, not a shared database.  Carrying a durable role as context instead would hand the caller standing privilege, which an authorize-every-action model exists to avoid.
-* Semantics.  A generic or agent PEP has no prior wiring and no human at a URL, so the denial itself carries the remediation contract: this is requestable, here is the binding material, here is where to submit and track.
+Where the PDP already has the approval, in its own store or carried in as context, a denial with a remediation URL is enough: the PEP hands a human to the URL, the approval lands where the PDP can read it, and the next evaluation permits.  That crosses PEP and PDP vendors cleanly, since it is one field emitted and rendered.  This profile is for the case where neither works: a per-action approval the PDP can neither see in its own state nor take as a durable fact, because the party that granted it shares no vendor, no trust domain, and no prior wiring with it.  Three boundaries explain the difference, and one flow crosses all three: an agent from one vendor, inside a customer's application from a second, attempts a refund that the customer's policy routes to its own approval service from a third.
 
-One flow crosses all three.  An agent from one vendor, running inside a customer's application from a second, attempts a refund that the customer's policy routes to its own approval service from a third.  The application denies with a requestable denial that points the agent at a service it was never wired for.  The agent submits, holds the Task Handle, and moves on.  A human approves later, and the approval service returns an Approval Result whose `approval.state` is bound to that request.  The agent re-evaluates, possibly from another worker, and the application's PDP verifies the state against the approval service's key, which it already trusts as this customer's approver, without reading that service's store.
+* Interop.  The application and the approval service are different vendors.  A standing role can be provisioned across that line, but not a per-request approval bound to a specific denied action, and a URL only hands off a human.  One requestable-denial contract that any conforming Access Request Service accepts replaces a connector per customer: the agent submits to a service it was never wired for, holds the Task Handle, and moves on.
+* Trust.  The application's PDP shares no approval-record state with the service that granted the approval.  When a human approves, the service returns an Approval Result whose `approval.state` is bound to that request, and the PDP verifies it against the service's key, which it already trusts as this customer's approver, without reading the service's store.  That is issuer trust, not a shared database.  Carrying a durable role as context instead would hand the agent standing privilege, which an authorize-every-action model exists to avoid.
+* Semantics.  The agent has no prior wiring and no human at a URL, so the denial itself carries the remediation contract: this is requestable, here is the binding material, here is where to submit and track.
 
 The requestable-denial signal is advisory, so a PEP that does not implement this profile sees a plain denial and adoption proceeds one participant at a time.
 
-## Why reuse AuthZEN? {#why-a-profile-of-the-authzen-authorization-api-rather-than-a-standalone-specification}
+### Why reuse AuthZEN? {#why-a-profile-of-the-authzen-authorization-api-rather-than-a-standalone-specification}
 
 Reusing AuthZEN's evaluation model avoids a second authorization interface.  The profile keeps its Subject, Resource, Action, Context, and Decision concepts, adds `context.access_request` to denials, and carries `context.approval` through the existing evaluation endpoint.
 
-## Why re-evaluate after approval? {#why-is-re-evaluation-mode-the-only-base-completion-mode}
+### Why leave workflows out of scope, and why companion profiles? {#why-does-the-spec-deliberately-not-define-a-workflow-engine-approval-policy-language-or-user-interface}
 
-Approval can take minutes or days; policy, subject status, risk, and approval validity can change meanwhile.  A new PDP decision checks those conditions at use, rather than freezing them at approval.  Issuance flows in which a token or credential represents the decision define their own `result.mode` ({{completion-semantics}}).
+Standardizing the handoff, rather than the workflow, lets deployments retain their existing IGA, ITSM, chat-approval, or custom infrastructure; a common workflow language or interface would force incompatible platforms into one model.  The same principle places capability that only some deployments need, and that brings its own document format, endpoint, or verification model, in a companion profile that hooks in through an extension point and registers its member names: catalogs, bulk submissions, callbacks, and actor delegation.  Each evolves without revising this specification, and a core-only implementation sees defined names it does not implement rather than unknown ones.
 
-## Why carry approval through the PEP? {#why-does-the-approval-round-trip-through-the-pep-rather-than-direct-pdp-to-access-request-service-communication}
+## Completion
 
-Carrying `result.approval` through a normal evaluation avoids requiring a back channel or shared state.  A PDP with access to trusted state can resolve `approval.id`; an independent PDP can verify integrity-protected `approval.state`.  The PEP uses the same wire shape in either topology.
+### Why re-evaluate after approval? {#why-is-re-evaluation-mode-the-only-base-completion-mode}
 
-## Why discover one Access Request Endpoint? {#why-one-access-request-endpoint-per-deployment-rather-than-per-resource-or-per-tenant}
+Approval can take minutes or days; policy, subject status, risk, and approval validity can change meanwhile.  A new PDP decision checks those conditions at use, rather than freezing them at approval.
 
-A metadata-discovered endpoint avoids resource- or tenant-specific URL construction in the PEP.  The payload's `template`, Subject, Resource, Action, and Context support routing by workflow, tenant, or resource family.  Intermediate enforcers (an OAuth Authorization Server or other gateway acting as PEP) MAY proxy the endpoint and present a different URL to their own callers while preserving the protocol surface.
+### Why carry approval through the PEP? {#why-does-the-approval-round-trip-through-the-pep-rather-than-direct-pdp-to-access-request-service-communication}
 
-## Why support two denial-binding forms? {#why-are-there-two-binding-patterns-evaluationid-and-bindingtoken}
+Carrying `result.approval` through a normal evaluation avoids requiring a back channel or shared state.  A PDP with access to trusted state resolves `approval.id`; an independent PDP verifies integrity-protected `approval.state`.  The PEP uses the same wire shape in either topology.
 
-The patterns support different trust and state arrangements:
+### Why allow other completion modes? {#why-is-resultmode-extensible-at-all-given-the-base-defines-only-one-mode}
 
-* With shared or accessible state, the Access Request Service can look up the denied evaluation by `evaluation_id` without cryptographic verification at that boundary.
-* Without that state, a PDP-signed `binding_token` proves the denial without trusting the PEP's assertion or requiring a back channel.
+Token-issuance, credential-issuance, and direct-decision flows may consume approval without re-evaluation.  The `result.mode` extension point lets profiles define those flows without changing the base wire shape or its PDP-authoritative completion mode.
 
-Neither signing infrastructure nor shared state is forced on every deployment.
+## Binding
 
-## Why echo selected denial fields? {#why-does-the-submissions-denial-object-carry-only-key-fields-not-the-full-authzen-decision}
+### Why two boundaries and two forms? {#why-are-there-two-binding-patterns-evaluationid-and-bindingtoken}
+
+Binding material crosses two boundaries in opposite directions, and each boundary has a form for each trust arrangement.  On the denial side, an Access Request Service with shared or accessible state looks up the denied evaluation by `evaluation_id` without cryptographic verification; without that state, a PDP-signed `binding_token` proves the denial without trusting the PEP's assertion.  On the approval side, a PDP with trusted state resolves `approval.id`; without it, the service-issued `approval.state` proves the approval.  The two artifacts keep separate names because their issuers, verifiers, and constraints differ: `binding_token` is PDP-issued and service-verified with a recommended claim set, while `approval.state` is service-issued and PDP-verified and may carry a signed token, a lookup reference, or deployment-specific state.  Neither signing infrastructure nor shared state is forced on every deployment, and the order in which the document presents the forms changes no obligation.
+
+### Why require `approval.id` with signed state? {#why-does-the-approval-object-always-carry-id-even-when-approvalstate-is-signed}
+
+`approval.id` is always present as a uniform correlation handle: a lookup key in shared-state deployments and an identifier for logs, callbacks, and tasks without parsing signed state.  When signed state carries an identifier, the PDP cross-checks it against `approval.id` to detect mismatched pairs.
+
+### Why echo selected denial fields? {#why-does-the-submissions-denial-object-carry-only-key-fields-not-the-full-authzen-decision}
 
 Signed or server-resolvable binding material is stronger evidence than a PEP-supplied JSON echo.  Other denial members, such as `endpoint`, `display`, and `form_url`, guide the PEP rather than the Access Request Service.  The submission carries only the fields the service uses.
 
-## Why separate `approval.state` from `binding_token`? {#why-is-approvalstate-distinct-from-bindingtoken-when-both-are-opaque-round-trip-slots}
+## Wire details
 
-The direction and constraints differ.  `binding_token` is PDP-issued and service-verified; it MUST be integrity-protected, typically as a JWS, with claim recommendations in {{binding-token-integrity}}.  `approval.state` is service-issued (or PDP-issued through the service) and PDP-verified, and can carry a signed token, lookup reference, or deployment-specific state.  Separate names distinguish these roles.
+### Why discover one Access Request Endpoint? {#why-one-access-request-endpoint-per-deployment-rather-than-per-resource-or-per-tenant}
 
-## Why require `approval.id` with signed state? {#why-does-the-approval-object-always-carry-id-even-when-approvalstate-is-signed}
+A metadata-discovered endpoint avoids resource- or tenant-specific URL construction in the PEP.  The payload's `template`, Subject, Resource, Action, and Context support routing by workflow, tenant, or resource family.  An intermediate enforcer, such as an OAuth Authorization Server or gateway acting as PEP, can proxy the endpoint and present a different URL to its own callers while preserving the protocol surface.
 
-`approval.id` is REQUIRED as a uniform correlation handle: a lookup key in shared-state deployments and an identifier for logs, callbacks, and tasks without parsing signed state.  When signed state carries an identifier, the PDP cross-checks it against `approval.id` to detect mismatched pairs.
-
-## Why use absolute timestamps? {#why-are-timestamps-always-absolute-never-relative-durations}
+### Why use absolute timestamps? {#why-are-timestamps-always-absolute-never-relative-durations}
 
 Absolute RFC 3339 timestamps give consumers a common deadline.  Offering both absolute and relative expiry would require reconciliation and precedence rules.  {{time-and-clock-skew}} addresses clock-skew tolerance.
 
-## Why leave `template` unconstrained? {#why-is-template-an-opaque-free-form-string-rather-than-a-constrained-enumeration}
+### Why leave `template` unconstrained? {#why-is-template-an-opaque-free-form-string-rather-than-a-constrained-enumeration}
 
 Workflow categories vary by deployment.  An opaque `template` can map to a stable workflow, ticket class, schema, policy, source-code identifier, or profile-defined value without revising this specification.  It remains routing input, not authorization policy ({{overbroad-approval}}).
-
-## Why leave workflows out of scope? {#why-does-the-spec-deliberately-not-define-a-workflow-engine-approval-policy-language-or-user-interface}
-
-Standardizing the handoff, rather than the workflow, lets deployments retain their existing IGA, ITSM, chat-approval, or custom infrastructure.  A common workflow language or interface would force incompatible platforms into one model.
-
-## Why allow other completion modes? {#why-is-resultmode-extensible-at-all-given-the-base-defines-only-one-mode}
-
-Token-issuance, credential-issuance, and direct-decision flows may consume approval without re-evaluation.  The extension point lets profiles define those flows without changing the base wire shape or its PDP-authoritative completion mode.
-
-## Why put catalogs in a companion profile? {#why-are-catalog-backed-form-fields-defined-in-a-companion-profile-rather-than-in-this-specification}
-
-Catalog resolution needs its own document format, endpoints, pagination, scoping, and authorization, but only some deployments need it.  The companion profile {{CATALOG}} can evolve independently, adding `request_catalogs_url` through the `context.access_request` extension point without revising this specification.
-
-## Why present trusted-state binding first? {#why-present-trusted-state-binding-first}
-
-Trusted-state examples expose the common PEP exchange without introducing artifact construction and verification at the same time.  {{binding-artifacts}} then explains the denial and approval artifacts separately.  Each boundary uses whichever form its topology permits, and placement does not change the interoperability baseline or any processing obligation.
 
 # Acknowledgements
 
