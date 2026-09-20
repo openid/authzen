@@ -158,6 +158,8 @@ Steps 1 and 6 use the AuthZEN Access Evaluation API.  Step 6 is a new evaluation
 
 In step 5 the PEP can poll the task, receive a callback ({{CALLBACK}}), or otherwise use the Task Handle to determine completion.
 
+The flow is the same for a caller with no human present.  An autonomous agent that receives a requestable denial for a newly discovered tool submits the Access Request, persists the Task Handle, continues independent work, and re-evaluates the tool invocation when approval completes.
+
 ## Protocol Invariants {#protocol-invariants}
 
 The rules of this profile rest on seven invariants, each stated normatively in the section that defines it:
