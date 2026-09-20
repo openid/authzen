@@ -38,6 +38,14 @@ normative:
         ins: K. McGuinness
         name: Karl McGuinness
     date: 2026
+  ACTOR:
+    title: "AuthZEN Actor Delegation Profile 1.0"
+    target: "https://openid.github.io/authzen/authzen-access-request-actor-profile-1_0.html"
+    author:
+      -
+        ins: K. McGuinness
+        name: Karl McGuinness
+    date: 2026
   CALLBACK:
     title: "AuthZEN Callback Notifications Profile 1.0"
     target: "https://openid.github.io/authzen/authzen-access-request-callback-profile-1_0.html"
@@ -55,7 +63,6 @@ normative:
   RFC7516:
   RFC7517:
   RFC7519:
-  RFC8693:
   RFC8785:
   I-D.bhutton-json-schema:
   I-D.bhutton-json-schema-validation:
@@ -97,7 +104,7 @@ The AuthZEN Authorization API lets a Policy Enforcement Point (PEP) ask a Policy
 
 When authority is fixed at provisioning time through roles, scopes, or service-account grants, a runtime denial typically ends the interaction.  When approval is possible during execution, a requestable denial lets the PEP submit an Access Request to an approval workflow.  In the base completion mode, the PEP re-evaluates access against current policy after approval.
 
-This profile standardizes that handoff for autonomous callers and user-facing applications ({{protocol-overview}}).  Companion profiles define bulk Access Requests ({{BULK}}), callback notifications ({{CALLBACK}}), and catalog-backed request input ({{CATALOG}}).
+This profile standardizes that handoff for autonomous callers and user-facing applications ({{protocol-overview}}).  Companion profiles define bulk Access Requests ({{BULK}}), callback notifications ({{CALLBACK}}), actor delegation ({{ACTOR}}), and catalog-backed request input ({{CATALOG}}).
 
 Workflow engines, approval policy languages, ticketing systems, entitlement catalogs, user interfaces, and approver-facing inbox or enumeration APIs are out of scope.  The PDP or Access Request Service supplies these capabilities, including how human or automated evaluators discover and act on pending requests.
 
@@ -673,7 +680,7 @@ Throughout this profile, structural comparison requires the same JSON type and a
 
 These rules apply wherever the profile compares Subject, Resource, Action, or authorization-relevant Context, including inline denial binding and approval-scope matching ({{approval-scope}}).
 
-For inline denial binding and exact-match approval-scope matching, Subject, Resource, and Action comparison includes the full AuthZEN Authorization API objects, including any `properties` members present in the bound values, except that `subject.properties.act` is excluded because the PEP MAY normalize the actor to `client.actor` (see {{pep-processing-rules}} and {{client-actor-source}}).  Context comparison includes each member of the authorization-relevant Context and excludes profile machinery members.
+For inline denial binding and exact-match approval-scope matching, Subject, Resource, and Action comparison includes the full AuthZEN Authorization API objects, including any `properties` members present in the bound values, except that `subject.properties.act` is excluded because the PEP MAY normalize the actor to `client.actor` (see {{pep-processing-rules}} and {{ACTOR}}).  Context comparison includes each member of the authorization-relevant Context and excludes profile machinery members.
 
 Denial binding, approval-scope matching, and idempotent-submission comparison all compare the authorization-relevant Context, so when any member is authorization-relevant the PDP MUST make it explicit and integrity-protected, and the Access Request Service MUST use exactly that set:
 
@@ -728,7 +735,7 @@ PEPs MUST NOT submit credentials to a host that is not trusted to receive them.
 * MUST NOT interpret the `template` value except for display or request submission; the value is not a policy language.
 * MAY ignore `display`.
 
-The PEP MUST preserve the principal identity of the Subject, and MUST preserve the Resource, Action, and relevant Context of the denied evaluation when submitting the Access Request.  When the original evaluation conveyed an actor identity in the Subject (for example, via `subject.properties.act`), the PEP MAY preserve the actor in the submission's `subject` or normalize it to `client.actor`; the actor identity itself MUST NOT be dropped.
+The PEP MUST preserve the principal identity of the Subject, and MUST preserve the Resource, Action, and relevant Context of the denied evaluation when submitting the Access Request.  When the original evaluation conveyed an actor identity in the Subject (for example, via `subject.properties.act`), the PEP MAY preserve the actor in the submission's `subject` or normalize it to `client.actor` ({{ACTOR}}); the actor identity itself MUST NOT be dropped.
 
 Submission-time augmentations MUST NOT change or remove authorization-relevant context from the denied evaluation.  When the Access Request Service needs to distinguish original evaluation context from submission-time input, deployments SHOULD place the latter in well-defined extension members rather than overwriting original context members.
 
@@ -834,7 +841,7 @@ Human-facing members are intended only for callers authorized for the correspond
 
 When a PEP renders requester-facing status to an end client, it SHOULD do so by rendering `task.display` and `task.links.ticket` rather than by exposing the machine surfaces.  A PEP MUST NOT expose `task.links.review` to a requester or other end client unless that caller has been authenticated and authorized as an approver or administrator for the task.
 
-Cancellation ({{cancellation}}), delegation ({{delegation}}), machine-readable forms ({{machine-readable-forms}}), and additional request members ({{submission-additional-information}}) define further PEP rules where those mechanisms are used.
+Cancellation ({{cancellation}}), actor delegation ({{ACTOR}}), machine-readable forms ({{machine-readable-forms}}), and additional request members ({{submission-additional-information}}) define further PEP rules where those mechanisms are used.
 
 # PDP Processing {#pdp-processing}
 
@@ -963,9 +970,9 @@ An Access Request whose denial binding does not cover the submitted Subject, Res
 
 The Access Request Service MUST be able to resolve or validate `denial.evaluation_id` before relying on it as denial-binding material.
 
-The Access Request Service MUST NOT rely on `client.actor` or `client.source` as authorization input unless the values are independently verified by the service.
+The Access Request Service MUST NOT rely on `client.actor` or `client.source` ({{ACTOR}}) as authorization input unless the values are independently verified by the service.
 
-{{actor-source-verification}} and {{verifying-denial-binding}} define the actor and denial-binding verification procedures.
+{{ACTOR}} defines actor-chain verification; {{verifying-denial-binding}} defines the denial-binding verification procedure.
 
 The `task.id` value MUST contain sufficient entropy to prevent practical guessing and MUST NOT encode semantics that a PEP is expected to parse.
 
@@ -1214,44 +1221,6 @@ The Access Request Service MUST authenticate the PEP and MUST verify the PEP is 
 
 PEPs that need to abandon an outstanding request without using this endpoint MAY stop polling and rely on `task.expires_at` and Access Request Service expiry to release resources.
 
-# Delegation and Acting Parties {#delegation}
-
-A PEP often acts for upstream principals: an application for a user, an Authorization Server for a client and user, an agent runtime for an agent and user, or a Security Token Service for an upstream caller.
-
-This profile does not define a new Subject shape for actor delegation.  Implementations SHOULD follow the conventions defined in {{?I-D.mcguinness-oauth-actor-profile}}, which standardizes an `act` claim representing the immediate actor with required `sub` and `iss` members and a RECOMMENDED `sub_profile` member (taking values such as `ai_agent`, `service`, or `user`).  Nested `act` objects represent multi-hop delegation chains.  The canonical actor identifier is the (`iss`, `sub`) pair regardless of which carrier expresses it.
-
-Under this profile:
-
-* The AuthZEN Authorization API `subject` carries the principal on whose behalf the operation is performed.
-* `client.actor` (defined in {{client-actor-source}}) carries the immediate actor and MAY include a nested `act` claim that walks the delegation chain from the immediate actor outward toward the Subject.
-
-Approval routing at the Access Request Service MAY consider any identity in the chain (for example, routing approval to the principal's owner, the agent's deployment owner, or a delegated approver).  This profile otherwise leaves routing policy unconstrained; it requires that the necessary identities be representable in the submission and verifiable by the service before routing decisions are taken.
-
-Cross-implementation interoperability for delegated flows depends on adoption of a common actor convention.  Deployments and profiles that depend on a specific actor convention SHOULD document the Subject shape, the actor convention used, and the credential format the Access Request Service accepts as proof of the chain.
-
-## Client Actor and Source {#client-actor-source}
-
-  * `actor`: OPTIONAL.  Object identifying the immediate actor on whose behalf the PEP submits the Access Request, when that actor differs from the Subject or when the deployment needs to audit the actor separately.  The following members are defined; implementations MAY include additional members.
-    * `id`: REQUIRED.  String.  Stable identifier for the actor.
-    * `issuer`: OPTIONAL.  String.  Issuer, authority, tenant, or identity provider for the actor identifier.
-    * `type`: OPTIONAL.  String.  Actor category, such as `user`, `service`, `workload`, or `ai_agent`.
-    * `act`: OPTIONAL.  Object.  Nested actor representing the next link in a delegation chain, following the conventions in {{?I-D.mcguinness-oauth-actor-profile}}.  Each `act` carries `sub` and `iss` (corresponding to `id` and `issuer` in the immediate actor) and optionally `sub_profile`; nesting represents the chain from the immediate actor outward toward the Subject.  See {{delegation}}.
-  * `source`: OPTIONAL.  Object.  Audit-trail context describing where the request originated.  The following members are defined; implementations MAY include additional members.
-    * `session_id`: OPTIONAL.  String.  Identifier of a bounded interaction context that produced the request, such as a chat or agent conversation, a web or mobile application session, a CLI invocation, or a long-running workflow thread.  This is an audit-origin identifier and is distinct from any authentication or authorization session associated with the caller.
-    * `external_url`: OPTIONAL.  HTTPS URI.  URL of an external system (ticket, document, dashboard, chat thread) that motivated the request.
-    * `integration_id`: OPTIONAL.  String.  Identifier of an upstream integration or workflow that produced the request.
-
-## Actor Chain Verification {#actor-source-verification}
-
-When authenticating a submission, the Access Request Service:
-
-* When the submission claims an actor or actor chain in `client.actor`, MUST verify that the authenticated caller's credential authorizes the entire claimed chain, not only the immediate actor.  Mechanisms commonly used to provide such authorization include {{RFC8693}} OAuth 2.0 Token Exchange (where the access token names the Subject as the on-behalf-of party and the chain via `act` claims), signed assertions from a trusted issuer, or deployment-specific authentication policies.
-* MUST reject submissions whose claimed chain cannot be verified against the caller's credential or against trusted issuers identified in the deployment.
-
-Unverified `client.actor` content MAY be retained as audit metadata only; the rule that it is not authorization input is stated in {{submission-processing}}.
-
-{{delegation}} describes the delegation model and credentials; {{client-actor-source}} defines the `client.actor` and `client.source` members.
-
 # Machine-Readable Forms {#machine-readable-forms}
 
 The requestable denial's `access_request` object has two members describing additional input the Access Request Service expects at submission:
@@ -1290,9 +1259,7 @@ The following top-level members supplement the request body in {{submission-requ
   * `id`: OPTIONAL.  String.  Stable identifier for the calling application or PEP deployment.
   * `name`: OPTIONAL.  String.  Human-readable name of the calling application.
 
-  The `actor` and `source` members of this object are defined in {{client-actor-source}}.
-
-  The `actor` and `source` objects are supplied for authorization, routing, and audit correlation.
+  The `actor` and `source` members of this object are defined by {{ACTOR}}.
 
 When the denial includes `request_schema_url`, the PEP uses the referenced JSON Schema to determine the additional members of `context` and `requested_access` ({{machine-readable-forms}}).
 
@@ -1321,7 +1288,7 @@ Additional members beyond those defined in this document or by {{companion-profi
 * AuthZEN Decision Context members defined by this profile.
 * `context` in an Access Request submission: augments the AuthZEN Context.
 * `requested_access` in an Access Request submission.
-* `client`, `client.actor`, and `client.source` in an Access Request submission.
+* `client` in an Access Request submission.
 * `task.display`: user-interface hints attached to a Task Handle.
 * `task.links`: link relations to related URLs.
 * `result` and the additions defined under each `result.mode`.
@@ -1395,7 +1362,7 @@ This section describes threats and cites their mitigations.  It introduces no re
 
 ## Operational and Integration
 
-**PEP acting on behalf of the Subject.** Accepting unverified actor claims would let a PEP assert authority it cannot demonstrate.  {{actor-source-verification}} and {{delegation}} govern chain verification; {{endpoint-protection}} requires caller authorization to submit or view the request for the supplied Subject, Resource, and Action.
+**PEP acting on behalf of the Subject.** Accepting unverified actor claims would let a PEP assert authority it cannot demonstrate.  {{endpoint-protection}} requires caller authorization to submit or view the request for the supplied Subject, Resource, and Action; actor-chain verification is defined by {{ACTOR}}.
 
 **Idempotency-key abuse.** Caller-supplied keys consume server-side state and are matched against retries.  {{idempotency-key-abuse}} gives scoping and retention guidance.
 
@@ -1491,9 +1458,6 @@ Initial entries registered by this specification:
 |---|---|---|
 | `requested_until` | `requested_access` | RFC 3339 timestamp requesting access through a specific absolute time. |
 | `emergency` | `requested_access` | Boolean requesting an expedited or emergency-access path. |
-| `session_id` | `client.source` | Identifier of a bounded interaction context that produced the request (chat or agent conversation, application session, CLI invocation, workflow thread). |
-| `external_url` | `client.source` | URL of an external system that motivated the request. |
-| `integration_id` | `client.source` | Identifier of an upstream integration or workflow that produced the request. |
 | `ticket` | `task.links` | URL where the requester can view the request and its status. |
 | `review` | `task.links` | URL where an approver or administrator can review or act on the request. |
 | `cancel` | `task.links` | URL where the PEP can cancel the request. |
@@ -2105,3 +2069,4 @@ The author thanks the OpenID AuthZEN Working Group for discussion and review.
 * Bulk submission and callback notification requirements, feature-specific security considerations, and examples moved to companion profiles, with the core retaining normative references to their defined members and processing rules.
 * Progressive layout: trusted-state examples lead the common protocol; artifact processing and additional mechanisms follow.  The interoperability baseline and all processing requirements retain their applicability and force.  A non-normative deadline guide and trusted-state walkthrough accompany the exchange, and two example omissions are corrected.
 * One normative home per rule: message definitions stay in the flow sections, cut to name, presence, type, and one sentence; every processing rule sits in PEP Processing, PDP Processing, or Access Request Service Processing; restating tables and duplicate examples removed; fourteen duplicate statements folded into their surviving rules.
+* Actor delegation (the `client.actor` and `client.source` members and actor-chain verification) moved to the companion AuthZEN Actor Delegation Profile, with the core retaining the preservation, comparison, and authorization-input rules that reference those members.

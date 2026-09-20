@@ -77,4 +77,4 @@ Cross-vendor interoperability between an independent PDP and Access Request Serv
 
 ## Not proposed
 
-Moving Delegation and Acting Parties: the chain-verification and authorization-input rules are behavior every Access Request Service exhibits on encountering `client.actor`, and the identity questions in G6 are core questions. Moving Cancellation: small, and the Task Handle's `links.cancel` and the terminal-state rules depend on it.
+Delegation and Acting Parties was moved to the AuthZEN Actor Delegation Profile on 2026-09-19 by the editor's decision, reversing this document's earlier position; the preservation, comparison, and authorization-input rules that reference `client.actor` stay in the core, as does G6.

@@ -1,28 +1,29 @@
-OPEN=$(word 1, $(wildcard /usr/bin/xdg-open /usr/bin/open /bin/echo))
-SOURCES?=${wildcard *.xml */*.xml}
-TEXT=${SOURCES:.xml=.txt}
-HTML=${SOURCES:.xml=.html}
+.DEFAULT_GOAL := all
 
-text:	$(TEXT)
-html:   $(HTML)
+# Explicit sources exclude working copies and editorial documents.
+SOURCES ?= authzen-access-request-approval-profile-1_0.md \
+	authzen-access-request-catalog-profile-1_0.md \
+	authzen-access-request-bulk-profile-1_0.md \
+	authzen-access-request-callback-profile-1_0.md \
+	authzen-access-request-actor-profile-1_0.md
+XML = $(SOURCES:.md=.xml)
+HTML = $(SOURCES:.md=.html)
+TEXT = $(SOURCES:.md=.txt)
 
-%.html: %.xml
-	xml2rfc --html $^
+.PHONY: all xml html text
+.DELETE_ON_ERROR:
+.SECONDARY: $(XML)
 
-%.txt:	%.xml
-	xml2rfc $^
+all: xml html text
+xml: $(XML)
+html: $(HTML)
+text: $(TEXT)
 
 %.xml: %.md
-	kramdown-rfc2629 > $@ $^
+	kramdown-rfc2629 $< > $@
 
-all:
-	@ $(MAKE) authzen-mcp-profile-1_0.xml
-	@ $(MAKE) authzen-mcp-profile-1_0.html
-	@ $(MAKE) authzen-mcp-profile-1_0.txt
-	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.xml
-	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.html
-	@ $(MAKE) authzen-access-request-approval/authzen-access-request-approval-profile-1_0.txt
-	@ $(MAKE) authzen-access-request-approval/authzen-access-request-catalog-profile-1_0.xml
-	@ $(MAKE) authzen-access-request-approval/authzen-access-request-catalog-profile-1_0.html
-	@ $(MAKE) authzen-access-request-approval/authzen-access-request-catalog-profile-1_0.txt
+%.html: %.xml
+	xml2rfc --html $< -o $@
 
+%.txt: %.xml
+	xml2rfc --text $< -o $@

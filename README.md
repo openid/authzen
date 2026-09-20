@@ -21,7 +21,7 @@ The HTML version is available [here](https://openid.github.io/authzen/authzen-ac
 
 A companion [Access Request Catalog Profile](https://openid.github.io/authzen/authzen-access-request-catalog-profile-1_0.html) defines how request form fields backed by catalogs (applications, entitlements, roles) are described and resolved.
 
-Companion [Bulk Access Requests](https://openid.github.io/authzen/authzen-access-request-bulk-profile-1_0.html) and [Callback Notifications](https://openid.github.io/authzen/authzen-access-request-callback-profile-1_0.html) profiles define multi-item requests and authenticated completion notifications.
+Companion [Bulk Access Requests](https://openid.github.io/authzen/authzen-access-request-bulk-profile-1_0.html) and [Callback Notifications](https://openid.github.io/authzen/authzen-access-request-callback-profile-1_0.html) profiles define multi-item requests and authenticated completion notifications, and an [Actor Delegation](https://openid.github.io/authzen/authzen-access-request-actor-profile-1_0.html) profile defines how a PEP conveys the acting party and request origin.
 
 ## Draft OAuth 2.0 Token Issuance Profile
 

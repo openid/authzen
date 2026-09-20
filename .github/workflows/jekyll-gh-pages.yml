@@ -160,6 +160,20 @@ jobs:
             authzen-access-request-callback-profile-1_0.html
             profiles/authzen-access-request-approval/authzen-access-request-callback-profile-1_0.xml
 
+      - name: Convert Actor Delegation Profile to rfc xml
+        run: kramdown-rfc2629 profiles/authzen-access-request-approval/authzen-access-request-actor-profile-1_0.md > profiles/authzen-access-request-approval/authzen-access-request-actor-profile-1_0.xml
+      - name: Render Actor Delegation Profile HTML
+        run: xml2rfc profiles/authzen-access-request-approval/authzen-access-request-actor-profile-1_0.xml --html -o authzen-access-request-actor-profile-1_0.html
+      - name: Render Actor Delegation Profile Text
+        run: xml2rfc profiles/authzen-access-request-approval/authzen-access-request-actor-profile-1_0.xml --text
+      - name: Upload Actor Delegation Profile artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: access-request-actor-profile
+          path: |
+            authzen-access-request-actor-profile-1_0.html
+            profiles/authzen-access-request-approval/authzen-access-request-actor-profile-1_0.xml
+
       - name: Convert Obligations Profile to rfc xml
         run: kramdown-rfc2629 profiles/authzen-obligations-profile-1_0.md > profiles/authzen-obligations-profile-1_0.xml
       - name: Render Obligations Profile HTML
@@ -279,6 +293,10 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: access-request-callback-profile
+      - name: Download artifact - Actor Delegation profile
+        uses: actions/download-artifact@v8
+        with:
+          name: access-request-actor-profile
       - name: Download artifact - Obligations profile
         uses: actions/download-artifact@v8
         with:
