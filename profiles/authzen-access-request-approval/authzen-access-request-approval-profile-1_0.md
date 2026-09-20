@@ -102,14 +102,14 @@ This profile extends the OpenID AuthZEN Authorization API so a Policy Enforcemen
 
 The AuthZEN Authorization API lets a Policy Enforcement Point (PEP) ask a Policy Decision Point (PDP) whether a Subject may perform an Action on a Resource within a Context.  The PDP returns an allow or deny Decision.
 
-Beyond a bare allow or deny, a PEP has three ways to continue, and one outcome that needs none:
+Beyond a bare allow or deny, the AuthZEN family gives a PEP several ways to continue.  The ones this profile relates to are:
 
 * An obligation is an action the PEP itself performs to honor a permit the PDP has already made.  No second evaluation follows.
 * A partial-evaluation residual is policy the caller completes locally.  No second evaluation follows.
 * An Access Request resolves a denial with an input the PEP cannot produce on its own: an approval or a grant recorded out of band.  The PDP evaluates again and remains authoritative.
 * A transient denial is retried after a delay with nothing changed ({{reevaluation-denials}}).
 
-Each fails closed.  An obligation the PEP cannot perform turns a permit into a deny; a residual or an Access Request the PEP cannot use leaves the denial standing.  How the three compose is defined by the profiles that carry them.
+Each fails closed.  An obligation the PEP cannot perform turns a permit into a deny; a residual or an Access Request the PEP cannot use leaves the denial standing.  How these mechanisms compose is defined by the profiles that carry them.
 
 This profile defines the Access Request.  When authority is fixed at provisioning time through roles, scopes, or service-account grants, a runtime denial ends the interaction.  When approval is possible during execution, a requestable denial lets the PEP submit an Access Request to an approval workflow, hold a Task Handle while the workflow runs, and re-evaluate access against current policy after approval ({{protocol-overview}}).  The profile serves autonomous callers and user-facing applications alike.  Companion profiles define bulk Access Requests ({{BULK}}), callback notifications ({{CALLBACK}}), actor delegation ({{ACTOR}}), and catalog-backed request input ({{CATALOG}}).
 
@@ -161,7 +161,7 @@ The rules of this profile rest on seven invariants, each stated normatively in t
 4. The PDP makes a new authorization decision at enforcement time.
 5. An Access Request is bound to the denied evaluation it remediates.
 6. An approval is bound to the Access Request it completed.
-7. The PEP carries binding material between the roles but does not establish its authority.
+7. The PEP carries binding material between the roles but does not establish or vouch for the authority it represents.
 
 # Requirements Notation and Conventions
 
@@ -1289,7 +1289,7 @@ This profile does not define an agent protocol surface.  Deployments serving age
 
 Extension points allow profiles and deployments to adapt the wire format to upstream protocols, governance platforms, and request interfaces.
 
-This document defines both a reusable AuthZEN extension and a profile of its use.  The extension is the AuthZEN surface: `context.access_request`, `context.evaluation_id`, `context.evaluated_at`, and `context.reason` on a denied Decision; `context.approval` on an Access Evaluation request; and `next_action`, `retry_after`, `reason`, and the approval members on a re-evaluation Decision.  The profile is the Access Request Endpoint, the submission, the Task Handle, and the completion mode.  The extension members are advisory in the sense of the AuthZEN extensibility model: a PEP that does not understand them sees a plain denial or a plain permit, and their handling when unrecognized is stated with each member and summarized in {{decision-context-members}}.
+This document defines both a reusable AuthZEN extension and a profile of its use.  The extension is the AuthZEN surface: `context.access_request`, `context.evaluation_id`, `context.evaluated_at`, and `context.reason` on a denied Decision; `context.approval` on an Access Evaluation request; and `next_action`, `retry_after`, `reason`, and the approval members on a re-evaluation Decision.  The profile is the Access Request Endpoint, the submission, the Task Handle, and the completion mode.  Unrecognized members of the extension do not change the underlying AuthZEN Decision: a PEP that does not implement this profile sees a plain denial or a plain permit.  Recognized members have the semantics this profile defines, including `context.approval` as authorization input to a PDP and `approved_until` as an enforcement bound on a PEP.  The handling of each member when unrecognized is stated with the member and summarized in {{decision-context-members}}.
 
 ## Companion-Defined Members {#companion-profiles}
 
@@ -1301,7 +1301,7 @@ The following protocol members and status value are defined by normative referen
 | Task Handle | `items`; `partial` value of `status` | Bulk Access Requests {{BULK}} |
 | Access Request submission | `callback` | Callback Notifications {{CALLBACK}} |
 
-These are defined protocol names, not unrecognized extension names under the forward-compatibility rule.  The companion definitions do not open the submission or Task Handle to arbitrary additional members.
+A normative reference to a companion profile makes its definitions authoritative when the feature is used; conformance to this profile does not require implementing a companion unless a rule here says so.  These are defined protocol names, not unrecognized extension names under the forward-compatibility rule.  The companion definitions do not open the submission or Task Handle to arbitrary additional members.
 
 ## Extension Points
 
@@ -1330,15 +1330,15 @@ This specification does not create registries for these enumerated values.  Spec
 
 The AuthZEN Decision Context and request Context members this document defines, with their processing strength and the handling of an unrecognized member or value, each stated normatively in the section cited:
 
-| Member | Position | Strength | Unrecognized member or value |
+| Member | Position | Effect when recognized | Unrecognized member or value |
 |---|---|---|---|
-| `context.access_request` | denied Decision | advisory | absent or unrecognized: the denial is not requestable ({{pep-recognize}}) |
-| `context.evaluation_id`, `context.evaluated_at`, `context.reason` | denied Decision | advisory | echoed when present, otherwise absent from the submission ({{pep-construct}}) |
-| `context.approval` | Access Evaluation request | request input | a PDP that cannot resolve or verify it evaluates as not approved by that reference ({{approval-verification}}) |
-| `next_action`, `retry_after`, `reason` | re-evaluation Decision | advisory | unrecognized `next_action` or `reason` falls back as defined in {{pep-reevaluation-handling}}; the Decision itself is unchanged |
-| response-side `approval` members | re-evaluation Decision | advisory to a PEP that does not implement this profile; bounds enforcement for one that does | unrecognized: the permit stands as an ordinary AuthZEN permit ({{approval-lifetime}}) |
+| `context.access_request` | denied Decision | the denial is requestable | absent or unrecognized: the denial is not requestable ({{pep-recognize}}) |
+| `context.evaluation_id`, `context.evaluated_at`, `context.reason` | denied Decision | echoed in the submission | echoed when present, otherwise absent from the submission ({{pep-construct}}) |
+| `context.approval` | Access Evaluation request | authorization input the PDP verifies | a PDP that cannot resolve or verify it evaluates as not approved by that reference ({{approval-verification}}) |
+| `next_action`, `retry_after`, `reason` | re-evaluation Decision | directs the PEP's next step | unrecognized `next_action` or `reason` falls back as defined in {{pep-reevaluation-handling}}; the Decision itself is unchanged |
+| response-side `approval` members | re-evaluation Decision | `approved_until` bounds reuse and enforcement | unrecognized: the permit stands as an ordinary AuthZEN permit ({{approval-lifetime}}) |
 
-No member in this table widens a denial or narrows a permit for a PEP that does not implement this profile.  Composition with other extensions that add Decision Context members, such as obligations, is not defined by this document.
+No member in this table widens a denial or narrows a permit for a PEP that does not implement this profile; in particular, `approved_until` is an enforcement and reuse bound for an implementer of this profile and does not narrow an ordinary AuthZEN permit for any other PEP.  Composition with other extensions that add Decision Context members, such as obligations, is not defined by this document.
 
 ## Naming Extensions {#extension-naming}
 
@@ -1959,7 +1959,7 @@ Authority may need to change during execution:
 
 These denials can lead to workflows that grant new authority.  A machine-readable handoff serves autonomous callers without a human present, and replaces custom approval prompts, out-of-band tickets, and vendor-specific integrations in user-facing applications.
 
-The profile addresses missing authority, not missing information: a denial that could be completed with attributes the caller already holds, or with a residual the caller can evaluate locally, is not an Access Request ({{protocol-overview}} and the Introduction state the boundary).  Within missing authority, the profile is needed where the PDP can neither see the approval in its own state nor take it as a durable fact; a single task that fans out across trust domains produces that shape ({{why-not-a-remediation-url}}).
+The profile is for resolution that requires an approval, a grant, or another action that produces authority the caller does not hold.  A denial that could be completed with attributes the caller already holds, or with a residual the caller can evaluate locally, is generally better represented as missing information or partial evaluation, though a deployment may still route it through an approval workflow ({{protocol-overview}} and the Introduction state the boundary).  Within missing authority, the profile is needed where the PDP can neither see the approval in its own state nor take it as a durable fact; a single task that fans out across trust domains produces that shape ({{why-not-a-remediation-url}}).
 
 Three goals shaped the design beyond the protocol invariants stated in the Introduction:
 
@@ -2027,7 +2027,7 @@ This non-normative appendix explains design choices, grouped by the question a r
 
 ### Why a protocol rather than a remediation URL? {#why-not-a-remediation-url}
 
-Where the PDP already has the approval, in its own store or carried in as context, a denial with a remediation URL is enough: the PEP hands a human to the URL, the approval lands where the PDP can read it, and the next evaluation permits.  That crosses PEP and PDP vendors cleanly, since it is one field emitted and rendered.  This profile is for the case where neither works: a per-action approval the PDP can neither see in its own state nor take as a durable fact, because the party that granted it shares no vendor, no trust domain, and no prior wiring with it.  Three boundaries explain the difference, and one flow crosses all three: an agent from one vendor, inside a customer's application from a second, attempts a refund that the customer's policy routes to its own approval service from a third.
+A denial that carries a remediation URL hands a human to a page.  Where the PDP already has the approval when it next evaluates, from its own store or carried in as context, that is enough, and it crosses PEP and PDP vendors cleanly, since it is one field emitted and rendered.  This profile adds what a URL does not provide: machine submission by a caller with no human present, a submission bound to the exact denied evaluation, asynchronous task state a caller can hold across restarts, a portable completion result, and an approval the PDP can verify at re-evaluation.  A deployment that shares state between the PDP and the Access Request Service uses these properties with `evaluation_id` and `approval.id`; the properties matter most where the parties share no vendor, no trust domain, and no prior wiring, which three boundaries describe and one flow crosses: an agent from one vendor, inside a customer's application from a second, attempts a refund that the customer's policy routes to its own approval service from a third.
 
 * Interop.  The application and the approval service are different vendors.  A standing role can be provisioned across that line, but not a per-request approval bound to a specific denied action, and a URL only hands off a human.  One requestable-denial contract that any conforming Access Request Service accepts replaces a connector per customer: the agent submits to a service it was never wired for, holds the Task Handle, and moves on.
 * Trust.  The application's PDP shares no approval-record state with the service that granted the approval.  When a human approves, the service returns an Approval Result whose `approval.state` is bound to that request, and the PDP verifies it against the service's key, which it already trusts as this customer's approver, without reading the service's store.  That is issuer trust, not a shared database.  Carrying a durable role as context instead would hand the agent standing privilege, which an authorize-every-action model exists to avoid.
