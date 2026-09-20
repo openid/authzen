@@ -1,5 +1,7 @@
 # PR A2 Plan: Wording Pass
 
+Current repository note (2026-09-17): the editor consolidated the A1/A2/A3 history into `arap-restructure`, tracking `origin/arap-restructure`. The branch names and stacked-stage descriptions below are historical; they no longer prescribe separate branches or pull requests. See `A3-PLAN.md` for the current work and audit status.
+
 Status: opened 2026-09-08 on branch `arap-restructure-a2`, stacked on `arap-restructure-a1`; all stages committed by 2026-09-16, each reviewed and approved. A2 changes the wording of normative text and therefore does not claim to be script-verifiable. Every changed unit is reviewed by a person against `PASS0-INVENTORY.tsv`, which records each unit's actor, condition, obligation, and exceptions; the scripts in the plan's Appendix X run as evidence, not as pass or fail. Nothing in A2 may settle a question recorded in `PROTOCOL-GAPS.md`.
 
 ## Inputs

@@ -28,6 +28,8 @@ Expiry enforcement on `denial.expires_at`, `task.expires_at`, and `approved_unti
 
 ## Capability advertisement
 
+The AuthZEN extensibility model (Draft 2) requires that any capability declaration that changes a decision enter evaluation identity, so that `binding_hash` covers it. The URNs proposed here are PDP-side discovery and change no decision. If a PDP ever conditions the requestable denial on a PEP-declared capability, that declaration must be bound as the model requires; this proposal does not introduce one.
+
 Each capability is declared by a URN in the PDP metadata `capabilities` array, alongside the existing `urn:openid:authzen:capability:access-request`, for example one URN for signed denial binding and one for signed approval state. The profile must define what a declaration means: that the deployment has the capability enabled for the roles the PDP speaks for, not merely that the product could support it; which role each URN covers; and that absence means the capability is not offered, so a PEP or peer does not expect the corresponding artifact. Without these semantics a URN names a contract without completing it.
 
 ## What a URN does not settle

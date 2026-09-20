@@ -134,3 +134,18 @@ Part I is approximately **8,600 whitespace-delimited words**, or **8,200 excludi
 - Two lost antecedents restored: "both patterns" now names lookup and `approval.state`; "the set" in the moved SHOULD now says the authorization-relevant Context set.
 - The rationale entry says each boundary uses whichever form its topology permits.
 - This record no longer claims a Deadline Reference citation change or a status lead-in, and lists the three example headings, the anchor split, and the heading-level changes.
+- Reading Guide removed at the editor's request (2026-09-18): a reading guide is not customary in a specification and signals that the structure does not speak for itself. Its interim conformance sentence now sits in the Binding Artifacts applicability paragraph beside the baseline it qualifies; the companions sentence was already in the Introduction; nothing cited the anchor. Remaining "Part" references were replaced by section citations.
+
+### PEP implementer review follow-up
+
+Applied against the existing working tree, preserving the editor's intervening changes:
+
+- Moved the PEP preservation and schema-required-input bullets from Core Conformance to Request Body. Added the explicit actor where the former list context supplied it; actors, conditions, exceptions, and keyword force are unchanged. The conformance checklist points to the relocated rules.
+- Clarified that submission Context comes from the original Access Evaluation request, not Decision Context, and that optional presence does not waive preservation. The standalone submission example now shows a non-empty `project` Context member and explicitly states that the PDP records it as authorization-relevant. This does not teach the PEP to parse binding artifacts or choose the bound member set.
+- Kept the binding-model table and wire-shape explanation near Roles. Moved its detailed verification pointers and stateless-PDP explanation to common Binding Integrity. Grouped the two general denial-issuance paragraphs after the exchange-facing example and URL rules, under Denial Issuance, outside artifact-specific conditions.
+- Moved Deadline Reference into Approval Lifetime and Enforcement, retaining `pep-deadlines` and explicitly keeping the table non-normative. Removed the now-empty PEP Implementation Guide appendix and its unreferenced `pep-implementation-guide` anchor.
+- Moved Time and Clock Skew verbatim out of the non-normative appendix into Approval Lifetime and Enforcement, retaining its generated anchor explicitly as `time-and-clock-skew`. Retargeted skew citations. G19 records this placement correction; G5 and G11 remain open and unchanged.
+
+The normalized non-code comparison isolates only the two actor-explicit relocated rules, the changed example introduction, and the obsolete appendix framing and deadline pointer wording. Other existing prose, including non-keyword rules, is preserved apart from citation retargets. Core keyword total remains 350. No commit or push was made for this follow-up.
+
+Verification: XML, HTML, and text rebuilt successfully, with existing stream-default and width warnings. The network-enabled rebuild refreshed references after the sandboxed attempt could not reach the bibliography service. All four profiles have no missing local or companion anchor targets, duplicate IDs, or unrendered list markers; all 33 core JSON-bearing examples parse. `git diff --check` passes. These checks add no test files or infrastructure.
