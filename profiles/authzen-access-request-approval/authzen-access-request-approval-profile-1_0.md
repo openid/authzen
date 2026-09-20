@@ -1952,30 +1952,24 @@ Location: https://pdp.example.com/access/v1/requests/arq_01HX4Y3AJZ7Y56W2F9H8Q8C
 
 # Motivation and Use Cases
 
-This non-normative appendix describes the use cases and design goals behind the profile.
+This non-normative appendix describes the use cases behind the profile and the goals it was written against.
 
 Authority may need to change during execution:
 
-* An AI agent discovers documents, records, or channels it needs mid-task, potentially producing many access denials.
-* An OAuth Authorization Server receives a new combination of requested scopes that requires policy, risk, or human review before token issuance.
-* An API gateway encounters an operation beyond a user's standing role and routes it to an owner for approval.
-* A Security Token Service discovers that a downstream resource requires per-call approval beyond the upstream token's authority.
+* An AI agent discovers documents, records, or channels it needs mid-task, potentially producing many access denials.  A broad-scope approval covers a class of later invocations; the agent runtime persists the Task Handle and resumes on completion ({{CALLBACK}}, {{ACTOR}}).
+* An OAuth Authorization Server receives a combination of requested scopes that requires policy, risk, or human review before token issuance.  The approval is consumed at issuance time by a companion profile that binds it to the issued token.
+* An API gateway encounters an operation beyond a user's standing role and routes it to an owner for approval.  This is the single-item flow of {{protocol-overview}} with no companion.
+* A Security Token Service discovers that a downstream resource requires per-call approval beyond the upstream token's authority.  The approval is short-lived and re-evaluated on each call.
 
-These denials can lead to workflows that grant new authority.  A machine-readable handoff serves autonomous callers without a human present and replaces custom approval prompts, out-of-band tickets, and vendor-specific integrations in user-facing applications.
+These denials can lead to workflows that grant new authority.  A machine-readable handoff serves autonomous callers without a human present, and replaces custom approval prompts, out-of-band tickets, and vendor-specific integrations in user-facing applications.
 
-The profile addresses missing authority, not missing information and not a missing action.  An obligation supplies an action the PEP performs to honor a permit; a residual supplies policy the caller completes locally; an Access Request supplies authority a third party creates, which the PDP then evaluates again (the lane test in the Introduction).  Supplying known attributes or using partial evaluation to identify locally satisfiable conditions addresses missing information.  A requestable denial instead calls for a workflow to create authority.  The mechanisms can be combined.
+The profile addresses missing authority, not missing information: a denial that could be completed with attributes the caller already holds, or with a residual the caller can evaluate locally, is not an Access Request ({{protocol-overview}} and the Introduction state the boundary).  Within missing authority, the profile is needed where the PDP can neither see the approval in its own state nor take it as a durable fact; a single task that fans out across trust domains produces that shape ({{why-not-a-remediation-url}}).
 
-This profile has the following design goals:
+Three goals shaped the design beyond the protocol invariants stated in the Introduction:
 
-* Preserve the AuthZEN Authorization API's allow/deny decision model.
-* Permit PDP evaluation without retaining prior decisions; support signed bindings where the PDP and Access Request Service do not share denial or approval records.  Durable request, approval, and denial-binding state lives in the Access Request Service role.
-* Provide a common handoff to human, automated, or hybrid governance evaluators without replacing existing approval infrastructure.
-* Support high-volume callers through broad-scope approvals, auto-approval, pre-approval, and bulk approval.
-* Make requestability machine-readable so autonomous PEPs can construct conformant submissions without human input.
-* Provide an opaque handle for the asynchronous approval task.
-* Avoid embedding a workflow policy language in the authorization response.
-* Support re-evaluation after approval so the PDP remains authoritative at enforcement time.
-* Correlate the denial, submission, approver action, and final authorization result for audit.
+* A common handoff to human, automated, or hybrid evaluators that leaves existing approval infrastructure in place.
+* High-volume callers absorbed by workflow patterns, such as broad-scope, auto-, pre-, and bulk approval, rather than per-denial human review.
+* Requestability that is machine-readable, so an autonomous PEP can construct a conformant submission without human input.
 
 # Implementation Considerations {#impl-considerations}
 
@@ -2032,6 +2026,18 @@ Implementations map backend lifecycle states to the canonical Task Status Endpoi
 # Design Rationale {#design-rationale}
 
 This non-normative appendix explains design choices; the rules in the body of the specification govern.
+
+## Why a protocol rather than a remediation URL? {#why-not-a-remediation-url}
+
+Where the PDP already has the approval, in its own store or carried in as context, a denial with a remediation URL is enough: the PEP hands a human to the URL, the approval lands where the PDP can read it, and the next evaluation permits.  That crosses PEP and PDP vendors cleanly, since it is one field emitted and rendered.  This profile is for the case where neither works: a per-action approval the PDP can neither see in its own state nor take as a durable fact, because the party that granted it shares no vendor, no trust domain, and no prior wiring with it.  Three boundaries explain the difference.
+
+* Interop.  The application and the approval system are different vendors.  A standing role can be provisioned across that line, but not a per-request approval bound to a specific denied action, and a URL only hands off a human.  One requestable-denial contract that any conforming Access Request Service accepts replaces a connector per customer.
+* Trust.  The verifying PDP shares no approval-record state with the service that granted the approval.  A signed `approval.state` lets it confirm that the approval matches this exact request against the approver's key, without reading that store; that is issuer trust, not a shared database.  Carrying a durable role as context instead would hand the caller standing privilege, which an authorize-every-action model exists to avoid.
+* Semantics.  A generic or agent PEP has no prior wiring and no human at a URL, so the denial itself carries the remediation contract: this is requestable, here is the binding material, here is where to submit and track.
+
+One flow crosses all three.  An agent from one vendor, running inside a customer's application from a second, attempts a refund that the customer's policy routes to its own approval service from a third.  The application denies with a requestable denial that points the agent at a service it was never wired for.  The agent submits, holds the Task Handle, and moves on.  A human approves later, and the approval service returns an Approval Result whose `approval.state` is bound to that request.  The agent re-evaluates, possibly from another worker, and the application's PDP verifies the state against the approval service's key, which it already trusts as this customer's approver, without reading that service's store.
+
+The requestable-denial signal is advisory, so a PEP that does not implement this profile sees a plain denial and adoption proceeds one participant at a time.
 
 ## Why reuse AuthZEN? {#why-a-profile-of-the-authzen-authorization-api-rather-than-a-standalone-specification}
 
