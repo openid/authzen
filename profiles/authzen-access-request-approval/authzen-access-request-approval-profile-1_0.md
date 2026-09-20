@@ -1286,6 +1286,8 @@ When the denial includes `request_schema_url`, the PEP uses the referenced JSON 
 
 Extension points allow profiles and deployments to adapt the wire format to upstream protocols, governance platforms, and request interfaces.
 
+This document defines both a reusable AuthZEN extension and a profile of its use.  The extension is the AuthZEN surface: `context.access_request`, `context.evaluation_id`, `context.evaluated_at`, and `context.reason` on a denied Decision; `context.approval` on an Access Evaluation request; and `next_action`, `retry_after`, `reason`, and the approval members on a re-evaluation Decision.  The profile is the Access Request Endpoint, the submission, the Task Handle, and the completion mode.  The extension members are advisory in the sense of the AuthZEN extensibility model: a PEP that does not understand them sees a plain denial or a plain permit, and their handling when unrecognized is stated with each member and summarized in {{decision-context-members}}.
+
 ## Companion-Defined Members {#companion-profiles}
 
 The following protocol members and status value are defined by normative reference to companion profiles.  Their presence, processing, and validation rules are specified in those profiles.
@@ -1300,7 +1302,7 @@ These are defined protocol names, not unrecognized extension names under the for
 
 ## Extension Points
 
-Additional members beyond those defined in this document or by {{companion-profiles}} MAY appear only at the following locations, and those members MUST follow the naming rules in {{extension-naming}}.  No other object members may be extended without a revision of this specification or a profile that explicitly redefines them.
+Additional members beyond those defined in this document or by {{companion-profiles}} MAY appear only at the following locations, and those members MUST follow the naming rules in {{extension-naming}}.  No other object members may be extended without a revision of this specification or a profile that explicitly redefines them.  The AuthZEN extensibility model proposes a recursive rule under which any named object carries registered, namespaced members; aligning this list with that rule is a decision for a revision of this specification.
 
 * `context.access_request`: additional members of the requestable denial, such as URLs of profile-defined companion documents the PEP consults when constructing a submission.
 * `context.access_request.display`: user-interface hints in a requestable denial.
@@ -1320,6 +1322,20 @@ This specification also defines extensibility for enumerated values:
 * New problem types for {{RFC9457}}-style error responses ({{error-responses}}).
 
 This specification does not create registries for these enumerated values.  Specifications that define new values for `task.status`, `result.mode`, or problem types SHOULD define stable names or URIs and processing rules for those values.  Short, unqualified names for `result.mode` are reserved for values defined by this base specification or by a future registry; profile-defined `result.mode` values SHOULD use absolute URIs unless such a registry exists.
+
+## Decision Context Members {#decision-context-members}
+
+The AuthZEN Decision Context and request Context members this document defines, with their processing strength and the handling of an unrecognized member or value, each stated normatively in the section cited:
+
+| Member | Position | Strength | Unrecognized member or value |
+|---|---|---|---|
+| `context.access_request` | denied Decision | advisory | absent or unrecognized: the denial is not requestable ({{pep-recognize}}) |
+| `context.evaluation_id`, `context.evaluated_at`, `context.reason` | denied Decision | advisory | echoed when present, otherwise absent from the submission ({{pep-construct}}) |
+| `context.approval` | Access Evaluation request | request input | a PDP that cannot resolve or verify it evaluates as not approved by that reference ({{approval-verification}}) |
+| `next_action`, `retry_after`, `reason` | re-evaluation Decision | advisory | unrecognized `next_action` or `reason` falls back as defined in {{pep-reevaluation-handling}}; the Decision itself is unchanged |
+| response-side `approval` members | re-evaluation Decision | advisory to a PEP that does not implement this profile; bounds enforcement for one that does | unrecognized: the permit stands as an ordinary AuthZEN permit ({{approval-lifetime}}) |
+
+No member in this table widens a denial or narrows a permit for a PEP that does not implement this profile.  Composition with other extensions that add Decision Context members, such as obligations, is not defined by this document.
 
 ## Naming Extensions {#extension-naming}
 
@@ -1454,7 +1470,7 @@ The capability and problem-type URNs ({{error-responses}}) use the OpenID Founda
 
 This specification requests creation of a new registry: the AuthZEN Access Request Member Names registry.
 
-The registry tracks well-known member names that may appear at the extension points defined in {{extensibility}}.  Registration policy is Specification Required.  Each entry has the following fields:
+The registry tracks well-known member names that may appear at the extension points defined in {{extensibility}}.  In the terms of the AuthZEN extensibility model this is a member-name registry; each entry's processing strength is that of the object it extends, as stated by its specification document.  Registration policy is Specification Required.  Each entry has the following fields:
 
 Name:
 : The member name as it appears on the wire.
@@ -1494,7 +1510,7 @@ Change Controller for all initial entries: OpenID Foundation AuthZEN Working Gro
 
 This specification requests creation of a new registry: the AuthZEN Access Request Re-evaluation Denial Reason registry.
 
-The registry tracks well-known `context.reason` values a PDP returns when it denies a re-evaluation that presented an `approval` reference ({{completion-semantics}}).  Registration policy is Specification Required.  Each entry has the following fields:
+The registry tracks well-known `context.reason` values a PDP returns when it denies a re-evaluation that presented an `approval` reference ({{completion-semantics}}).  In the terms of the AuthZEN extensibility model this is an enumerated-type registry whose values are advisory.  Registration policy is Specification Required.  Each entry has the following fields:
 
 Reason:
 : The `context.reason` value as it appears on the wire.
