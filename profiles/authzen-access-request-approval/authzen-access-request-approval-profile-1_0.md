@@ -144,6 +144,18 @@ Steps 1 and 6 use the AuthZEN Access Evaluation API.  Step 6 is a new evaluation
 
 In step 5 the PEP can poll the task, receive a callback ({{CALLBACK}}), or otherwise use the Task Handle to determine completion.
 
+## Protocol Invariants {#protocol-invariants}
+
+The rules of this profile rest on seven invariants, each stated normatively in the section that defines it:
+
+1. A requestable denial is still a denial.
+2. An Access Request does not itself grant access.
+3. An approval does not itself grant access.
+4. The PDP makes a new authorization decision at enforcement time.
+5. An Access Request is bound to the denied evaluation it remediates.
+6. An approval is bound to the Access Request it completed.
+7. The PEP carries binding material between the roles but does not establish its authority.
+
 # Requirements Notation and Conventions
 
 {::boilerplate bcp14-tagged}
@@ -904,6 +916,8 @@ At re-evaluation, the PDP:
 * MUST NOT authorize a re-evaluation solely because the request contains a known `approval.id`.
 * MUST resolve or verify the approval reference presented in `context.approval` and confirm that it is applicable to the authenticated caller or requester, current Subject, Resource, Action, relevant Context, approval scope, and approval expiry before using it as an input to an allow decision.
 * MUST ignore or reject a swapped, replayed, expired, or otherwise non-applicable approval reference, and MUST evaluate the request as not approved by that reference.
+
+Values carried outside `approval.state`, including `approval.id`, `approved_at`, and `approved_until`, MUST NOT be treated as authoritative by the PDP unless resolved from trusted state or proven by integrity-protected approval binding material.
 
 Deployments MAY use lookup of `approval.id` and verification of `approval.state` together.  In all cases, the PDP MUST verify the approval against trusted state or integrity-protected binding material; neither `approval.id` nor `approval.state` is a bearer grant by itself.
 
@@ -2048,7 +2062,7 @@ Token-issuance, credential-issuance, and direct-decision flows may consume appro
 
 Catalog resolution needs its own document format, endpoints, pagination, scoping, and authorization, but only some deployments need it.  The companion profile {{CATALOG}} can evolve independently, adding `request_catalogs_url` through the `context.access_request` extension point without revising this specification.
 
-## Why present trusted-state binding first? {#why-does-this-document-present-signed-denial-binding-and-signed-approval-state-first-and-shared-state-as-the-alternative}
+## Why present trusted-state binding first? {#why-present-trusted-state-binding-first}
 
 Trusted-state examples expose the common PEP exchange without introducing artifact construction and verification at the same time.  {{binding-artifacts}} then explains the denial and approval artifacts separately.  Each boundary uses whichever form its topology permits, and placement does not change the interoperability baseline or any processing obligation.
 
@@ -2064,7 +2078,7 @@ The author thanks the OpenID AuthZEN Working Group for discussion and review.
 
 -01
 
-* Editorial restructure.  The core protocol (requestable denial, submission, task status, approval and re-evaluation) is presented first, followed by binding and verification rules that place signed mechanisms beside their shared-state alternatives; cancellation, delegation and acting parties, and machine-readable forms follow in their own sections; security considerations name threats and point to the rules that sit beside the mechanisms they protect.  Requirements were relocated and restated without change in force, and duplicated restatements were consolidated.
+* Protocol restructuring and modularization, with each requirement's force preserved.  The core protocol (requestable denial, submission, task status, approval and re-evaluation) is presented first, followed by binding and verification rules that place signed mechanisms beside their shared-state alternatives; cancellation, delegation and acting parties, and machine-readable forms follow in their own sections; security considerations name threats and point to the rules that sit beside the mechanisms they protect.  Requirements were relocated and restated without change in force, duplicated restatements were consolidated, and the conformance surface of this document changed only by what moved to companion profiles.
 * Catalog references moved to the companion AuthZEN Access Request Catalog Profile.
 * Bulk submission and callback notification requirements, feature-specific security considerations, and examples moved to companion profiles, with the core retaining normative references to their defined members and processing rules.
 * Progressive layout: trusted-state examples lead the common protocol; artifact processing and additional mechanisms follow.  The interoperability baseline and all processing requirements retain their applicability and force.  A non-normative deadline guide and trusted-state walkthrough accompany the exchange, and two example omissions are corrected.
