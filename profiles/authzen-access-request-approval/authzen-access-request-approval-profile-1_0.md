@@ -179,6 +179,9 @@ Requestable Denial:
 Task Handle:
 : An opaque identifier and associated status endpoint representing the lifecycle of an Access Request.
 
+Autonomous PEP:
+: A PEP that acts without a human present to confirm what it fetches or submits.
+
 Approval Result:
 : The completed result of an Access Request task.  An Approval Result does not itself permit access; the PEP uses it to obtain an AuthZEN Authorization API allow decision through a new Access Evaluation, or enforces it according to a profile-defined completion mode where one applies.
 
@@ -680,7 +683,7 @@ Stateless PDP evaluation means retaining no prior decisions, not dispensing with
 
 ## Structural Comparison {#structural-comparison}
 
-Profile machinery members (`access_request`, `evaluation_id`, `evaluated_at`, and `reason`) are not authorization-relevant, and a PDP SHOULD also exclude volatile members (timestamps, nonces, or request identifiers such as `context.time`) so the authorization-relevant Context set compares equal across the denial and a later submission or re-evaluation.
+Profile machinery members (`access_request`, `evaluation_id`, `evaluated_at`, `reason`, and `approval`) are not authorization-relevant, and a PDP SHOULD also exclude volatile members (timestamps, nonces, or request identifiers such as `context.time`) so the authorization-relevant Context set compares equal across the denial and a later submission or re-evaluation.
 
 Throughout this profile, structural comparison requires the same JSON type and applies these rules:
 
@@ -692,7 +695,7 @@ Throughout this profile, structural comparison requires the same JSON type and a
 
 These rules apply wherever the profile compares Subject, Resource, Action, or authorization-relevant Context, including inline denial binding and approval-scope matching ({{approval-scope}}).
 
-For inline denial binding and exact-match approval-scope matching, Subject, Resource, and Action comparison includes the full AuthZEN Authorization API objects, including any `properties` members present in the bound values, except that `subject.properties.act` is excluded because the PEP MAY normalize the actor to `client.actor` (see {{pep-processing-rules}} and {{ACTOR}}).  Context comparison includes each member of the authorization-relevant Context and excludes profile machinery members.
+For inline denial binding and exact-match approval-scope matching, Subject, Resource, and Action are compared as full AuthZEN Authorization API objects, every `properties` member present in the bound values included, except that `subject.properties.act` is excluded because the PEP MAY normalize the actor to `client.actor` (see {{pep-processing-rules}} and {{ACTOR}}).  Context comparison includes each member of the authorization-relevant Context and excludes profile machinery members.
 
 Denial binding, approval-scope matching, and idempotent-submission comparison all compare the authorization-relevant Context, so when any member is authorization-relevant the PDP MUST make it explicit and integrity-protected, and the Access Request Service MUST use exactly that set:
 
@@ -735,6 +738,8 @@ The following checks apply to `endpoint`, `form_url`, `request_schema_url`, and 
 
 An autonomous PEP MUST verify that these URLs resolve to hosts trusted under the deployment before fetching or acting on them, by requiring the same origin as the Access Request Endpoint advertised in PDP metadata or by maintaining an explicit allowlist of trusted Access Request Service hosts.
 A PEP that renders them for a human user SHOULD apply the same check.
+
+A PEP that performs the origin check obtains the Access Request Endpoint from PDP metadata even when the denial supplies `endpoint`.  When a URL fails the check, the PEP does not fetch it or submit to it; what it then reports to a requester is a deployment matter.
 
 PEPs MUST NOT submit credentials to a host that is not trusted to receive them.
 
