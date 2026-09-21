@@ -1,6 +1,6 @@
 # Gaps Register: AuthZEN Access Request and Approval Profile
 
-Version 21. Status: register for the working group. This is not a design. Version 21 adds G33 (workflow input mixed into the submission `context`) under Issue 4 and G34 (`approval_revoked` as a registered reason code) under Issue 5, from the fourth reviewer's confirmation pass (2026-09-19), which otherwise found the five remaining blockers already recorded; no entry is resolved. Version 20 records, from a fourth independent review (2026-09-19), a three-case validity model under G3 that converts it from an open question into a concrete direction, the reuse-versus-retry rule under G5, the reviewer's three identity terms under G6, the inline-or-hash direction for the approval claim set under G2 and G27, the REQUIRED claim set under G1, and the `act` exclusion note under Issue 4; no entry is resolved. Version 19 adds G31 (composition with obligations) and G32 (the closed extension-point list versus the extensibility model's recursive rule) to issue 7, renamed Base task surface and extensibility, and adds the mandatory-to-understand reading under G11 and G28, all from reading the draft against the AuthZEN Extensibility Model (Draft 2, 2026-09-19).
+Version 22. Status: register for the working group. This is not a design. Version 22 records that the seven Part A issues were filed as openid/authzen#659 through #665 on 2026-09-20, in register order, each carrying the candidate directions of versions 20 and 21. The issues are where each question is now decided; this register keeps the line-cited evidence, the withdrawn candidate designs, and the closed entries. The two companion issues in `BULK-GAPS.md` and `CALLBACK-GAPS.md` are drafted and not filed. Version 21 added G33 and G34. Version 21 adds G33 (workflow input mixed into the submission `context`) under Issue 4 and G34 (`approval_revoked` as a registered reason code) under Issue 5, from the fourth reviewer's confirmation pass (2026-09-19), which otherwise found the five remaining blockers already recorded; no entry is resolved. Version 20 records, from a fourth independent review (2026-09-19), a three-case validity model under G3 that converts it from an open question into a concrete direction, the reuse-versus-retry rule under G5, the reviewer's three identity terms under G6, the inline-or-hash direction for the approval claim set under G2 and G27, the REQUIRED claim set under G1, and the `act` exclusion note under Issue 4; no entry is resolved. Version 19 adds G31 (composition with obligations) and G32 (the closed extension-point list versus the extensibility model's recursive rule) to issue 7, renamed Base task surface and extensibility, and adds the mandatory-to-understand reading under G11 and G28, all from reading the draft against the AuthZEN Extensibility Model (Draft 2, 2026-09-19).
 
 Version 18 reorganizes the register into the eight working-group issues it will be filed as, each with its member entries, one summary, and one direction. Entry numbers are stable identifiers and are unchanged. Three entries are closed: G19 (the clock-skew guidance now sits in the normative body), G16 (folded into G6), and G21 (split between the companion registers). Three entries moved to registers beside the profiles that now own their subject: G12 and the `items` half of G21 to `BULK-GAPS.md`, G18 and the `callback` half of G21 to `CALLBACK-GAPS.md`. Editorial entries G7, G8, G14, and G25 are addressed by stage A7 and are listed under Editorial with their status; G15 stays open, tied to issue 1. The Tracking table is retired; each issue carries a status line. Version history before 18 is in the git log of this file.
 
@@ -20,7 +20,7 @@ Issues 1 to 3 concern the signed layer and go with the conformance-layering deci
 
 **Direction.** Adopt a minimum `approval.state` claim set that includes scope and the artifact's own validity bound; state that `approved_until` bounds use of the Approval Result, not the authority granted; state what a stateless PDP does for current status.
 
-**Status.** Not filed.
+**Status.** Filed as openid/authzen#659 (2026-09-20).
 
 #### G2. `approval.state` has no standardized signed payload
 
@@ -80,7 +80,7 @@ Issues 1 to 3 concern the signed layer and go with the conformance-layering deci
 
 **Direction.** Name the inline claims; decide whether the issuer-side claims are MUST; make the PEP echo every `denial` member the PDP supplied.
 
-**Status.** Not filed.
+**Status.** Filed as openid/authzen#660 (2026-09-20).
 
 #### G1. The inline denial-binding form never names its claims
 
@@ -120,7 +120,7 @@ Issues 1 to 3 concern the signed layer and go with the conformance-layering deci
 
 **Direction.** Define both identifiers; choose between a separate service `jwks_uri` in PDP metadata and a service issuer identifier with its own metadata.
 
-**Status.** Not filed.
+**Status.** Filed as openid/authzen#661 (2026-09-20).
 
 #### G4. Issuer and audience identifiers and key-to-issuer trust are undefined
 
@@ -142,7 +142,7 @@ Note (2026-09-19): the `subject.properties.act` exclusion in structural comparis
 
 **Direction.** Define the four identities in Terminology; state each binding rule against a named identity; settle MUST versus SHOULD for binding the approval to the tuple; use the Terminology name for bound Context.
 
-**Status.** Not filed.
+**Status.** Filed as openid/authzen#662 (2026-09-20).
 
 #### G6. Caller, requester, and client binding lack identity and comparison semantics
 
@@ -180,7 +180,7 @@ Note (2026-09-19): the `subject.properties.act` exclusion in structural comparis
 
 **Direction.** State that the PEP resends the original evaluation's Context; define the response-side expiry member; name the governing expiry and a polling bound; make `next_action` authoritative and `reason` informational, withdrawing the default-action registry.
 
-**Status.** Not filed.
+**Status.** Filed as openid/authzen#663 (2026-09-20).
 
 #### G23. The Context a PEP sends at re-evaluation is unspecified
 
@@ -244,7 +244,7 @@ PEP-side evidence (2026-09-18): the PEP rule to stop enforcing past "an approval
 
 **Direction.** Define the precedence; state the error precedence; key audit reconstruction on the identifier together with the task or evaluation time.
 
-**Status.** Not filed.
+**Status.** Filed as openid/authzen#664 (2026-09-20).
 
 #### G5. Retry processing versus fresh-submission validation is not ordered
 
@@ -270,7 +270,7 @@ PEP-side evidence (2026-09-18): the PEP rule to stop enforcing past "an approval
 
 **Direction.** Decide the base member set for the Task Handle; adopt or decline the two capabilities; define composition with obligations; decide whether the extension-point list opens to the extensibility model's recursive rule.
 
-**Status.** Not filed.
+**Status.** Filed as openid/authzen#665 (2026-09-20).
 
 #### G30. `progress` and `task.links.review` expose workflow-engine surface in the base
 

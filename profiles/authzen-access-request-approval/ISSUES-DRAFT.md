@@ -1,6 +1,6 @@
 # Working-Group Issue Drafts
 
-Drafted 2026-09-19 from `PROTOCOL-GAPS.md` version 18. Not filed. Each draft is one GitHub issue: title, body, and the register entries it closes. File in the order listed.
+Drafted 2026-09-19 from `PROTOCOL-GAPS.md` version 18. The seven core issues were filed on 2026-09-20 as openid/authzen#659 (1), #660 (2), #661 (3), #662 (4), #663 (5), #664 (6), and #665 (7), with bodies refreshed from register versions 20 and 21, which carry better candidate directions than the drafts below. The two companion drafts at the end are not filed. Kept for the record; the issues are authoritative.
 
 ---
 
