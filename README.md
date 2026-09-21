@@ -19,6 +19,10 @@ COAZ-MCP is the COAZ binding for the Model Context Protocol (MCP), defining how 
 A profile that specifies an approval workflow for handling denials in a structured way.
 The HTML version is available [here](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html)
 
+A companion [Access Request Catalog Profile](https://openid.github.io/authzen/authzen-access-request-catalog-profile-1_0.html) defines how request form fields backed by catalogs (applications, entitlements, roles) are described and resolved.
+
+Companion [Bulk Access Requests](https://openid.github.io/authzen/authzen-access-request-bulk-profile-1_0.html) and [Callback Notifications](https://openid.github.io/authzen/authzen-access-request-callback-profile-1_0.html) profiles define multi-item requests and authenticated completion notifications, and an [Actor Delegation](https://openid.github.io/authzen/authzen-access-request-actor-profile-1_0.html) profile defines how a PEP conveys the acting party and request origin.
+
 ## Draft Obligations Profile
 
 A profile that lets a PDP attach mandatory, machine-readable actions -- obligations -- to an authorization decision, which the PEP must carry out in order to honor that decision. It defines the obligation object model, PEP compliance semantics, a set of normative obligation types, and a mechanism for a PDP and PEP to discover which types they mutually support. It is at `profiles/authzen-obligations-profile-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-obligations-profile-1_0.html).
