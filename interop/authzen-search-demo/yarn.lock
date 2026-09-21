@@ -621,17 +621,17 @@
   resolved "https://registry.yarnpkg.com/@radix-ui/rect/-/rect-1.1.3.tgz#5a58fbae3deefb7f8cfe6ea314287d699eb694a9"
   integrity sha512-JtyZR+mqgBibTo8xea3B6ZRmzZiM/YeVBtUkas6zMuXjAlfIFIW2FgqeM9eLyvEaYX66vr6DJMK+4U6LV0KhNw==
 
-"@react-router/dev@^8.3.1":
-  version "8.3.1"
-  resolved "https://registry.yarnpkg.com/@react-router/dev/-/dev-8.3.1.tgz#c967acdbd1dc47fcd419c0f20b2d1dd0e2d9893f"
-  integrity sha512-yvhMiOq+LLmGPgTOYYWjzfapUN4B2/T3nfr8P81bLTiyh0YSx88OAz5y2D/KKS0boF9EoHyhzeMH4ZweMTwjJA==
+"@react-router/dev@^8.4.0":
+  version "8.4.0"
+  resolved "https://registry.yarnpkg.com/@react-router/dev/-/dev-8.4.0.tgz#8c11f26d942c7b46aa3254729850a1b7f11a7ffd"
+  integrity sha512-GKznpn6h8c52xGXwtsypD5ZwNiWFSeqoKPdyGq7SfG+T9rFjGO8F0i/R/yECfZqHXaNz1NVmpODuBamBy9FfMg==
   dependencies:
     "@babel/core" "^7.29.7"
     "@babel/generator" "^7.29.7"
     "@babel/parser" "^7.29.7"
     "@babel/traverse" "^7.29.7"
     "@babel/types" "^7.29.7"
-    "@react-router/node" "8.3.1"
+    "@react-router/node" "8.4.0"
     "@remix-run/node-fetch-server" "^0.14.1"
     babel-dead-code-elimination "^1.0.12"
     chokidar "^5.0.0"
@@ -650,27 +650,27 @@
     tinyglobby "^0.2.16"
     valibot "^1.4.1"
 
-"@react-router/express@8.3.1":
-  version "8.3.1"
-  resolved "https://registry.yarnpkg.com/@react-router/express/-/express-8.3.1.tgz#448944f017da3a010954b5b0f142a084f1b2dc08"
-  integrity sha512-b4Qj+gNc/8zBojI7jouoie8zf/Vv4sBmE1P41tfLl5alxQPyUgH4kXlJzc+GY59lB3poanhBXVcj9P2A+5B2fw==
+"@react-router/express@8.4.0":
+  version "8.4.0"
+  resolved "https://registry.yarnpkg.com/@react-router/express/-/express-8.4.0.tgz#91b14a65f5863272ca014fa4afaa223015778ee6"
+  integrity sha512-JPujWEE0LZuwuuBoZwXwYDZSrqft63GU1c0XZ1JOGQPqmR8/nrzvBU/UgPCFHAuPsfRk79ebxljmlri+4sGR+w==
   dependencies:
-    "@react-router/node" "8.3.1"
+    "@react-router/node" "8.4.0"
 
-"@react-router/node@8.3.1", "@react-router/node@^8.3.1":
-  version "8.3.1"
-  resolved "https://registry.yarnpkg.com/@react-router/node/-/node-8.3.1.tgz#e8596192b747d6b4d1ca8993b87d1e652f79f773"
-  integrity sha512-JQI2vPd0twfHXxRxD1QWxKkCfu5I7bxojgEZFL97EvbJLm1B6p4qeqvGc9hl9g/3ZYbieczQY6ElM3zZjiG4sA==
+"@react-router/node@8.4.0", "@react-router/node@^8.4.0":
+  version "8.4.0"
+  resolved "https://registry.yarnpkg.com/@react-router/node/-/node-8.4.0.tgz#5853ca501bd111c66fb72bad419bf596d3cb4e3f"
+  integrity sha512-1teZHtk7XDm1pteQ2Plgtvtjjup5C5sIwFlOMYVIyoOH7X3bId3Qb//kUdbydX6NRIxcGK28UnfZlz4SrD/mkg==
   dependencies:
     "@remix-run/node-fetch-server" "^0.14.1"
 
-"@react-router/serve@^8.3.1":
-  version "8.3.1"
-  resolved "https://registry.yarnpkg.com/@react-router/serve/-/serve-8.3.1.tgz#d64468629656d68f5142ad35c708e5c4686fd6b6"
-  integrity sha512-BtR3jw0Uw8/2KzeFdOMSDhKOL1NPXIbxfthDNZcsy4Wz7VfrxdfgDOkDMzcsk47nOGyI+C5Y+x8TSyv6oBvVqg==
+"@react-router/serve@^8.4.0":
+  version "8.4.0"
+  resolved "https://registry.yarnpkg.com/@react-router/serve/-/serve-8.4.0.tgz#56163232a7016e65549e07b0ced9f2b801414d67"
+  integrity sha512-R2i5hed/7wwPxARQxSNM99rFnjy6bCigu8vUVyghaB6Si1VdUAjz7u7zhyBQ/T+8fdPHXIZ9SMV4rPmguD0nEw==
   dependencies:
-    "@react-router/express" "8.3.1"
-    "@react-router/node" "8.3.1"
+    "@react-router/express" "8.4.0"
+    "@react-router/node" "8.4.0"
     "@remix-run/node-fetch-server" "^0.14.1"
     compression "^1.8.1"
     express "^5.2.1"
@@ -681,6 +681,11 @@
   version "0.14.1"
   resolved "https://registry.yarnpkg.com/@remix-run/node-fetch-server/-/node-fetch-server-0.14.1.tgz#3c843ff1622dbce1f7836d3f78967ad519a3b4f5"
   integrity sha512-pKenF5ysIN5lDCnCyvoUxDhKP0tfnGagvGbZh01xxHG6DJXSIXWVC9NpLSDGjxcxd1CKdCOKuZFleXBF3pChIg==
+
+"@remix-run/route-pattern@^0.22.1":
+  version "0.22.1"
+  resolved "https://registry.yarnpkg.com/@remix-run/route-pattern/-/route-pattern-0.22.1.tgz#4937466528a59a7c9d882f725aac92536d20e010"
+  integrity sha512-czdGJWh09Lapvcqt7Vb09KlrU2PhRJ8xQaI+AItTuD9aDJ5MAgxnS38lnys6Ll+6RJEqPiaUqTwIQhVLwFvv+w==
 
 "@rolldown/binding-android-arm-eabi@1.2.8":
   version "1.2.8"
@@ -1025,9 +1030,9 @@
     "@types/unist" "*"
 
 "@types/node@^26":
-  version "26.5.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-26.5.1.tgz#b19c390e15813f402a94b86e3af9042f792138be"
-  integrity sha512-CzNm2FezW4VR/LjG6yUdiEgLE/rAQ9Slj5gCu/C2VrdcW7I0ahNZ8DRbHT7zOZ6r3ONgd/bsQIeSaoDGrd1C6g==
+  version "26.6.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-26.6.1.tgz#059fb87569c8b47a495c75ed8a884832c73eab1d"
+  integrity sha512-VqGJBMCtdhqkBUCcBLvywI0NJ+KLuVzgNnlBUNFOQjqVxzo2lxLUNg1DSey8+u2u6ktswSAxg+s68QLzWHNOuA==
   dependencies:
     undici-types "~8.9.0"
 
@@ -2061,10 +2066,10 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
-lucide-react@^1.45.0:
-  version "1.45.0"
-  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-1.45.0.tgz#d7a570f883a5257715836ecaf1dda25fc69c54ba"
-  integrity sha512-yH1ubCAduho9UR7oJhRXIQXogksRILBiTuZC4/bQIGeB9JOkxMlSuEHyyZpo1Z3S0yWJO2KTSUZbjiNvVxeOUw==
+lucide-react@^1.47.0:
+  version "1.47.0"
+  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-1.47.0.tgz#a358c1362b0377928ce58908ed9c884937d5b026"
+  integrity sha512-o8C23aXpNQypRY73W7fW02EyvWJinEMXgKeGjFoKym0zj3Q73hD97A1IQps1g8C14HTGsOpZL0Am+xjfgFZAbg==
 
 magic-string@^0.30.21:
   version "0.30.21"
@@ -2387,11 +2392,12 @@ react-router-devtools@^6.2.3:
     "@rollup/rollup-darwin-arm64" "^4.53.2"
     "@rollup/rollup-linux-x64-gnu" "^4.53.2"
 
-react-router@^8.3.1:
-  version "8.3.1"
-  resolved "https://registry.yarnpkg.com/react-router/-/react-router-8.3.1.tgz#d704ca5a564e2bc89ce05a537ab577578e947b7b"
-  integrity sha512-TEOpiO2g0TJHEOJeRVv4amUFun9v1npCKszvcquNvzETUtJ8udV86ah5eFoHT7g26bsBvT6EiIhqulR8eDF++A==
+react-router@^8.4.0:
+  version "8.4.0"
+  resolved "https://registry.yarnpkg.com/react-router/-/react-router-8.4.0.tgz#fa3c0ba58555cfb120a9ed8042518e374000fb4b"
+  integrity sha512-JtydAkBvU9UTEe5qNC+POhu+ZBNM7rlKY2IegwXc7Idj7xfRG16x5RZrw3mju+XlqBxfvb2ky9P3jUp9WyWC1g==
   dependencies:
+    "@remix-run/route-pattern" "^0.22.1"
     cookie-es "^3.1.1"
 
 react-style-singleton@^2.2.2, react-style-singleton@^2.2.3:
@@ -2631,10 +2637,10 @@ statuses@^2.0.1, statuses@^2.0.2, statuses@~2.0.2:
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-2.0.2.tgz#8f75eecef765b5e1cfcdc080da59409ed424e382"
   integrity sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==
 
-tailwind-merge@^3.6.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/tailwind-merge/-/tailwind-merge-3.6.0.tgz#88d83242d1dd7bc847223f73dcf210dd1f2ee11c"
-  integrity sha512-uxL7qAVQriqRQPAyK3pj66VqskWqoZ37PW94jwOTwNfq/z9oyu1V+eqrZqtR2+fCiXdYOZe/Modt8GtvqNzu+w==
+tailwind-merge@^3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/tailwind-merge/-/tailwind-merge-3.7.0.tgz#61e9a67ab11b64138dea7d4fa5b74a33e17f2c87"
+  integrity sha512-XPPUyAc+cvspz3lHTcR/QgPfW2A0lv/xQNIjX3HGhLR+Nq2lHaLq5MtTesHn8GUr3W3DguT2KT5x3NVgRtYwmA==
 
 tailwindcss@4.3.3, tailwindcss@^4.0.0:
   version "4.3.3"
@@ -2812,7 +2818,7 @@ yallist@^3.0.2:
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-3.1.1.tgz#dbb7daf9bfd8bac9ab45ebf602b8cbad0d5d08fd"
   integrity sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==
 
-zod@^4.6.2:
-  version "4.6.2"
-  resolved "https://registry.yarnpkg.com/zod/-/zod-4.6.2.tgz#91b2ce79ec994eaa42675499166587d3d223c961"
-  integrity sha512-lh5RCAGFa1Cm2hjtNwLQhSs/AsqdWnTQaBER9fEwN/88pSh7KOtJavtBx/0VlkN/uFd61SwYmljLMDAsHlvzBQ==
+zod@^4.6.5:
+  version "4.6.5"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-4.6.5.tgz#e3af3edbdc260239c52f73caad05dbbffe6e82cd"
+  integrity sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==
