@@ -1,0 +1,466 @@
+{
+  "title": "AuthZEN COAZ-MCP agent-identity trust-anchor conformance vectors",
+  "specification": "../../../profiles/authzen-coaz-mcp-binding-1_0.md#agent-identity-claim",
+  "enforcement": "verification: a mapping-supplied context.agent MUST equal the agent-identity claim; where the mapping supplies none the PEP sets it from the claim; where the claim is absent the field is omitted and no mapping- or caller-supplied value may stand in for it",
+  "note": "Repository-level, non-normative vectors. Subject, action, and resource are identical in every single-decision vector; the only variables are the validated token, the declared mapping, and the caller-supplied tool arguments. The bulk vectors additionally exercise the effective context of each decision under the AuthZEN default/override semantics of an evaluations request.",
+  "policy": {
+    "description": "Actor-sensitive sample policy used to derive the expected decision. Evaluated only for vectors whose outcome is 'request'.",
+    "permit_when": { "subject.id": "alice@example.com", "action.name": "get_customer", "resource.id": "customer-123", "context.agent": "agent-A" }
+  },
+  "baseline": {
+    "method": "tools/call",
+    "params": {
+      "name": "get_customer",
+      "arguments": { "id": "customer-123" }
+    }
+  },
+  "vectors": [
+    {
+      "id": "anchored-agent-a-permit",
+      "description": "Correct trusted actor. The mapping expresses the agent-identity claim and its resolved value equals the claim, so the PEP's independent verification succeeds.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com", "client_id": "agent-A" },
+      "mapping": {
+        "evaluation": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "$params.arguments.id" },
+          "context": { "agent": "$token.?client_id" }
+        }
+      },
+      "expected": {
+        "outcome": "request",
+        "request": {
+          "subject": { "type": "identity", "id": "alice@example.com" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "customer-123" },
+          "context": { "agent": "agent-A" }
+        },
+        "decision": true
+      }
+    },
+    {
+      "id": "anchored-agent-b-deny",
+      "description": "Different trusted actor, byte-identical subject/action/resource. The maintainer-requested negative distinction: the acting identity alone changes the decision.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com", "client_id": "agent-B" },
+      "mapping": {
+        "evaluation": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "$params.arguments.id" },
+          "context": { "agent": "$token.?client_id" }
+        }
+      },
+      "expected": {
+        "outcome": "request",
+        "request": {
+          "subject": { "type": "identity", "id": "alice@example.com" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "customer-123" },
+          "context": { "agent": "agent-B" }
+        },
+        "decision": false
+      }
+    },
+    {
+      "id": "mapping-literal-spoof",
+      "description": "The MCP server's declared mapping asserts a literal agent identity that the token does not support. The literal cannot become authoritative: verification fails and the PDP is not called.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com", "client_id": "agent-B" },
+      "mapping": {
+        "evaluation": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "$params.arguments.id" },
+          "context": { "agent": "agent-A" }
+        }
+      },
+      "expected": { "outcome": "mapping_error", "pdp_called": false, "reason": "context.agent resolved to 'agent-A' but the agent-identity claim is 'agent-B'" }
+    },
+    {
+      "id": "caller-argument-spoof",
+      "description": "The mapping sources context.agent from a caller-controlled tool argument. The expression source confers no authority: the caller cannot select its own acting identity.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com", "client_id": "agent-B" },
+      "params": {
+        "name": "get_customer",
+        "arguments": { "id": "customer-123", "agent": "agent-A" }
+      },
+      "mapping": {
+        "evaluation": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "$params.arguments.id" },
+          "context": { "agent": "$params.arguments.agent" }
+        }
+      },
+      "expected": { "outcome": "mapping_error", "pdp_called": false, "reason": "context.agent resolved to 'agent-A' but the agent-identity claim is 'agent-B'" }
+    },
+    {
+      "id": "mapping-omits-agent-pep-supplies",
+      "description": "The mapping omits context.agent while the trusted claim is present; the PEP supplies it from the agent-identity claim, so every anchored value reaching the PDP has been PEP-established.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com", "client_id": "agent-B" },
+      "mapping": {
+        "evaluation": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "$params.arguments.id" }
+        }
+      },
+      "expected": {
+        "outcome": "request",
+        "request": {
+          "subject": { "type": "identity", "id": "alice@example.com" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "customer-123" },
+          "context": { "agent": "agent-B" }
+        },
+        "decision": false
+      }
+    },
+    {
+      "id": "no-agent-claim-omitted",
+      "description": "No trusted acting identity is available. The mapping's literal must not acquire authenticated semantics, so context.agent is omitted entirely and the actor-sensitive policy fails closed at the PDP.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com" },
+      "mapping": {
+        "evaluation": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "$params.arguments.id" },
+          "context": { "agent": "agent-A" }
+        }
+      },
+      "expected": {
+        "outcome": "request",
+        "request": {
+          "subject": { "type": "identity", "id": "alice@example.com" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "customer-123" },
+          "context": {}
+        },
+        "decision": false
+      }
+    },
+    {
+      "id": "designated-claim-shared-client",
+      "description": "Shared-specialist case. Two requests carry the same client_id but different upstream actors; the deployment designates the actor claim as its agent-identity claim, so context.agent carries the distinction that client_id cannot.",
+      "agent_identity_claim": "acting_client",
+      "token": { "sub": "alice@example.com", "client_id": "reusable-specialist", "acting_client": "agent-A" },
+      "mapping": {
+        "evaluation": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "$params.arguments.id" },
+          "context": { "agent": "$token.?acting_client" }
+        }
+      },
+      "expected": {
+        "outcome": "request",
+        "request": {
+          "subject": { "type": "identity", "id": "alice@example.com" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "customer-123" },
+          "context": { "agent": "agent-A" }
+        },
+        "decision": true
+      }
+    },
+    {
+      "id": "designated-claim-shared-client-other-upstream",
+      "description": "The companion to the previous vector: identical subject, action, resource and client_id, but a different upstream actor in the designated claim. The decision differs, demonstrating the deployment picked an agent-identity claim sufficient for its policy.",
+      "agent_identity_claim": "acting_client",
+      "token": { "sub": "alice@example.com", "client_id": "reusable-specialist", "acting_client": "agent-B" },
+      "mapping": {
+        "evaluation": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "$params.arguments.id" },
+          "context": { "agent": "$token.?acting_client" }
+        }
+      },
+      "expected": {
+        "outcome": "request",
+        "request": {
+          "subject": { "type": "identity", "id": "alice@example.com" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "customer-123" },
+          "context": { "agent": "agent-B" }
+        },
+        "decision": false
+      }
+    },
+    {
+      "id": "bulk-top-level-agent-inherited",
+      "description": "Top-level trusted agent with no per-entry context: each entry's effective context is the top-level one, so both decisions carry the anchored agent.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com", "client_id": "agent-A" },
+      "mapping": {
+        "evaluations": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "context": { "agent": "$token.?client_id" },
+          "evaluations": [
+            {
+              "action": { "name": "get_customer" },
+              "resource": { "type": "customer", "id": "$params.arguments.id" }
+            },
+            {
+              "action": { "name": "list_cases" },
+              "resource": { "type": "customer", "id": "$params.arguments.id" }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "outcome": "request",
+        "request": {
+          "subject": { "type": "identity", "id": "alice@example.com" },
+          "context": { "agent": "agent-A" },
+          "evaluations": [
+            {
+              "action": { "name": "get_customer" },
+              "resource": { "type": "customer", "id": "customer-123" }
+            },
+            {
+              "action": { "name": "list_cases" },
+              "resource": { "type": "customer", "id": "customer-123" }
+            }
+          ]
+        },
+        "decision": [true, false]
+      }
+    },
+    {
+      "id": "bulk-per-entry-context-overrides-omitting-agent",
+      "description": "The override case: a per-entry context supplies only {case}, which under AuthZEN default/override semantics replaces the top-level context for that entry. The PEP must still place the trusted agent in the resulting effective context rather than letting the override drop it.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com", "client_id": "agent-A" },
+      "params": {
+        "name": "get_customer",
+        "arguments": { "id": "customer-123", "case": "case-67890" }
+      },
+      "mapping": {
+        "evaluations": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "context": { "agent": "$token.?client_id" },
+          "evaluations": [
+            {
+              "action": { "name": "get_customer" },
+              "resource": { "type": "customer", "id": "$params.arguments.id" },
+              "context": { "case": "$params.arguments.case" }
+            },
+            {
+              "action": { "name": "list_cases" },
+              "resource": { "type": "customer", "id": "$params.arguments.id" }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "outcome": "request",
+        "request": {
+          "subject": { "type": "identity", "id": "alice@example.com" },
+          "context": { "agent": "agent-A" },
+          "evaluations": [
+            {
+              "action": { "name": "get_customer" },
+              "resource": { "type": "customer", "id": "customer-123" },
+              "context": { "case": "case-67890", "agent": "agent-A" }
+            },
+            {
+              "action": { "name": "list_cases" },
+              "resource": { "type": "customer", "id": "customer-123" }
+            }
+          ]
+        },
+        "decision": [true, false]
+      }
+    },
+    {
+      "id": "bulk-per-entry-agent-matches",
+      "description": "A per-entry context that names the trusted agent explicitly is valid: verification succeeds for that entry's effective context.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com", "client_id": "agent-A" },
+      "mapping": {
+        "evaluations": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "context": { "agent": "$token.?client_id" },
+          "evaluations": [
+            {
+              "action": { "name": "get_customer" },
+              "resource": { "type": "customer", "id": "$params.arguments.id" },
+              "context": { "agent": "$token.?client_id" }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "outcome": "request",
+        "request": {
+          "subject": { "type": "identity", "id": "alice@example.com" },
+          "context": { "agent": "agent-A" },
+          "evaluations": [
+            {
+              "action": { "name": "get_customer" },
+              "resource": { "type": "customer", "id": "customer-123" },
+              "context": { "agent": "agent-A" }
+            }
+          ]
+        },
+        "decision": [true]
+      }
+    },
+    {
+      "id": "bulk-per-entry-agent-spoof",
+      "description": "Per-entry identity smuggling: an entry asserts agent-B while the trusted claim is agent-A. Anchoring the effective context of every decision catches it, so the PDP is not called.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com", "client_id": "agent-A" },
+      "mapping": {
+        "evaluations": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "context": { "agent": "$token.?client_id" },
+          "evaluations": [
+            {
+              "action": { "name": "get_customer" },
+              "resource": { "type": "customer", "id": "$params.arguments.id" }
+            },
+            {
+              "action": { "name": "list_cases" },
+              "resource": { "type": "customer", "id": "$params.arguments.id" },
+              "context": { "agent": "agent-B" }
+            }
+          ]
+        }
+      },
+      "expected": { "outcome": "mapping_error", "pdp_called": false, "reason": "context.agent resolved to 'agent-B' but the agent-identity claim is 'agent-A'" }
+    },
+    {
+      "id": "bulk-no-agent-claim-omitted-everywhere",
+      "description": "No trusted agent-identity claim: no authoritative agent value appears at either level, including in an overriding per-entry context that asserted one.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com" },
+      "mapping": {
+        "evaluations": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "context": { "agent": "agent-A" },
+          "evaluations": [
+            {
+              "action": { "name": "get_customer" },
+              "resource": { "type": "customer", "id": "$params.arguments.id" },
+              "context": { "agent": "agent-A" }
+            },
+            {
+              "action": { "name": "list_cases" },
+              "resource": { "type": "customer", "id": "$params.arguments.id" }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "outcome": "request",
+        "request": {
+          "subject": { "type": "identity", "id": "alice@example.com" },
+          "context": {},
+          "evaluations": [
+            {
+              "action": { "name": "get_customer" },
+              "resource": { "type": "customer", "id": "customer-123" },
+              "context": {}
+            },
+            {
+              "action": { "name": "list_cases" },
+              "resource": { "type": "customer", "id": "customer-123" }
+            }
+          ]
+        },
+        "decision": [false, false]
+      }
+    },
+    {
+      "id": "no-context-member-pep-creates",
+      "description": "Regression: the mapping constructs a valid request with no context member at all while the trusted claim is present. The PEP creates the container the anchored value needs rather than failing or dropping the identity.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com", "client_id": "agent-A" },
+      "mapping": {
+        "evaluation": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "$params.arguments.id" }
+        }
+      },
+      "expected": {
+        "outcome": "request",
+        "request": {
+          "subject": { "type": "identity", "id": "alice@example.com" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "customer-123" },
+          "context": { "agent": "agent-A" }
+        },
+        "decision": true
+      }
+    },
+    {
+      "id": "bulk-no-context-member-pep-creates-default",
+      "description": "Regression for the absent-context code path: an evaluations mapping with no top-level context and no per-entry context, with the trusted claim present. The anchored value is established once as the shared top-level default rather than duplicated into a fabricated context per entry.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com", "client_id": "agent-A" },
+      "mapping": {
+        "evaluations": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "evaluations": [
+            {
+              "action": { "name": "get_customer" },
+              "resource": { "type": "customer", "id": "$params.arguments.id" }
+            },
+            {
+              "action": { "name": "list_cases" },
+              "resource": { "type": "customer", "id": "$params.arguments.id" }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "outcome": "request",
+        "request": {
+          "subject": { "type": "identity", "id": "alice@example.com" },
+          "context": { "agent": "agent-A" },
+          "evaluations": [
+            {
+              "action": { "name": "get_customer" },
+              "resource": { "type": "customer", "id": "customer-123" }
+            },
+            {
+              "action": { "name": "list_cases" },
+              "resource": { "type": "customer", "id": "customer-123" }
+            }
+          ]
+        },
+        "decision": [true, false]
+      }
+    },
+    {
+      "id": "no-context-member-no-claim-stays-absent",
+      "description": "No trusted claim and no context member: the PEP must not manufacture a context object, and above all must not manufacture context.agent. The request is forwarded with no context and an actor-dependent policy fails closed.",
+      "agent_identity_claim": "client_id",
+      "token": { "sub": "alice@example.com" },
+      "mapping": {
+        "evaluation": {
+          "subject": { "type": "identity", "id": "$token.sub" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "$params.arguments.id" }
+        }
+      },
+      "expected": {
+        "outcome": "request",
+        "request": {
+          "subject": { "type": "identity", "id": "alice@example.com" },
+          "action": { "name": "get_customer" },
+          "resource": { "type": "customer", "id": "customer-123" }
+        },
+        "decision": false
+      }
+    }
+  ]
+}
