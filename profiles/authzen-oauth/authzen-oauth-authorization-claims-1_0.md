@@ -591,8 +591,20 @@ send them concurrently. The evaluation:
         "name": "issue:access_token:authorization_code"
       }
     },
-    { "action": { "name": "files.read"  } },
-    { "action": { "name": "files.write" } }
+    {
+      "action": { "name": "files.read" },
+      "resource": {
+        "type": "protected_resource",
+        "id": "https://api.example/files"
+      }
+    },
+    {
+      "action": { "name": "files.write" },
+      "resource": {
+        "type": "protected_resource",
+        "id": "https://api.example/files"
+      }
+    }
   ],
   "options": { "evaluations_semantic": "execute_all" }
 }
