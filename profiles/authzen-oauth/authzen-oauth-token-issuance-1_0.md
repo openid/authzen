@@ -326,8 +326,9 @@ PDP authorizes is the identifier the token carries.
 ## Resource {#resource}
 
 For the gate and scope tuples of {{gate-and-scope}}, `resource.type` MUST be
-`audience` and each `resource.id` MUST be an issuance target. Authorization
-detail tuples name their resource differently, as {{rar-tuple}} sets out.
+`audience` and each `resource.id` MUST be an issuance target, except for the
+ID token gate of {{id-token-gate}}. Authorization detail tuples name their
+resource differently, as {{rar-tuple}} sets out.
 
 A single registered type is used rather than a type per kind of target
 (service, trust domain, peer authorization server) because the type names
@@ -378,6 +379,18 @@ reachable. That key narrows a *set* of targets, and a set can only be
 narrowed if the request was able to put more than one member in it.
 
 {{ex-rar-two}} shows a two-target request on the wire.
+
+### The ID Token Gate {#id-token-gate}
+
+A gate tuple's resource is the audience of the token that gate governs, which
+for an access token or a refresh token is an issuance target. An ID token is
+addressed elsewhere: {{RFC8707}} resource indicators do not apply to it, its
+`aud` is the `client_id`, and one is minted for the request however many
+targets the request names.
+
+A gate tuple whose token type is `id_token` therefore carries a `resource.id`
+of the `client_id`, with `resource.type` still `audience`, and is formed once
+for the request rather than once per target ({{batch}}).
 
 ## Actions: Gate, Scope, and Authorization Detail Tuples {#gate-and-scope}
 
@@ -626,12 +639,16 @@ response.
 
 For each requested target ({{resource}}), the AS forms:
 
-- one gate tuple ({{gate-tuple}}) for each token type it would mint, and
+- one gate tuple ({{gate-tuple}}) for each token type other than `id_token`
+  that it would mint, and
 - one scope tuple ({{scope-tuple}}) for each requested scope,
 
-each carrying that target as its `resource`. Where the request carries
-`authorization_details`, the AS also forms the authorization detail tuples of
-{{rar-tuple}}, which carry a resource of their own.
+each carrying that target as its `resource`. Where the AS would mint an ID
+token, it forms one further gate tuple, carrying the `client_id` as its
+resource and standing outside the per-target set ({{id-token-gate}}). Where
+the request carries `authorization_details`, the AS also forms the
+authorization detail tuples of {{rar-tuple}}, which carry a resource of their
+own.
 
 A token request may mint more than one token. An `authorization_code` request
 returns an access token and, where the AS issues one, a refresh token; where
@@ -643,8 +660,8 @@ tuples at that target, `issue:access_token:authorization_code` and
 type it would otherwise mint, so the gates it forms are those its own
 configuration has already admitted.
 
-This document therefore produces one gate tuple per target per token type.
-Bindings may produce more: the token exchange family evaluates the authority
+This document therefore produces one gate tuple per target per token type,
+and one ID token gate for the request. Bindings may produce more: the token exchange family evaluates the authority
 of the requesting party separately from that of the subject, and so produces
 two per target for the token type it mints.
 
