@@ -41,6 +41,7 @@ informative:
   RFC7515:
   RFC7643:
   RFC8176:
+  RFC8628:
   RFC8707:
   RFC9068:
   RFC9126:
@@ -701,17 +702,42 @@ The error is the one belonging to the parameter that overran the bound:
 `invalid_request` is not, because it does not tell the client what to
 shorten.
 
-### A Denied Gate Removes a Target {#gate-denial}
+### A Denied Gate {#gate-denial}
 
 A gate tuple governs one token type at one target.
 
 Where the denied gate names a token type the request cannot proceed without -
 the access token of an `authorization_code`, `client_credentials` or
 `refresh_token` request, or the token named by `requested_token_type` on a
-token exchange - that target is removed from the request: the AS MUST NOT
-name it in the audience of any token it issues, and MUST disregard the scope
-tuples formed for it and any authorization detail tuple naming it as
-`resource.id`.
+token exchange - the AS MUST fail the request and MUST NOT issue a token.
+
+This holds even where the request named other targets and their gates were
+permitted. A narrowed audience is invisible to the client: {{RFC8707}}
+defines `resource` as a request parameter with no response counterpart, so a
+token good for fewer audiences than were asked for cannot be told apart from
+one good for all of them until a resource server rejects it. Scope and
+authorization details narrow observably, since {{RFC6749}} Section 5.1
+reports the granted `scope` and {{RFC9396}} Section 7 the granted
+`authorization_details`; an audience has no such carrier, so it is not
+narrowed at all. {{one-target}} already permits an AS to refuse a
+multi-target request outright, and this requires it once policy has removed
+any part of one. {{ex-rar-two}} closes on what a denied gate would do to the
+batch shown there.
+
+The error is `access_denied`, or `invalid_target` ({{RFC8693}}) for a token
+exchange request, where that code is already defined for a target the AS is
+unwilling to serve. `access_denied` is defined at the authorization endpoint
+({{RFC6749}} Section 4.1.2.1), but {{RFC8628}} Section 3.5 already returns it
+from the token endpoint, and its meaning is what a gate denial is. The
+alternatives mislead: `invalid_request` means the request was malformed
+({{RFC6749}} Section 5.2) and would send a client to correct syntax that is
+already correct, and `invalid_grant` would send it to discard a credential
+that is still good.
+
+An AS MUST return the same error for every gate denial. The client learns
+that policy refused it, which tells it not to retry and not to discard its
+grant, and learns nothing about which target or token type failed. An error
+that varied with the gate would let a client map policy by probing.
 
 Where the denied gate names any other token type, the request is narrowed
 rather than failed: the AS MUST NOT mint a token of that type, and MUST
@@ -719,25 +745,13 @@ otherwise proceed. A denied `issue:refresh_token:authorization_code` yields an
 access token and no refresh token, which is the response {{RFC6749}} Section
 5.1 already permits, since `refresh_token` is OPTIONAL there. A denied
 `issue:id_token:authorization_code` yields a token response with no `id_token`
-member.
-
-Where every target is removed, the AS MUST fail the request and MUST NOT
-issue a token. For token exchange requests the appropriate error is
-`invalid_target` ({{RFC8693}}).
-
-An AS MAY instead fail the whole request when any gate is denied.
-{{one-target}} already permits it to refuse a multi-target request outright,
-and an AS unwilling to issue a token for a subset of what was asked for is
-exercising the same discretion later. {{ex-rar-two}} closes on what a denied
-gate would have removed from the batch shown there.
-
-Where one target was requested, both rules coincide: a denied gate fails the
-request.
+member. Neither narrowing is silent in the way an audience narrowing would
+be, since the absent member is visible to the client in the token response.
 
 ### A Denied Scope Must Narrow Every Target {#scope-denial}
 
 A scope tuple governs one scope at one target. A scope is carried in the
-issued token only where it was permitted at *every* surviving target. The AS
+issued token only where it was permitted at *every* requested target. The AS
 reports the reduced set in the `scope` response parameter, as {{RFC6749}}
 already requires.
 
@@ -777,7 +791,7 @@ containing the survivors, which would return a cell the PDP denied.
 
 Where an entry's `locations` was absent and its tuples were therefore fanned
 across several targets, a cell survives only where it was permitted at every
-surviving target, for the reason given in {{scope-denial}}.
+requested target, for the reason given in {{scope-denial}}.
 
 An entry with no surviving cells is dropped. Where the request carried
 `authorization_details` and no entry survives, the AS MUST fail the request
@@ -902,9 +916,10 @@ that target while still permitting the request; it does not let one
 evaluation speak for another.
 
 An empty array therefore withdraws the target that evaluation was about,
-with the same effect as the denied gate of {{gate-denial}}. Where no target
-survives, the AS MUST fail the request; for token exchange requests the
-appropriate error is `invalid_target` ({{RFC8693}}).
+with the same effect as the denied gate of {{gate-denial}} and the same
+consequence: the AS MUST fail the request, with the error {{gate-denial}}
+names. A target withdrawn here is as invisible to the client as a target
+denied at its gate.
 
 The value is an array even when it names a single target, per the
 single-type rule above. An AS remains free to render a single-element set as
@@ -1059,7 +1074,7 @@ Within a token type, an AS MUST compose per-item shaping as follows:
 |---|---|
 | `token_lifetime` | Minimum over permitted items |
 | `granted_scope` | Union over permitted items, intersected with what the AS would otherwise grant and with the surviving scopes of {{scope-denial}} |
-| `audience` | The surviving targets of {{gate-denial}}, less any target whose item returned an empty array |
+| `audience` | The requested targets; a target withheld by any item fails the request ({{gate-denial}}) |
 | `authorization_details` | Union of entries, then the per-entry structural check, intersected with the entries reassembled under {{rar-denial}} |
 | `claims` | Merge; see below |
 | `crit` | Union |
@@ -1148,15 +1163,15 @@ per-request one, and nothing in this profile requires it.
 
 | Condition | Authorization server behavior |
 |---|---|
-| Gate tuple denied | Fail the request; do not issue |
+| Gate denied for a required token type, or target withheld by an empty `audience` | Fail the request; `access_denied`, or `invalid_target` ({{RFC8693}}) on a token exchange |
+| Gate denied for any other token type | Issue without that token; no error |
 | All scope tuples denied | Fail the request; `invalid_scope` |
 | Some scope tuples denied | Issue with the permitted subset; report via `scope` |
-| Target denied or empty audience set | `invalid_target` ({{RFC8693}}) |
 | No authorization detail entry survives | `invalid_authorization_details` ({{RFC9396}}) |
 | Batch would exceed the bound of {{bounded}} | The error of the parameter that overran it |
 | Shaping key violates {{no-broadening}} | Treat as denial; fail the request |
 | Unknown `crit` member | Treat as denial; fail the request |
-| PDP unreachable or malformed response | Fail closed; do not issue |
+| PDP unreachable or malformed response | Fail closed; HTTP 503 with `Retry-After` ({{fail-closed}}) |
 
 Reason information returned by a PDP is diagnostic and intended for the
 operator of the AS. An AS MUST NOT relay PDP reason strings to the client,
@@ -1554,9 +1569,10 @@ type, as {{rar-denial}} requires:
 ~~~
 
 Both gates permitted, so both targets remain in the audience. Had the second
-gate been denied instead, {{gate-denial}} would have removed that target and
-the AS would have disregarded both evaluations naming it, denied or not,
-leaving the first entry alone and no second entry at all.
+gate been denied instead, {{gate-denial}} would have failed the whole request
+with `access_denied`, rather than issuing a token for the first target alone:
+the client asked for both, and a token carrying one of them would not have
+told it otherwise.
 
 # Relationship to Companion Documents {#companions}
 
@@ -1638,6 +1654,20 @@ Every failure of the profile - an unreachable PDP, a malformed response, a
 shaping value that violates {{no-broadening}}, an unrecognized `crit`
 member - MUST result in no token being issued. A PDP that cannot be
 consulted is not an authorization to proceed.
+
+A failure of this kind is not a decision, and an AS MUST NOT report it as
+one. Where the PDP could not be reached or its response could not be
+understood, the AS SHOULD respond with HTTP 503 and a `Retry-After` header.
+{{RFC6749}} defines no token endpoint error code for a condition that is
+temporary and is nobody's fault, and the HTTP status carries the two things
+the client needs: that the request may be repeated, and roughly when.
+
+An AS MUST NOT answer such a failure with a deferred token response
+({{I-D.gerber-oauth-deferred-token-response}}), which {{deferred}} names as the
+mechanism for a decision that cannot be reached synchronously. A slow PDP and
+an absent one must not look the same to a client: deferral asks the client to
+wait for a result that is coming, and a fail-closed denial has no result
+coming at all.
 
 Because the PDP is on the token issuance path, its availability becomes the
 AS's availability. Deployments should consider caching of decisions, local
