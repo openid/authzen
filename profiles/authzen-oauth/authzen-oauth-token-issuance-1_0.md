@@ -46,6 +46,7 @@ informative:
   RFC9068:
   RFC9126:
   RFC9700:
+  RFC9728:
   I-D.brossard-oauth-rar-authzen:
   I-D.gerber-oauth-deferred-token-response:
   I-D.ietf-oauth-identity-chaining:
@@ -216,7 +217,7 @@ Gate tuple:
 
 Scope tuple:
 : An evaluation request whose action is a requested scope, expressing
-  *access authority*. See {{gate-and-scope}}.
+  *access authority* at the issuance target. See {{gate-and-scope}}.
 
 # Architecture {#architecture}
 
@@ -325,16 +326,31 @@ PDP authorizes is the identifier the token carries.
 
 ## Resource {#resource}
 
-For the gate and scope tuples of {{gate-and-scope}}, `resource.type` MUST be
-`audience` and each `resource.id` MUST be an issuance target, except for the
-ID token gate of {{id-token-gate}}. Authorization detail tuples name their
-resource differently, as {{rar-tuple}} sets out.
+For the gate and scope tuples of {{gate-and-scope}}, each `resource.id` MUST be
+an issuance target, except for the ID token gate of {{id-token-gate}}.
+`resource.type` MUST be `audience` for a gate tuple and `protected_resource`
+for a scope tuple. Authorization detail tuples name their resource
+differently, as {{rar-tuple}} sets out.
 
-A single registered type is used rather than a type per kind of target
-(service, trust domain, peer authorization server) because the type names
-the *protocol role* the target plays, not a guess at its nature. Policies
-written against `audience` port across deployments; policies written against
-locally invented type names do not.
+The two types carry the difference between the two questions of
+{{gate-and-scope}} structurally, rather than in the spelling of `action.name`.
+A gate asks whether a token may be minted for a target: `audience` is what
+{{RFC8707}} and {{RFC8693}} call that target, and the value the AS intends for
+the token's `aud`. A scope tuple asks whether the subject may exercise a
+privilege at that target, which is the role {{RFC9728}} gives a protected
+resource. One target therefore appears under both types in a single batch,
+answering to a different question under each.
+
+The consequence is that an AS-composed gate action and a client-chosen scope
+value cannot collide however either is spelled, so the profile reserves no
+scope values and a deployment keeps the whole scope namespace. Gate actions and
+scope values are controlled by different parties, and nothing requires them to
+share a namespace.
+
+Both are registered types naming the *protocol role* the target plays, not a
+guess at its nature (service, trust domain, peer authorization server).
+Policies written against them port across deployments; policies written
+against locally invented type names do not.
 
 The **requested targets** of a request are the values it carries in a
 `resource` parameter in the sense of {{RFC8707}}, in an `audience` parameter
@@ -432,9 +448,9 @@ mint an access token under `grant_type=authorization_code`;
 read the same way. The last segment always names the grant, never a second
 token type.
 
-The `issue:` prefix is reserved. A deployment MUST NOT use a scope value
-beginning with `issue:` as a scope tuple action. {{ex-cc}} shows a gate tuple
-in a request.
+A gate tuple always names a resource whose type is `audience` ({{resource}}), so
+a scope value spelled the same way as a gate action is a different question and
+not a collision. {{ex-cc}} shows a gate tuple in a request.
 
 The grant is part of the action because nothing else in the tuple determines
 it. The same subject, audience, and token type arise from an authorization
@@ -477,7 +493,8 @@ such grammar admits; mapping them remains internal to the PDP.
 ### Scope Tuple {#scope-tuple}
 
 A scope tuple is an evaluation whose `action.name` is a single requested
-scope value, carried verbatim.
+scope value, carried verbatim, and whose resource is the issuance target under
+the type `protected_resource` ({{resource}}).
 
 Scope values are not transformed into policy-engine relation names by the
 AS. Any such mapping is internal to the PDP. This keeps `action.name` a
@@ -526,11 +543,11 @@ MUST NOT form a compound name where the `datatypes` value itself contains a
 colon; such an entry is decomposed on `locations` and `actions` only, and its
 datatype axis is narrowed on the response side alone ({{rar-response}}).
 
-These names cannot be confused with the gate names of {{gate-tuple}}. A gate
-tuple always names a resource whose type is `audience`; an authorization
-detail tuple never does, because `resource.type` is the entry's own `type`.
-The two may name the same `resource.id` and remain distinct questions, which
-{{ex-rar-one}} shows.
+Each of the three tuple kinds is identified by its resource type rather than by
+the shape of its action name: `audience` for a gate ({{gate-tuple}}),
+`protected_resource` for a scope tuple ({{scope-tuple}}), and the entry's own
+`type` here. Tuples of different kinds may name the same `resource.id` and
+remain distinct questions, which {{ex-rar-one}} shows.
 
 {{ex-rar-two}} shows an entry decomposing into the four cells of a two by two
 product, and one of them denied.
@@ -643,8 +660,12 @@ For each requested target ({{resource}}), the AS forms:
   that it would mint, and
 - one scope tuple ({{scope-tuple}}) for each requested scope,
 
-each carrying that target as its `resource`. Where the AS would mint an ID
-token, it forms one further gate tuple, carrying the `client_id` as its
+each carrying that target as its `resource`, under the type its kind takes
+({{resource}}). A batch therefore mixes resource types, and the top-level
+`resource` of {{AUTHZEN}} Section 7.1.1 can serve as the default for at most
+one of them; the rest carry a `resource` on the individual evaluation object.
+Where the AS would mint an ID token, it forms one further gate tuple, carrying
+the `client_id` as its
 resource and standing outside the per-target set ({{id-token-gate}}). Where
 the request carries `authorization_details`, the AS also forms the
 authorization detail tuples of {{rar-tuple}}, which carry a resource of their
@@ -1178,9 +1199,10 @@ be denied. That question is about policy content, so its answer belongs on
 the authenticated evaluation surface rather than in metadata; {{AUTHZEN}}
 notes that an unauthenticated PDP can be probed for the shape of its policy.
 The Action Search API of {{AUTHZEN}} answers it directly: a search for a
-representative subject and an `audience` resource returns the action names
-policy would permit, and gate actions among them indicate the issuances the
-deployment is prepared for. This is a deployment-time check, not a
+representative subject and an `audience` resource returns the gate actions
+policy would permit, which are the issuances the deployment is prepared for.
+Only gates are returned, since scope questions are asked of the same target
+under a different type ({{resource}}). This is a deployment-time check, not a
 per-request one, and nothing in this profile requires it.
 
 # Error Mapping
@@ -1220,9 +1242,10 @@ provides no value.
 
 One scope is requested, so the request is one gate tuple ({{gate-tuple}}) and
 one scope tuple ({{scope-tuple}}). This is the floor: two evaluations, so the
-Access Evaluations API. One target is shared by both, so `resource` is carried
-once at the top level; the examples below that need a resource per evaluation
-carry it there instead, as {{several-targets}} provides.
+Access Evaluations API. Both name the same target, the gate under `audience`
+and the scope tuple under `protected_resource` ({{resource}}), so the top-level
+`resource` serves the gate and the scope tuple carries its own, as
+{{several-targets}} provides.
 
 ~~~ http-message
 POST /access/v1/evaluations HTTP/1.1
@@ -1243,7 +1266,13 @@ Authorization: Bearer <token>
         "name": "issue:access_token:client_credentials"
       }
     },
-    { "action": { "name": "telemetry.write" } }
+    {
+      "action": { "name": "telemetry.write" },
+      "resource": {
+        "type": "protected_resource",
+        "id": "https://telemetry.example"
+      }
+    }
   ],
   "options": { "evaluations_semantic": "execute_all" }
 }
@@ -1293,9 +1322,27 @@ gate for each ({{batch}}). Three scopes are requested behind them, and
         "name": "issue:refresh_token:authorization_code"
       }
     },
-    { "action": { "name": "files.read"   } },
-    { "action": { "name": "files.write"  } },
-    { "action": { "name": "files.delete" } }
+    {
+      "action": { "name": "files.read" },
+      "resource": {
+        "type": "protected_resource",
+        "id": "https://api.example/files"
+      }
+    },
+    {
+      "action": { "name": "files.write" },
+      "resource": {
+        "type": "protected_resource",
+        "id": "https://api.example/files"
+      }
+    },
+    {
+      "action": { "name": "files.delete" },
+      "resource": {
+        "type": "protected_resource",
+        "id": "https://api.example/files"
+      }
+    }
   ],
   "options": { "evaluations_semantic": "execute_all" }
 }
@@ -1820,6 +1867,7 @@ is Specification Required. Initial entries:
 | `client` | subject | An OAuth client acting on its own behalf |
 | `workload` | subject | A non-human software identity |
 | `audience` | resource | The audience of the access being granted |
+| `protected_resource` | resource | The same target, asked about access rather than issuance |
 
 Change Controller for all initial entries: OpenID Foundation AuthZEN Working
 Group. Specification Document for all initial entries: This document.
@@ -1828,8 +1876,8 @@ Group. Specification Document for all initial entries: This document.
 
 This specification requests creation of a new registry: the AuthZEN Token
 Issuance Action Names registry, which tracks the two short-name vocabularies
-from which action names in the reserved `issue:` space are composed.
-Registration policy is Specification Required.
+from which gate action names are composed. Registration policy is
+Specification Required.
 
 A gate action name is `issue:<token-type>:<grant-type>`, so the registry
 grows with the number of token types plus the number of grant types, not
@@ -1868,11 +1916,11 @@ Group. Specification Document for all initial entries: This document.
 
 Registrations MUST give the URI or parameter value the short name
 corresponds to, and MUST state which of the two vocabularies they join.
-Names outside the `issue:` prefix are not registered here, since scope values
-and the action names of {{rar-tuple}} are carried verbatim and are not
-registered vocabularies.
+Gate action names alone are registered here, since scope values and the action
+names of {{rar-tuple}} are carried verbatim and are not registered
+vocabularies.
 
-This document reserves one further name outside the `issue:` prefix:
+This document defines one further name outside the `issue:` prefix:
 `authorization_detail`, which {{rar-tuple}} substitutes for the action of an
 authorization details entry that names none.
 

@@ -295,8 +295,9 @@ scope-dependent.
 
 ## Resource {#resource}
 
-`resource.type` MUST be `audience` and `resource.id` MUST be the issuance
-target, as in {{ISSUANCE}}. Where the request carries an `audience`
+`resource.type` MUST be `audience` for a gate tuple and `protected_resource`
+for a scope tuple, and `resource.id` MUST be the issuance target, as in
+{{ISSUANCE}}. Where the request carries an `audience`
 parameter, or a `resource` parameter in the sense of {{RFC8707}}, that value
 determines the issuance target.
 
@@ -679,7 +680,11 @@ Authorization: Bearer <token>
     },
     {
       "subject": { "type": "user", "id": "alice@example.com" },
-      "action":  { "name": "read:docs" }
+      "action":  { "name": "read:docs" },
+      "resource": {
+        "type": "protected_resource",
+        "id": "https://api.partner.example"
+      }
     }
   ],
   "options": { "evaluations_semantic": "execute_all" }
