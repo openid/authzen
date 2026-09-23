@@ -45,13 +45,20 @@ informative:
   RFC8707:
   RFC9068:
   RFC9126:
-  RFC9470:
   RFC9700:
   I-D.brossard-oauth-rar-authzen:
   I-D.gerber-oauth-deferred-token-response:
   I-D.ietf-oauth-identity-chaining:
   I-D.ietf-oauth-identity-assertion-authz-grant:
   I-D.ietf-oauth-transaction-tokens:
+  OBLIGATIONS:
+    title: "AuthZEN Profile for Obligations 1.0"
+    target: "https://openid.github.io/authzen/authzen-obligations-profile-1_0"
+    date: 2026-09-17
+    author:
+      - ins: A. Babeanu
+        name: "Alexandre Babeanu"
+        org: "IndyKite"
   ARAP:
     title: "AuthZEN Access Request and Approval Profile 1.0"
     target: "https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0"
@@ -1178,18 +1185,6 @@ operator of the AS. An AS MUST NOT relay PDP reason strings to the client,
 as they may disclose policy structure to a party that is not authorized to
 learn it.
 
-Where a PDP returns a denial accompanied by authentication requirements -
-the step-up pattern of {{AUTHZEN}}, in which the required `acr` and `amr`
-values are named - an AS SHOULD surface the requirement to the client. This
-document does not define that mapping, and neither end of it is presently
-specified. {{AUTHZEN}} illustrates the pattern in a non-normative example
-rather than defining the response context keys that carry it, leaving a
-profile nothing normative to reference; and on the OAuth side,
-`insufficient_user_authentication` in {{RFC9470}} is defined for resource
-servers rather than for the token endpoint, where no equivalent signal
-exists. This is an open item, and closing it requires work in both
-specifications.
-
 # Examples {#examples}
 
 The first example below is shown in full, framed against the HTTPS JSON
@@ -1714,6 +1709,24 @@ This is why the reservations in {{claims}} are normative rather than
 advisory. An implementation that passed PDP-supplied claims into a token
 without checking them against that list would give the PDP the ability to
 mint arbitrary identities.
+
+## A Step-Up Obligation Is Not Actionable Here {#step-up}
+
+{{OBLIGATIONS}} defines a `step-up` obligation, which requires an enforcement
+point to put the subject through further authentication before honoring a
+decision. An authorization server at the token endpoint cannot do that: the
+subject is not a party to that exchange, and only the client can return them
+to the authorization endpoint with a stronger `acr_values`.
+
+A PDP governing token issuance therefore SHOULD NOT return one. On a denial it
+changes nothing, since the request already fails. On a permit it is
+destructive: {{OBLIGATIONS}} requires an enforcement point that cannot comply
+with an obligation to treat the response as a denial whatever `decision` said,
+so a step-up obligation attached to a permit does not produce a step-up, it
+produces no token.
+
+An AS implementing {{OBLIGATIONS}} SHOULD declare its supported obligation
+types in the request `context` and omit `step-up` from them.
 
 ## Integrity of the Decision Response
 
