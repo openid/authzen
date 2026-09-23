@@ -1935,12 +1935,8 @@ established that a Policy Decision Point belongs behind the token endpoint,
 and that the response of such a Policy Decision Point may legitimately shape
 what is issued. This document takes up the other half of that decision.
 
-Roland Baum's review on the OAuth Working Group mailing list objected that
-AS-controlled and client-controlled action names shared a single flat namespace
-and were told apart by pattern matching; gate and scope tuples are separated by
-resource type ({{resource}}) as a result. Dave Hyland's detailed review found,
-among other corrections, that the ID token gate of {{id-token-gate}} had no
-resource these rules could describe.
+Thanks to Roland Baum and Dave Hyland, each of whom gave the profile a detailed
+review that led to material changes.
 
 Thanks also to the participants in the OpenID AuthZEN interoperability
 events, whose December 2025 identity provider scenario demonstrated AuthZEN
