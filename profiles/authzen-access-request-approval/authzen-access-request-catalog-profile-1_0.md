@@ -155,7 +155,7 @@ The following is a non-normative example:
       "endpoint": "https://pdp.example.com/access/v1/requests",
       "template": "application_access",
       "expires_at": "2026-04-30T20:25:00Z",
-      "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJldmFsdWF0aW9uX2lkIjoiZXZhbF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNMSJ9.bXBfc2lnbmF0dXJl",
+      "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJhdWQiOiJodHRwczovL3BkcC5leGFtcGxlLmNvbS9hY2Nlc3MvdjEvcmVxdWVzdHMiLCJiaW5kaW5nX2NvbnRleHRfbWVtYmVycyI6W10sImJpbmRpbmdfaGFzaCI6Imp5Mk5hMG9sazhUdUlRRTN3eE9qWFdEQ0t4dHZpWWJyUGpCWVNteUY2bzgiLCJkZW5pYWxfZXhwaXJlc19hdCI6IjIwMjYtMDQtMzBUMjA6MjU6MDBaIiwiZXZhbHVhdGlvbl9pZCI6ImV2YWxfMDFIWDRZMlA4QlE0WTNGMFYwSzlENlo3TTEiLCJleHAiOjE3Nzc1ODA3MDAsImlhdCI6MTc3NzU4MDEwMCwiaXNzIjoiaHR0cHM6Ly9wZHAuZXhhbXBsZS5jb20iLCJqdGkiOiJidF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNMSJ9.FFJgt11MRgoWRawW4sPymk5p4kBYgPLPVuagODpa8k432NXC3p_40FNUkGf1FKndn2rfpeAiHkS6wxpDy5vj0g",
       "form_url": "https://requests.example.com/forms/application_access",
       "request_schema_url": "https://requests.example.com/schemas/application_access.json",
       "request_catalogs_url": "https://requests.example.com/catalogs/application_access.json",
@@ -425,7 +425,7 @@ Content-Type: application/json
       "endpoint": "https://pdp.example.com/access/v1/requests",
       "template": "application_access",
       "expires_at": "2026-04-30T20:25:00Z",
-      "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJldmFsdWF0aW9uX2lkIjoiZXZhbF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNMSJ9.bXBfc2lnbmF0dXJl",
+      "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJhdWQiOiJodHRwczovL3BkcC5leGFtcGxlLmNvbS9hY2Nlc3MvdjEvcmVxdWVzdHMiLCJiaW5kaW5nX2NvbnRleHRfbWVtYmVycyI6W10sImJpbmRpbmdfaGFzaCI6Imp5Mk5hMG9sazhUdUlRRTN3eE9qWFdEQ0t4dHZpWWJyUGpCWVNteUY2bzgiLCJkZW5pYWxfZXhwaXJlc19hdCI6IjIwMjYtMDQtMzBUMjA6MjU6MDBaIiwiZXZhbHVhdGlvbl9pZCI6ImV2YWxfMDFIWDRZMlA4QlE0WTNGMFYwSzlENlo3TTEiLCJleHAiOjE3Nzc1ODA3MDAsImlhdCI6MTc3NzU4MDEwMCwiaXNzIjoiaHR0cHM6Ly9wZHAuZXhhbXBsZS5jb20iLCJqdGkiOiJidF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNMSJ9.FFJgt11MRgoWRawW4sPymk5p4kBYgPLPVuagODpa8k432NXC3p_40FNUkGf1FKndn2rfpeAiHkS6wxpDy5vj0g",
       "form_url": "https://requests.example.com/forms/application_access",
       "request_schema_url": "https://requests.example.com/schemas/application_access.json",
       "request_catalogs_url": "https://requests.example.com/catalogs/application_access.json"
@@ -579,7 +579,7 @@ Idempotency-Key: 7b8d0f0d-65a1-4af1-9fd3-a684f08a5d13
     "evaluated_at": "2026-04-30T20:15:00Z",
     "expires_at": "2026-04-30T20:25:00Z",
     "reason": "approval_required",
-    "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJldmFsdWF0aW9uX2lkIjoiZXZhbF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNMSJ9.bXBfc2lnbmF0dXJl",
+    "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJhdWQiOiJodHRwczovL3BkcC5leGFtcGxlLmNvbS9hY2Nlc3MvdjEvcmVxdWVzdHMiLCJiaW5kaW5nX2NvbnRleHRfbWVtYmVycyI6W10sImJpbmRpbmdfaGFzaCI6Imp5Mk5hMG9sazhUdUlRRTN3eE9qWFdEQ0t4dHZpWWJyUGpCWVNteUY2bzgiLCJkZW5pYWxfZXhwaXJlc19hdCI6IjIwMjYtMDQtMzBUMjA6MjU6MDBaIiwiZXZhbHVhdGlvbl9pZCI6ImV2YWxfMDFIWDRZMlA4QlE0WTNGMFYwSzlENlo3TTEiLCJleHAiOjE3Nzc1ODA3MDAsImlhdCI6MTc3NzU4MDEwMCwiaXNzIjoiaHR0cHM6Ly9wZHAuZXhhbXBsZS5jb20iLCJqdGkiOiJidF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNMSJ9.FFJgt11MRgoWRawW4sPymk5p4kBYgPLPVuagODpa8k432NXC3p_40FNUkGf1FKndn2rfpeAiHkS6wxpDy5vj0g",
     "template": "application_access"
   }
 }
