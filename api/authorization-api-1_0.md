@@ -1379,7 +1379,7 @@ Requests MUST include a `Content-Type` header with the value `application/json`,
 
 A successful response is an HTTPS response with a status code of `200` and a `Content-Type` of `application/json`. Its body is a JSON object that conforms to the corresponding response structure, as defined in {{table-api-endpoints}}.
 
-The request URL MUST be the value of the corresponding endpoint parameter, as defined in {{table-api-endpoints}}, if it is provided in the Policy Decision Point metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the default path, as defined in {{table-api-endpoints}}, to the PDP's base URL (which is the `policy_decision_point` value from the Policy Decision Point metadata, if available.
+The request URL MUST be the value of the corresponding endpoint parameter, as defined in {{table-api-endpoints}}, if it is provided in the Policy Decision Point metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the default path, as defined in {{table-api-endpoints}}, to the PDP's base URL (which is the `policy_decision_point` value from the Policy Decision Point metadata, if available).
 
 The following table provides an overview of the API endpoints defined in this binding:
 
