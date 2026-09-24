@@ -78,6 +78,7 @@ normative:
     date: 2024
 
 informative:
+  RFC8693:
   RFC8707:
   OAUTH21:
     title: "The OAuth 2.1 Authorization Framework"
@@ -177,7 +178,7 @@ This binding fulfils the binding conformance requirements of the COAZ Framework
 | Operations in scope | All MCP methods, per the default mapping table; pass-through set listed ({{default-mappings}}) |
 | Default mapping behavior | Per-method default mapping table ({{default-mappings}}) |
 | Declared mapping behavior | MCP server MAY declare a mapping for a tool; overrides the default for that tool ({{declared-mappings}}) |
-| Trust-anchored fields | `subject.id` SHOULD be anchored to the subject-identity claim; when it is, it is enforced by verification against `$token.sub`, and a mapping MAY override its source for edge cases ({{declared-mappings}}) |
+| Trust-anchored fields | `subject.id` SHOULD be anchored to the subject-identity claim; when it is, it is enforced by verification against `$token.sub`, and a mapping MAY override its source for edge cases. `context.agent` is anchored to the agent-identity claim and enforced by **verification**, with no override path: a value the mapping supplies MUST equal the claim or the request is a mapping error; where the mapping supplies none, the PEP sets the field from the claim; where the claim is absent, the field is omitted and no mapping- or caller-supplied value may stand in for it. Applied to the effective context of every decision. No other `context` member is trust-anchored ({{declared-mappings}}, {{agent-identity-claim}}, {{pep-behavior}}) |
 | Error transport | JSON-RPC 2.0 error responses ({{error-handling}}) |
 | Discoverability | Declared mappings advertised in the `tools/list` response ({{declaring-support}}) |
 
@@ -273,9 +274,56 @@ claim, so that `subject.id` carries the human user. When a deployment designates
 an on-behalf-of claim `C`, every use of `$token.sub` as `subject.id` in this
 binding (in default mappings, in declared mappings, and in the verification of
 {{declared-mappings}}) is read as `$token.C`. The agent identity remains in
-`context.agent` (typically `$token.?client_id`) regardless. The designated claim
+`context.agent`, derived from the agent-identity claim
+({{agent-identity-claim}}), regardless. The designated claim
 MUST be agreed between the PEP and the token issuer; absent any designation, the
 subject-identity claim is `sub`.
+
+## The Agent-Identity Claim {#agent-identity-claim}
+
+Where policy depends on which agent or client is acting — as distinct from the
+principal represented by `subject.id` — that identity is carried in
+`context.agent`. Its value is derived from a single token claim, the
+**agent-identity claim**, which by convention is `client_id` — hence the
+expression `$token.?client_id` used in the mappings below.
+
+`context.agent` has one fixed semantic role: it identifies the acting client
+named by the agent-identity claim of the validated access token. It does not
+mean whichever delegated party happens to matter for the policy being
+evaluated, and it does not carry a delegation chain. Where a deployment's
+policy must also distinguish an upstream actor — for example, where one
+reusable client is invoked on behalf of several distinct upstream applications
+and the same `client_id` therefore appears for both — that actor is a separate
+fact and remains separately addressable. Delegation semantics such as the `act`
+claim of {{RFC8693}} are defined by their own specifications and are not
+equivalent to the client identified by `client_id`; reproducing or
+reinterpreting them in `context.agent` is out of scope for this binding.
+
+{{RFC8693}} defines `client_id` as the identifier of the OAuth client that
+requested the token. That client is not necessarily the acting party whose
+identity a deployment's policy needs to distinguish. A deployment MAY therefore
+designate a different claim as the agent-identity claim. When a deployment
+designates an agent-identity claim `A`, every use of `$token.?client_id` as
+`context.agent` in this binding (in default mappings, in declared mappings, and
+in the verification of {{declared-mappings}}) is read as `$token.?A`. The
+designated claim MUST be agreed between the PEP and the token issuer, per the
+applicable token profile and deployment configuration; absent any designation,
+the agent-identity claim is `client_id`. The designation is a property of that
+agreement and MUST NOT be selected by the author of a declared mapping: a
+mapping expression names the claim it reads, but cannot make a claim of its own
+choosing authoritative.
+
+If the validated access token carries no agent-identity claim, the PEP MUST
+omit `context.agent` from the constructed request and MUST NOT populate it from
+any other source ({{pep-behavior}}). A policy that requires an acting client
+then fails closed at the PDP, rather than evaluating an identity the PEP could
+not establish.
+
+Because the PEP validates the token's issuer before using its claims, the
+agent-identity claim is authoritative within that trust relationship. A
+deployment that accepts tokens from more than one issuer should therefore use
+issuer-unique agent identifiers, or project `iss` into a separate context
+attribute, rather than assuming a bare claim value is globally unique.
 
 # Expressions and Literals {#expressions}
 
@@ -448,6 +496,14 @@ and shares the following `subject` and `context`, which establish the subject
 }
 ~~~
 {: #fig-default-envelope title="Shared default-mapping shape"}
+
+The `$token.?client_id` expression shown here, and in every default mapping
+below, is the default form of the agent-identity claim
+({{agent-identity-claim}}); a deployment that has designated a different
+agent-identity claim `A` reads each occurrence as `$token.?A`. The PEP verifies
+the resolved value against the designated claim, so the expression documents the
+field's provenance rather than establishing its trustworthiness
+({{declared-mappings}}, {{pep-behavior}}).
 
 For methods that target the MCP server as a whole rather than a specific item,
 `resource.id` identifies this MCP server. MCP requires access tokens to be
@@ -654,8 +710,32 @@ untrusted input, exactly like declared `action`, `resource`, and `context`
 attributes; only the verified `subject.id` is trustworthy as the authenticated
 identity. See {{security-considerations}}.
 
-For autonomous-agent use cases the `context` MUST include the agent identity
-(typically `$token.?client_id`).
+The agent identity (`context.agent`) is anchored to the agent-identity claim of
+the validated access token ({{agent-identity-claim}}), and is enforced by
+verification. A declared mapping MAY express it — every default mapping does,
+as `$token.?client_id` — but expressing it confers no authority to assert it:
+where a declared mapping sets `context.agent`, the PEP MUST verify that its
+resolved value equals that claim, treating a mismatch as a mapping error
+({{mapping-errors}}). Where a mapping does not supply the field and the claim is
+present, the PEP sets it from the claim; where the claim is absent, the field is
+omitted. {{pep-behavior}} specifies this over the effective context of each
+decision.
+
+Unlike `subject.id`, `context.agent` has no override path. A value drawn from a
+literal, a request parameter, MCP metadata, or any other mapping-controlled
+input does not become an authoritative agent identity by being mapped to
+`context.agent`: it either equals the claim, in which case the PEP has
+independently corroborated it, or the request is a mapping error. Such a value
+is never a fallback when the claim is absent. A deployment that needs an
+acting-agent identity originating outside the token MUST carry it in a
+different, untrusted `context` member and MUST NOT rely on it as an
+authenticated identity. A trust anchor establishes both the provenance and the
+semantic role of an authorization input; anchoring the field name alone would
+not be enough.
+
+Every other `context` member remains untrusted input, exactly like declared
+`action`, `resource`, and non-`id` subject attributes. See
+{{security-considerations}}.
 
 ## Single-evaluation Example
 
@@ -809,21 +889,47 @@ When an MCP message is processed, the PEP MUST:
    MUST NOT carry a per-evaluation `subject`; if one is present, treat the request
    as a mapping error and do not call the PDP.
 
-7. Construct the AuthZEN request from the resolved mapping and send it to the
+7. Anchor the agent identity: determine the acting-client identity from the
+   agent-identity claim ({{agent-identity-claim}}) of the validated access
+   token, independently of the selected mapping. Apply the rule below to the
+   **effective context** of every decision in the constructed request — that
+   is, the `context` that applies to a decision after the default and override
+   semantics of {{AUTHZEN}} have been resolved. Under the `evaluation`
+   envelope there is one effective context, the request's `context`. Under the
+   `evaluations` envelope, an entry that specifies its own `context` overrides
+   the top-level `context` for that entry rather than merging with it, so each
+   entry's effective context is its own `context` where present and the
+   top-level `context` otherwise.
+
+   For each effective context, where the agent-identity claim is present in
+   the validated token:
+
+   - if the effective context specifies `agent`, its resolved value MUST equal
+     that claim; the PEP MUST treat a mismatch as a mapping error
+     ({{mapping-errors}}) and not call the PDP;
+   - if the effective context does not specify `agent` — including where an
+     overriding per-entry `context` omits it — the PEP MUST set it to that
+     claim, so that every decision carries the anchored value.
+
+   Where the validated token carries no agent-identity claim, the PEP MUST
+   omit `agent` from every effective context and MUST NOT populate it from the
+   mapping, the caller, or any other source.
+
+8. Construct the AuthZEN request from the resolved mapping and send it to the
    API named by the mapping's envelope ({{mapping-envelopes}}): the Access
    Evaluation API for `evaluation`, the Access Evaluations API for
    `evaluations`.
 
-8. Before applying a permit, verify that the message's `method`, selected
+9. Before applying a permit, verify that the message's `method`, selected
    mapping, and input-variable values are semantically unchanged from those of
    the evaluated message. Harmless serialization differences do not constitute
    a change. If any of these values changed, the PEP MUST re-evaluate the final
    message or refuse it; it MUST NOT apply the earlier permit to the changed
    message.
 
-9. Enforce the response: if every decision is `true` (permit), allow the message
-   to proceed; if any decision is `false` (deny), do not allow it and return a
-   JSON-RPC error ({{authorization-denial}}).
+10. Enforce the response: if every decision is `true` (permit), allow the
+    message to proceed; if any decision is `false` (deny), do not allow it and
+    return a JSON-RPC error ({{authorization-denial}}).
 
 # Error Handling {#error-handling}
 
@@ -837,8 +943,10 @@ request `id` could not be determined.
 
 A mapping error occurs when the PEP cannot construct a valid AuthZEN request —
 for example, an expression references a missing field, an expression fails to
-evaluate, or the mapping is malformed. The PEP MUST return error code `-32602`
-(Invalid params). The `message` SHOULD describe the failure.
+evaluate, the mapping is malformed, or a trust-anchored field resolves to a
+value other than the token claim it is anchored to ({{pep-behavior}}). The PEP
+MUST return error code `-32602` (Invalid params). The `message` SHOULD describe
+the failure.
 
 ~~~ json
 {
@@ -907,12 +1015,32 @@ framework in use. Because default mappings for server-scoped operations use the
 `aud` claim as the resource identifier, correct audience validation and
 resource-indicator binding {{RFC8707}} are essential.
 
+Token validity and claim semantics are separate questions. A cryptographically
+valid token establishes that its issuer asserted the claims it carries; it does
+not by itself establish that a given claim has the semantics a policy needs. In
+particular, a token containing `client_id` does not thereby establish that the
+client it names is the actor relevant to a deployment's authorization decision,
+which is why the agent-identity claim is designated by agreement between the PEP
+and the issuer rather than assumed ({{agent-identity-claim}}).
+
 ## Zero-Trust for AI Agents
 
-This binding represents the human user as the AuthZEN Subject and the AI agent
-as part of the Context. This separation lets policies evaluate the trust level of
-the user and the agent independently, supporting zero-trust architectures for AI
-agent interactions.
+This binding represents the human user as the AuthZEN Subject and the acting
+agent or client as `context.agent`. This separation lets policies evaluate the
+represented principal and the acting client independently, supporting zero-trust
+architectures for AI agent interactions: a policy can permit a subject to
+perform an operation through one acting client and deny the same subject the
+same operation through another.
+
+A PDP may rely on `context.agent` for that purpose because it is trust-anchored
+to the agent-identity claim and enforced by the PEP ({{agent-identity-claim}},
+{{pep-behavior}}), not because it appears in the Context. No other `context`
+member carries that guarantee, and this separation does not make arbitrary
+Context authenticated. Where a policy requires an acting client and the token
+carries no agent-identity claim, the field is absent and the policy fails closed
+at the PDP. Filling it instead from the MCP server's own identity, or from any
+caller-supplied value, would reintroduce exactly the confused-deputy failure
+this field exists to prevent, which is why no such fallback is permitted.
 
 ## Subject Identity
 
@@ -939,22 +1067,39 @@ unverifiable `subject.id` SHOULD NOT be relied upon as an authenticated identity
 ## Untrusted Declared-Mapping Attributes
 
 A declared mapping is supplied by the MCP server, which is the party whose
-operation is being authorized. Every attribute it produces — `action`,
-`resource`, `context`, and all subject attributes other than the verified
-`subject.id`, including `subject.type` — is untrusted input to the PDP. PDP
-policies MUST NOT treat an attribute that originates from a declared mapping as
-authoritative for identity or privilege; for example, a policy MUST NOT grant
-access on the basis of a `subject.type` or `context` attribute that the mapping
-could freely set. The trustworthy authorization inputs are the verified
-`subject.id` and any attributes the PDP itself obtains from trusted sources.
+operation is being authorized. Every attribute it produces is untrusted input to
+the PDP **except** those this binding designates as trust-anchored and the PEP
+has actually enforced. Exactly two fields are so designated:
+
+- the verified `subject.id`, anchored to the subject-identity claim; and
+- `context.agent`, anchored to the agent-identity claim
+  ({{agent-identity-claim}}).
+
+Everything else — `action`, `resource`, every other `context` member, and all
+subject attributes other than `subject.id`, including `subject.type` — is
+untrusted. PDP policies MUST NOT treat such an attribute as authoritative for
+identity or privilege; for example, a policy MUST NOT grant access on the basis
+of a `subject.type` or a `context` member that the mapping could freely set.
+
+This exception is specific to those two fields and does not extend to
+token-derived values generally. A mapping may resolve any `context` member from
+a `$token.*` expression, and doing so does not make that member trustworthy: the
+PEP verifies only the two anchored fields, so any other token-derived member is
+indistinguishable to the PDP from a literal the server chose. Nor does the
+`agent` key itself confer trust — a `context.agent` that the PEP has not
+corroborated against the agent-identity claim is a mapping error or an omitted
+field, never a trusted value carrying weaker provenance ({{pep-behavior}}). The
+trustworthy authorization inputs are the two anchored fields and any attributes
+the PDP itself obtains from trusted sources.
 
 ## Mapping Integrity
 
 A declared mapping is supplied by the MCP server. A PEP SHOULD validate that a
 declared mapping is well-formed and that its expressions reference only defined
-properties, and MUST verify the trust-anchored `subject.id` ({{declared-mappings}}),
-before relying on it. The trust placed in the server as the author of declared
-mappings MUST be considered in the deployment's threat model.
+properties, and MUST verify the trust-anchored `subject.id` and `context.agent`
+({{declared-mappings}}), before relying on it. The trust placed in the server as
+the author of declared mappings MUST be considered in the deployment's threat
+model.
 
 ## Authorization Granularity and Omitted Inputs
 
