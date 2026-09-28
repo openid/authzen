@@ -21,9 +21,9 @@
   "devDependencies": {
     "@types/axios": "^0.14.4",
     "@types/cli-color": "^2.0.6",
-    "@types/node": "^26.6.1",
-    "@typescript-eslint/eslint-plugin": "^8.70.0",
-    "@typescript-eslint/parser": "^8.70.0",
+    "@types/node": "^26.6.2",
+    "@typescript-eslint/eslint-plugin": "^8.70.1",
+    "@typescript-eslint/parser": "^8.70.1",
     "eslint": "^10.11.0",
     "ts-node": "^10.7.0",
     "typescript": "^7.0.2"
