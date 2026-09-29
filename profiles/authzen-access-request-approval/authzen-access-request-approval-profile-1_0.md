@@ -201,6 +201,9 @@ Autonomous PEP:
 Approval Result:
 : The completed result of an Access Request task.  An Approval Result does not itself permit access; the PEP uses it to obtain an AuthZEN Authorization API allow decision through a new Access Evaluation, or enforces it according to a profile-defined completion mode where one applies.
 
+Completion Mode:
+: The mechanism by which an approved Access Request is completed to obtain an authorization decision or credential for enforcement.  In this profile, the mode is identified by `result.mode`.  The only base mode is `reevaluate`: the PEP performs a new Access Evaluation carrying `context.approval`, and the PDP remains authoritative.  Profiles can define additional completion modes, such as token issuance.  See {{completion-semantics}}.
+
 Authorization-Relevant Context:
 : The subset of AuthZEN Authorization API `context` members that the PDP treats as authorization input and includes in denial binding and approval scope.
 
@@ -740,7 +743,7 @@ Possession of a valid-looking approval identifier is insufficient to authorize a
 
 When approval state is carried by reference, the PDP or Access Request Service MUST protect the backing approval record against unauthorized lookup and mutation.  When approval binding material is carried by value, for example in `approval.state`, the PDP MUST verify integrity, issuer, audience or intended recipient, expiry, and binding before accepting it.
 
-Approval results MUST expire.  Re-evaluation Mode SHOULD bind approval references to the original request tuple.  Profiles of this specification that define token-based completion modes are responsible for defining the token's audience restriction, lifetime, and binding to the approved request.
+Approval results MUST expire.  Under the `reevaluate` completion mode, approval references SHOULD be bound to the original request tuple.  Profiles of this specification that define token-based completion modes are responsible for defining the token's audience restriction, lifetime, and binding to the approved request.
 
 ## Time and Clock Skew {#time-and-clock-skew}
 
@@ -1229,7 +1232,7 @@ A single signed JWT MAY simultaneously satisfy this profile's claim recommendati
 
 ## Approval State {#approval-state}
 
-When the PDP cannot resolve `approval.id` from trusted server-side state shared with, or delegated by, the Access Request Service, the Approval Result MUST include `approval.state` or another profile-defined PDP-verifiable artifact.  An Access Request Service MUST NOT return a Re-evaluation Mode result that the PDP cannot verify without trusting PEP-supplied assertions.
+When the PDP cannot resolve `approval.id` from trusted server-side state shared with, or delegated by, the Access Request Service, the Approval Result MUST include `approval.state` or another profile-defined PDP-verifiable artifact.  An Access Request Service MUST NOT return a result under the `reevaluate` completion mode that the PDP cannot verify without trusting PEP-supplied assertions.
 
 When `approval.state` is carried by value as a JWS:
 
@@ -1318,7 +1321,7 @@ Additional members beyond those defined in this document or by {{companion-profi
 * `task.display`: user-interface hints attached to a Task Handle.
 * `task.links`: link relations to related URLs.
 * `result` and the additions defined under each `result.mode`.
-* `approval.state` in a Re-evaluation Mode result: opaque profile-specific or deployment-specific verifier state carried through the PEP to the PDP at re-evaluation time.
+* `approval.state` in a result under the `reevaluate` completion mode: opaque profile-specific or deployment-specific verifier state carried through the PEP to the PDP at re-evaluation time.
 
 This specification also defines extensibility for enumerated values:
 
