@@ -20,7 +20,7 @@ author:
   -
     fullname: Alexandre Babeanu
     organization: Indykite
-    email: alex@indykite.com
+    email: alex.babeanu@indykite.com
 normative:
   RFC2119:
   RFC8174:
