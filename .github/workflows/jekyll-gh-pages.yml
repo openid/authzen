@@ -37,6 +37,18 @@ jobs:
           - name: access-request-approval-profile
             source: profiles/authzen-access-request-approval/authzen-access-request-approval-profile-1_0.md
             html: authzen-access-request-approval-profile-1_0.html
+          - name: access-request-catalog-profile
+            source: profiles/authzen-access-request-approval/authzen-access-request-catalog-profile-1_0.md
+            html: authzen-access-request-catalog-profile-1_0.html
+          - name: access-request-bulk-profile
+            source: profiles/authzen-access-request-approval/authzen-access-request-bulk-profile-1_0.md
+            html: authzen-access-request-bulk-profile-1_0.html
+          - name: access-request-callback-profile
+            source: profiles/authzen-access-request-approval/authzen-access-request-callback-profile-1_0.md
+            html: authzen-access-request-callback-profile-1_0.html
+          - name: access-request-actor-profile
+            source: profiles/authzen-access-request-approval/authzen-access-request-actor-profile-1_0.md
+            html: authzen-access-request-actor-profile-1_0.html
           - name: obligations-profile
             source: profiles/authzen-obligations-profile-1_0.md
             html: authzen-obligations-profile-1_0.html
