@@ -7,60 +7,60 @@
   resolved "https://registry.yarnpkg.com/@cfworker/json-schema/-/json-schema-4.1.1.tgz#4a2a3947ee9fa7b7c24be981422831b8674c3be6"
   integrity sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og==
 
-"@cloudflare/workerd-darwin-64@1.20241230.0":
-  version "1.20241230.0"
-  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-darwin-64/-/workerd-darwin-64-1.20241230.0.tgz#ed5a40791f0efa85cf4f0c6fb103182f7be7231c"
-  integrity sha512-BZHLg4bbhNQoaY1Uan81O3FV/zcmWueC55juhnaI7NAobiQth9RppadPNpxNAmS9fK2mR5z8xrwMQSQrHmztyQ==
+"@cloudflare/workerd-darwin-64@1.20250821.0":
+  version "1.20250821.0"
+  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-darwin-64/-/workerd-darwin-64-1.20250821.0.tgz#ea54f3f491f3db670354ab5317f4caa0e8cce183"
+  integrity sha512-atEhekqp2C7eUj9TP5wl4LLRndWNAbeJGnGuL2sSZwOnBMASIup2UU5Q+pVvIETK8o81C5Vgzsy5d19Y+Pl1oQ==
 
-"@cloudflare/workerd-darwin-arm64@1.20241230.0":
-  version "1.20241230.0"
-  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-darwin-arm64/-/workerd-darwin-arm64-1.20241230.0.tgz#4cc6f5dac7ef9e280bdf2c1a3ae0572afc3b9aac"
-  integrity sha512-lllxycj7EzYoJ0VOJh8M3palUgoonVrILnzGrgsworgWlIpgjfXGS7b41tEGCw6AxSxL9prmTIGtfSPUvn/rjg==
+"@cloudflare/workerd-darwin-arm64@1.20250821.0":
+  version "1.20250821.0"
+  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-darwin-arm64/-/workerd-darwin-arm64-1.20250821.0.tgz#969155946bc67e49111b60eaa60c3972ed6cbc38"
+  integrity sha512-BpPnIqQrLN1fPWvEFDp7SrPCoUolPbiwY5ZWsTg2l/ZU3XjPEqBdA72v6C4ZWHohW+MeBmnZHRc5oURSNwyvUg==
 
-"@cloudflare/workerd-linux-64@1.20241230.0":
-  version "1.20241230.0"
-  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-linux-64/-/workerd-linux-64-1.20241230.0.tgz#a22f4d666328ca561723171362d2641ea62316d2"
-  integrity sha512-Y3mHcW0KghOmWdNZyHYpEOG4Ba/ga8tht5vj1a+WXfagEjMO8Y98XhZUlCaYa9yB7Wh5jVcK5LM2jlO/BLgqpA==
+"@cloudflare/workerd-linux-64@1.20250821.0":
+  version "1.20250821.0"
+  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-linux-64/-/workerd-linux-64-1.20250821.0.tgz#c7864eae0f971e72dbce45f06002d6f142b1e5da"
+  integrity sha512-/8/HvlTQfEwYHWuhcrmMW9N1T9n/Ce5DiPPiZk9+XC+velVHN0+Z8+TMDNfsLyvrSiCbDU0waveRzAJSTO6KxQ==
 
-"@cloudflare/workerd-linux-arm64@1.20241230.0":
-  version "1.20241230.0"
-  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-linux-arm64/-/workerd-linux-arm64-1.20241230.0.tgz#a5c91382ddf8b9eb359a09048af33c76de914410"
-  integrity sha512-IAjhsWPlHzhhkJ6I49sDG6XfMnhPvv0szKGXxTWQK/IWMrbGdHm4RSfNKBSoLQm67jGMIzbmcrX9UIkms27Y1g==
+"@cloudflare/workerd-linux-arm64@1.20250821.0":
+  version "1.20250821.0"
+  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-linux-arm64/-/workerd-linux-arm64-1.20250821.0.tgz#6e580db6e44d78e2e1757df361c062b03f363504"
+  integrity sha512-uMT1UyFVByCC539NZjLeLEfr0xMmq7w4JqZZbL4HLYWk97gppJLuiOVTKaR04FPr01StXKItfdmXHLptItnK/g==
 
-"@cloudflare/workerd-windows-64@1.20241230.0":
-  version "1.20241230.0"
-  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-windows-64/-/workerd-windows-64-1.20241230.0.tgz#22a5b694f01dfa92f66f6af84a12eb9f90aa5e66"
-  integrity sha512-y5SPIk9iOb2gz+yWtHxoeMnjPnkYQswiCJ480oHC6zexnJLlKTpcmBCjDH1nWCT4pQi8F25gaH8thgElf4NvXQ==
+"@cloudflare/workerd-windows-64@1.20250821.0":
+  version "1.20250821.0"
+  resolved "https://registry.yarnpkg.com/@cloudflare/workerd-windows-64/-/workerd-windows-64-1.20250821.0.tgz#b24c89f05b22e8966965383be276457c04ef8e9d"
+  integrity sha512-PSqhaf3mwCAdZCzOLpl6WSGMJwj+QPloH0v0PqCTKUh8qVh98l2flp0MXg2IgKxp2L+2HH86AEPBkl0IQRVjZw==
 
-"@deno/darwin-arm64@2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@deno/darwin-arm64/-/darwin-arm64-2.3.1.tgz#909e0860b0828a07205a93eb1ec52a2cb3c42cd2"
-  integrity sha512-lKUfHFvtygPNajIUY7QTjpGyIetOSRD+NCsZjiWlyXVPzZQLSXYtqRSDth31N9ORs5dP9tj0/rnho0yoF08lyg==
+"@deno/darwin-arm64@2.8.3":
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/@deno/darwin-arm64/-/darwin-arm64-2.8.3.tgz#03f1e9c76fa9632acf9d17205b8ecc8af22e4b43"
+  integrity sha512-X1nL8PwiApngEwHjsxARrkH3IF4otKBughsmHtzsu9R5ufah1fBDPLOYBnJHSapAD+nlihPsr0Yp2bV61cDbgQ==
 
-"@deno/darwin-x64@2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@deno/darwin-x64/-/darwin-x64-2.3.1.tgz#ce7b679b3aa5000a511cd8d792c99691f6977caf"
-  integrity sha512-NoKA2HLnlCk/oVTE+YJr0zYtT0hGdLd9fM09RAXNHQmgn572NoK2Mbs+maZJxHRw30QOXqoheOwi+S8Z9turzQ==
+"@deno/darwin-x64@2.8.3":
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/@deno/darwin-x64/-/darwin-x64-2.8.3.tgz#04b7b13b471280e13f816958499a55825dd27148"
+  integrity sha512-qF+TSsqAUoNrgJEsM0OYz5hthvsApuv0tOgAQTrq3VDPr1RYFLTJXyy06nIibSd4aE0D9Mqlwr5abErrp54VJQ==
 
-"@deno/linux-arm64-glibc@2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@deno/linux-arm64-glibc/-/linux-arm64-glibc-2.3.1.tgz#daba088763d94d3a1ff28622d801034088b8bbf0"
-  integrity sha512-/sc7tDVZHmjfNO5ghuIQINlHugyBhqMr6/tCtSdi/3rWA3lfP2OV3gh4myVjOurR0kaB5HjrLpxXVUq5hD5Vag==
+"@deno/linux-arm64-glibc@2.8.3":
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/@deno/linux-arm64-glibc/-/linux-arm64-glibc-2.8.3.tgz#3a3e22b9c38a86da8e4b62c8c1309d22222b3d0f"
+  integrity sha512-w/Cj3d/jxzMDbmK3G5YiGQMDIFK/L69hPeweSgM4DoUnWHHyCyQ++DLZMJxYkyDC7a6bO5JVIEofCTZooYCFGQ==
 
-"@deno/linux-x64-glibc@2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@deno/linux-x64-glibc/-/linux-x64-glibc-2.3.1.tgz#c0e9728c268a15ac9a4bec143909cc3cbcebad69"
-  integrity sha512-ipQqXDtjc3Lln1q1TuPG7SygWrxJga1RODofP/pNwozc14wwZEeCNE4z7z4jDqes6eH5XL8ZH+qZa5beS7118Q==
+"@deno/linux-x64-glibc@2.8.3":
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/@deno/linux-x64-glibc/-/linux-x64-glibc-2.8.3.tgz#823d226be1366808c460418b459bdd70602722c3"
+  integrity sha512-73K6NpAFfGyEJ84nSSPECKilO1+gaEnNU90p/ebluWJBUFJ3HfpUgRxjG6hNXhVLuGDmp0u+2C00Cz6lbW4X+A==
 
-"@deno/win32-arm64@2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@deno/win32-arm64/-/win32-arm64-2.3.1.tgz#ae1db7c6161cbb42ddd9b66d9b28c773e9e3f48a"
-  integrity sha512-UKwl7uqmuP4qcTR210ZlwozFqH5eb7o3cgNgp5eXZSdFbejKxz+dTKsiSOMjoxTbbKZHofVdp/Dc7jVUvlwShQ==
+"@deno/win32-arm64@2.8.3":
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/@deno/win32-arm64/-/win32-arm64-2.8.3.tgz#a4371ef1c7d6643877eee3335f475d1814e321ce"
+  integrity sha512-ik+NcDyUMl3SmP1acrLnI/PvtAsATofuXAZTIovXetYV5LnM5zD7xya1iRKOmornr6k0k5ZcrREvyoR50q2FEA==
 
-"@deno/win32-x64@2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@deno/win32-x64/-/win32-x64-2.3.1.tgz#4814a184c00d6bee3c06cbd56b13dbb213f32088"
-  integrity sha512-vbnSEXjL3+dz6EwvV8qUFrDvtluQQdYxEJo+FaSkUu9x2Hws5YpLln4l0tT/KS58RXI9DpWS9dxwMIPbe5kQQQ==
+"@deno/win32-x64@2.8.3":
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/@deno/win32-x64/-/win32-x64-2.8.3.tgz#562d4d7571b60fd844da98fb53d4794b0144c095"
+  integrity sha512-T8PT3vwXqUbf/HiKi+NuHobZZm4qNJk7zfSRubjGe+AY384YsiwYq5Lm0Esj3eB+OzUqDqSe7z+ItiyVqbJtLw==
 
 "@esbuild/aix-ppc64@0.28.1":
   version "0.28.1"
@@ -665,9 +665,9 @@
     "@swc/counter" "^0.1.3"
 
 "@types/node@^26":
-  version "26.6.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-26.6.1.tgz#059fb87569c8b47a495c75ed8a884832c73eab1d"
-  integrity sha512-VqGJBMCtdhqkBUCcBLvywI0NJ+KLuVzgNnlBUNFOQjqVxzo2lxLUNg1DSey8+u2u6ktswSAxg+s68QLzWHNOuA==
+  version "26.6.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-26.6.2.tgz#11bfb8e00bafe728d2113e474a7637becc9ab279"
+  integrity sha512-X1P21scMv4zGKLYqjdGjaKa7COa0RKVYYZZN/NfvLQ1JegxFhdhpZG/Lyn8AXx6CDUavKAd11v6BvfpkDByK8g==
   dependencies:
     undici-types "~8.9.0"
 
@@ -771,25 +771,25 @@
   resolved "https://registry.yarnpkg.com/@typescript/typescript-win32-x64/-/typescript-win32-x64-7.0.2.tgz#cf3b7b0d6ce5635daca4c8e01c189cdcde47ec3c"
   integrity sha512-0BQ3HkAHHlKLSp1qRvf3SUhGpGsDuhB/jgFw75guyqbxJqEaS0Cw/VFO8i2nHglJUzQCRtMMR/IBAKE3ETMC4g==
 
-"@zuplo/cli@7.7.17":
-  version "7.7.17"
-  resolved "https://registry.yarnpkg.com/@zuplo/cli/-/cli-7.7.17.tgz#47d232450124179ce29d599256a2cc1d1dc4941e"
-  integrity sha512-UR+dIi2688Da9aUIHyHx+DdoR+Bo1fz6yPsd4ycYPHqcOszdXPCYQ9rynNyouhu0XFFXB8rRKNdcRDt9KY3TCw==
+"@zuplo/cli@7.8.15":
+  version "7.8.15"
+  resolved "https://registry.yarnpkg.com/@zuplo/cli/-/cli-7.8.15.tgz#3151b1c25077ea4321ab888dce04df984e6b4ab9"
+  integrity sha512-+GbtH86O548hjKAhwCQt+PVvIxqOyuKNkpfhg+2RAfPHWgSv12k8UNs2XaLNThpKc81TgXRkhPcAMS9wbMuWAQ==
   dependencies:
     "@inquirer/prompts" "8.5.2"
     "@opentelemetry/api" "1.9.0"
     "@opentelemetry/api-logs" "0.220.0"
     "@swc/core" "1.10.18"
-    "@zuplo/core" "7.7.17"
+    "@zuplo/core" "7.8.15"
     "@zuplo/editor" "1.0.33162667821"
-    "@zuplo/graphql" "7.7.17"
-    "@zuplo/openapi-tools" "7.7.17"
-    "@zuplo/otel" "7.7.17"
-    "@zuplo/runtime" "7.7.17"
+    "@zuplo/graphql" "7.8.15"
+    "@zuplo/openapi-tools" "7.8.15"
+    "@zuplo/otel" "7.8.15"
+    "@zuplo/runtime" "7.8.15"
     chalk "5.4.1"
     chokidar "3.5.3"
     cookie "1.0.2"
-    deno "2.3.1"
+    deno "2.8.3"
     dotenv "16.5.0"
     esbuild "0.28.1"
     execa "6.1.0"
@@ -813,20 +813,20 @@
     strip-ansi "7.1.0"
     tar "7.5.22"
     undici "7.29.0"
-    workerd "1.20241230.0"
+    workerd "1.20250821.0"
     yargs "17.7.2"
     zod "4.4.3"
   optionalDependencies:
-    "@zuplo/lint-darwin-arm64" "7.7.17"
-    "@zuplo/lint-darwin-x64" "7.7.17"
-    "@zuplo/lint-linux-arm64" "7.7.17"
-    "@zuplo/lint-linux-x64" "7.7.17"
-    "@zuplo/lint-win32-x64" "7.7.17"
+    "@zuplo/lint-darwin-arm64" "7.8.15"
+    "@zuplo/lint-darwin-x64" "7.8.15"
+    "@zuplo/lint-linux-arm64" "7.8.15"
+    "@zuplo/lint-linux-x64" "7.8.15"
+    "@zuplo/lint-win32-x64" "7.8.15"
 
-"@zuplo/core@7.7.17":
-  version "7.7.17"
-  resolved "https://registry.yarnpkg.com/@zuplo/core/-/core-7.7.17.tgz#f628b89a500a10c8fcb08cd259fd227ecab709be"
-  integrity sha512-8S9X2/G+pzC2KUosmX1nXDnF1hiqFinE8V2IGTaVxVcTdmekaAf9QFMYvaaKFFt8YmFacP/UlgE2ZloLD400lg==
+"@zuplo/core@7.8.15":
+  version "7.8.15"
+  resolved "https://registry.yarnpkg.com/@zuplo/core/-/core-7.8.15.tgz#1d284cb3190a202ea58de2909ab4b370260effb1"
+  integrity sha512-4410aUmdVoJS+yg/RQrL5Emiyq1+ltoMU8oWORo8uocBRGE2jbTuc5iKLWIBCRpG8ACmBWsfwSotGVtZqke7kQ==
   dependencies:
     chokidar "^3.5.3"
     esbuild "0.28.1"
@@ -839,42 +839,42 @@
   resolved "https://registry.yarnpkg.com/@zuplo/editor/-/editor-1.0.33162667821.tgz#8984d90db59f5b3a7cecce6e030555eabcf484df"
   integrity sha512-H029WPOT7b7Gj0lTp4Ap4vP2vYzF9K1RwVIVRHu5VfL7eCbZ3k1euuVeeE0KqVHopeJQgTHwNpk2Nw1kBZjZCg==
 
-"@zuplo/graphql@7.7.17":
-  version "7.7.17"
-  resolved "https://registry.yarnpkg.com/@zuplo/graphql/-/graphql-7.7.17.tgz#6d5915ca2c66cb1dab70f7e865444ebbb79962a6"
-  integrity sha512-n8JU3Ra+VqNd2t5N+Zw7CQNsirra0SPz/+2wXjdtAys5wZJl4jji19Z/2KTYG1P56T38vCL6fQq5j7jX7F2q+g==
+"@zuplo/graphql@7.8.15":
+  version "7.8.15"
+  resolved "https://registry.yarnpkg.com/@zuplo/graphql/-/graphql-7.8.15.tgz#04827c8cfee14bfd9dbd83535652eaabe6d1557c"
+  integrity sha512-IUKJgxy2I43JNCQXJhVNzrFpt7GSqTZLO2sIh06WDXlbUuxJlYyGEQEp+sEkZOCWp7QYaxf8l8RP6epJuyZpHg==
   dependencies:
     graphql "^16.8.1"
 
-"@zuplo/lint-darwin-arm64@7.7.17":
-  version "7.7.17"
-  resolved "https://registry.yarnpkg.com/@zuplo/lint-darwin-arm64/-/lint-darwin-arm64-7.7.17.tgz#0f505de92713aab7a16205a82d235c335e52e26a"
-  integrity sha512-xGOf/SO+lRfBVPwBLCRvSvtyuQwbkUPov9ZYDNU3Whdu91KXOQfs7y8wICFAyadb26MhHLvfvqKFlvg+8io8TA==
+"@zuplo/lint-darwin-arm64@7.8.15":
+  version "7.8.15"
+  resolved "https://registry.yarnpkg.com/@zuplo/lint-darwin-arm64/-/lint-darwin-arm64-7.8.15.tgz#587d2b529baf8feb350921112f7843fe77c866b7"
+  integrity sha512-b9tNrB8ITxO0m0qyJ13VEHzjIZ4ju/Mh47nhTeskka5KPvgxMk8AZqyHQwNguamNkiNtw4UX9iEaKJnHcXq59A==
 
-"@zuplo/lint-darwin-x64@7.7.17":
-  version "7.7.17"
-  resolved "https://registry.yarnpkg.com/@zuplo/lint-darwin-x64/-/lint-darwin-x64-7.7.17.tgz#75adf7e19f3754195ddce5fe65d59ac84ccd6996"
-  integrity sha512-vvScl8tfW80bN6G7sM0yQ+jPoxWJ2tfUxqiavA83CaCkkWyJMkdSkkBZFzvZuOwjqLw13Nzayp3maxn2LcQ0lg==
+"@zuplo/lint-darwin-x64@7.8.15":
+  version "7.8.15"
+  resolved "https://registry.yarnpkg.com/@zuplo/lint-darwin-x64/-/lint-darwin-x64-7.8.15.tgz#8faa52ccf8afa27e0cfa5a4336be7cb35860a1a5"
+  integrity sha512-5KMPXHtNnvi3y9Sxo7vZvBYm5/bzi/Xl05a341QGuy1E2FnkeAYShSZ/eIu5OUXVIjvs56CHJVlH560ouUYlCQ==
 
-"@zuplo/lint-linux-arm64@7.7.17":
-  version "7.7.17"
-  resolved "https://registry.yarnpkg.com/@zuplo/lint-linux-arm64/-/lint-linux-arm64-7.7.17.tgz#a9a53f5b677dcaafc272e672ee0afc3e58b848ff"
-  integrity sha512-Gdq9UGBZgMGwz6c1yAgimbILTrCZwNvIqdd7WY0mNXYzSmDVybyvgFjq+Em84zeQ97FyFyNfcnilKGj9FwuQIw==
+"@zuplo/lint-linux-arm64@7.8.15":
+  version "7.8.15"
+  resolved "https://registry.yarnpkg.com/@zuplo/lint-linux-arm64/-/lint-linux-arm64-7.8.15.tgz#03f5b873e782cf81826ce63c213cf8ed8d2cbdea"
+  integrity sha512-Sh57URbmykZ87So1IHgMLgl/1ZETHQ4pdHQSJr55jF2cVHQYT5Ht+LjNQplUuqMpkhWf7nv7I/q3MS0DhBSjdw==
 
-"@zuplo/lint-linux-x64@7.7.17":
-  version "7.7.17"
-  resolved "https://registry.yarnpkg.com/@zuplo/lint-linux-x64/-/lint-linux-x64-7.7.17.tgz#b35eca256a1cfe557528f870c77dcf63ca04d3b8"
-  integrity sha512-p8KBWm4GwG/FAl6UrReUvccZ3fMa+A3VLjTm7yzaF+h3D3/QqN4w9FdAXq4gIiU2ajY0pNr46EIAzaiMmUZVag==
+"@zuplo/lint-linux-x64@7.8.15":
+  version "7.8.15"
+  resolved "https://registry.yarnpkg.com/@zuplo/lint-linux-x64/-/lint-linux-x64-7.8.15.tgz#2d963d5c41a07f16c94740d4315d1aecbc9bf204"
+  integrity sha512-S8PBEg75MIMElbS8iPoZjbnHuHmRg4lvbea8sLraxGXF8iY2ODjiVHI/5u1ifO/gV02pXUViL7S5/ak0Gh3OlQ==
 
-"@zuplo/lint-win32-x64@7.7.17":
-  version "7.7.17"
-  resolved "https://registry.yarnpkg.com/@zuplo/lint-win32-x64/-/lint-win32-x64-7.7.17.tgz#0669e9bc7c508345eeec2c000fbd16d4c9fc785e"
-  integrity sha512-mpQ7FUpTjen+VzUvAf7CgO7Fd9Ofdp5bGtyMj9mS3rTQ+KdyJXLAWICIEjrAYaxRWn3GXk88xyYZuHzdMxNFBw==
+"@zuplo/lint-win32-x64@7.8.15":
+  version "7.8.15"
+  resolved "https://registry.yarnpkg.com/@zuplo/lint-win32-x64/-/lint-win32-x64-7.8.15.tgz#55c87fea0a5c54c79d0c2977b929cf1bfd5bb9d2"
+  integrity sha512-W6CNIZuE7klkaINfdLH9lsPhs4oeMF9e6JgzZ8a2QmP8U3qiimuzqOMBOTxMdfmntoRvwZJ4V81x/ecu8BGrxQ==
 
-"@zuplo/openapi-tools@7.7.17":
-  version "7.7.17"
-  resolved "https://registry.yarnpkg.com/@zuplo/openapi-tools/-/openapi-tools-7.7.17.tgz#9b3acd8c83cc64a5423ef6549a5a47a52070c15f"
-  integrity sha512-UBC25kgvfZBn92dPkLSAy2+EyZaMDErjIl9gXCvridFFen5QtUGvJpZ1iznF+sw9m7jgywttRsAu0ZsML7nTgQ==
+"@zuplo/openapi-tools@7.8.15":
+  version "7.8.15"
+  resolved "https://registry.yarnpkg.com/@zuplo/openapi-tools/-/openapi-tools-7.8.15.tgz#123630d9ee21505c57b18398a47f0c1ddcd86cac"
+  integrity sha512-/6qlfPHGVSlNWlKBVdXSm97WkHbLJOk7J+wJTmdU+Gi7NPFM+tiwlxQ+HKQWleAtGG2P8qU8wA1NjeeeB78Nkg==
   dependencies:
     js-yaml "^4.3.2"
     jsonpath-plus "^10.3.0"
@@ -883,10 +883,10 @@
     uuid "^11.1.0"
     zod "4.4.3"
 
-"@zuplo/otel@7.7.17":
-  version "7.7.17"
-  resolved "https://registry.yarnpkg.com/@zuplo/otel/-/otel-7.7.17.tgz#0e4e59884963466dbc5e25a00e7cc4403b62e1fd"
-  integrity sha512-dIr4X9quk8z1gCElr10jV3gxDgSssgRkPlAYBbKxO9uZkX33HVNfd9hMRibnL+LCxd6iPoMp7dZ40AVz2ydYVg==
+"@zuplo/otel@7.8.15":
+  version "7.8.15"
+  resolved "https://registry.yarnpkg.com/@zuplo/otel/-/otel-7.8.15.tgz#71e1bef9a6abbd587152b487db95a2f3ffc61e61"
+  integrity sha512-Y53+QilQWTNkmdIIJN4LeoESpTVtEAved2jE2HaDzSFyywbFZhnKtaga5I9MMBJyitzVFaVrXILtnDcr/qBKVA==
   dependencies:
     "@opentelemetry/api" "1.9.0"
     "@opentelemetry/api-logs" "0.220.0"
@@ -899,10 +899,10 @@
     "@opentelemetry/sdk-trace-base" "2.9.0"
     "@opentelemetry/semantic-conventions" "1.43.0"
 
-"@zuplo/runtime@7.7.17":
-  version "7.7.17"
-  resolved "https://registry.yarnpkg.com/@zuplo/runtime/-/runtime-7.7.17.tgz#8af7d0cdfc2fb16e7c369fd4db6c3153dd206dde"
-  integrity sha512-+s4roQhF0CxbJTkeQvaEuFzZYG8aprUD5RNAaRf+MEEEetqvcU7Jo5J39ma6MThXlSLISsvf4ku31hUQDgCb2w==
+"@zuplo/runtime@7.8.15":
+  version "7.8.15"
+  resolved "https://registry.yarnpkg.com/@zuplo/runtime/-/runtime-7.8.15.tgz#0656fedcc88131e398abb9c5cf92b7e220c99967"
+  integrity sha512-n2lBAEokR9Yl5GVRMsqz8KyUaaGszP7ZlafOHSpqE4TQQQPLiVxh9OLqc4X7ycA15ufqmgfkOhOtwPmmPJ75kA==
   dependencies:
     "@cfworker/json-schema" "4.1.1"
     "@modelcontextprotocol/client" "^2.0.0"
@@ -920,10 +920,10 @@
     uuid "^11.1.0"
     zod "4.4.3"
 
-"@zuplo/test@7.7.17":
-  version "7.7.17"
-  resolved "https://registry.yarnpkg.com/@zuplo/test/-/test-7.7.17.tgz#5b8ad19d19e7e1ff0e85c2b19e3c75a477f6ea1e"
-  integrity sha512-p+ilO2qWhLs63rG1MESl9EhC1eNh0ZIIOMBTW+4XZOaOCiMUWac475TNzTrYNcRPTdRi/MPD/5iMKZ2yWHZsoA==
+"@zuplo/test@7.8.15":
+  version "7.8.15"
+  resolved "https://registry.yarnpkg.com/@zuplo/test/-/test-7.8.15.tgz#b1d77b9807c2f1e53acb846bef9c3591b2ea19a8"
+  integrity sha512-JMAD5rCH3aTcC4eaOwEcdwryDWvqZMT4D6lCiMqrKPzEXUocERlztMRGtK3GUvm31NGVX/oUZvDubzUvnHd0kw==
 
 accepts@^2.0.0:
   version "2.0.0"
@@ -1253,17 +1253,17 @@ define-lazy-prop@^3.0.0:
   resolved "https://registry.yarnpkg.com/define-lazy-prop/-/define-lazy-prop-3.0.0.tgz#dbb19adfb746d7fc6d734a06b72f4a00d021255f"
   integrity sha512-N+MeXYoqr3pOgn8xfyRPREN7gHakLYjhsHhWGT3fWAiL4IkAt0iDw14QiiEm2bE30c5XX5q0FtAA3CK5f9/BUg==
 
-deno@2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/deno/-/deno-2.3.1.tgz#8507826613e1e488857301067dec9d0740e49b7e"
-  integrity sha512-ZkXW3Th3BvfhSz2XjVdlFIQby8+jimiG1NdEOa5dadxMMNCPlvSgMzTwhFgFQIal7w12F5QQSf82i2ruHq0n6w==
+deno@2.8.3:
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/deno/-/deno-2.8.3.tgz#17d001a9b5a6373bc58887187aef8dd1eb552c61"
+  integrity sha512-k9G9EdoqBMOqtNatz/1s9daVedzVonMM/Cz2RTEG4e94p3ja+qKo6nJTa1WtpS0SXDHboSJg1ZTEsVkZJGeINw==
   optionalDependencies:
-    "@deno/darwin-arm64" "2.3.1"
-    "@deno/darwin-x64" "2.3.1"
-    "@deno/linux-arm64-glibc" "2.3.1"
-    "@deno/linux-x64-glibc" "2.3.1"
-    "@deno/win32-arm64" "2.3.1"
-    "@deno/win32-x64" "2.3.1"
+    "@deno/darwin-arm64" "2.8.3"
+    "@deno/darwin-x64" "2.8.3"
+    "@deno/linux-arm64-glibc" "2.8.3"
+    "@deno/linux-x64-glibc" "2.8.3"
+    "@deno/win32-arm64" "2.8.3"
+    "@deno/win32-x64" "2.8.3"
 
 depd@^2.0.0, depd@~2.0.0:
   version "2.0.0"
@@ -2165,9 +2165,9 @@ prettier@3.8.1:
   integrity sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==
 
 prettier@^3, prettier@^3.5.3:
-  version "3.9.8"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.9.8.tgz#54e81128584538c81d85fce9d5fd77a410c385c5"
-  integrity sha512-WRFq3Wn3WId7LLROfMLdH7xaFr2jR62wU8nLO6rQUOLOxNZUviyJQs1M0iIhLexSFy+L+w0ch66wtoO2jRjG0A==
+  version "3.9.9"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.9.9.tgz#09b826918c91cd4cbc80e0cbd1d2a922ff04f233"
+  integrity sha512-Z/CJHIkdujO/OtN7nXUii0Rf3VT5SRuhjBA82Xvu2XhBUgX3nhP67T0LHceBdQLex7OOFGTox+Q5Yg8Jk2Qivg==
 
 process-warning@^5.0.0:
   version "5.0.0"
@@ -2615,16 +2615,16 @@ which@^2.0.1:
   dependencies:
     isexe "^2.0.0"
 
-workerd@1.20241230.0:
-  version "1.20241230.0"
-  resolved "https://registry.yarnpkg.com/workerd/-/workerd-1.20241230.0.tgz#2957e5f988d15b78bd8125db1fbe5f194848dd1b"
-  integrity sha512-EgixXP0JGXGq6J9lz17TKIZtfNDUvJNG+cl9paPMfZuYWT920fFpBx+K04YmnbQRLnglsivF1GT9pxh1yrlWhg==
+workerd@1.20250821.0:
+  version "1.20250821.0"
+  resolved "https://registry.yarnpkg.com/workerd/-/workerd-1.20250821.0.tgz#d89bd3ca9d7ea4785e7dde1d6830d9695d993152"
+  integrity sha512-FqOklSZ0ogyJoY8+7C2fYzv5JbBbl+N+QAbUojtdfx0+URducn9dMxkeqBSThBI9NvrbIzX1kpPYoke40RBIfA==
   optionalDependencies:
-    "@cloudflare/workerd-darwin-64" "1.20241230.0"
-    "@cloudflare/workerd-darwin-arm64" "1.20241230.0"
-    "@cloudflare/workerd-linux-64" "1.20241230.0"
-    "@cloudflare/workerd-linux-arm64" "1.20241230.0"
-    "@cloudflare/workerd-windows-64" "1.20241230.0"
+    "@cloudflare/workerd-darwin-64" "1.20250821.0"
+    "@cloudflare/workerd-darwin-arm64" "1.20250821.0"
+    "@cloudflare/workerd-linux-64" "1.20250821.0"
+    "@cloudflare/workerd-linux-arm64" "1.20250821.0"
+    "@cloudflare/workerd-windows-64" "1.20250821.0"
 
 "wrap-ansi-cjs@npm:wrap-ansi@^7.0.0":
   version "7.0.0"
@@ -2697,11 +2697,11 @@ zod@4.4.3, "zod@^3.25 || ^4.0", zod@^4.2.0:
   integrity sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==
 
 zuplo@^7:
-  version "7.7.17"
-  resolved "https://registry.yarnpkg.com/zuplo/-/zuplo-7.7.17.tgz#8944037bcb9f6d4412e91e86ca72c7dfe3ac3af8"
-  integrity sha512-ixfFv9qz4U5I/8qJgyASXfTK9xOOvCaaCG3RCs3mHv1dn3aPauFRBVWeGQPM+D/oC+GuHyHmSR8TgHN/6Cyf4g==
+  version "7.8.15"
+  resolved "https://registry.yarnpkg.com/zuplo/-/zuplo-7.8.15.tgz#fe8758e64d76e5afbd58ef23d564d0be13e72b80"
+  integrity sha512-+AHAphtSaWzD+tR/qgKJ1G8QAB9tjBJ8bd5BfDs7QKzuA46n6xGdKy9VxfSclQizRM2BCX1uj2eCiPVUAxZsHw==
   dependencies:
-    "@zuplo/cli" "7.7.17"
-    "@zuplo/core" "7.7.17"
-    "@zuplo/runtime" "7.7.17"
-    "@zuplo/test" "7.7.17"
+    "@zuplo/cli" "7.8.15"
+    "@zuplo/core" "7.8.15"
+    "@zuplo/runtime" "7.8.15"
+    "@zuplo/test" "7.8.15"
