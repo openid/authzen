@@ -592,6 +592,6 @@ This specification requests the following initial registrations:
 | custom | Reserved for bilaterally agreed obligations outside this specification's scope. | {{obligation-custom}} |
 {: #tab-iana-registrations title="Initial AuthZEN Obligation Types registrations"}
 
-# Acknowledgements {#acknowledgements numbered="false"}
+# Acknowledgements
 
 The author acknowledges the OpenID AuthZEN Working Group for the base specification upon which this profile builds, and prior obligation-bearing access-control models (notably {{XACML}}) for informing the design of this profile's Obligation object model.
