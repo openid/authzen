@@ -1,4 +1,4 @@
-import { StatefulAuthorizationService } from "interfaces";
+import { StatefulAuthorizationService } from "../interfaces";
 
 export class OpenFGAStatefulAuthorizationService implements StatefulAuthorizationService {
   private readonly baseUrl: string;
@@ -17,21 +17,24 @@ export class OpenFGAStatefulAuthorizationService implements StatefulAuthorizatio
           Authorization: this.apiKey,
           "Content-Type": "application/json",
         },
-        body: body
+        body: body,
       });
 
       if (!response.ok) {
         const errorBody = await response.text();
-        throw new Error(`OpenFGA request failed: ${response.statusText}. Response: ${errorBody}`);
+        throw new Error(
+          `OpenFGA request failed: ${response.statusText}. Response: ${errorBody}`
+        );
       }
     } catch (error) {
-      console.error('OpenFGA request failed:', error);
-      throw new Error('Failed to update authorization state');
+      console.error("OpenFGA request failed:", error);
+      throw new Error("Failed to update authorization state");
     }
   }
 
   async insert(todoId: string, userId: string): Promise<void> {
-    await this.makeRequest(JSON.stringify({
+    await this.makeRequest(
+      JSON.stringify({
         "writes": {
           "tuple_keys": [
             {
@@ -43,14 +46,16 @@ export class OpenFGAStatefulAuthorizationService implements StatefulAuthorizatio
               "user": `todo:todo-1`,
               "relation": "parent",
               "object": `todo:${todoId}`,
-            }
-          ]
-        }
-      }))
+            },
+          ],
+        },
+      })
+    );
   }
 
   async delete(todoId: string, userId: string): Promise<void> {
-    await this.makeRequest(JSON.stringify({
+    await this.makeRequest(
+      JSON.stringify({
         "deletes": {
           "tuple_keys": [
             {
@@ -62,10 +67,10 @@ export class OpenFGAStatefulAuthorizationService implements StatefulAuthorizatio
               "user": `todo:todo-1`,
               "relation": "parent",
               "object": `todo:${todoId}`,
-            }
-          ]
-        }
-      }))
+            },
+          ],
+        },
+      })
+    );
   }
-
 }

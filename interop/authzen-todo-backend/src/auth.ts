@@ -10,8 +10,8 @@ import dotenv from "dotenv";
 import dotenvExpand from "dotenv-expand";
 import log from "./log";
 import config from "./pdps.json";
-import { Store } from "store";
-import { Todo } from "interfaces";
+import { Store } from "./store";
+import { Todo } from "./interfaces";
 
 // Configuration
 dotenvExpand.expand(dotenv.config());
@@ -60,7 +60,7 @@ const resourceMapper = async (
     can_read_todos: () => ({ type: "todo", id: "todo-1" }),
     can_create_todo: () => ({ type: "todo", id: "todo-1" }),
     can_update_todo: async () => {
-      const todo = await store.get(req.params.id);
+      const todo = await store.get(req.params.id as string);
       if (!todo) {
         log(`todo ${req.params.id} not found in SQLite db`);
         return {};
@@ -77,7 +77,7 @@ const resourceMapper = async (
       };
     },
     can_delete_todo: async () => {
-      const todoToDelete = await store.get(req.params.id);
+      const todoToDelete = await store.get(req.params.id as string);
       if (!todoToDelete) {
         log(`todo ${req.params.id} not found in SQLite db`);
         return {};
@@ -153,7 +153,11 @@ export const authzMiddleware = (store: Store) => (permission: string) => {
         headers: getHeaders(pdpAuthHeader),
       });
       log(response?.data);
-      response?.data?.decision ? next() : res.status(403).send();
+      if (response?.data?.decision) {
+        next();
+      } else {
+        res.status(403).send();
+      }
     } catch (error) {
       log(error);
       res.status(500).send();

@@ -20,7 +20,8 @@ AuthZEN IdP Interop demonstrates how an OpenID Connect identity provider (IdP) c
 
 - `pnpm dev` – framework-mode SSR with HMR and automatic route-type generation.
 - `pnpm typecheck` – regenerates `./+types/*` and runs the strict TypeScript check; always run after creating or renaming routes.
-- `pnpm lint:fix` – Biome formatting and linting.
+- `pnpm lint` / `pnpm lint:fix` – lint with oxlint (optionally applying fixes).
+- `pnpm format` / `pnpm format:check` – format (or check formatting) with oxfmt.
 - `pnpm build && pnpm start` – production build and SSR server.
 - Docker: `docker build -t authzen-idp .` and `docker run -p 3000:3000 authzen-idp`.
 
