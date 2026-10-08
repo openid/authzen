@@ -625,7 +625,7 @@ When the PDP denies a re-evaluation that presented an `approval` reference, it c
 
 ## Re-evaluation Example {#lookup-reevaluation-example}
 
-This non-normative exchange uses `approval.id` to resolve the approval from trusted server-side state ({{approval-reference-lookup}}).
+This non-normative exchange uses `approval.id` to resolve the approval from trusted server-side state ({{approval-reference-lookup}}).  It continues the exchange in {{submission-example}}, where `project` was authorization-relevant in the original evaluation, so the request carries `project` again for the approval-scope comparison ({{approval-scope}}).
 
 Non-normative re-evaluation request:
 
@@ -643,6 +643,7 @@ Non-normative re-evaluation request:
     "name": "can_read"
   },
   "context": {
+    "project": "customer-renewal",
     "approval": {
       "id": "apr_01HX4Y8E2NE3Y2X7P0K4JE6WVH",
       "approved_at": "2026-04-30T20:42:00Z",
