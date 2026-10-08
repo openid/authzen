@@ -2,28 +2,30 @@
   "name": "authzen-api-gateway-test-runner",
   "version": "0.1.16",
   "description": "AuthZEN API Gateway test runner",
+  "keywords": [],
+  "license": "MIT",
+  "author": "Omri Gazitt <ogazitt@gmail.com>",
   "main": "test/runner.ts",
   "scripts": {
     "build": "yarn clean && tsc",
     "clean": "rm -rf ./build",
     "tsc": "tsc --noEmit --incremental",
     "test": "node build/runner.js",
-    "test-clean": "yarn build && yarn test"
+    "test-clean": "yarn build && yarn test",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
   },
-  "keywords": [],
-  "author": "Omri Gazitt <ogazitt@gmail.com>",
-  "license": "MIT",
   "dependencies": {
-    "cli-color": "^2.0.4",
-    "node-fetch": "^3.3.2"
+    "cli-color": "^2.0.4"
   },
   "devDependencies": {
     "@types/cli-color": "^2.0.6",
     "@types/node": "^26.6.4",
-    "@typescript-eslint/eslint-plugin": "^8.71.0",
-    "@typescript-eslint/parser": "^8.71.0",
-    "eslint": "^10.12.0",
-    "ts-node": "^10.7.0",
+    "oxfmt": "^0.72.0",
+    "oxlint": "^1.87.0",
+    "ts-node": "^10.9.2",
     "typescript": "^7.0.2"
   },
   "packageManager": "yarn@1.22.19"

@@ -10,7 +10,8 @@ The `app/` directory holds the React Router v7 framework code. `app/routes.ts` d
 - `pnpm dev` — launch the React Router dev server with live type generation.
 - `pnpm build` — create a production bundle under `build/`.
 - `pnpm start` — serve the production build via `@react-router/serve`.
-- `pnpm lint:fix` — run Biome to auto-format and lint the codebase.
+- `pnpm lint` / `pnpm lint:fix` — lint the codebase with oxlint (`lint:fix` applies safe fixes).
+- `pnpm format` / `pnpm format:check` — format the codebase with oxfmt, or check formatting without writing.
 - `pnpm typecheck` — regenerate route types and run the strict TypeScript check.
 - `pnpm generate` — invoke `buf` to regenerate Cerbos Hub gRPC/Connect clients.
 
@@ -31,7 +32,7 @@ The `app/` directory holds the React Router v7 framework code. `app/routes.ts` d
 
 ## Coding Style & Naming Conventions
 
-Use TypeScript strict mode with modern ECMAScript modules. Follow Biome’s defaults: two-space indentation, single quotes, and no semicolons. Prefer functional React components and hooks, and keep route logic in loaders/actions rather than component effects. Reference modules with the `~/` alias for items in `app/`. Always import route types using `./+types/<route-name>`; if they are missing, run `pnpm typecheck` instead of adjusting paths.
+Use TypeScript strict mode with modern ECMAScript modules. Formatting is enforced by oxfmt (`.oxfmtrc.json`): two-space indentation, double quotes, semicolons, trailing commas, and an 80-column print width. Lint rules live in `.oxlintrc.json`. Prefer functional React components and hooks, and keep route logic in loaders/actions rather than component effects. Reference modules with the `~/` alias for items in `app/`. Always import route types using `./+types/<route-name>`; if they are missing, run `pnpm typecheck` instead of adjusting paths.
 
 ## Testing Guidelines
 
@@ -39,7 +40,7 @@ Formal automated tests are being introduced; coordinate with maintainers before 
 
 ## Commit & Pull Request Guidelines
 
-Write concise, imperative commit messages (e.g. `add policy editor form`). Before opening a PR, run `pnpm lint:fix` and `pnpm typecheck`, and note any follow-up actions required. Provide a focused summary, link related issues, and include screenshots or recordings for UI-facing changes. Keep changes scoped to a single concern and call out any new configuration or environment variables such as `SESSION_SECRET` used by `app/lib/cerbos-hub.ts`.
+Write concise, imperative commit messages (e.g. `add policy editor form`). Before opening a PR, run `pnpm format`, `pnpm lint`, and `pnpm typecheck`, and note any follow-up actions required. Provide a focused summary, link related issues, and include screenshots or recordings for UI-facing changes. Keep changes scoped to a single concern and call out any new configuration or environment variables such as `SESSION_SECRET` used by `app/lib/cerbos-hub.ts`.
 
 # React Router v7 Framework Mode - Cursor Rules
 

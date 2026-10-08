@@ -3,8 +3,7 @@ import { evaluation as actions } from "./action/results.json";
 import { evaluation as subjects } from "./subject/results.json";
 import { evaluation as resources } from "./resource/results.json";
 
-const AUTHZEN_PDP_URL =
-  process.argv[2] || "https://topaz-search.authzen-interop.net";
+const AUTHZEN_PDP_URL = process.argv[2] || "https://topaz-search.authzen-interop.net";
 const AUTHZEN_PDP_API_KEY = process.env.AUTHZEN_PDP_API_KEY;
 const AUTHZEN_PDP_API_HEADER = process.env.AUTHZEN_PDP_API_HEADER;
 
@@ -13,17 +12,21 @@ enum OutputTypes {
   CONSOLE,
 }
 
-const FORMAT =
-  process.argv[3] === "markdown" ? OutputTypes.MARKDOWN : OutputTypes.CONSOLE;
+const FORMAT = process.argv[3] === "markdown" ? OutputTypes.MARKDOWN : OutputTypes.CONSOLE;
 
 type Endpoint = "action" | "resource" | "subject";
 
-type Expected = (typeof actions)[0]["expected"] | (typeof subjects)[0]["expected"] | (typeof resources)[0]["expected"];
-type ExpectedResult = Expected["results"]
+type Expected =
+  | (typeof actions)[0]["expected"]
+  | (typeof subjects)[0]["expected"]
+  | (typeof resources)[0]["expected"];
 
 interface Result {
   endpoint: Endpoint;
-  request: (typeof actions)[number]["request"] | (typeof subjects)[number]["request"] | (typeof resources)[number]["request"];
+  request:
+    | (typeof actions)[number]["request"]
+    | (typeof subjects)[number]["request"]
+    | (typeof resources)[number]["request"];
   expected: Expected;
   response?: boolean;
   status: "PASS" | "FAIL" | "ERROR";
@@ -60,7 +63,6 @@ async function main() {
     results.push(result);
   }
 
-
   if (FORMAT === OutputTypes.MARKDOWN) {
     console.log(
       arrayToTable(
@@ -85,7 +87,7 @@ async function execute(
     const response = await fetch(`${AUTHZEN_PDP_URL}/access/v1/search/${endpoint}`, {
       method: "POST",
       headers: {
-        [process.env.AUTHZEN_PDP_API_HEADER || "authorization"]: AUTHZEN_PDP_API_KEY,
+        [AUTHZEN_PDP_API_HEADER || "authorization"]: AUTHZEN_PDP_API_KEY,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(REQ),
@@ -120,14 +122,14 @@ async function execute(
 function status(response: Expected, expected: Expected) {
   const sortResults = (items: Expected["results"]) => {
     return [...items].sort((a, b) => {
-      const aAsTypeId = (a as { type: string, id: string });
-      const bAsTypeId = (b as { type: string, id: string });
+      const aAsTypeId = a as { type: string; id: string };
+      const bAsTypeId = b as { type: string; id: string };
       if (aAsTypeId.type) {
         if (aAsTypeId.type !== bAsTypeId.type) return aAsTypeId.type.localeCompare(bAsTypeId.type);
         return aAsTypeId.id.localeCompare(bAsTypeId.id);
       }
-      const aAsName = (a as { name: string });
-      const bAsName = (b as { name: string });
+      const aAsName = a as { name: string };
+      const bAsName = b as { name: string };
       return aAsName.name.localeCompare(bAsName.name);
     });
   };
@@ -135,10 +137,14 @@ function status(response: Expected, expected: Expected) {
   const sortedActualResults = sortResults(response.results || []);
   const sortedExpectedResults = sortResults(expected.results || []);
 
-  const actualJson = JSON.stringify(sortedActualResults, (_, value) => value === null ? undefined : value);
-  const expectedjson = JSON.stringify(sortedExpectedResults, (_, value) => value === null ? undefined : value);
+  const actualJson = JSON.stringify(sortedActualResults, (_, value) =>
+    value === null ? undefined : value
+  );
+  const expectedjson = JSON.stringify(sortedExpectedResults, (_, value) =>
+    value === null ? undefined : value
+  );
 
-  return actualJson === expectedjson ? "PASS" : "FAIL"
+  return actualJson === expectedjson ? "PASS" : "FAIL";
 }
 
 function logResult(result: Result) {
@@ -164,7 +170,6 @@ function logResult(result: Result) {
 }
 
 function arrayToTable(array) {
-  var cols = Object.keys(array[0]);
   var table = `<table>
   <tr>
     <th>result</th>

@@ -144,8 +144,7 @@ function logResult(result: Result) {
 }
 
 function arrayToTable(array) {
-  var cols = Object.keys(array[0]);
-  var table = `<table>
+  let table = `<table>
   <tr>
     <th>result</th>
     <th>request</th>

@@ -26,7 +26,7 @@ export class Server {
     };
     const versions = Object.keys(pdps.pdps);
     for (const v of versions) {
-      config.pdps[v] = Object.keys(pdps.pdps[v])
+      config.pdps[v] = Object.keys(pdps.pdps[v]);
     }
     config.gateways = pdps.gateways;
     config.gatewayPdps = Object.keys(pdps.gatewayPdps);
@@ -36,10 +36,10 @@ export class Server {
   async listGatewayPdps(_: Request, res: Response) {
     res.json(pdps.gatewayPdps);
   }
-  
+
   async getUser(req: JWTRequest, res: Response) {
-    const { userID } = req.params;
-    if(req.auth.sub === userID) {
+    const userID = req.params.userID as string;
+    if (req.auth.sub === userID) {
       res.json(await this.directory.getUserByIdentity(userID));
     } else {
       res.json(await this.directory.getUserById(userID));
@@ -59,32 +59,39 @@ export class Server {
       const user = await this.directory.getUserByIdentity(req.auth.sub);
       todo.OwnerID = user.id;
 
-
       await this.store.insert(todo);
-      await this.getStatefulAuthorizationService(req).insert(todo.ID, req.auth.sub);
+      await this.getStatefulAuthorizationService(req).insert(
+        todo.ID,
+        req.auth.sub
+      );
 
       res.json({ msg: "Todo created" });
     } catch (error) {
-      res.status(422).send({error: (error as Error).message})
+      res.status(422).send({ error: (error as Error).message });
     }
   }
 
   async update(req: JWTRequest, res: Response) {
     const todo: Todo = req.body;
-    todo.ID = req.params.id;
+    todo.ID = req.params.id as string;
 
     await this.store.update(todo);
     res.json({ msg: "Todo updated" });
   }
 
   async delete(req: JWTRequest, res: Response) {
-    await this.store.delete(req.params.id);
-    await this.getStatefulAuthorizationService(req).delete(req.params.id, req.auth.sub);
+    const id = req.params.id as string;
+    await this.store.delete(id);
+    await this.getStatefulAuthorizationService(req).delete(id, req.auth.sub);
     res.json({ msg: "Todo deleted" });
   }
 
-  private getStatefulAuthorizationService(req: JWTRequest){ 
-      const { pdpBaseName, pdpAuthHeader, pdpHeader } = getPdpInfo(req);
-      return createStatefulAuthorizationService(pdpBaseName, pdpAuthHeader, pdpHeader);
+  private getStatefulAuthorizationService(req: JWTRequest) {
+    const { pdpBaseName, pdpAuthHeader, pdpHeader } = getPdpInfo(req);
+    return createStatefulAuthorizationService(
+      pdpBaseName,
+      pdpAuthHeader,
+      pdpHeader
+    );
   }
 }
