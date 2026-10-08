@@ -165,7 +165,7 @@ The aggregate status is then recomputed: `cancelled` when no item completed befo
 
 For a task containing an `items` array, each approved item MUST include a per-item `result` that is independently enforceable according to its own `result.mode`.
 
-For a bundled Access Request, the default approval scope for each approved item is that item's Subject, Resource, Action, and relevant Context.
+For a bundled Access Request, the default approval scope for each approved item is that item's Subject, Resource, Action, and authorization-relevant Context.
 
 When the original submission carried an `items` array, the PEP re-evaluates each approved item separately, including that item's `result.approval` at `context.approval` in the item's re-evaluation request as described in [Approval and Re-evaluation](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#completion-semantics).  This profile does not define an aggregate re-evaluation that covers multiple items in one AuthZEN Authorization API call.
 

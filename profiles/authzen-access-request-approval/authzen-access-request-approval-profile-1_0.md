@@ -783,7 +783,7 @@ PEPs MUST NOT submit credentials to a host that is not trusted to receive them.
 * MUST NOT interpret the `template` value except for display or request submission; the value is not a policy language.
 * MAY ignore `display`.
 
-The PEP MUST preserve the principal identity of the Subject, and MUST preserve the Resource, Action, and relevant Context of the denied evaluation when submitting the Access Request.  When the original evaluation conveyed an actor identity in the Subject (for example, via `subject.properties.act`), the PEP MAY preserve the actor in the submission's `subject` or normalize it to `client.actor` ({{ACTOR}}); the actor identity itself MUST NOT be dropped.
+The PEP MUST preserve the principal identity of the Subject, and MUST preserve the Resource, Action, and authorization-relevant Context of the denied evaluation when submitting the Access Request.  When the original evaluation conveyed an actor identity in the Subject (for example, via `subject.properties.act`), the PEP MAY preserve the actor in the submission's `subject` or normalize it to `client.actor` ({{ACTOR}}); the actor identity itself MUST NOT be dropped.
 
 Submission-time augmentations MUST NOT change or remove authorization-relevant context from the denied evaluation.  When the Access Request Service needs to distinguish original evaluation context from submission-time input, deployments SHOULD place the latter in well-defined extension members rather than overwriting original context members.
 
@@ -940,14 +940,14 @@ The PDP MUST evaluate the new request using current policy and the approval refe
 
 The `approval` object, not the original `evaluation_id`, links re-evaluation to the approved Access Request and original denial.
 
-The PDP MUST be able to resolve or verify `approval.id`, `approval.state`, or both, and bind the approval to the Access Request task, the original denied evaluation when recorded, the approved Subject, Resource, Action, relevant Context, approval scope, and approval expiry.
+The PDP MUST be able to resolve or verify `approval.id`, `approval.state`, or both, and bind the approval to the Access Request task, the original denied evaluation when recorded, the approved Subject, Resource, Action, authorization-relevant Context, approval scope, and approval expiry.
 
 When both `approval.id` and an integrity-protected `approval.state` are present and `approval.state` carries its own approval identifier, the PDP MUST verify that the two identifiers match, and MUST reject the re-evaluation on mismatch.
 
 At re-evaluation, the PDP:
 
 * MUST NOT authorize a re-evaluation solely because the request contains a known `approval.id`.
-* MUST resolve or verify the approval reference presented in `context.approval` and confirm that it is applicable to the authenticated caller or requester, current Subject, Resource, Action, relevant Context, approval scope, and approval expiry before using it as an input to an allow decision.
+* MUST resolve or verify the approval reference presented in `context.approval` and confirm that it is applicable to the authenticated caller or requester, current Subject, Resource, Action, authorization-relevant Context, approval scope, and approval expiry before using it as an input to an allow decision.
 * MUST ignore or reject a swapped, replayed, expired, or otherwise non-applicable approval reference, and MUST evaluate the request as not approved by that reference.
 
 Values carried outside `approval.state`, including `approval.id`, `approved_at`, and `approved_until`, MUST NOT be treated as authoritative by the PDP unless resolved from trusted state or proven by integrity-protected approval binding material.
@@ -1226,7 +1226,7 @@ The following rules govern the freshness deadline of a submission:
 
 PDPs MAY add deployment-specific claims (policy version, factors, risk score, tenant identifier) when the Access Request Service needs them for routing or audit.  When such claims must remain opaque to the PEP, the PDP wraps the signed payload in JWE encrypted to the Access Request Service.
 
-When `binding_token` uses another integrity-protected format, the Access Request Service MUST perform equivalent verification for issuer authenticity, audience or intended recipient, expiry when present, replay resistance when provided by the format, and binding to the submitted Subject, Resource, Action, and relevant Context.
+When `binding_token` uses another integrity-protected format, the Access Request Service MUST perform equivalent verification for issuer authenticity, audience or intended recipient, expiry when present, replay resistance when provided by the format, and binding to the submitted Subject, Resource, Action, and authorization-relevant Context.
 
 A single signed JWT MAY simultaneously satisfy this profile's claim recommendations and the requirements of another profile or specification that uses the same JWT, provided the union of required claims is present and consistent.  For example, the same JWT can appear as `context.access_request.binding_token` and as a profile-defined token elsewhere.  Verifiers process the claims they understand without rejecting additional profile-specific claims.
 
