@@ -49,6 +49,9 @@ jobs:
           - name: access-request-actor-profile
             source: profiles/authzen-access-request-approval/authzen-access-request-actor-profile-1_0.md
             html: authzen-access-request-actor-profile-1_0.html
+          - name: obligations-extension
+            source: profiles/authzen-obligations-extension-1_0.md
+            html: authzen-obligations-extension-1_0.html
           - name: obligations-profile
             source: profiles/authzen-obligations-profile-1_0.md
             html: authzen-obligations-profile-1_0.html

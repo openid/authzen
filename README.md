@@ -23,9 +23,13 @@ A companion [Access Request Catalog Profile](https://openid.github.io/authzen/au
 
 Companion [Bulk Access Requests](https://openid.github.io/authzen/authzen-access-request-bulk-profile-1_0.html) and [Callback Notifications](https://openid.github.io/authzen/authzen-access-request-callback-profile-1_0.html) profiles define multi-item requests and authenticated completion notifications, and an [Actor Delegation](https://openid.github.io/authzen/authzen-access-request-actor-profile-1_0.html) profile defines how a PEP conveys the acting party and request origin.
 
+## Draft Obligations Extension
+
+An extension that lets a PDP attach mandatory, machine-readable actions -- obligations -- to an authorization decision, which the PEP must carry out in order to honor that decision. It defines the obligation object model, its fail-closed processing, the opt-in (`supported_mandatory_extensions`) and negotiation mechanism by which a PEP commits to enforcing obligations, binding requirements, and discovery. It is at `profiles/authzen-obligations-extension-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-obligations-extension-1_0.html).
+
 ## Draft Obligations Profile
 
-A profile that lets a PDP attach mandatory, machine-readable actions -- obligations -- to an authorization decision, which the PEP must carry out in order to honor that decision. It defines the obligation object model, PEP compliance semantics, a set of normative obligation types, and a mechanism for a PDP and PEP to discover which types they mutually support. It is at `profiles/authzen-obligations-profile-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-obligations-profile-1_0.html).
+A profile of the Obligations Extension that defines a set of normative obligation types -- `step-up`, `notification`, and `session_termination` -- and the conformance requirements for PDPs and PEPs that implement them. It is at `profiles/authzen-obligations-profile-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-obligations-profile-1_0.html).
 
 ## Draft OAuth 2.0 Token Issuance Profile
 
