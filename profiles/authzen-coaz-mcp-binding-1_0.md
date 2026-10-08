@@ -170,7 +170,7 @@ This binding fulfils the binding conformance requirements of the COAZ Framework
 | Framework requirement | This binding |
 |:---|:---|
 | Information model | `params`, `token` ({{information-model}}) |
-| Mapping location | `net.openid/authzen/coaz-mcp` key in a tool's `_meta`; otherwise the default mapping ({{declared-mappings}}, {{default-mappings}}) |
+| Mapping location | `net.openid/authzen/coaz/mcp` key in a tool's `_meta`; otherwise the default mapping ({{declared-mappings}}, {{default-mappings}}) |
 | Literal/expression discriminator | framework default: `$` prefix, `$$` escape ({{expressions}}) |
 | Expression language | framework default: Common Expression Language {{CEL}} ({{expressions}}) |
 | Envelopes | `evaluation` and `evaluations` ({{mapping-envelopes}}) |
@@ -251,7 +251,7 @@ that the ticket mattered:
     "required": ["report_id"]
   },
   "_meta": {
-    "net.openid/authzen/coaz-mcp": {
+    "net.openid/authzen/coaz/mcp": {
       "evaluation": {
         "subject":  { "type": "identity", "id": "$token.sub" },
         "action":   { "name": "get_report" },
@@ -441,7 +441,7 @@ message only if every decision is a permit.
 # Declaring a Mapping {#declaring-support}
 
 An MCP server declares a mapping for a tool by including a mapping object under
-the `net.openid/authzen/coaz-mcp` key of that tool's `_meta` object in the
+the `net.openid/authzen/coaz/mcp` key of that tool's `_meta` object in the
 `tools/list` response. `_meta` is the MCP extension point for attaching
 additional metadata to protocol objects {{MCP}}; the key uses a reverse-DNS
 prefix of the OpenID Foundation, as MCP recommends, so that it cannot collide
@@ -449,7 +449,7 @@ with keys defined by MCP or by other extensions. The mapping is deliberately not
 placed in `inputSchema`, which is a JSON Schema document describing the tool's
 arguments and is not a namespace this binding controls.
 
-The presence of the `net.openid/authzen/coaz-mcp` key in a tool's `_meta`
+The presence of the `net.openid/authzen/coaz/mcp` key in a tool's `_meta`
 indicates the tool carries a declared mapping; its absence means the default
 mapping for `tools/call` applies. No separate marker field is used. A PEP MUST
 ignore any other `_meta` keys when selecting a mapping.
@@ -479,7 +479,7 @@ that declares a mapping and one that does not:
         "required": ["id"]
       },
       "_meta": {
-        "net.openid/authzen/coaz-mcp": {
+        "net.openid/authzen/coaz/mcp": {
           "evaluation": {
             "subject": { "type": "identity", "id": "$token.sub" },
             "action": { "name": "get_customer" },
@@ -674,7 +674,7 @@ version of the binding.
 # Declared Mappings {#declared-mappings}
 
 An MCP server MAY declare a mapping for a tool by including it under the
-`net.openid/authzen/coaz-mcp` key of the tool's `_meta` ({{declaring-support}}). A declared mapping has the same
+`net.openid/authzen/coaz/mcp` key of the tool's `_meta` ({{declaring-support}}). A declared mapping has the same
 shape as a default mapping — an envelope naming the AuthZEN API and a template
 for that API's request body ({{mapping-envelopes}}) — and uses the same
 expression and literal rules ({{expressions}}). A declared mapping MAY use
@@ -775,7 +775,7 @@ PEP.
     "required": ["source", "destination"]
   },
   "_meta": {
-    "net.openid/authzen/coaz-mcp": {
+    "net.openid/authzen/coaz/mcp": {
       "evaluations": {
         "subject": { "type": "identity", "id": "$token.sub" },
         "context": { "agent": "$token.?client_id" },
@@ -835,7 +835,7 @@ so on the basis of the verified `subject.id`, not the declared `subject.type`:
     "required": ["from_account", "to_account", "amount", "currency"]
   },
   "_meta": {
-    "net.openid/authzen/coaz-mcp": {
+    "net.openid/authzen/coaz/mcp": {
       "evaluation": {
         "subject": {
           "type": "$token.roles.exists(r, r == 'treasury') ? 'treasury_user' : 'standard_user'",
@@ -1096,7 +1096,7 @@ declared mapping requires multiple decisions ({{mapping-envelopes}}).
 ## Model Context Protocol
 
 This binding extends the MCP {{MCP}} tool definition with the
-`net.openid/authzen/coaz-mcp` key in the tool's `_meta`. It is backward
+`net.openid/authzen/coaz/mcp` key in the tool's `_meta`. It is backward
 compatible: servers and clients that do not understand it ignore the key, and the default mappings still allow a
 PEP to authorize their messages.
 
