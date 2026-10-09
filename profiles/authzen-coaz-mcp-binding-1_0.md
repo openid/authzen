@@ -574,6 +574,21 @@ resource has changed, so a policy that restricts which resources a subject may
 read SHOULD also restrict the URIs a subject may list in
 `context.notifications.resourceSubscriptions`.
 
+## Logging
+
+In 2026-07-28 a client sets the log level for an individual request in
+`params._meta["io.modelcontextprotocol/logLevel"]`, which replaces the
+`logging/setLevel` method and is itself deprecated {{MCP}}. No default mapping
+projects it. Two requests that differ only in their requested log level, or in
+whether they request one at all, therefore construct the same AuthZEN request
+and receive the same decision ({{omitted-inputs}}).
+
+A deployment whose policy depends on the requested log level MUST enforce that
+condition independently of the default mappings. For a tool, a declared mapping
+MAY instead project the level, for example as
+`"log_level": "$params._meta[?'io.modelcontextprotocol/logLevel']"` in
+`context`, which omits the field when no level is requested.
+
 ## Pass-through Operations
 
 The following are pass-through: the PEP MUST NOT call the PDP for them and MUST
@@ -1029,7 +1044,7 @@ properties, and MUST verify the trust-anchored `subject.id` ({{declared-mappings
 before relying on it. The trust placed in the server as the author of declared
 mappings MUST be considered in the deployment's threat model.
 
-## Authorization Granularity and Omitted Inputs
+## Authorization Granularity and Omitted Inputs {#omitted-inputs}
 
 An AuthZEN decision applies to the request constructed by the selected mapping.
 Two MCP messages that differ only in an input the mapping does not project can
