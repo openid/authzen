@@ -59,12 +59,12 @@ normative:
         org: SGNL
     date: 2026
   MCP:
-    title: "Model Context Protocol Specification"
-    target: https://spec.modelcontextprotocol.io/
+    title: "Model Context Protocol Specification, Version 2026-07-28"
+    target: https://modelcontextprotocol.io/specification/2026-07-28
     author:
       -
         name: Anthropic
-    date: 2025
+    date: 2026
   JSONRPC:
     title: "JSON-RPC 2.0 Specification"
     target: https://www.jsonrpc.org/specification
@@ -174,7 +174,7 @@ This binding fulfils the binding conformance requirements of the COAZ Framework
 | Literal/expression discriminator | framework default: `$` prefix, `$$` escape ({{expressions}}) |
 | Expression language | framework default: Common Expression Language {{CEL}} ({{expressions}}) |
 | Envelopes | `evaluation` and `evaluations` ({{mapping-envelopes}}) |
-| Operations in scope | All MCP methods, per the default mapping table; pass-through set listed ({{default-mappings}}) |
+| Operations in scope | All client-to-server MCP 2026-07-28 requests, per the default mapping table, plus methods from earlier versions; pass-through set listed ({{default-mappings}}, {{earlier-versions}}) |
 | Default mapping behavior | Per-method default mapping table ({{default-mappings}}) |
 | Declared mapping behavior | MCP server MAY declare a mapping for a tool; overrides the default for that tool ({{declared-mappings}}) |
 | Trust-anchored fields | `subject.id` SHOULD be anchored to the subject-identity claim; when it is, it is enforced by verification against `$token.sub`, and a mapping MAY override its source for edge cases ({{declared-mappings}}) |
@@ -463,7 +463,24 @@ value, it is a mapping error ({{mapping-errors}}). A PEP that knows its own
 resource identifier from configuration MAY use it directly instead of deriving
 it from `aud`.
 
-The default mappings are:
+This binding targets MCP protocol version 2026-07-28 {{MCP}}. The default
+mappings below cover every client-to-server request defined by that version:
+`server/discover`, `tools/list`, `tools/call`, `resources/list`,
+`resources/templates/list`, `resources/read`, `prompts/list`, `prompts/get`,
+`completion/complete`, and `subscriptions/listen`. Every notification is a
+pass-through operation. Methods defined only by earlier MCP versions are
+covered in {{earlier-versions}}.
+
+## Discovery
+
+~~~ jsonc
+// server/discover
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id" },
+    "action": { "name": "server/discover" },
+    "resource": { "type": "mcp_server", "id": "$token.aud" } } }
+~~~
 
 ## Tools
 
@@ -486,15 +503,15 @@ The default mappings are:
 ## Resources
 
 ~~~ jsonc
-// resources/list
+// resources/list   (resources/templates/list uses the same shape; only
+//                   action.name differs)
 { "evaluation": {
     "subject": { "type": "identity", "id": "$token.sub" },
     "context": { "agent": "$token.?client_id" },
     "action": { "name": "resources/list" },
     "resource": { "type": "mcp_server", "id": "$token.aud" } } }
 
-// resources/read   (resources/subscribe and resources/unsubscribe use the
-//                   same shape; only action.name differs)
+// resources/read
 { "evaluation": {
     "subject": { "type": "identity", "id": "$token.sub" },
     "context": { "agent": "$token.?client_id" },
@@ -533,20 +550,109 @@ The default mappings are:
       "id":   "$params.ref.type == 'ref/prompt' ? $params.ref.name : $params.ref.uri" } } }
 ~~~
 
-## Logging
+## Subscriptions
+
+A `subscriptions/listen` request opens a stream on which the server delivers
+the notifications the client opts in to. The `notifications` filter in its
+`params` lists those notification types and, in `resourceSubscriptions`, the
+URIs of the resources whose updates the client wants. The default mapping
+authorizes opening the stream against the server and carries the whole filter
+in `context`, so that policy can evaluate what the stream will deliver:
 
 ~~~ jsonc
-// logging/setLevel
+// subscriptions/listen
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id", "notifications": "$params.notifications" },
+    "action": { "name": "subscriptions/listen" },
+    "resource": { "type": "mcp_server", "id": "$token.aud" } } }
+~~~
+
+Notifications delivered on the stream are pass-through and are not authorized
+individually. A `notifications/resources/updated` notification reveals that a
+resource has changed, so a policy that restricts which resources a subject may
+read SHOULD also restrict the URIs a subject may list in
+`context.notifications.resourceSubscriptions`.
+
+## Logging
+
+In 2026-07-28 a client sets the log level for an individual request in
+`params._meta["io.modelcontextprotocol/logLevel"]`, which replaces the
+`logging/setLevel` method and is itself deprecated {{MCP}}. No default mapping
+projects it. Two requests that differ only in their requested log level, or in
+whether they request one at all, therefore construct the same AuthZEN request
+and receive the same decision ({{omitted-inputs}}).
+
+A deployment whose policy depends on the requested log level MUST enforce that
+condition independently of the default mappings. For a tool, a declared mapping
+MAY instead project the level, for example as
+`"log_level": "$params._meta[?'io.modelcontextprotocol/logLevel']"` in
+`context`, which omits the field when no level is requested.
+
+## Pass-through Operations
+
+The following are pass-through: the PEP MUST NOT call the PDP for them and MUST
+allow them to proceed. They are listed explicitly so that the absence of a
+mapping is never interpreted as a deny.
+
+- all notifications (`notifications/*`), in either direction, which carry no
+  `id` and expect no response. In 2026-07-28 these are
+  `notifications/cancelled`, `notifications/progress`, `notifications/message`,
+  `notifications/resources/updated`, `notifications/resources/list_changed`,
+  `notifications/tools/list_changed`, `notifications/prompts/list_changed`, and
+  `notifications/subscriptions/acknowledged`.
+
+## Unknown Methods
+
+A request whose `method` has neither a default mapping defined by this binding
+nor an applicable declared mapping, and that is not in the pass-through set
+above, MUST be denied: the PEP MUST NOT allow it to proceed and MUST return an
+authorization denial ({{authorization-denial}}). This ensures that methods
+introduced by future MCP versions or extensions fail closed rather than bypassing
+authorization. The pass-through set is the only set of methods that proceed
+without a PDP decision.
+
+## Multi Round-Trip Requests
+
+In MCP 2026-07-28 a server does not send `sampling/createMessage`,
+`elicitation/create`, or `roots/list` to the client as separate JSON-RPC
+requests. Instead, it answers a client request with an `InputRequiredResult`
+that carries those requests in `inputRequests`, and the client retries the
+original request with its answers in `params.inputResponses`, together with
+any opaque `params.requestState` the server returned.
+
+A retry is an ordinary client request. The PEP MUST authorize it with the
+mapping for its method, exactly as for the first attempt, and MUST NOT reuse
+the decision made for an earlier attempt. `inputResponses` and `requestState`
+are part of `params` and are therefore available to expressions; no default
+mapping projects them. Authorizing the server's embedded input requests
+themselves is out of scope for this version of the binding.
+
+## Methods from Earlier MCP Versions {#earlier-versions}
+
+MCP 2026-07-28 removed several methods that earlier protocol versions define.
+A PEP that also serves clients using an earlier protocol version MUST apply the
+following default mappings to those methods, in addition to the mappings
+above.
+
+~~~ jsonc
+// logging/setLevel   (replaced in 2026-07-28 by a per-request log level in
+//                     _meta)
 { "evaluation": {
     "subject": { "type": "identity", "id": "$token.sub" },
     "context": { "agent": "$token.?client_id", "level": "$params.level" },
     "action": { "name": "logging/setLevel" },
     "resource": { "type": "mcp_server", "id": "$token.aud" } } }
-~~~
 
-## Tasks
+// resources/subscribe   (resources/unsubscribe uses the same shape; only
+//                        action.name differs. Replaced in 2026-07-28 by
+//                        subscriptions/listen)
+{ "evaluation": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "context": { "agent": "$token.?client_id" },
+    "action": { "name": "resources/subscribe" },
+    "resource": { "type": "resource", "id": "$params.uri" } } }
 
-~~~ jsonc
 // tasks/get   (tasks/result and tasks/cancel use the same shape; only
 //              action.name differs)
 { "evaluation": {
@@ -563,34 +669,16 @@ The default mappings are:
     "resource": { "type": "mcp_server", "id": "$token.aud" } } }
 ~~~
 
-## Pass-through Operations
+For earlier protocol versions, `initialize` and `ping` are also pass-through
+operations: they establish and maintain the session and act on no server
+resource.
 
-The following are pass-through: the PEP MUST NOT call the PDP for them and MUST
-allow them to proceed. They are listed explicitly so that the absence of a
-mapping is never interpreted as a deny.
-
-- `ping`
-- all notifications (`notifications/*`), which carry no `id` and expect no
-  response.
-
-## Unknown Methods
-
-A request whose `method` has neither a default mapping defined by this binding
-nor an applicable declared mapping, and that is not in the pass-through set
-above, MUST be denied: the PEP MUST NOT allow it to proceed and MUST return an
-authorization denial ({{authorization-denial}}). This ensures that methods
-introduced by future MCP versions or extensions fail closed rather than bypassing
-authorization. The pass-through set is the only set of methods that proceed
-without a PDP decision.
-
-## Server-initiated Requests
-
-The MCP requests `sampling/createMessage`, `elicitation/create`, and
-`roots/list` are initiated by the server toward the client. The PEP model in
-this binding authorizes client-to-server requests using the client's access
-token, which is not the appropriate identity for server-initiated requests.
-Authorization of server-initiated requests is therefore out of scope for this
-version of the binding.
+In earlier protocol versions, `sampling/createMessage`, `elicitation/create`,
+and `roots/list` are JSON-RPC requests sent by the server to the client. The
+PEP model in this binding authorizes client-to-server requests using the
+client's access token, which is not the appropriate identity for
+server-initiated requests. Authorization of those requests is out of scope for
+this version of the binding.
 
 # Declared Mappings {#declared-mappings}
 
@@ -956,7 +1044,7 @@ properties, and MUST verify the trust-anchored `subject.id` ({{declared-mappings
 before relying on it. The trust placed in the server as the author of declared
 mappings MUST be considered in the deployment's threat model.
 
-## Authorization Granularity and Omitted Inputs
+## Authorization Granularity and Omitted Inputs {#omitted-inputs}
 
 An AuthZEN decision applies to the request constructed by the selected mapping.
 Two MCP messages that differ only in an input the mapping does not project can
