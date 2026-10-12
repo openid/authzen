@@ -1,4 +1,5 @@
 import clc from "cli-color";
+import { compareResults } from "./compare";
 import { evaluation as actions } from "./action/results.json";
 import { evaluation as subjects } from "./subject/results.json";
 import { evaluation as resources } from "./resource/results.json";
@@ -101,7 +102,7 @@ async function execute(
       request: REQ,
       response: RSP,
       expected: EXP,
-      status: status(RSP, EXP),
+      status: compareResults(RSP, EXP),
     };
 
     if (FORMAT === OutputTypes.CONSOLE) logResult(result);
@@ -117,34 +118,6 @@ async function execute(
     if (FORMAT === OutputTypes.CONSOLE) logResult(result);
     return result;
   }
-}
-
-function status(response: Expected, expected: Expected) {
-  const sortResults = (items: Expected["results"]) => {
-    return [...items].sort((a, b) => {
-      const aAsTypeId = a as { type: string; id: string };
-      const bAsTypeId = b as { type: string; id: string };
-      if (aAsTypeId.type) {
-        if (aAsTypeId.type !== bAsTypeId.type) return aAsTypeId.type.localeCompare(bAsTypeId.type);
-        return aAsTypeId.id.localeCompare(bAsTypeId.id);
-      }
-      const aAsName = a as { name: string };
-      const bAsName = b as { name: string };
-      return aAsName.name.localeCompare(bAsName.name);
-    });
-  };
-
-  const sortedActualResults = sortResults(response.results || []);
-  const sortedExpectedResults = sortResults(expected.results || []);
-
-  const actualJson = JSON.stringify(sortedActualResults, (_, value) =>
-    value === null ? undefined : value
-  );
-  const expectedjson = JSON.stringify(sortedExpectedResults, (_, value) =>
-    value === null ? undefined : value
-  );
-
-  return actualJson === expectedjson ? "PASS" : "FAIL";
 }
 
 function logResult(result: Result) {

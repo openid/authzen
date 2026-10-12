@@ -9,6 +9,7 @@
     "tsc": "tsc --noEmit --incremental",
     "test": "node build/runner.js",
     "test-clean": "yarn build && yarn test",
+    "test:unit": "yarn build && node --test build/compare.test.js",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt src",
