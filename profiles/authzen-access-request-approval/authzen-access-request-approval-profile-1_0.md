@@ -921,7 +921,9 @@ A PDP MUST include the following capability URN for each binding capability ({{b
 `urn:openid:authzen:capability:access-request:signed-approval-state`
 : The Access Request Service identified by `access_request_endpoint` issues `approval.state`, and the PDP verifies it.
 
-A capability URN declares that the capability is enabled for the roles the metadata describes, not that the implementation could support it.  Absence of a URN means the capability is not offered, so a peer does not expect the artifact.
+A capability URN declares that the capability is in use by the deployment the metadata describes, not that an implementation could be configured to support it.  An absent URN means the artifact is not sent ({{binding-capabilities}}).
+
+A PDP that includes a binding capability URN MUST also include `urn:openid:authzen:capability:access-request`.  Capability URNs are compared as whole values; the binding capability URNs are distinct values and are not implied by `urn:openid:authzen:capability:access-request` despite sharing its prefix.
 
 The `access_request_endpoint` MAY be hosted by the PDP itself, by a service trusted by the PDP, or by an independent service operating with delegated authority from the PDP.  When hosted by a different service, the PDP metadata MUST identify the endpoint actually used by the PEP to submit access requests.
 
