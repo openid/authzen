@@ -219,6 +219,16 @@ Three roles take part in this profile:
 
 The protocol, authorization, and binding requirements apply regardless of which entity plays the Access Request Service role.
 
+## Conformance Claims {#conformance-claims}
+
+Conformance is claimed per role.  A PEP, a PDP, or an Access Request Service claims the requirements this profile places on that role.
+
+A binding capability is a property of a deployment rather than of a product.  It is declared in PDP metadata ({{pdp-metadata-rules}}) by the operator of the PDP and Access Request Service pair, and it states what that pair issues and verifies ({{binding-capabilities}}).  A product states separately, outside this profile, which capabilities it can be configured to support.
+
+This profile does not require a particular binding mechanism unconditionally; the topology rules in {{denial-binding}} and {{approval-state}} determine when a signed mechanism is required.  A requestable denial carries at least one denial-binding form, and the PDP resolves or verifies the approval by lookup, by integrity-protected material, or both ({{approval-verification}}).  Lookup needs no declaration, because it is internal to roles that already share state; the signed mechanisms are declared, because they are contracts between roles that do not.
+
+A difference in binding mechanism imposes no additional requirement on a PEP, which carries both artifacts unchanged without decoding them ({{pep-construct}}, {{approval-reevaluation-request}}), so a conforming PEP works against either mechanism.  Interoperability between a PDP and an Access Request Service built independently of each other depends on compatible deployment configuration: this profile does not define the interface by which the two roles share state, so a pair that supports no common binding capability is not guaranteed to interoperate.
+
 ## Binding Model {#binding-model}
 
 Denial and approval binding material passes through the PEP for verification by the receiving role:
@@ -904,6 +914,18 @@ A PDP supporting this profile SHOULD include the following capability URN in the
 
 `urn:openid:authzen:capability:access-request`
 
+A PDP MUST include the following capability URN for each binding capability ({{binding-capabilities}}) the deployment supports:
+
+`urn:openid:authzen:capability:access-request:signed-denial-binding`
+: The PDP issues `binding_token` as defined by this profile, and the Access Request Service identified by `access_request_endpoint` verifies it.
+
+`urn:openid:authzen:capability:access-request:signed-approval-state`
+: The Access Request Service identified by `access_request_endpoint` issues `approval.state`, and the PDP verifies it.
+
+A capability URN declares that the capability is in use by the deployment the metadata describes, not that an implementation could be configured to support it.  An absent URN means the artifact is not sent ({{binding-capabilities}}).
+
+A PDP that includes a binding capability URN MUST also include `urn:openid:authzen:capability:access-request`.  Capability URNs are compared as whole values; the binding capability URNs are distinct values and are not implied by `urn:openid:authzen:capability:access-request` despite sharing its prefix.
+
 The `access_request_endpoint` MAY be hosted by the PDP itself, by a service trusted by the PDP, or by an independent service operating with delegated authority from the PDP.  When hosted by a different service, the PDP metadata MUST identify the endpoint actually used by the PEP to submit access requests.
 
 ## Issue a Requestable Denial {#denial-issuance}
@@ -1037,6 +1059,7 @@ When `denial.binding_token` is absent, the Access Request Service MUST resolve o
 The Access Request Service applies the artifact-specific verification rules in {{binding-artifacts}} to every requested item:
 
 * When `denial.binding_token` is present, the service MUST verify its integrity.  When the value is a JWS, the service MUST verify the signature using a key resolved from the JWK Set advertised at the PDP's `jwks_uri` ({{binding-keys}}); JWS `kid` headers are matched against JWK `kid` parameters.
+* When `denial.binding_token` is present in a form the service cannot verify, the service MUST NOT resolve an accompanying `denial.evaluation_id` as the binding form instead ({{denial-binding}}); the submission is rejected with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
 
 ### Idempotency and Retries {#submission-idempotency}
 
@@ -1109,15 +1132,29 @@ Access Request Services MUST evaluate approver eligibility before returning `app
 
 # Binding Artifacts {#binding-artifacts}
 
-This section defines how the PDP and the Access Request Service issue and verify binding artifacts at the denial and approval boundaries; a PEP carries the artifacts unchanged ({{pep-construct}}, {{approval-reevaluation-request}}) and needs nothing further from this section.  The Interoperability Baseline requires support for the respective JWS verification paths in every deployment; shared-state deployments need not exchange binding artifacts, but their Access Request Services and PDPs still support those paths.  Whenever `binding_token` or `approval.state` is used, its applicable processing rules apply, including any conditions on its format.  Rules in this section that are stated for either binding form, or for the Approval Result the Access Request Service returns, apply in every deployment.
+This section defines how the PDP and the Access Request Service issue and verify binding artifacts at the denial and approval boundaries; a PEP carries the artifacts unchanged ({{pep-construct}}, {{approval-reevaluation-request}}) and needs nothing further from this section.  The JWS verification paths are optional capabilities ({{binding-capabilities}}) that a deployment declares; roles that resolve everything through shared state need not support them.  Whenever `binding_token` or `approval.state` is used, its applicable processing rules apply, including any conditions on its format.  Rules in this section that are stated for either binding form, or for the Approval Result the Access Request Service returns, apply in every deployment.
 
 An independent Access Request Service needs `binding_token` to verify the denial.  A PDP without trusted access to the approval record needs `approval.state` or another profile-defined PDP-verifiable artifact ({{approval-state}}).  The `state` member can carry proof or verifier state; its JWS rules apply when it is carried by value as a JWS.
 
-## Interoperability Baseline {#interoperability-baseline}
+## Binding Capabilities {#binding-capabilities}
 
-For cross-vendor interoperability, an Access Request Service MUST support verifying a `binding_token` presented as a JWS in compact serialization, and a PDP MUST support verifying an `approval.state` presented as a JWS in compact serialization ({{approval-state}}).
+This profile defines two optional capabilities.  They are independent: a deployment may need one, both, or neither.
 
-Other integrity-protected formats MAY be used when both the issuer and the verifier support them.
+Signed Denial Binding:
+: The PDP issues `binding_token` and the Access Request Service verifies it ({{denial-binding}}).  A deployment needs this capability when the Access Request Service cannot resolve the PDP's denial state.
+
+Signed Approval State:
+: The Access Request Service issues `approval.state` and the PDP verifies it ({{approval-state}}).  A deployment needs this capability when the PDP cannot resolve the approval record.
+
+A deployment declares the capabilities it supports in PDP metadata ({{pdp-metadata-rules}}).
+
+Under a declared Signed Denial Binding capability, the PDP MUST support issuing `binding_token` as a JWS in compact serialization and the Access Request Service MUST support verifying a `binding_token` presented in that form.  Under a declared Signed Approval State capability, the Access Request Service MUST support issuing `approval.state` as a JWS in compact serialization and the PDP MUST support verifying an `approval.state` presented in that form.  Within a declared capability the artifact is a JWS in compact serialization, so two peers operating under the same declaration cannot diverge on format; the payload, algorithms, and trust configuration are defined elsewhere in this section.
+
+A declaration also governs what is emitted.  A PDP MUST NOT include `context.access_request.binding_token` in a requestable denial unless Signed Denial Binding is declared for the deployment, and an Access Request Service MUST NOT include `approval.state` in an Approval Result unless Signed Approval State is declared.  An absent declaration therefore means the artifact is not sent, which is what allows the other role to rely on it.
+
+Declaration and validation are distinct.  The requirements above govern which artifacts an implementation issues and which verification paths it provides.  Every rule in this section that is conditioned on an artifact being present applies whenever an implementation receives that artifact, whether or not the corresponding capability is declared.
+
+Other integrity-protected formats MAY be used by bilateral agreement between the issuer and the verifier.  Such use lies outside the declared capabilities, and this profile defines no interoperability for it.
 
 ## Keys and Metadata {#binding-keys}
 
@@ -1139,7 +1176,9 @@ Non-normative metadata example:
   "access_request_endpoint": "https://pdp.example.com/access/v1/requests",
   "jwks_uri": "https://pdp.example.com/access/v1/jwks",
   "capabilities": [
-    "urn:openid:authzen:capability:access-request"
+    "urn:openid:authzen:capability:access-request",
+    "urn:openid:authzen:capability:access-request:signed-denial-binding",
+    "urn:openid:authzen:capability:access-request:signed-approval-state"
   ]
 }
 ~~~
@@ -1233,7 +1272,9 @@ A single signed JWT MAY simultaneously satisfy this profile's claim recommendati
 
 ## Approval State {#approval-state}
 
-When the PDP cannot resolve `approval.id` from trusted server-side state shared with, or delegated by, the Access Request Service, the Approval Result MUST include `approval.state` or another profile-defined PDP-verifiable artifact.  An Access Request Service MUST NOT return a result under the `reevaluate` completion mode that the PDP cannot verify without trusting PEP-supplied assertions.
+When the PDP cannot resolve `approval.id` from trusted server-side state shared with, or delegated by, the Access Request Service, the Approval Result MUST include `approval.state` or another profile-defined PDP-verifiable artifact, and the deployment MUST declare Signed Approval State ({{binding-capabilities}}).  An Access Request Service MUST NOT return a result under the `reevaluate` completion mode that the PDP cannot verify without trusting PEP-supplied assertions.
+
+A deployment MUST therefore provide at least one approval-verification path: either the PDP resolves `approval.id` from trusted state, or Signed Approval State is declared.  A deployment providing neither has no conformant Approval Result under the `reevaluate` completion mode, which is a configuration error rather than a condition a role reports at request time.
 
 When `approval.state` is carried by value as a JWS:
 
@@ -1466,6 +1507,36 @@ Capability URN:
 
 Capability Description:
 : Indicates that the PDP supports requestable denials and the Access Request Endpoint defined by this specification.
+
+Change Controller:
+: OpenID Foundation AuthZEN Working Group
+
+Specification Document:
+: This document.
+
+Capability Name:
+: `access-request:signed-denial-binding`
+
+Capability URN:
+: `urn:openid:authzen:capability:access-request:signed-denial-binding`
+
+Capability Description:
+: Indicates that the PDP issues `binding_token` as defined by this specification and that the Access Request Service it identifies verifies it.
+
+Change Controller:
+: OpenID Foundation AuthZEN Working Group
+
+Specification Document:
+: This document.
+
+Capability Name:
+: `access-request:signed-approval-state`
+
+Capability URN:
+: `urn:openid:authzen:capability:access-request:signed-approval-state`
+
+Capability Description:
+: Indicates that the Access Request Service the PDP identifies issues `approval.state` as defined by this specification and that the PDP verifies it.
 
 Change Controller:
 : OpenID Foundation AuthZEN Working Group
@@ -2105,6 +2176,6 @@ The author thanks the OpenID AuthZEN Working Group for discussion and review.
 * Protocol restructuring and modularization, with each requirement's force preserved.  The core protocol (requestable denial, submission, task status, approval and re-evaluation) is presented first, followed by binding and verification rules that place signed mechanisms beside their shared-state alternatives; cancellation, delegation and acting parties, and machine-readable forms follow in their own sections; security considerations name threats and point to the rules that sit beside the mechanisms they protect.  Requirements were relocated and restated without change in force, duplicated restatements were consolidated, and the conformance surface of this document changed only by what moved to companion profiles.
 * Catalog references moved to the companion AuthZEN Access Request Catalog Profile.
 * Bulk submission and callback notification requirements, feature-specific security considerations, and examples moved to companion profiles, with the core retaining normative references to their defined members and processing rules.
-* Progressive layout: trusted-state examples lead the common protocol; artifact processing and additional mechanisms follow.  The interoperability baseline and all processing requirements retain their applicability and force.  A non-normative deadline guide and trusted-state walkthrough accompany the exchange, and two example omissions are corrected.
+* Progressive layout: trusted-state examples lead the common protocol; artifact processing and additional mechanisms follow.  All processing requirements retain their applicability and force.  A non-normative deadline guide and trusted-state walkthrough accompany the exchange, and two example omissions are corrected.
 * One normative home per rule: message definitions stay in the flow sections, cut to name, presence, type, and one sentence; every processing rule sits in PEP Processing, PDP Processing, or Access Request Service Processing; restating tables and duplicate examples removed; fourteen duplicate statements folded into their surviving rules.
 * Actor delegation (the `client.actor` and `client.source` members and actor-chain verification) moved to the companion AuthZEN Actor Delegation Profile, with the core retaining the preservation, comparison, and authorization-input rules that reference those members.
