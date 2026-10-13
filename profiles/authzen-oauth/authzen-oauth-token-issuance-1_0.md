@@ -425,8 +425,8 @@ client to hold a token but not to exchange for one - has nothing to attach
 to unless the grant is in the five-tuple.
 
 Neither segment subsumes the other. A single authorization code request may
-mint an access token, a refresh token, and an ID token, which are separately
-gateable; and a token exchange selects its output through
+mint an access token, a refresh token, and an ID token, each of which takes
+its own gate ({{batch}}); and a token exchange selects its output through
 `requested_token_type`, so its token type is a variable of the request.
 Together the two segments name one privilege: what may be minted, and by
 what means.
@@ -463,7 +463,8 @@ AS. Any such mapping is internal to the PDP. This keeps `action.name` a
 stable interface: the AS reports what the client asked for, and the PDP
 decides what that means in its own policy vocabulary.
 
-{{ex-downscope}} shows three scope tuples behind a gate, one of them denied.
+{{ex-downscope}} shows three scope tuples behind a pair of gates, one of the
+three denied.
 
 ### Authorization Detail Tuple {#rar-tuple}
 
@@ -617,27 +618,40 @@ response.
 
 For each requested target ({{resource}}), the AS forms:
 
-- a gate tuple ({{gate-tuple}}), and
+- one gate tuple ({{gate-tuple}}) for each token type it would mint, and
 - one scope tuple ({{scope-tuple}}) for each requested scope,
 
 each carrying that target as its `resource`. Where the request carries
 `authorization_details`, the AS also forms the authorization detail tuples of
 {{rar-tuple}}, which carry a resource of their own.
 
-This document produces one gate tuple per target. Bindings may produce more:
-the token exchange family evaluates the authority of the requesting party
-separately from that of the subject, and so produces two per target.
+A token request may mint more than one token. An `authorization_code` request
+returns an access token and, where the AS issues one, a refresh token; where
+the request is an OpenID Connect request it returns an ID token as well. Each
+of those is a separate privilege, so each takes its own gate: a request
+minting an access token and a refresh token for one target forms two gate
+tuples at that target, `issue:access_token:authorization_code` and
+`issue:refresh_token:authorization_code`. An AS forms a gate only for a token
+type it would otherwise mint, so the gates it forms are those its own
+configuration has already admitted.
+
+This document therefore produces one gate tuple per target per token type.
+Bindings may produce more: the token exchange family evaluates the authority
+of the requesting party separately from that of the subject, and so produces
+two per target for the token type it mints.
 
 Where a request yields more than one tuple, the AS MUST use the Access
 Evaluations API of {{AUTHZEN}} with `options.evaluations_semantic` set to
 `execute_all`, and MUST place gate tuples at the leading indices of the
 `evaluations` array, beginning at index 0. The response lists decisions in
 request order ({{AUTHZEN}} Section 7.2), so the AS recovers which target,
-scope, or authorization detail cell each decision belongs to by position.
+token type, scope, or authorization detail cell each decision belongs to by
+position.
 
-A request reduces to a single evaluation only when it names one target, no
-scopes, and no authorization details, in which case the gate tuple stands
-alone. {{ex-no-scopes}} is that case, and {{ex-cc}} the smallest batch.
+A request reduces to a single evaluation only when it names one target and
+mints one token type, with no scopes and no authorization details, in which
+case the gate tuple stands alone. {{ex-no-scopes}} is that case, and
+{{ex-cc}} the smallest batch.
 
 `execute_all` is required because a denial must be able to narrow the grant
 rather than fail it. {{AUTHZEN}} evaluation semantics are selected per request
@@ -689,10 +703,23 @@ shorten.
 
 ### A Denied Gate Removes a Target {#gate-denial}
 
-A gate tuple governs one target. Where its decision is `false`, that target
-is removed from the request: the AS MUST NOT name it in the audience of any
-token it issues, and MUST disregard the scope tuples formed for it and any
-authorization detail tuple naming it as `resource.id`.
+A gate tuple governs one token type at one target.
+
+Where the denied gate names a token type the request cannot proceed without -
+the access token of an `authorization_code`, `client_credentials` or
+`refresh_token` request, or the token named by `requested_token_type` on a
+token exchange - that target is removed from the request: the AS MUST NOT
+name it in the audience of any token it issues, and MUST disregard the scope
+tuples formed for it and any authorization detail tuple naming it as
+`resource.id`.
+
+Where the denied gate names any other token type, the request is narrowed
+rather than failed: the AS MUST NOT mint a token of that type, and MUST
+otherwise proceed. A denied `issue:refresh_token:authorization_code` yields an
+access token and no refresh token, which is the response {{RFC6749}} Section
+5.1 already permits, since `refresh_token` is OPTIONAL there. A denied
+`issue:id_token:authorization_code` yields a token response with no `id_token`
+member.
 
 Where every target is removed, the AS MUST fail the request and MUST NOT
 issue a token. For token exchange requests the appropriate error is
@@ -1007,12 +1034,26 @@ one, and MUST be evaluated as such.
 
 An Access Evaluations response in {{AUTHZEN}} carries no top-level context;
 each element of the `evaluations` array is a decision with its own optional
-context. Token shaping, however, is a property of the token: there is one
-lifetime, one claim set, one authorization details array for the token being
-minted, while this profile fans scopes, targets, and authorization detail
-cells out across many evaluations.
+context. Token shaping, however, is a property of a token: each token minted
+has one lifetime, one claim set, one authorization details array, while this
+profile fans token types, scopes, targets, and authorization detail cells out
+across many evaluations.
 
-An AS MUST therefore compose per-item shaping as follows:
+Aggregation is therefore **per token type**. Each shaping key is composed only
+from the items that speak for the token being minted, which are:
+
+- the gate tuple naming that token type ({{batch}}), and
+- for the access token, the scope tuples and authorization detail tuples of
+  the same target, which describe what that access token carries and speak
+  for no other token type.
+
+A `token_lifetime` returned on `issue:refresh_token:authorization_code`
+therefore bounds the refresh token and not the access token issued beside it,
+and a `claims` value returned on an ID token gate does not reach the access
+token. A PDP that intends a bound to apply to more than one token returns it
+on each of their gates.
+
+Within a token type, an AS MUST compose per-item shaping as follows:
 
 | Key | Aggregation |
 |---|---|
@@ -1023,13 +1064,19 @@ An AS MUST therefore compose per-item shaping as follows:
 | `claims` | Merge; see below |
 | `crit` | Union |
 
+`granted_scope` and `authorization_details` are meaningful only for the access
+token, since no other token type carries them. An AS MUST ignore either key
+where it is returned on a gate tuple naming another token type.
+
 Shaping keys appearing in the context of a **denied** item MUST be ignored.
 
-Where two permitted items return different values for the same member of
-`claims`, the AS MUST reject the decision. There is no general narrowing
-merge for arbitrary JSON values, and choosing one arbitrarily could
-broaden the result. Identical values are not a conflict. A PDP SHOULD return
-token-level shaping on a single item to avoid the situation.
+Where two permitted items speaking for the same token type return different
+values for the same member of `claims`, the AS MUST reject the decision. There
+is no general narrowing merge for arbitrary JSON values, and choosing one
+arbitrarily could broaden the result. Identical values are not a conflict.
+Values returned for different token types are not a conflict either, since
+they shape different tokens. A PDP SHOULD return token-level shaping on a
+single item per token type to avoid the situation.
 
 # Discovery {#discovery}
 
@@ -1192,8 +1239,9 @@ Content-Type: application/json
 
 ## Authorization Code, Downscoping {#ex-downscope}
 
-Three scopes are requested. The gate leads at index 0 and `execute_all`
-allows the AS to issue the permitted subset of the rest, per
+The AS would mint an access token and a refresh token, so the batch carries a
+gate for each ({{batch}}). Three scopes are requested behind them, and
+`execute_all` allows the AS to issue the permitted subset, per
 {{scope-denial}}.
 
 ~~~ json
@@ -1213,6 +1261,11 @@ allows the AS to issue the permitted subset of the rest, per
         "name": "issue:access_token:authorization_code"
       }
     },
+    {
+      "action": {
+        "name": "issue:refresh_token:authorization_code"
+      }
+    },
     { "action": { "name": "files.read"   } },
     { "action": { "name": "files.write"  } },
     { "action": { "name": "files.delete" } }
@@ -1224,7 +1277,18 @@ allows the AS to issue the permitted subset of the rest, per
 ~~~ json
 {
   "evaluations": [
-    { "decision": true },
+    {
+      "decision": true,
+      "context": {
+        "issuance": { "token_lifetime": 900 }
+      }
+    },
+    {
+      "decision": true,
+      "context": {
+        "issuance": { "token_lifetime": 86400 }
+      }
+    },
     {
       "decision": true,
       "context": {
@@ -1240,13 +1304,21 @@ allows the AS to issue the permitted subset of the rest, per
 }
 ~~~
 
-The AS issues a token bearing `files.read files.write`, a `groups` claim,
-and reports the reduced scope set in the token response.
+The AS issues an access token bearing `files.read files.write` and a `groups`
+claim, and reports the reduced scope set in the token response. It issues a
+refresh token beside it.
+
+The two lifetimes do not compete. Aggregation is per token type
+({{aggregation}}), so the access token expires in 900 seconds and the refresh
+token in a day. The `claims` value returned at index 2 is a scope tuple of this
+target and so shapes the access token; it does not reach the refresh token. Had
+the PDP denied index 1, the AS would have returned the access token with no
+refresh token ({{gate-denial}}).
 
 Had the same subject arrived at the same audience with the same scopes on a
-refresh, index 0 would have read
-`issue:access_token:refresh_token`, and a policy that requires fresh
-authorization here could deny it while leaving the scope tuples untouched.
+refresh, index 0 would have read `issue:access_token:refresh_token`, and a
+policy that requires fresh authorization here could deny it while leaving the
+scope tuples untouched.
 
 ## No Scopes Requested {#ex-no-scopes}
 
