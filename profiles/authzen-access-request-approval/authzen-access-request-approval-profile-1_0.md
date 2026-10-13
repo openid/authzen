@@ -1175,7 +1175,9 @@ Non-normative metadata example:
   "access_request_endpoint": "https://pdp.example.com/access/v1/requests",
   "jwks_uri": "https://pdp.example.com/access/v1/jwks",
   "capabilities": [
-    "urn:openid:authzen:capability:access-request"
+    "urn:openid:authzen:capability:access-request",
+    "urn:openid:authzen:capability:access-request:signed-denial-binding",
+    "urn:openid:authzen:capability:access-request:signed-approval-state"
   ]
 }
 ~~~
