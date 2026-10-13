@@ -1141,11 +1141,15 @@ Signed Denial Binding:
 Signed Approval State:
 : The Access Request Service issues `approval.state` and the PDP verifies it ({{approval-state}}).  A deployment needs this capability when the PDP cannot resolve the approval record.
 
-A PDP supporting Signed Denial Binding MUST support issuing `binding_token` as a JWS in compact serialization, and an Access Request Service supporting Signed Denial Binding MUST support verifying a `binding_token` presented in that form.  An Access Request Service supporting Signed Approval State MUST support issuing `approval.state` as a JWS in compact serialization, and a PDP supporting Signed Approval State MUST support verifying an `approval.state` presented in that form.  A capability therefore fixes the format for both of its roles; the payload, algorithms, and trust configuration are defined elsewhere in this section.  Deployments declare the capabilities they support in PDP metadata ({{pdp-metadata-rules}}).
+A deployment declares the capabilities it supports in PDP metadata ({{pdp-metadata-rules}}).
 
-Support and validation are distinct.  The two requirements above govern whether an implementation provides these verification paths at all.  Every rule in this section that is conditioned on an artifact being present applies whenever an implementation accepts that artifact, whether or not the corresponding capability is declared.
+Under a declared Signed Denial Binding capability, the PDP MUST support issuing `binding_token` as a JWS in compact serialization and the Access Request Service MUST support verifying a `binding_token` presented in that form.  Under a declared Signed Approval State capability, the Access Request Service MUST support issuing `approval.state` as a JWS in compact serialization and the PDP MUST support verifying an `approval.state` presented in that form.  Within a declared capability the artifact is a JWS in compact serialization, so two peers operating under the same declaration cannot diverge on format; the payload, algorithms, and trust configuration are defined elsewhere in this section.
 
-Other integrity-protected formats MAY be used when both the issuer and the verifier support them.
+A declaration also governs what is emitted.  A PDP MUST NOT include `context.access_request.binding_token` in a requestable denial unless Signed Denial Binding is declared for the deployment, and an Access Request Service MUST NOT include `approval.state` in an Approval Result unless Signed Approval State is declared.  An absent declaration therefore means the artifact is not sent, which is what allows the other role to rely on it.
+
+Declaration and validation are distinct.  The requirements above govern which artifacts an implementation issues and which verification paths it provides.  Every rule in this section that is conditioned on an artifact being present applies whenever an implementation receives that artifact, whether or not the corresponding capability is declared.
+
+Other integrity-protected formats MAY be used by bilateral agreement between the issuer and the verifier.  Such use lies outside the declared capabilities, and this profile defines no interoperability for it.
 
 ## Keys and Metadata {#binding-keys}
 
