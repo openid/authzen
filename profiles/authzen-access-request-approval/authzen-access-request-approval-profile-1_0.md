@@ -219,6 +219,14 @@ Three roles take part in this profile:
 
 The protocol, authorization, and binding requirements apply regardless of which entity plays the Access Request Service role.
 
+## Conformance Claims {#conformance-claims}
+
+Conformance is claimed per role.  A PEP, a PDP, or an Access Request Service claims the requirements this profile places on that role.  A PDP or an Access Request Service additionally names which binding capabilities it supports ({{binding-capabilities}}).
+
+This profile does not require a particular binding mechanism.  A requestable denial carries at least one denial-binding form ({{denial-binding}}), and the PDP resolves or verifies the approval by lookup, by integrity-protected material, or both ({{approval-verification}}).  Lookup needs no capability declaration, because it is internal to roles that already share state; the signed mechanisms are declared, because they are contracts between roles that do not.
+
+A difference in binding mechanism imposes no additional requirement on a PEP, which carries both artifacts unchanged without decoding them ({{pep-construct}}, {{approval-reevaluation-request}}), so a conforming PEP works against either mechanism.  Interoperability between a PDP and an Access Request Service built independently of each other depends on compatible deployment configuration: this profile does not define the interface by which the two roles share state, so a pair that supports no common binding capability is not guaranteed to interoperate.
+
 ## Binding Model {#binding-model}
 
 Denial and approval binding material passes through the PEP for verification by the receiving role:
