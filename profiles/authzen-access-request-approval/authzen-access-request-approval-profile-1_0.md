@@ -1054,7 +1054,7 @@ When `denial.binding_token` is absent, the Access Request Service MUST resolve o
 The Access Request Service applies the artifact-specific verification rules in {{binding-artifacts}} to every requested item:
 
 * When `denial.binding_token` is present, the service MUST verify its integrity.  When the value is a JWS, the service MUST verify the signature using a key resolved from the JWK Set advertised at the PDP's `jwks_uri` ({{binding-keys}}); JWS `kid` headers are matched against JWK `kid` parameters.
-* When `denial.binding_token` is present in a form the service does not implement, the service MUST reject the submission with `urn:openid:authzen:access-request:error:invalid_denial_binding` and MUST NOT resolve an accompanying `denial.evaluation_id` as the binding form instead.  Not implementing the Signed Denial Binding capability is distinct from not understanding JWS; both produce this rejection.
+* When `denial.binding_token` is present in a form the service does not implement, the service MUST reject the submission with `urn:openid:authzen:access-request:error:invalid_denial_binding` and MUST NOT resolve an accompanying `denial.evaluation_id` as the binding form instead.  This covers a service that has not implemented Signed Denial Binding and one that cannot process the particular format presented.  A format that both the issuer and the verifier support is implemented, and is not affected.
 
 ### Idempotency and Retries {#submission-idempotency}
 
