@@ -911,6 +911,16 @@ A PDP supporting this profile SHOULD include the following capability URN in the
 
 `urn:openid:authzen:capability:access-request`
 
+A PDP SHOULD include the following capability URNs for each binding capability ({{binding-capabilities}}) the deployment supports:
+
+`urn:openid:authzen:capability:access-request:signed-denial-binding`
+: The PDP issues `binding_token` as defined by this profile, and the Access Request Service identified by `access_request_endpoint` verifies it.
+
+`urn:openid:authzen:capability:access-request:signed-approval-state`
+: The Access Request Service identified by `access_request_endpoint` issues `approval.state`, and the PDP verifies it.
+
+A capability URN declares that the capability is enabled for the roles the metadata describes, not that the implementation could support it.  Absence of a URN means the capability is not offered, so a peer does not expect the artifact.
+
 The `access_request_endpoint` MAY be hosted by the PDP itself, by a service trusted by the PDP, or by an independent service operating with delegated authority from the PDP.  When hosted by a different service, the PDP metadata MUST identify the endpoint actually used by the PEP to submit access requests.
 
 ## Issue a Requestable Denial {#denial-issuance}
