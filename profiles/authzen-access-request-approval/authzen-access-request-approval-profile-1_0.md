@@ -1141,7 +1141,7 @@ Signed Denial Binding:
 Signed Approval State:
 : The Access Request Service issues `approval.state` and the PDP verifies it ({{approval-state}}).  A deployment needs this capability when the PDP cannot resolve the approval record.
 
-An Access Request Service supporting Signed Denial Binding MUST support verifying a `binding_token` presented as a JWS in compact serialization.  A PDP supporting Signed Approval State MUST support verifying an `approval.state` presented as a JWS in compact serialization.  Deployments declare the capabilities they support in PDP metadata ({{pdp-metadata-rules}}).
+A PDP supporting Signed Denial Binding MUST support issuing `binding_token` as a JWS in compact serialization, and an Access Request Service supporting Signed Denial Binding MUST support verifying a `binding_token` presented in that form.  An Access Request Service supporting Signed Approval State MUST support issuing `approval.state` as a JWS in compact serialization, and a PDP supporting Signed Approval State MUST support verifying an `approval.state` presented in that form.  A capability therefore fixes the format for both of its roles; the payload, algorithms, and trust configuration are defined elsewhere in this section.  Deployments declare the capabilities they support in PDP metadata ({{pdp-metadata-rules}}).
 
 Support and validation are distinct.  The two requirements above govern whether an implementation provides these verification paths at all.  Every rule in this section that is conditioned on an artifact being present applies whenever an implementation accepts that artifact, whether or not the corresponding capability is declared.
 
