@@ -1112,9 +1112,19 @@ This section defines how the PDP and the Access Request Service issue and verify
 
 An independent Access Request Service needs `binding_token` to verify the denial.  A PDP without trusted access to the approval record needs `approval.state` or another profile-defined PDP-verifiable artifact ({{approval-state}}).  The `state` member can carry proof or verifier state; its JWS rules apply when it is carried by value as a JWS.
 
-## Interoperability Baseline {#interoperability-baseline}
+## Binding Capabilities {#binding-capabilities}
 
-For cross-vendor interoperability, an Access Request Service MUST support verifying a `binding_token` presented as a JWS in compact serialization, and a PDP MUST support verifying an `approval.state` presented as a JWS in compact serialization ({{approval-state}}).
+This profile defines two optional capabilities.  They are independent: a deployment may need one, both, or neither.
+
+Signed Denial Binding:
+: The PDP issues `binding_token` and the Access Request Service verifies it ({{denial-binding}}).  A deployment needs this capability when the Access Request Service cannot resolve the PDP's denial state.
+
+Signed Approval State:
+: The Access Request Service issues `approval.state` and the PDP verifies it ({{approval-state}}).  A deployment needs this capability when the PDP cannot resolve the approval record.
+
+An Access Request Service supporting Signed Denial Binding MUST support verifying a `binding_token` presented as a JWS in compact serialization.  A PDP supporting Signed Approval State MUST support verifying an `approval.state` presented as a JWS in compact serialization.  Deployments declare the capabilities they support in PDP metadata ({{pdp-metadata-rules}}).
+
+Support and validation are distinct.  The two requirements above govern whether an implementation provides these verification paths at all.  Every rule in this section that is conditioned on an artifact being present applies whenever an implementation accepts that artifact, whether or not the corresponding capability is declared.
 
 Other integrity-protected formats MAY be used when both the issuer and the verifier support them.
 
