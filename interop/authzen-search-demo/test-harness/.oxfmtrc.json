@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 100,
+  "singleQuote": false,
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "build/**",
+    "node_modules/**",
+    "src/**/*.md",
+    "src/**/*.json"
+  ],
+  "trailingComma": "es5"
+}
