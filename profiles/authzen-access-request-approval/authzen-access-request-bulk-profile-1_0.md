@@ -108,7 +108,7 @@ Idempotency-Key: 7b8d0f0d-65a1-4af1-9fd3-a684f08a5d14
     "evaluated_at": "2026-04-30T20:15:00Z",
     "expires_at": "2026-04-30T20:25:00Z",
     "reason": "approval_required",
-    "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJidW5kbGVfaWQiOiJidW5fMDFIWDVTVUJNMSIsIml0ZW1zIjpbeyJyZXNvdXJjZSI6ImRvY3VtZW50OnE0LXBsYW4iLCJhY3Rpb24iOiJjYW5fcmVhZCJ9LHsicmVzb3VyY2UiOiJjaGFubmVsOmVuZ2luZWVyaW5nIiwiYWN0aW9uIjoiY2FuX3Bvc3QifV19.bXBfc2lnbmF0dXJl",
+    "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJhdWQiOiJodHRwczovL3BkcC5leGFtcGxlLmNvbS9hY2Nlc3MvdjEvcmVxdWVzdHMiLCJiaW5kaW5nX2NvbnRleHRfbWVtYmVycyI6W10sImJpbmRpbmdfaGFzaCI6Ik5NMG8xakk2cWV4ck1URW5LRW8xZHhsYUdqWVBQT3JPczlFY3F6bXEzcG8iLCJidW5kbGVfaWQiOiJidW5fMDFIWDVTVUJNMSIsImRlbmlhbF9leHBpcmVzX2F0IjoiMjAyNi0wNC0zMFQyMDoyNTowMFoiLCJldmFsdWF0aW9uX2lkIjoiZXZhbF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNMiIsImV4cCI6MTc3NzU4MDcwMCwiaWF0IjoxNzc3NTgwMTAwLCJpc3MiOiJodHRwczovL3BkcC5leGFtcGxlLmNvbSIsImp0aSI6ImJ0XzAxSFg0WTJQOEJRNFkzRjBWMEs5RDZaN00yIn0.CxbdSY0hQVADiiValT73T1rnuaLowfYh3gnCj9GajLciSnO-KJU-h2FQYtxM6s6l_0dDIspFhSZuHSWNGghCCA",
     "template": "onboarding_bundle"
   }
 }
