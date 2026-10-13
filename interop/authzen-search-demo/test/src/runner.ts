@@ -72,23 +72,22 @@ function compareResponses(actual: ExpectedResponse, expected: ExpectedResponse):
     // Create copies of the objects to avoid modifying the original
     const comparableActual = { ...actual, results: sortedActualResults };
     const comparableExpected = { ...expected, results: sortedExpectedResults };
-    
+
     deepStrictEqual(comparableActual, comparableExpected);
-    return { match: true, details: "Actual response matches expected response." };
+    return { match: true, details: 'Actual response matches expected response.' };
   } catch (error: any) {
-    return { 
-      match: false, 
-      details: `Mismatch found: ${error.message}\nExpected: ${JSON.stringify(expected, null, 2)}\nActual: ${JSON.stringify(actual, null, 2)}`
+    return {
+      match: false,
+      details: `Mismatch found: ${error.message}\nExpected: ${JSON.stringify(expected, null, 2)}\nActual: ${JSON.stringify(actual, null, 2)}`,
     };
   }
 }
 
-
 // --- Main script logic ---
 async function runTests() {
-  await runTestSuite(SUBJECT_RESULTS_FILE_PATH,SUBJECT_SEARCH_ROUTE);
-  await runTestSuite(ACTION_RESULTS_FILE_PATH,ACTION_SEARCH_ROUTE);
-  await runTestSuite(RESOURCE_RESULTS_FILE_PATH,RESOURCE_SEARCH_ROUTE);
+  await runTestSuite(SUBJECT_RESULTS_FILE_PATH, SUBJECT_SEARCH_ROUTE);
+  await runTestSuite(ACTION_RESULTS_FILE_PATH, ACTION_SEARCH_ROUTE);
+  await runTestSuite(RESOURCE_RESULTS_FILE_PATH, RESOURCE_SEARCH_ROUTE);
 }
 async function runTestSuite(testFile: string, apiRoute: string) {
   console.log(`Reading results from: ${testFile}`);
@@ -107,47 +106,46 @@ async function runTestSuite(testFile: string, apiRoute: string) {
   for (let i = 0; i < resultsData.evaluation.length; i++) {
     const testCase = resultsData.evaluation[i];
     console.log(`--- Test Case ${i + 1} ---`);
-    console.log("Request Payload:", JSON.stringify(testCase.request, null, 2));
-    console.log("Expected Response:", JSON.stringify(testCase.expected, null, 2));
+    console.log('Request Payload:', JSON.stringify(testCase.request, null, 2));
+    console.log('Expected Response:', JSON.stringify(testCase.expected, null, 2));
 
     try {
-      const response = await axios.post<ExpectedResponse>(API_ENDPOINT_URL+apiRoute, testCase.request, {
+      const response = await axios.post<ExpectedResponse>(API_ENDPOINT_URL + apiRoute, testCase.request, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
 
-      console.log("Actual Response Status:", response.status);
-      console.log("Actual Response Data:", JSON.stringify(response.data, null, 2));
+      console.log('Actual Response Status:', response.status);
+      console.log('Actual Response Data:', JSON.stringify(response.data, null, 2));
 
       const comparison = compareResponses(response.data, testCase.expected);
       if (comparison.match) {
-        console.log("Comparison Result: SUCCESS\n");
+        console.log('Comparison Result: SUCCESS\n');
       } else {
-        console.error("Comparison Result: FAILED");
-        console.error("Details:", comparison.details, "\n");
+        console.error('Comparison Result: FAILED');
+        console.error('Details:', comparison.details, '\n');
       }
-
     } catch (error) {
       console.error(`Error during API call for Test Case ${i + 1}:`);
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
         if (axiosError.response) {
-          console.error("Status:", axiosError.response.status);
-          console.error("Data:", JSON.stringify(axiosError.response.data, null, 2));
+          console.error('Status:', axiosError.response.status);
+          console.error('Data:', JSON.stringify(axiosError.response.data, null, 2));
         } else if (axiosError.request) {
-          console.error("No response received:", axiosError.request);
+          console.error('No response received:', axiosError.request);
         } else {
-          console.error("Error message:", axiosError.message);
+          console.error('Error message:', axiosError.message);
         }
       } else {
-        console.error("Unexpected error:", error);
+        console.error('Unexpected error:', error);
       }
-      console.log("\n");
+      console.log('\n');
     }
   }
 }
 
-runTests().catch(error => {
-  console.error("An unexpected error occurred during the test run:", error);
+runTests().catch((error) => {
+  console.error('An unexpected error occurred during the test run:', error);
 });
