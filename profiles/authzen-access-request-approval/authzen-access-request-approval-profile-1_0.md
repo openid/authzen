@@ -1501,6 +1501,36 @@ Change Controller:
 Specification Document:
 : This document.
 
+Capability Name:
+: `access-request:signed-denial-binding`
+
+Capability URN:
+: `urn:openid:authzen:capability:access-request:signed-denial-binding`
+
+Capability Description:
+: Indicates that the PDP issues `binding_token` as defined by this specification and that the Access Request Service it identifies verifies it.
+
+Change Controller:
+: OpenID Foundation AuthZEN Working Group
+
+Specification Document:
+: This document.
+
+Capability Name:
+: `access-request:signed-approval-state`
+
+Capability URN:
+: `urn:openid:authzen:capability:access-request:signed-approval-state`
+
+Capability Description:
+: Indicates that the Access Request Service the PDP identifies issues `approval.state` as defined by this specification and that the PDP verifies it.
+
+Change Controller:
+: OpenID Foundation AuthZEN Working Group
+
+Specification Document:
+: This document.
+
 The capability and problem-type URNs ({{error-responses}}) use the OpenID Foundation's `urn:openid:authzen:` namespace, not AuthZEN's `urn:ietf:params:authzen:` capability sub-namespace.  This profile convention leaves the AuthZEN `capabilities` array as a list of URNs ({{AuthZEN}}).
 
 ## AuthZEN Access Request Member Names Registry {#iana-member-names}
