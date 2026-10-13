@@ -1,19 +1,23 @@
 {
   "name": "authzen-todo",
   "version": "0.1.0",
-  "type": "module",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "zuplo dev",
     "test": "zuplo test",
-    "lint": "eslint"
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
   },
   "dependencies": {
     "zuplo": "^7"
   },
   "devDependencies": {
     "@types/node": "^26",
-    "prettier": "^3",
+    "oxfmt": "^0.72.0",
+    "oxlint": "^1.87.0",
     "typescript": "^7"
   }
 }

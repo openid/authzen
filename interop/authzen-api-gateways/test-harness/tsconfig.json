@@ -1,16 +1,17 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "baseUrl": "src",
+    "module": "node16",
+    "moduleResolution": "node16",
+    "rootDir": "./test",
     "outDir": "./build",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": false,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node"]
   },
   "include": ["src", "test", "test/**/*.json"],
   "exclude": ["node_modules"]

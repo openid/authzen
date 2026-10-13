@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "baseUrl": "src",
+    "module": "node16",
+    "moduleResolution": "node16",
+    "rootDir": "src",
+    "types": ["node"],
     "outDir": "./build",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
