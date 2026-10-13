@@ -1265,7 +1265,9 @@ A single signed JWT MAY simultaneously satisfy this profile's claim recommendati
 
 ## Approval State {#approval-state}
 
-When the PDP cannot resolve `approval.id` from trusted server-side state shared with, or delegated by, the Access Request Service, the Approval Result MUST include `approval.state` or another profile-defined PDP-verifiable artifact.  An Access Request Service MUST NOT return a result under the `reevaluate` completion mode that the PDP cannot verify without trusting PEP-supplied assertions.
+When the PDP cannot resolve `approval.id` from trusted server-side state shared with, or delegated by, the Access Request Service, the Approval Result MUST include `approval.state` or another profile-defined PDP-verifiable artifact, and the deployment MUST declare Signed Approval State ({{binding-capabilities}}).  An Access Request Service MUST NOT return a result under the `reevaluate` completion mode that the PDP cannot verify without trusting PEP-supplied assertions.
+
+A deployment MUST therefore provide at least one approval-verification path: either the PDP resolves `approval.id` from trusted state, or Signed Approval State is declared.  A deployment providing neither has no conformant Approval Result under the `reevaluate` completion mode, which is a configuration error rather than a condition a role reports at request time.
 
 When `approval.state` is carried by value as a JWS:
 
