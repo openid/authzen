@@ -614,7 +614,7 @@ When the PDP denies a re-evaluation that presented an `approval` reference, it c
     * `retry`: re-evaluate the same request after a delay; the denial is expected to be transient.  This is the transient-denial outcome of the Introduction: nothing is remediated and nothing changes in the request.
     * `none`: do not retry or re-request; the denial is terminal for this approval.
 * `retry_after`: RECOMMENDED when `next_action` is `retry`.  Integer.  Number of seconds the PEP waits before re-evaluating the same request.  Its value has the delta-seconds semantics of HTTP `Retry-After` (Section 10.2.3 of {{RFC9110}}); it appears in Decision Context because an Access Evaluation denial is a successful protocol response.
-* `reason`: OPTIONAL.  String.  A machine-readable reason code for UX and audit.  This profile defines the following well-known re-evaluation denial reason codes with their default `next_action`:
+* `reason`: OPTIONAL.  String.  A machine-readable reason code for UX and audit.  This profile defines the following well-known re-evaluation denial reason codes:
     * `approval_expired`: the approval is no longer valid because `approved_until` has passed.
     * `approval_revoked`: the approval was revoked, cancelled, or superseded before `approved_until`.
     * `out_of_scope`: the approval is valid but the current evaluation falls outside its approval scope.
