@@ -122,13 +122,13 @@ Custom Obligation:
 
 : An Obligation whose `type` is `custom`. Its semantics are defined bilaterally between a specific PDP and PEP implementation, and are out of scope of this specification.
 
-Enforcing PEP:
+PEP:
 
-: The PEP that will actually enforce the decision returned by the PDP. The Enforcing PEP is not necessarily the immediate caller of the PDP's API, for example when the request passes through a gateway or other intermediary.
+: As defined in {{AUTHZEN}}. As in {{AUTHZEN-EXT}}, the PEP is always the entity that issues the AuthZEN request to the PDP, and that enforces the decision it receives.
 
 Adopting PEP:
 
-: An Enforcing PEP that has listed the `obligations` extension identifier in the `supported_mandatory_extensions` member of the request context ({{opt-in}}), and so has committed to the fail-closed processing of this extension for that request.
+: A PEP that has listed the `obligations` extension identifier in the `supported_mandatory_extensions` member of the request context ({{opt-in}}), and so has committed to the fail-closed processing of this extension for that request.
 
 # Design Overview
 
@@ -136,7 +136,7 @@ This specification makes the following core design choices:
 
 1. Obligations are carried in the `context` member of an AuthZEN decision, under the `obligations` key. In Search responses, they are carried in the top-level response `context`, in the `context` of individual results, or both ({{search-requests}}). When a decision carries no obligations, the PDP omits the key, and the response is an ordinary core AuthZEN response.
 
-2. The `obligations` member is **mandatory-to-understand** ({{processing-strength}}). The core AuthZEN default is that an unknown member is ignorable. A PDP therefore returns obligations only to an Adopting PEP, that is, a PEP that has explicitly listed `obligations` in `supported_mandatory_extensions` in the request context. When policy requires an obligation that the Enforcing PEP has not committed to enforcing, the PDP returns a plain core DENY instead ({{pdp-outcome}}).
+2. The `obligations` member is **mandatory-to-understand** ({{processing-strength}}). The core AuthZEN default is that an unknown member is ignorable. A PDP therefore returns obligations only to an Adopting PEP, that is, a PEP that has explicitly listed `obligations` in `supported_mandatory_extensions` in the request context. When policy requires an obligation that the PEP has not committed to enforcing, the PDP returns a plain core DENY instead ({{pdp-outcome}}).
 
 3. Obligations MAY be attached to a response regardless of the value of the `decision` field. In both cases, the obligations are mandatory for an Adopting PEP.
 
@@ -242,11 +242,11 @@ The following is a non-normative example of a `custom` obligation used to reques
 
 # Adoption and Negotiation {#negotiation}
 
-The Obligations Core uses two levels of negotiation, as described in {{AUTHZEN-EXT}}. The first is a coarse, safety-critical opt-in, by which the Enforcing PEP commits to the extension's fail-closed processing. The second is a fine, per-type declaration, by which the PEP lists the Obligation Types it can execute.
+The Obligations Core uses two levels of negotiation, as described in {{AUTHZEN-EXT}}. The first is a coarse, safety-critical opt-in, by which the PEP commits to the extension's fail-closed processing. The second is a fine, per-type declaration, by which the PEP lists the Obligation Types it can execute.
 
 ## Support Opt-In: supported_mandatory_extensions {#opt-in}
 
-An Enforcing PEP that adopts the Obligations Core MUST include the extension identifier `obligations` in the `supported_mandatory_extensions` array of the request `context`:
+An PEP that adopts the Obligations Core MUST include the extension identifier `obligations` in the `supported_mandatory_extensions` array of the request `context`:
 
 ~~~ json
 {
@@ -259,11 +259,9 @@ An Enforcing PEP that adopts the Obligations Core MUST include the extension ide
   }
 }
 ~~~
-{: #fig-request-opt-in title="Enforcing PEP opting in to the Obligations Core"}
+{: #fig-request-opt-in title="PEP opting in to the Obligations Core"}
 
 By listing `obligations`, the PEP makes a stronger claim than an ordinary capability advertisement. It asserts that it will not grant access if it cannot understand or enforce an obligation in the response, and that it will apply the rules of {{pep-compliance}} and {{unknown-handling}}. A PEP MUST NOT list `obligations` unless it implements those rules.
-
-The opt-in refers to the Enforcing PEP, which may not be the immediate caller of the PDP. Requirements for intermediaries are defined in {{binding}}.
 
 `supported_mandatory_extensions` is defined by {{AUTHZEN-EXT}}, not by this specification. The following rules from that model apply:
 
@@ -292,7 +290,7 @@ When evaluating a request, the PDP MUST determine its outcome as follows:
 
 Consequently:
 
-- A PDP MUST NOT include an `obligations` member in any response, whether PERMIT or DENY, to a request whose Enforcing PEP has not listed `obligations` in `supported_mandatory_extensions`. The PDP MUST NOT omit a policy-required obligation and return a PERMIT. It MUST return a plain core DENY instead.
+- A PDP MUST NOT include an `obligations` member in any response, whether PERMIT or DENY, to a request whose PEP has not listed `obligations` in `supported_mandatory_extensions`. The PDP MUST NOT omit a policy-required obligation and return a PERMIT. It MUST return a plain core DENY instead.
 - A PDP MUST NOT emit, to an Adopting PEP, an obligation whose type the PEP did not list in `supported_obligations`. Where policy permits, the PDP MAY instead select a different Obligation Type that achieves an equivalent policy goal and that the PEP did list.
 - When policy requires an obligation on a DENY that the PDP cannot emit under these rules (for example, an accountability notification), the decision remains DENY. The PDP MUST NOT assume that the side effect will be performed. It SHOULD fulfill the policy goal by other means under its own control, for example by recording the event in its own audit log.
 
@@ -434,7 +432,7 @@ A PDP MUST NOT assume that a side effect was performed ({{security-consideration
 
 - An extension identifier in `supported_mandatory_extensions` that the PDP does not implement is a no-op ({{opt-in}}).
 - A value in `supported_obligations` that the PDP did not advertise is ignored ({{item-negotiation}}).
-- The absence of `supported_mandatory_extensions`, or the absence of `obligations` from it, means that the Enforcing PEP has not adopted the extension.
+- The absence of `supported_mandatory_extensions`, or the absence of `obligations` from it, means that the PEP has not adopted the extension.
 - The absence of `supported_obligations` from an Adopting PEP's request is equivalent to an empty array.
 
 **Core interoperability.** In every case, the absence of the members defined by this extension reduces to a plain core AuthZEN allow or deny. A PEP or PDP that implements only the core specification remains interoperable with one that implements this extension.
@@ -443,17 +441,11 @@ A PDP MUST NOT assume that a side effect was performed ({{security-consideration
 
 The `supported_mandatory_extensions` and `supported_obligations` declarations change the response a PDP returns. An Adopting PEP may receive a PERMIT with obligations where a non-adopter would receive a DENY. These declarations, and the `obligations` member of the response, are therefore decision-relevant state, and the following requirements apply.
 
-**Authentication and integrity of the opt-in.** The opt-in MUST be authenticated to the Enforcing PEP and integrity-protected in transit. Forgery is the dangerous case. If the opt-in is stripped, the PDP sees no adoption and returns a DENY, which is safe. If the opt-in is forged onto a request from a PEP that has not adopted the extension, the PDP emits obligations that the PEP ignores, and the PEP grants access. A PDP MUST honor the opt-in only when it can establish that the Enforcing PEP asserted it. Examples include a direct caller that is authenticated as the Enforcing PEP, or a request whose integrity and origin are otherwise verifiable.
+**Authentication and integrity of the opt-in.** The opt-in MUST be authenticated to the PEP and integrity-protected in transit. Forgery is the dangerous case. If the opt-in is stripped, the PDP sees no adoption and returns a DENY, which is safe. If the opt-in is forged onto a request from a PEP that has not adopted the extension, the PDP emits obligations that the PEP ignores, and the PEP grants access. A PDP MUST honor the opt-in only when it has authenticated the PEP that sent the request.
 
-**Intermediaries.** An intermediary (such as a gateway or aggregator) that is not itself the Enforcing PEP:
+**Integrity of the response.** Removing obligations from a PERMIT in transit would turn a conditional grant into an unconditional one. The response MUST therefore be integrity-protected between the PDP and the PEP.
 
-- MUST NOT add `obligations` to `supported_mandatory_extensions` on behalf of an Enforcing PEP that has not asserted it, and MUST NOT carry an opt-in established for one hop over to a different hop or a different Enforcing PEP;
-- MUST NOT remove, alter, or drop any element of an `obligations` member in a response;
-- MUST, if it cannot deliver obligations unchanged to an Adopting Enforcing PEP, treat any PERMIT that carries obligations as a DENY.
-
-**Integrity of the response.** Removing obligations from a PERMIT in transit would turn a conditional grant into an unconditional one. The response MUST therefore be integrity-protected between the PDP and the Enforcing PEP.
-
-**Caching and evaluation identity.** A PDP or PEP that caches decisions MUST include `supported_mandatory_extensions` and `supported_obligations` in the cache key. A cached decision MUST NOT be reused for a request with different declarations, or for a different Enforcing PEP. Where another profile binds an evaluation's identity to its request context, these declarations MUST be covered by that binding. An example is the `binding_hash` of {{ARAP}}.
+**Caching and evaluation identity.** A PDP or PEP that caches decisions MUST include `supported_mandatory_extensions` and `supported_obligations` in the cache key. A cached decision MUST NOT be reused for a request with different declarations, or for a different PEP. Where another profile binds an evaluation's identity to its request context, these declarations MUST be covered by that binding. An example is the `binding_hash` of {{ARAP}}.
 
 # Composition {#composition}
 
@@ -498,8 +490,8 @@ Discovery is the PDP-to-PEP direction. It lets a PEP check whether a PDP support
 A conformant deployment proceeds as follows:
 
 1. The PEP retrieves PDP metadata. It checks for the capability URN `urn:openid:authzen:capability:obligations`, and inspects `supported_obligations` to learn which Obligation Types the PDP may issue.
-2. When the Enforcing PEP submits an AuthZEN evaluation or Search request, it opts in by listing `obligations` in `supported_mandatory_extensions` in the request `context`. It also declares, in `supported_obligations`, the Obligation Types it can execute ({{negotiation}}). In a batch request, it repeats both declarations in every per-evaluation `context` it supplies.
-3. The PDP evaluates policy and determines its outcome per {{pdp-outcome}}. If policy requires obligations and the Enforcing PEP has adopted the extension and supports the required types, the PDP includes them under `context.obligations` (or, for Search, in the top-level response `context` or in the `context` of the affected results), whether `decision` is `true` or `false`. Otherwise, it returns a plain core DENY, or omits the affected Search results.
+2. When the PEP submits an AuthZEN evaluation or Search request, it opts in by listing `obligations` in `supported_mandatory_extensions` in the request `context`. It also declares, in `supported_obligations`, the Obligation Types it can execute ({{negotiation}}). In a batch request, it repeats both declarations in every per-evaluation `context` it supplies.
+3. The PDP evaluates policy and determines its outcome per {{pdp-outcome}}. If policy requires obligations and the PEP has adopted the extension and supports the required types, the PDP includes them under `context.obligations` (or, for Search, in the top-level response `context` or in the `context` of the affected results), whether `decision` is `true` or `false`. Otherwise, it returns a plain core DENY, or omits the affected Search results.
 4. The PEP applies {{pep-compliance}} and {{unknown-handling}}. It executes every Obligation it can. It treats a PERMIT as a DENY if it cannot comply with any Obligation, except for Search requests, where it instead excludes only the results to which that Obligation applies. It executes every Obligation it does understand even when treating the response as a DENY.
 
 # Examples
@@ -541,7 +533,7 @@ The following is a non-normative example of a request that carries no `supported
 ~~~
 {: #fig-example-no-opt-in-request title="Request without an opt-in"}
 
-Suppose that policy would grant this access on condition of an obligation. Because the Enforcing PEP has not adopted the Obligations Core, the PDP returns a plain core DENY ({{pdp-outcome}}):
+Suppose that policy would grant this access on condition of an obligation. Because the PEP has not adopted the Obligations Core, the PDP returns a plain core DENY ({{pdp-outcome}}):
 
 ~~~ json
 {
@@ -623,9 +615,9 @@ In the following non-normative example, the second evaluation supplies its own `
 
 # Security Considerations {#security-considerations}
 
-**Opt-in forgery.** The opt-in of {{opt-in}} is safety-critical. A forged opt-in on a request from a PEP that has not adopted the extension causes the PDP to emit obligations that the PEP ignores, so the PEP grants access unconditionally. Implementers MUST apply the authentication, integrity, and intermediary requirements of {{binding}}. A stripped opt-in fails safe.
+**Opt-in forgery.** The opt-in of {{opt-in}} is safety-critical. A forged opt-in on a request from a PEP that has not adopted the extension causes the PDP to emit obligations that the PEP ignores, so the PEP grants access unconditionally. Implementers MUST apply the authentication and integrity requirements of {{binding}}. A stripped opt-in fails safe.
 
-**Response tampering.** Removing obligations from a PERMIT in transit converts a conditional grant into an unconditional one. Responses MUST be integrity-protected between the PDP and the Enforcing PEP ({{binding}}).
+**Response tampering.** Removing obligations from a PERMIT in transit converts a conditional grant into an unconditional one. Responses MUST be integrity-protected between the PDP and the PEP ({{binding}}).
 
 **Cache confusion.** A decision computed for an Adopting PEP MUST NOT be served from a cache to a PEP that has not adopted the extension, or to one with a different `supported_obligations`. Otherwise a PERMIT-with-obligations could reach a PEP that ignores the obligations ({{binding}}).
 
@@ -676,7 +668,7 @@ Capability URN:
 : `urn:openid:authzen:capability:obligations`
 
 Capability Description:
-: Indicates that the PDP implements the Obligations Core, and may return obligations to an Enforcing PEP that has opted in.
+: Indicates that the PDP implements the Obligations Core, and may return obligations to a PEP that has opted in.
 
 Change Controller:
 : OpenID Foundation AuthZEN Working Group
@@ -710,7 +702,7 @@ Extension Identifier:
 : `obligations`
 
 Description:
-: The Obligations Core extension. An Enforcing PEP that lists this identifier in `supported_mandatory_extensions` commits to the fail-closed processing of obligations.
+: The Obligations Core extension. An PEP that lists this identifier in `supported_mandatory_extensions` commits to the fail-closed processing of obligations.
 
 Mandatory-to-Understand Members:
 : `obligations` (see {{iana-json-members}})

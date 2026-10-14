@@ -134,7 +134,7 @@ when, and only when, they appear in all capitals, as shown here.
 
 ## Terminology
 
-This specification uses the terms "Policy Enforcement Point" (PEP), "Policy Decision Point" (PDP), "subject", "resource", "action", and "context" as defined in {{AUTHZEN}}. It uses the terms "Obligation", "Obligation Type", "Obligations Core", "Enforcing PEP", and "Adopting PEP" as defined in {{OBLIGATIONS-CORE}}. Additionally, this specification uses the following term:
+This specification uses the terms "Policy Enforcement Point" (PEP), "Policy Decision Point" (PDP), "subject", "resource", "action", and "context" as defined in {{AUTHZEN}}. It uses the terms "Obligation", "Obligation Type", "Obligations Core", and "Adopting PEP" as defined in {{OBLIGATIONS-CORE}}. Additionally, this specification uses the following term:
 
 Standard Obligation Type:
 
@@ -150,7 +150,7 @@ A PDP conforms to the Standard Types Profile if it:
 
 A PEP conforms to the Standard Types Profile if it:
 
-- implements the Obligations Core, and lists `obligations` in `supported_mandatory_extensions` on every request for which it is the Enforcing PEP;
+- implements the Obligations Core, and lists `obligations` in `supported_mandatory_extensions` on every request it sends;
 - lists in `supported_obligations` exactly the Standard Obligation Types (and `custom`, where applicable) that it implements;
 - implements each Standard Obligation Type it lists, as defined in {{standard-obligation-types}}.
 

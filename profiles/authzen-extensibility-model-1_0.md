@@ -78,7 +78,7 @@ informative:
 
 --- abstract
 
-The OpenID AuthZEN Authorization API leaves the decision context, and much of the request context, without normative semantics. That openness lets the ecosystem add obligations, advice, access requests, partial evaluation, and other features, but without a shared model every addition must invent its own conventions and answer the same safety questions differently. This specification defines the contract for extending AuthZEN. It defines the kinds of specification that extend AuthZEN (extensions, profiles, and transport bindings), the extension surface, the processing strengths of extension members and the handling of unknown members, and the invariants that every addition must preserve. It also defines the `supported_mandatory_extensions` request context member. An Enforcing PEP uses this member to commit to the fail-closed processing of an extension's mandatory-to-understand members, and a PDP relies on it before emitting them. Finally, the specification defines what every extension specification must state, and establishes the registries that keep extension identifiers from colliding.
+The OpenID AuthZEN Authorization API leaves the decision context, and much of the request context, without normative semantics. That openness lets the ecosystem add obligations, advice, access requests, partial evaluation, and other features, but without a shared model every addition must invent its own conventions and answer the same safety questions differently. This specification defines the contract for extending AuthZEN. It defines the kinds of specification that extend AuthZEN (extensions, profiles, and transport bindings), the extension surface, the processing strengths of extension members and the handling of unknown members, and the invariants that every addition must preserve. It also defines the `supported_mandatory_extensions` request context member. An PEP uses this member to commit to the fail-closed processing of an extension's mandatory-to-understand members, and a PDP relies on it before emitting them. Finally, the specification defines what every extension specification must state, and establishes the registries that keep extension identifiers from colliding.
 
 --- middle
 
@@ -157,13 +157,13 @@ Extension Identifier:
 
 : A registered identifier for an extension that defines mandatory-to-understand members. It is the value a PEP lists in `supported_mandatory_extensions` ({{opt-in}}).
 
-Enforcing PEP:
+PEP:
 
-: The PEP that will actually enforce the decision returned by the PDP. The Enforcing PEP is not necessarily the immediate caller of the PDP's API, for example when the request passes through a gateway or other intermediary.
+: As defined in {{AUTHZEN}}. In this specification, the PEP is always the entity that issues the AuthZEN request to the PDP, and that enforces the decision it receives.
 
 Adopting PEP:
 
-: An Enforcing PEP that has listed a given extension's identifier in `supported_mandatory_extensions` for a request. A PEP is an Adopting PEP only with respect to the extensions it lists, and only for that request.
+: A PEP that has listed a given extension's identifier in `supported_mandatory_extensions` for a request. A PEP is an Adopting PEP only with respect to the extensions it lists, and only for that request.
 
 Capability Declaration:
 
@@ -189,10 +189,8 @@ Extensibility is a recursive rule, not a fixed list. Any named object in the pro
 
 Named objects include, but are not limited to:
 
-- the request;
 - the `subject`, `resource`, and `action` objects, and their `properties`;
 - the request `context` and the decision `context`;
-- batch `options`, and the members of each evaluation in a batch request;
 - the Search response `context` and Search result objects;
 - PDP metadata;
 - objects defined by profiles, such as the task and result objects of {{ARAP}}, callback documents, and catalog documents.
@@ -227,7 +225,7 @@ The processing strength of a member is part of its registration, and is immutabl
 
 ## Mandatory PDP Outcome {#pdp-outcome}
 
-It follows from {{strengths}} that a PDP cannot simply attach a mandatory-to-understand element to a PERMIT and assume it will be enforced. When policy requires such an element and the PDP cannot establish that the Enforcing PEP has adopted the defining extension, the PDP MUST return a plain core DENY. It MUST NOT omit the element and return a PERMIT.
+It follows from {{strengths}} that a PDP cannot simply attach a mandatory-to-understand element to a PERMIT and assume it will be enforced. When policy requires such an element and the PDP cannot establish that the PEP has adopted the defining extension, the PDP MUST return a plain core DENY. It MUST NOT omit the element and return a PERMIT.
 
 Adoption is established by the `supported_mandatory_extensions` opt-in ({{opt-in}}), refined by the extension's own item negotiation ({{item-negotiation}}). When evaluating a request, the PDP MUST determine its outcome as follows:
 
@@ -242,19 +240,6 @@ Adoption is established by the `supported_mandatory_extensions` opt-in ({{opt-in
 A "plain core DENY" is a decision with `"decision": false` that carries no member of the extension whose adoption could not be established.
 
 An extension MAY refine this table, for example by allowing the PDP to substitute an equivalent supported item. An extension MUST NOT relax it.
-
-## Enforcing PEP and Intermediaries {#enforcing-pep}
-
-The opt-in refers to the Enforcing PEP, which may not be the immediate caller of the PDP. A request may pass through gateways, aggregators, or other intermediaries, and a response may be forwarded to a PEP other than the one that called the PDP.
-
-Intermediaries and downgrade paths MUST be handled so that an opt-in established for one hop is not assumed for another. In particular, an intermediary that is not itself the Enforcing PEP:
-
-- MUST NOT add an extension identifier to `supported_mandatory_extensions` on behalf of an Enforcing PEP that has not asserted it;
-- MUST NOT carry an opt-in established for one hop over to a different hop or a different Enforcing PEP;
-- MUST NOT remove or alter mandatory-to-understand members of a response;
-- MUST, if it cannot deliver mandatory-to-understand members unchanged to an Enforcing PEP that has adopted the defining extension, treat a PERMIT that carries them as a DENY.
-
-This specification does not define how the Enforcing PEP is identified and authenticated when it is not the immediate caller. Transport bindings define how this is realized over their transport ({{profile-requirements}}).
 
 ## Unknown Handling per Extension and per Position {#unknown-handling}
 
@@ -288,8 +273,7 @@ A producer MUST therefore bind, or otherwise account for, any capability declara
 - decision cache keys;
 - evaluation identity;
 - signed-request protection;
-- denial binding, where relevant;
-- intermediary and downgrade handling ({{enforcing-pep}}).
+- denial binding, where relevant.
 
 For example, where {{ARAP}} computes a `binding_hash` over the subject, resource, action, and context of an evaluation, any capability declaration that affects the decision is part of that evaluation's identity, and MUST be covered by the hash.
 
@@ -314,13 +298,19 @@ Because the endpoints carry `context` differently, placement differs by endpoint
 | PDP metadata | Not per request | The PDP advertises the extensions it supports through its `capabilities` metadata. This is the discovery direction, from PDP to PEP. A PEP uses it to check whether a PDP supports an extension before relying on it. |
 {: #tab-placement title="Placement of capability declarations by endpoint"}
 
-On the response side, the Access Evaluation decision and each Search response carry a `context`, so a PDP MAY return decision-relevant response signals there. An extension MAY also define members of individual Search results, as {{surface}} permits. The Access Evaluations response carries only a Decision for each evaluation, and defines no top-level response context. A request-wide response signal therefore has nowhere to go on that endpoint. Any extension that defines a response-side negotiation signal MUST account for this.
+On the response side, {{AUTHZEN}} defines a `context` in exactly three places:
+
+- the Decision returned by the Access Evaluation API;
+- each Decision in the `evaluations` array of an Access Evaluations response;
+- the top level of a Search response.
+
+A PDP MAY return decision-relevant response signals in any of these. An extension MAY also define members of individual Search result objects ({{surface}}).
 
 ## Two Levels of Negotiation {#two-levels}
 
 Negotiation takes place at two levels:
 
-- **Support opt-in** (coarse): the Enforcing PEP commits to the mandatory-to-understand processing of an extension, using `supported_mandatory_extensions` ({{opt-in}}). This is the safety-critical signal.
+- **Support opt-in** (coarse): the PEP commits to the mandatory-to-understand processing of an extension, using `supported_mandatory_extensions` ({{opt-in}}). This is the safety-critical signal.
 - **Item negotiation** (fine): a party declares which specific items within an extension it can handle, using a member defined by that extension ({{item-negotiation}}). This is advisory with respect to safety.
 
 ## Support Opt-In: supported_mandatory_extensions {#opt-in}
@@ -329,7 +319,7 @@ This specification defines the `supported_mandatory_extensions` request context 
 
 supported_mandatory_extensions:
 
-: OPTIONAL. A JSON array of Strings. Each String is an Extension Identifier registered in the "AuthZEN Extension Identifiers" registry ({{iana-extension-identifiers}}). The array MUST NOT contain duplicate values. By listing an Extension Identifier, the Enforcing PEP commits to the mandatory-to-understand processing of that extension's members for this request.
+: OPTIONAL. A JSON array of Strings. Each String is an Extension Identifier registered in the "AuthZEN Extension Identifiers" registry ({{iana-extension-identifiers}}). The array MUST NOT contain duplicate values. By listing an Extension Identifier, the PEP commits to the mandatory-to-understand processing of that extension's members for this request.
 
 The following is a non-normative example of a request that opts in to the Obligations Core extension {{OBLIGATIONS-CORE}}:
 
@@ -352,17 +342,16 @@ Listing an extension in `supported_mandatory_extensions` is a stronger claim tha
 A PEP:
 
 - MUST NOT list an extension unless it implements that extension's mandatory-to-understand processing in full;
-- MUST list only extensions for which it is the Enforcing PEP, or for which it relays the authenticated assertion of the Enforcing PEP ({{enforcing-pep}});
 - MAY list extensions that a given PDP does not support. A PEP may advertise a superset of what any one PDP supports.
 
 ### PDP Processing {#opt-in-pdp}
 
 A PDP:
 
-- MUST NOT emit a policy-required mandatory-to-understand element until the Enforcing PEP has listed the defining extension in `supported_mandatory_extensions`, and MUST apply {{pdp-outcome}};
+- MUST NOT emit a policy-required mandatory-to-understand element until the PEP has listed the defining extension in `supported_mandatory_extensions`, and MUST apply {{pdp-outcome}};
 - MUST treat an entry it does not implement as a no-op, since it cannot emit elements of an extension it does not support;
 - MUST NOT reject a request merely because `supported_mandatory_extensions` lists an extension the PDP does not implement;
-- MUST honor the opt-in only when it is authenticated to the Enforcing PEP and bound to the request ({{invariants}}, invariant 7).
+- MUST honor the opt-in only when it is authenticated to the PEP and bound to the request ({{invariants}}, invariant 7).
 
 ### Self-Bootstrapping {#bootstrapping}
 
@@ -370,7 +359,7 @@ A PDP:
 
 ### Binding and Forgery {#opt-in-binding}
 
-`supported_mandatory_extensions` is a decision-relevant self-assertion, and is subject to invariant 7 ({{invariants}}). It MUST be authenticated to the Enforcing PEP, and bound to the request.
+`supported_mandatory_extensions` is a decision-relevant self-assertion, and is subject to invariant 7 ({{invariants}}). It MUST be authenticated to the PEP, and bound to the request.
 
 Forgery is the dangerous case. A stripped signal fails safe: the PDP sees no adoption, and returns a DENY. A signal forged onto a request from a PEP that implements only the core specification makes the PDP emit a mandatory-to-understand element. That PEP then ignores the element, as {{AUTHZEN}} permits, and grants access.
 
@@ -411,7 +400,7 @@ Every extension, profile, and transport binding MUST preserve all of the followi
 
 6. **Composability.** Extensions compose without contradiction. Where two extensions can interact, the composition and any precedence MUST be defined. An example is an access-request response that also carries obligations.
 
-7. **Binding of decision-relevant state.** Any capability declaration, including `supported_mandatory_extensions`, and any carried artifact that affects the decision or its enforceability MUST be integrity-protected, bound to the originating evaluation, and authenticated to the enforcing party. It then cannot be tampered with, downgraded, forged, or replayed against a different request or a different PEP.
+7. **Binding of decision-relevant state.** Any capability declaration, including `supported_mandatory_extensions`, and any carried artifact that affects the decision or its enforceability MUST be integrity-protected, bound to the originating evaluation, and authenticated to the party that asserted or issued it. It then cannot be tampered with, downgraded, forged, or replayed against a different request or a different PEP.
 
 # Requirements for Extension Specifications {#extension-requirements}
 
@@ -421,7 +410,6 @@ A specification that defines an AuthZEN extension MUST define:
 2. **Processing strength.** The processing strength of each member, advisory or mandatory-to-understand ({{strengths}}).
 3. **Mandatory-to-understand processing.** If any member is mandatory-to-understand:
    - its Extension Identifier, for use in `supported_mandatory_extensions` ({{opt-in}});
-   - which PEP the opt-in refers to ({{enforcing-pep}});
    - the exact fail-closed behavior;
    - the PDP's outcome when adoption cannot be established, consistent with {{pdp-outcome}};
    - any item negotiation member, and its handling ({{item-negotiation}}).
@@ -449,7 +437,7 @@ A transport binding:
 
 - MUST preserve the abstract semantics of the core specification and of every extension, including processing strengths and the outcome of {{pdp-outcome}};
 - MUST define transport-specific authentication, errors, serialization, retries, and integrity behavior;
-- MUST define how invariant 7 is realized over that transport, in particular how `supported_mandatory_extensions` is authenticated to the Enforcing PEP and bound to the request;
+- MUST define how invariant 7 is realized over that transport, in particular how `supported_mandatory_extensions` is authenticated to the PEP and bound to the request;
 - MUST register any transport-specific extension surface, such as headers or error types, under the discipline of {{iana-considerations}}.
 
 # Examples (non-normative) {#examples}
@@ -543,11 +531,9 @@ This is the safe direction of failure, but it is a change in behavior that exist
 
 # Security Considerations {#security-considerations}
 
-**Opt-in forgery.** `supported_mandatory_extensions` is safety-critical. A forged opt-in, on a request from a PEP that has not adopted the extension, causes the PDP to emit mandatory-to-understand elements that the PEP ignores. The PEP then grants access unconditionally. Implementers MUST authenticate the opt-in to the Enforcing PEP and bind it to the request (invariant 7). A stripped opt-in fails safe.
+**Opt-in forgery.** `supported_mandatory_extensions` is safety-critical. A forged opt-in, on a request from a PEP that has not adopted the extension, causes the PDP to emit mandatory-to-understand elements that the PEP ignores. The PEP then grants access unconditionally. Implementers MUST authenticate the opt-in to the PEP and bind it to the request (invariant 7). A stripped opt-in fails safe.
 
-**Intermediaries and downgrade.** An opt-in established for one hop can be wrongly assumed for another, for example when a gateway forwards a response to a PEP that implements only the core specification. Intermediaries MUST follow {{enforcing-pep}}.
-
-**Response tampering.** Removing a mandatory-to-understand element from a PERMIT in transit converts a conditional grant into an unconditional one. Responses that carry such elements MUST be integrity-protected between the PDP and the Enforcing PEP.
+**Response tampering.** Removing a mandatory-to-understand element from a PERMIT in transit converts a conditional grant into an unconditional one. Responses that carry such elements MUST be integrity-protected between the PDP and the PEP.
 
 **Cache confusion.** A decision computed for a PEP that has adopted an extension MUST NOT be served from a cache to a PEP that has not, or to one with different item declarations. Cache keys MUST include every capability declaration that affects the decision ({{capabilities}}).
 
@@ -591,7 +577,7 @@ A member name MUST be unique within its location. Designated experts SHOULD reje
 
 | Member | Location | Processing strength | Extension Identifier | Description | Reference |
 |---|---|---|---|---|---|
-| `supported_mandatory_extensions` | Request `context` | Advisory | (none) | Extensions whose mandatory-to-understand processing the Enforcing PEP commits to. | {{opt-in}} |
+| `supported_mandatory_extensions` | Request `context` | Advisory | (none) | Extensions whose mandatory-to-understand processing the PEP commits to. | {{opt-in}} |
 {: #tab-iana-json-members title="Initial AuthZEN JSON Members registration"}
 
 ## AuthZEN Extension Identifiers Registry {#iana-extension-identifiers}
