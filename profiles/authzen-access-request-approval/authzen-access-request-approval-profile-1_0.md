@@ -839,6 +839,8 @@ A PEP that receives `next_action: "retry"` without `retry_after` SHOULD apply bo
 
 A PEP MUST stop retrying at the Approval Result's `approved_until` ({{approval-result}}), applying the tolerance rules in {{time-and-clock-skew}}, and MUST additionally enforce a finite attempt budget.  Expiry alone is not a sufficient bound: the backoff above permits roughly one attempt a minute, which is hundreds of evaluations within a multi-hour approval.  The budget MUST survive automatic continuation or handoff to another process rather than resetting with each one; how a deployment keys and accounts for the chain is its own concern.
 
+A PEP MUST enforce a finite attempt budget for the chain of Access Requests arising automatically from one attempted operation, and MUST stop submitting when it is exhausted.  The chain is scoped to that operation: not to the Subject, Resource and Action alone, which would conflate unrelated operations, and not to request packaging, which would merge operations that were bundled together.  The budget MUST survive automatic continuation or handoff.
+
 A PEP uses a recognized `reason`'s registered default only when `next_action` is absent or unrecognized.  A PEP treats an unrecognized `reason` as informational and relies on `next_action` or the fallback rule above.
 
 This non-normative table summarizes the fallback order defined above.  Use the first matching row.
