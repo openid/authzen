@@ -24,6 +24,8 @@ author:
     email: alex.babeanu@indykite.com
   -
     fullname: Karl McGuinness
+    organization: Independent
+    email: public@karlmcguinness.com
 normative:
   RFC2119:
   RFC8174:
