@@ -41,8 +41,11 @@ normative:
     date: 2026
   AUTHZEN-EXT:
     title: "AuthZEN Extensibility Model"
-    target: https://gist.github.com/mcguinness/caab9ff46a8b0123cfa84645e9a60a7f
+    target: https://openid.github.io/authzen/authzen-extensibility-model-1_0.html
     author:
+      -
+        name: Alexandre Babeanu
+        org: Indykite
       -
         name: Karl McGuinness
     date: 2026
@@ -641,7 +644,7 @@ The `supported_obligations` declaration can reveal information about a PEP's dep
 
 # IANA Considerations {#iana-considerations}
 
-The Extensibility Model {{AUTHZEN-EXT}} expects separate registries for JSON member names, enumerated type identifiers, capability identifiers, and profile identifiers. The registrations below follow that separation. The processing strength of each member registered here is part of its registration, and is immutable. Changing a member from mandatory-to-understand to advisory, or the reverse, MUST be done by registering a new identifier, not by an in-place change.
+The Extensibility Model {{AUTHZEN-EXT}} separates registries for JSON member names, extension identifiers, enumerated type identifiers, capability identifiers, and profile identifiers. The registrations below follow that separation. The processing strength of each member registered here is part of its registration, and is immutable. Changing a member from mandatory-to-understand to advisory, or the reverse, MUST be done by registering a new identifier, not by an in-place change.
 
 ## AuthZEN Obligation Types Registry {#iana-obligation-types}
 
@@ -700,19 +703,37 @@ Change Controller:
 Specification Document(s):
 : {{metadata-extension}} of this specification
 
-## Mandatory Extension Identifier
+## AuthZEN Extension Identifiers Registry
 
-This specification defines the extension identifier `obligations` for use in the `supported_mandatory_extensions` request context member defined by {{AUTHZEN-EXT}}. When a registry of extension identifiers is established, this identifier is to be registered with a reference to this specification.
+This specification requests the following registration in the "AuthZEN Extension Identifiers" registry established by {{AUTHZEN-EXT}}.
 
-## JSON Member Names
+Extension Identifier:
+: `obligations`
 
-When a registry of AuthZEN JSON member names is established, the following members are to be registered with a reference to this specification:
+Description:
+: The Obligations Core extension. An Enforcing PEP that lists this identifier in `supported_mandatory_extensions` commits to the fail-closed processing of obligations.
 
-| Member | Location | Processing strength | Reference |
-|---|---|---|---|
-| `obligations` | Decision context; Search response context; Search result `context` | Mandatory-to-understand (for an Adopting PEP) | {{obligation-object}}, {{search-requests}} |
-| `context` | Search result object | Container; the processing strength of each member is defined by the extension that defines it | {{search-requests}} |
-| `supported_obligations` | Request context | Advisory | {{item-negotiation}} |
+Mandatory-to-Understand Members:
+: `obligations` (see {{iana-json-members}})
+
+Change Controller:
+: OpenID Foundation AuthZEN Working Group
+: mailto:openid-specs-authzen@lists.openid.net
+
+Specification Document(s):
+: This specification
+
+## AuthZEN JSON Members Registry {#iana-json-members}
+
+This specification requests the following registrations in the "AuthZEN JSON Members" registry established by {{AUTHZEN-EXT}}. For all of them, the change controller is the OpenID Foundation AuthZEN Working Group.
+
+| Member | Location | Processing strength | Extension Identifier | Reference |
+|---|---|---|---|---|
+| `obligations` | Decision `context` | Mandatory-to-Understand | `obligations` | {{obligation-object}} |
+| `obligations` | Search response `context` | Mandatory-to-Understand | `obligations` | {{search-requests}} |
+| `obligations` | Search result `context` | Mandatory-to-Understand | `obligations` | {{search-requests}} |
+| `context` | Search result object | Not applicable (container; each member's strength is defined by the extension that defines it) | (none) | {{search-requests}} |
+| `supported_obligations` | Request `context` | Advisory | (none) | {{item-negotiation}} |
 {: #tab-iana-members title="JSON members defined by the Obligations Core"}
 
 # Acknowledgements
