@@ -609,7 +609,7 @@ The PEP's rules for carrying the approval are in {{approval-reevaluation-request
 
 When the PDP denies a re-evaluation that presented an `approval` reference, it conveys what the PEP should do next through the following Decision Context members ({{pdp-reevaluation-denial}}); the PEP's handling is in {{pep-reevaluation-handling}}:
 
-* `next_action`: RECOMMENDED.  String.  The action the PEP should take.  One of:
+* `next_action`: REQUIRED.  String.  The action the PEP should take.  One of:
     * `request`: submit a new Access Request.
     * `retry`: re-evaluate the same request after a delay; the denial is expected to be transient.  This is the transient-denial outcome of the Introduction: nothing is remediated and nothing changes in the request.
     * `none`: do not retry or re-request; the denial is terminal for this approval.
