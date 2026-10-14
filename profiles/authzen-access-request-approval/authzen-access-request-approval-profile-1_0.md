@@ -833,7 +833,9 @@ A PEP handles `next_action` as follows:
 * A PEP that receives no `next_action`, or an unrecognized value, falls back first to the default next action for a recognized `reason`, then to the requestable-denial signal.
 * When the fallback action is `request`, the PEP treats the denial as `request` only when `context.access_request` is present; otherwise it treats the denial as `none`.
 
-A PEP that receives `next_action: "retry"` without `retry_after` SHOULD apply bounded exponential backoff with jitter, starting at several seconds and growing to no more than one minute between attempts, and MUST stop retrying once the approval expires.
+A PEP that receives `next_action: "retry"` without `retry_after` SHOULD apply bounded exponential backoff with jitter, starting at several seconds and growing to no more than one minute between attempts.
+
+A PEP MUST stop retrying at the Approval Result's `approved_until` ({{approval-result}}), applying the tolerance rules in {{time-and-clock-skew}}, and MUST additionally enforce a finite attempt budget.  Expiry alone is not a sufficient bound: the backoff above permits roughly one attempt a minute, which is hundreds of evaluations within a multi-hour approval.  The budget MUST survive automatic continuation or handoff to another process rather than resetting with each one; how a deployment keys and accounts for the chain is its own concern.
 
 A PEP uses a recognized `reason`'s registered default only when `next_action` is absent or unrecognized.  A PEP treats an unrecognized `reason` as informational and relies on `next_action` or the fallback rule above.
 
