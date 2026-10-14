@@ -615,7 +615,8 @@ When the PDP denies a re-evaluation that presented an `approval` reference, it c
     * `none`: do not retry or re-request; the denial is terminal for this approval.
 * `retry_after`: RECOMMENDED when `next_action` is `retry`.  Integer.  Number of seconds the PEP waits before re-evaluating the same request.  Its value has the delta-seconds semantics of HTTP `Retry-After` (Section 10.2.3 of {{RFC9110}}); it appears in Decision Context because an Access Evaluation denial is a successful protocol response.
 * `reason`: OPTIONAL.  String.  A machine-readable reason code for UX and audit.  This profile defines the following well-known re-evaluation denial reason codes with their default `next_action`:
-    * `approval_expired` (`request`): the approval is no longer valid because `approved_until` has passed or it was revoked, cancelled, or superseded.
+    * `approval_expired` (`request`): the approval is no longer valid because `approved_until` has passed.
+    * `approval_revoked` (`request`): the approval was revoked, cancelled, or superseded before `approved_until`.  Neither this code nor `approval_expired` implies that a new Access Request is available; the PDP returns `request` with a fresh `context.access_request` only where one is eligible.
     * `out_of_scope` (`request`): the approval is valid but the current evaluation falls outside its approval scope.
     * `grant_pending` (`retry`): the approval is valid and in scope, but the backing entitlement, role, or grant is not yet present (for example, provisioning has not completed).
     * `policy_denied` (`none`): the approval is valid and in scope, but current policy, subject status, or risk state denies the request; re-requesting will not help.
@@ -1545,7 +1546,8 @@ Initial entries, summarizing the semantics and default next actions defined in {
 
 | Reason | Default Next Action | Description |
 |---|---|---|
-| `approval_expired` | `request` | Approval no longer valid: `approved_until` passed, or revoked, cancelled, or superseded. |
+| `approval_expired` | `request` | Approval no longer valid: `approved_until` passed. |
+| `approval_revoked` | `request` | Approval revoked, cancelled, or superseded before `approved_until`. |
 | `out_of_scope` | `request` | Approval valid but the evaluation is outside its approval scope. |
 | `grant_pending` | `retry` | Approval valid and in scope, but the backing grant is not yet present (for example, provisioning incomplete). |
 | `policy_denied` | `none` | Approval valid and in scope, but current policy, subject status, or risk state denies the request. |
