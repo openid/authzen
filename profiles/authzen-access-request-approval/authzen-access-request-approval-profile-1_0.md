@@ -1521,8 +1521,6 @@ The registry tracks well-known `context.reason` values a PDP returns when it den
 Reason:
 : The `context.reason` value as it appears on the wire.
 
-Default Next Action:
-: The RECOMMENDED `next_action` for the value, which a PEP applies when the PDP's response carries no recognized `next_action`: `request`, `retry`, or `none`.
 
 Description:
 : A short description of the denial condition.
@@ -1535,14 +1533,14 @@ Specification Document:
 
 Initial entries, summarizing the semantics and default next actions defined in {{reevaluation-denials}}:
 
-| Reason | Default Next Action | Description |
-|---|---|---|
-| `approval_expired` | `request` | Approval no longer valid: `approved_until` passed. |
-| `approval_revoked` | `request` | Approval revoked, cancelled, or superseded before `approved_until`. |
-| `out_of_scope` | `request` | Approval valid but the evaluation is outside its approval scope. |
-| `grant_pending` | `retry` | Approval valid and in scope, but the backing grant is not yet present (for example, provisioning incomplete). |
-| `policy_denied` | `none` | Approval valid and in scope, but current policy, subject status, or risk state denies the request. |
-| `approval_unverifiable` | `none` | The presented `approval.id` or `approval.state` could not be resolved, verified, or bound. |
+| Reason | Description |
+|---|---|
+| `approval_expired` | Approval no longer valid: `approved_until` passed. |
+| `approval_revoked` | Approval revoked, cancelled, or superseded before `approved_until`. |
+| `out_of_scope` | Approval valid but the evaluation is outside its approval scope. |
+| `grant_pending` | Approval valid and in scope, but the backing grant is not yet present (for example, provisioning incomplete). |
+| `policy_denied` | Approval valid and in scope, but current policy, subject status, or risk state denies the request. |
+| `approval_unverifiable` | The presented `approval.id` or `approval.state` could not be resolved, verified, or bound. |
 
 Change Controller for all initial entries: OpenID Foundation AuthZEN Working Group.  Specification Document for all initial entries: This document.
 
