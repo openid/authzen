@@ -806,6 +806,8 @@ An intermediate enforcer (such as an OAuth Authorization Server or other gateway
 * PEPs SHOULD use exponential backoff: a starting interval of several seconds, growing to no more than one minute, with jitter applied to spread load across many concurrent pollers.
 * If the Access Request Service returns the `Retry-After` HTTP header (Section 10.2.3 of {{RFC9110}}), the PEP MUST wait at least the indicated duration before issuing the next poll.
 * The PEP MUST stop polling once `task.expires_at` is reached or the task reaches a terminal status ({{state-transitions}}).
+* When `task.expires_at` is absent, the PEP MUST bound polling by a configured deadline or finite attempt budget, which MUST survive automatic continuation or handoff.  A transport or companion profile that defines its own polling bounds satisfies this requirement, which covers polling only and not the retry or re-request bounds.
+* Exhausting a polling bound neither cancels nor expires the task, and a PEP MUST NOT infer a terminal status from it.  A PEP that is intentionally abandoning the workflow SHOULD cancel the task ({{cancellation}}); a PEP that is merely stopping its own automation MUST NOT, because another authorized caller may still complete it ({{task-handle-portability}}).
 * A PEP that receives an unknown status value MUST treat the task as not approved.
 * SHOULD fail closed when task status cannot be determined.
 
