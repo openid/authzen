@@ -615,12 +615,14 @@ When the PDP denies a re-evaluation that presented an `approval` reference, it c
     * `none`: do not retry or re-request; the denial is terminal for this approval.
 * `retry_after`: RECOMMENDED when `next_action` is `retry`.  Integer.  Number of seconds the PEP waits before re-evaluating the same request.  Its value has the delta-seconds semantics of HTTP `Retry-After` (Section 10.2.3 of {{RFC9110}}); it appears in Decision Context because an Access Evaluation denial is a successful protocol response.
 * `reason`: OPTIONAL.  String.  A machine-readable reason code for UX and audit.  This profile defines the following well-known re-evaluation denial reason codes with their default `next_action`:
-    * `approval_expired` (`request`): the approval is no longer valid because `approved_until` has passed.
-    * `approval_revoked` (`request`): the approval was revoked, cancelled, or superseded before `approved_until`.  Neither this code nor `approval_expired` implies that a new Access Request is available; the PDP returns `request` with a fresh `context.access_request` only where one is eligible.
-    * `out_of_scope` (`request`): the approval is valid but the current evaluation falls outside its approval scope.
-    * `grant_pending` (`retry`): the approval is valid and in scope, but the backing entitlement, role, or grant is not yet present (for example, provisioning has not completed).
-    * `policy_denied` (`none`): the approval is valid and in scope, but current policy, subject status, or risk state denies the request; re-requesting will not help.
-    * `approval_unverifiable` (`none`): the presented `approval.id` or `approval.state` could not be resolved or verified, or its binding did not match.
+    * `approval_expired`: the approval is no longer valid because `approved_until` has passed.
+    * `approval_revoked`: the approval was revoked, cancelled, or superseded before `approved_until`.
+    * `out_of_scope`: the approval is valid but the current evaluation falls outside its approval scope.
+    * `grant_pending`: the approval is valid and in scope, but the backing entitlement, role, or grant is not yet present (for example, provisioning has not completed).
+    * `policy_denied`: the approval is valid and in scope, but current policy, subject status, or risk state denies the request.
+    * `approval_unverifiable`: the presented `approval.id` or `approval.state` could not be resolved or verified, or its binding did not match.
+
+  A reason code does not imply an action.  The PDP states the action in `next_action`, including whether a new Access Request is available.
 
   Implementations MAY register additional reason codes.  These codes are registered in the AuthZEN Access Request Re-evaluation Denial Reason registry ({{iana-reeval-reasons}}).
 
@@ -980,7 +982,7 @@ The Access Request Service's workflow policy determines approval breadth, subjec
 
 ## Deny a Re-evaluation {#pdp-reevaluation-denial}
 
-When the PDP denies a re-evaluation that presented an `approval` reference, it SHOULD tell the PEP what to do next using the Decision Context members defined in {{reevaluation-denials}}.
+When the PDP denies a re-evaluation that presented an `approval` reference, it MUST tell the PEP what to do next using `next_action`, and MAY add the other Decision Context members defined in {{reevaluation-denials}}.
 
 When `next_action` is `request`, the PDP MUST also include a fresh `context.access_request` ({{requestable-denial-context}}) so the PEP has a valid requestable-denial signal for the new submission.
 
@@ -1531,7 +1533,7 @@ Change Controller:
 Specification Document:
 : The document defining the value.
 
-Initial entries, summarizing the semantics and default next actions defined in {{reevaluation-denials}}:
+Initial entries, summarizing the semantics defined in {{reevaluation-denials}}:
 
 | Reason | Description |
 |---|---|
