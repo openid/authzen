@@ -978,6 +978,8 @@ The exact-match baseline is the default unless the Access Request Service or PDP
 
 The PDP MUST only consider an Approval Result applicable when the current evaluation request is within the approval scope recorded for that Approval Result.
 
+The PDP MUST compare every member of the bound authorization-relevant Context and MUST NOT treat a bound member that is absent from the request as matching.
+
 #### Approval Scope Extensions {#approval-scope-extensions}
 
 Broader approvals can cover a resource class, role, entitlement, or time-bounded tool class.  Their representation and matching are deployment-specific or defined by downstream profiles, not portable across policy engines.  This profile does not define context-constraint matching.
