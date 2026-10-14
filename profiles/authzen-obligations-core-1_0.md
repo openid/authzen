@@ -50,7 +50,6 @@ normative:
         name: Karl McGuinness
     date: 2026
 informative:
-  RFC8259:
   XACML:
     title: "eXtensible Access Control Markup Language (XACML) Version 3.0"
     target: http://docs.oasis-open.org/xacml/3.0/xacml-3.0-core-spec-os-en.html

@@ -252,7 +252,7 @@ Intermediaries and downgrade paths MUST be handled so that an opt-in established
 - MUST NOT remove or alter mandatory-to-understand members of a response;
 - MUST, if it cannot deliver mandatory-to-understand members unchanged to an Enforcing PEP that has adopted the defining extension, treat a PERMIT that carries them as a DENY.
 
-How the Enforcing PEP is identified and authenticated when it is not the immediate caller is an open issue ({{open-issues}}).
+This specification does not define how the Enforcing PEP is identified and authenticated when it is not the immediate caller. Transport bindings define how this is realized over their transport ({{profile-requirements}}).
 
 ## Unknown Handling per Extension and per Position {#unknown-handling}
 
@@ -312,7 +312,7 @@ Because the endpoints carry `context` differently, placement differs by endpoint
 | PDP metadata | Not per request | The PDP advertises the extensions it supports through its `capabilities` metadata. This is the discovery direction, from PDP to PEP. A PEP uses it to check whether a PDP supports an extension before relying on it. |
 {: #tab-placement title="Placement of capability declarations by endpoint"}
 
-On the response side, the Access Evaluation decision and each Search response carry a `context`, so a PDP MAY return decision-relevant response signals there. An extension MAY also define members of individual Search results, as {{surface}} permits. The Access Evaluations response carries only a Decision for each evaluation, and defines no top-level response context. A request-wide response signal therefore has nowhere to go on that endpoint. Any extension that defines a response-side negotiation signal MUST account for this ({{open-issues}}).
+On the response side, the Access Evaluation decision and each Search response carry a `context`, so a PDP MAY return decision-relevant response signals there. An extension MAY also define members of individual Search results, as {{surface}} permits. The Access Evaluations response carries only a Decision for each evaluation, and defines no top-level response context. A request-wide response signal therefore has nowhere to go on that endpoint. Any extension that defines a response-side negotiation signal MUST account for this.
 
 ## Two Levels of Negotiation {#two-levels}
 
