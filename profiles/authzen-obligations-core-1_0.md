@@ -1,10 +1,10 @@
 ---
-title: "AuthZEN Obligations Extension - Draft 1"
-abbrev: "authzen-obligations-ext"
+title: "AuthZEN Obligations Core - Draft 1"
+abbrev: "authzen-obligations-core"
 category: std
 date: 2026-10-06
 ipr: none
-docname: authzen-obligations-extension-1_0
+docname: authzen-obligations-core-1_0
 consensus: true
 workgroup: OpenID AuthZEN
 keyword:
@@ -62,9 +62,9 @@ informative:
       -
         name: OpenID AuthZEN Working Group
     date: 2026
-  OBLIGATIONS-PROFILE:
-    title: "AuthZEN Obligations Profile"
-    target: https://openid.github.io/authzen/authzen-obligations-profile-1_0.html
+  STANDARD-TYPES-PROFILE:
+    title: "AuthZEN Obligations Core: Standard Types Profile"
+    target: https://openid.github.io/authzen/authzen-obligations-standard-types-profile-1_0.html
     author:
       -
         name: Alexandre Babeanu
@@ -73,7 +73,7 @@ informative:
 
 --- abstract
 
-This specification defines the AuthZEN Obligations Extension, a reusable, use-case-neutral extension of the OpenID AuthZEN Authorization API. The extension defines the `obligations` member. A Policy Decision Point (PDP) uses this member to attach one or more mandatory, machine-readable actions to an authorization decision. The specification defines the Obligation object, the member's mandatory-to-understand processing strength and fail-closed rule, and the handling of unknown and absent members for permits, denials, Search results, and side effects. It also defines the opt-in and negotiation mechanism by which a Policy Enforcement Point (PEP) commits to enforcing obligations, the binding requirements for that decision-relevant state, composition with other extensions, discovery, and the AuthZEN Obligation Types registry. The extension follows the AuthZEN Extensibility Model. Concrete Obligation Types for common use cases are defined separately, by profiles such as the AuthZEN Obligations Profile.
+This specification defines the AuthZEN Obligations Core extension, a reusable, use-case-neutral extension of the OpenID AuthZEN Authorization API. The extension defines the `obligations` member. A Policy Decision Point (PDP) uses this member to attach one or more mandatory, machine-readable actions to an authorization decision. The specification defines the Obligation object, the member's mandatory-to-understand processing strength and fail-closed rule, and the handling of unknown and absent members for permits, denials, Search results, and side effects. It also defines the opt-in and negotiation mechanism by which a Policy Enforcement Point (PEP) commits to enforcing obligations, the binding requirements for that decision-relevant state, composition with other extensions, discovery, and the AuthZEN Obligation Types registry. The extension follows the AuthZEN Extensibility Model. Concrete Obligation Types for common use cases are defined separately, by profiles such as the AuthZEN Obligations Core: Standard Types Profile.
 
 --- middle
 
@@ -89,9 +89,9 @@ This specification does not attempt to define a general-purpose workflow or orch
 
 Following the AuthZEN Extensibility Model {{AUTHZEN-EXT}}, this document is an extension. It defines reusable surface and processing rules, and does not depend on any particular Obligation Type. It defines only one type, the bilateral `custom` type ({{obligation-custom}}).
 
-Profiles select this extension and define Obligation Types for particular use cases, together with their conformance requirements. The AuthZEN Obligations Profile {{OBLIGATIONS-PROFILE}} is one such profile. It defines the Normative Obligation Types `step-up`, `notification`, and `session_termination`. Other profiles MAY build on this extension and define their own Obligation Types, without adopting the Obligations Profile.
+Profiles select this extension and define Obligation Types for particular use cases, together with their conformance requirements. The Standard Types Profile {{STANDARD-TYPES-PROFILE}} is one such profile. It defines the Standard Obligation Types `step-up`, `notification`, and `session_termination`. Other profiles MAY build on this extension and define their own Obligation Types, without adopting the Standard Types Profile.
 
-Some non-normative examples in this document use Obligation Types defined in {{OBLIGATIONS-PROFILE}}. They do so for illustration only, and implementing this extension does not require implementing those types.
+Some non-normative examples in this document use Obligation Types defined in {{STANDARD-TYPES-PROFILE}}. They do so for illustration only, and implementing this extension does not require implementing those types.
 
 ## Requirements Notation and Conventions
 
@@ -112,7 +112,7 @@ Obligation Type:
 
 : A unique, registered identifier (the `type` member of an Obligation object) that determines the semantics of an Obligation and the meaning of its type-specific properties.
 
-Obligations Extension:
+Obligations Core:
 
 : The extension defined by this specification, identified by the extension identifier `obligations`.
 
@@ -146,7 +146,7 @@ This specification makes the following core design choices:
 
 # Extension Identifier and Processing Strength {#processing-strength}
 
-The Obligations Extension is identified by the extension identifier `obligations`. A party uses this identifier in the `supported_mandatory_extensions` request context member ({{opt-in}}). The extension is also identified by the capability URN `urn:openid:authzen:capability:obligations` in PDP metadata ({{metadata-extension}}).
+The Obligations Core is identified by the extension identifier `obligations`. A party uses this identifier in the `supported_mandatory_extensions` request context member ({{opt-in}}). The extension is also identified by the capability URN `urn:openid:authzen:capability:obligations` in PDP metadata ({{metadata-extension}}).
 
 The `obligations` member, wherever it appears, is **mandatory-to-understand**. An Adopting PEP that does not understand an Obligation, or cannot apply it, MUST treat a PERMIT as a DENY, as defined in {{non-compliance}}.
 
@@ -156,7 +156,7 @@ The processing strength of the `obligations` member is fixed. A future revision 
 
 # Extension Surface {#extension-surface}
 
-The Obligations Extension adds the following members to the AuthZEN protocol. Each member is a registered, namespaced extension member ({{iana-considerations}}). The presence of a member is itself the signal that the extension applies.
+The Obligations Core adds the following members to the AuthZEN protocol. Each member is a registered, namespaced extension member ({{iana-considerations}}). The presence of a member is itself the signal that the extension applies.
 
 | Member | Location | Direction | Defined in |
 |---|---|---|---|
@@ -167,9 +167,9 @@ The Obligations Extension adds the following members to the AuthZEN protocol. Ea
 | `supported_obligations` | Request `context` | PEP to PDP | {{item-negotiation}} |
 | `supported_obligations` | PDP metadata | PDP to PEP | {{metadata-extension}} |
 | `urn:openid:authzen:capability:obligations` | PDP metadata `capabilities` | PDP to PEP | {{metadata-extension}} |
-{: #tab-extension-surface title="Members defined or used by the Obligations Extension"}
+{: #tab-extension-surface title="Members defined or used by the Obligations Core"}
 
-The Obligations Extension does not redefine or change the meaning of any core member. In particular, the meaning of `decision` is unchanged. A PDP-issued PERMIT remains a PERMIT on the wire. The fail-closed rule of {{non-compliance}} governs only how an Adopting PEP enforces that decision.
+The Obligations Core does not redefine or change the meaning of any core member. In particular, the meaning of `decision` is unchanged. A PDP-issued PERMIT remains a PERMIT on the wire. The fail-closed rule of {{non-compliance}} governs only how an Adopting PEP enforces that decision.
 
 # The Obligation Object {#obligation-object}
 
@@ -240,11 +240,11 @@ The following is a non-normative example of a `custom` obligation used to reques
 
 # Adoption and Negotiation {#negotiation}
 
-The Obligations Extension uses two levels of negotiation, as described in {{AUTHZEN-EXT}}. The first is a coarse, safety-critical opt-in, by which the Enforcing PEP commits to the extension's fail-closed processing. The second is a fine, per-type declaration, by which the PEP lists the Obligation Types it can execute.
+The Obligations Core uses two levels of negotiation, as described in {{AUTHZEN-EXT}}. The first is a coarse, safety-critical opt-in, by which the Enforcing PEP commits to the extension's fail-closed processing. The second is a fine, per-type declaration, by which the PEP lists the Obligation Types it can execute.
 
 ## Support Opt-In: supported_mandatory_extensions {#opt-in}
 
-An Enforcing PEP that adopts the Obligations Extension MUST include the extension identifier `obligations` in the `supported_mandatory_extensions` array of the request `context`:
+An Enforcing PEP that adopts the Obligations Core MUST include the extension identifier `obligations` in the `supported_mandatory_extensions` array of the request `context`:
 
 ~~~ json
 {
@@ -257,7 +257,7 @@ An Enforcing PEP that adopts the Obligations Extension MUST include the extensio
   }
 }
 ~~~
-{: #fig-request-opt-in title="Enforcing PEP opting in to the Obligations Extension"}
+{: #fig-request-opt-in title="Enforcing PEP opting in to the Obligations Core"}
 
 By listing `obligations`, the PEP makes a stronger claim than an ordinary capability advertisement. It asserts that it will not grant access if it cannot understand or enforce an obligation in the response, and that it will apply the rules of {{pep-compliance}} and {{unknown-handling}}. A PEP MUST NOT list `obligations` unless it implements those rules.
 
@@ -455,7 +455,7 @@ The `supported_mandatory_extensions` and `supported_obligations` declarations ch
 
 # Composition {#composition}
 
-**Core AuthZEN.** The Obligations Extension adds members only. It does not change the meaning of `subject`, `resource`, `action`, `context`, or `decision`.
+**Core AuthZEN.** The Obligations Core adds members only. It does not change the meaning of `subject`, `resource`, `action`, `context`, or `decision`.
 
 **Batch evaluations.** Each Decision in an Access Evaluations response is processed independently. A PEP that treats one Decision as a DENY under {{non-compliance}} does not thereby affect the other Decisions. It also does not affect any short-circuit semantics already applied by the PDP.
 
@@ -465,11 +465,11 @@ The `supported_mandatory_extensions` and `supported_obligations` declarations ch
 
 **Other mandatory-to-understand extensions.** When a decision carries mandatory-to-understand members of several extensions, an Adopting PEP MUST satisfy the fail-closed rule of each. A PERMIT is honored only when every such rule permits it.
 
-**Profiles.** A profile that defines Obligation Types (for example, {{OBLIGATIONS-PROFILE}}) MUST NOT relax any requirement of this extension. It MAY add conformance requirements, such as requiring a PEP to implement particular types.
+**Profiles.** A profile that defines Obligation Types (for example, {{STANDARD-TYPES-PROFILE}}) MUST NOT relax any requirement of this extension. It MAY add conformance requirements, such as requiring a PEP to implement particular types.
 
 # Discovery: PDP Metadata {#metadata-extension}
 
-A PDP that implements the Obligations Extension MUST include the capability URN `urn:openid:authzen:capability:obligations` in the `capabilities` member of its metadata {{AUTHZEN}}. It MUST also include a `supported_obligations` metadata member. This member is an array of Strings, each of which MUST be an Obligation Type registered per {{iana-obligation-types}}, or the literal value `custom`, that the PDP is capable of issuing.
+A PDP that implements the Obligations Core MUST include the capability URN `urn:openid:authzen:capability:obligations` in the `capabilities` member of its metadata {{AUTHZEN}}. It MUST also include a `supported_obligations` metadata member. This member is an array of Strings, each of which MUST be an Obligation Type registered per {{iana-obligation-types}}, or the literal value `custom`, that the PDP is capable of issuing.
 
 A PDP that does not implement this extension MAY omit both. The absence of `supported_obligations` is equivalent to an empty array.
 
@@ -487,7 +487,7 @@ The following is a non-normative example of a metadata fragment:
   ]
 }
 ~~~
-{: #fig-metadata-example title="Example PDP metadata advertising the Obligations Extension"}
+{: #fig-metadata-example title="Example PDP metadata advertising the Obligations Core"}
 
 Discovery is the PDP-to-PEP direction. It lets a PEP check whether a PDP supports the extension before relying on it. Discovery is not an opt-in. A PDP MUST NOT treat a PEP as having adopted the extension on the basis of metadata or out-of-band configuration alone. Adoption is established only by the per-request signal of {{opt-in}}.
 
@@ -539,7 +539,7 @@ The following is a non-normative example of a request that carries no `supported
 ~~~
 {: #fig-example-no-opt-in-request title="Request without an opt-in"}
 
-Suppose that policy would grant this access on condition of an obligation. Because the Enforcing PEP has not adopted the Obligations Extension, the PDP returns a plain core DENY ({{pdp-outcome}}):
+Suppose that policy would grant this access on condition of an obligation. Because the Enforcing PEP has not adopted the Obligations Core, the PDP returns a plain core DENY ({{pdp-outcome}}):
 
 ~~~ json
 {
@@ -674,7 +674,7 @@ Capability URN:
 : `urn:openid:authzen:capability:obligations`
 
 Capability Description:
-: Indicates that the PDP implements the Obligations Extension, and may return obligations to an Enforcing PEP that has opted in.
+: Indicates that the PDP implements the Obligations Core, and may return obligations to an Enforcing PEP that has opted in.
 
 Change Controller:
 : OpenID Foundation AuthZEN Working Group
@@ -713,7 +713,7 @@ When a registry of AuthZEN JSON member names is established, the following membe
 | `obligations` | Decision context; Search response context; Search result `context` | Mandatory-to-understand (for an Adopting PEP) | {{obligation-object}}, {{search-requests}} |
 | `context` | Search result object | Container; the processing strength of each member is defined by the extension that defines it | {{search-requests}} |
 | `supported_obligations` | Request context | Advisory | {{item-negotiation}} |
-{: #tab-iana-members title="JSON members defined by the Obligations Extension"}
+{: #tab-iana-members title="JSON members defined by the Obligations Core"}
 
 # Acknowledgements
 

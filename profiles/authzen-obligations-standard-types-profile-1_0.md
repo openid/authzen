@@ -1,10 +1,10 @@
 ---
-title: "AuthZEN Obligations Profile - Draft 1"
-abbrev: "authzen-obligations"
+title: "AuthZEN Obligations Core: Standard Types Profile - Draft 1"
+abbrev: "authzen-obligations-standard-types"
 category: std
 date: 2026-10-06
 ipr: none
-docname: authzen-obligations-profile-1_0
+docname: authzen-obligations-standard-types-profile-1_0
 consensus: true
 workgroup: OpenID AuthZEN
 keyword:
@@ -38,9 +38,9 @@ normative:
         name: Atul Tulshibagwale
         org: SGNL
     date: 2026
-  OBLIGATIONS-EXT:
-    title: "AuthZEN Obligations Extension"
-    target: https://openid.github.io/authzen/authzen-obligations-extension-1_0.html
+  OBLIGATIONS-CORE:
+    title: "AuthZEN Obligations Core"
+    target: https://openid.github.io/authzen/authzen-obligations-core-1_0.html
     author:
       -
         name: Alexandre Babeanu
@@ -102,13 +102,13 @@ informative:
 
 --- abstract
 
-This specification defines the AuthZEN Obligations Profile. The profile selects the AuthZEN Obligations Extension, by which a Policy Decision Point (PDP) attaches mandatory, machine-readable actions to an authorization decision. It defines a set of Normative Obligation Types for common use cases: step-up authentication, notification, and session termination. These types are ready for immediate implementation. The profile also defines the conformance requirements for PDPs and PEPs that implement them.
+This specification defines the AuthZEN Obligations Core: Standard Types Profile. The profile selects the AuthZEN Obligations Core, by which a Policy Decision Point (PDP) attaches mandatory, machine-readable actions to an authorization decision. It defines a set of Standard Obligation Types for common use cases: step-up authentication, notification, and session termination. These types are ready for immediate implementation. The profile also defines the conformance requirements for PDPs and PEPs that implement them.
 
 --- middle
 
 # Introduction
 
-The AuthZEN Obligations Extension {{OBLIGATIONS-EXT}} defines how a Policy Decision Point (PDP) attaches obligations to an AuthZEN {{AUTHZEN}} decision. Obligations are mandatory actions that a Policy Enforcement Point (PEP) must perform in order to honor the decision. The extension defines the Obligation object, its fail-closed processing, the opt-in and negotiation mechanism, and the "AuthZEN Obligation Types" registry. However, it intentionally defines no Obligation Types for specific use cases.
+The AuthZEN Obligations Core {{OBLIGATIONS-CORE}} defines how a Policy Decision Point (PDP) attaches obligations to an AuthZEN {{AUTHZEN}} decision. Obligations are mandatory actions that a Policy Enforcement Point (PEP) must perform in order to honor the decision. The extension defines the Obligation object, its fail-closed processing, the opt-in and negotiation mechanism, and the "AuthZEN Obligation Types" registry. However, it intentionally defines no Obligation Types for specific use cases.
 
 This profile fills that gap for common use cases, several of which are familiar from prior authorization standards such as {{XACML}}:
 
@@ -116,11 +116,11 @@ This profile fills that gap for common use cases, several of which are familiar 
 - **Notifications and Accountability**: alerting a manager, a security team, or the person whose data was accessed ({{obligation-notification}}).
 - **Session Termination**: ending all sessions of a subject, for example in response to suspicious activity ({{obligation-session-termination}}).
 
-## Relationship to the Obligations Extension {#structure}
+## Relationship to the Obligations Core {#structure}
 
-Following the AuthZEN Extensibility Model {{AUTHZEN-EXT}}, this document is a profile. It selects and constrains the Obligations Extension, defines a type vocabulary, and defines conformance. All processing rules are defined in {{OBLIGATIONS-EXT}} and apply unchanged. These include the Obligation object, PEP compliance on PERMIT and DENY decisions, the handling of Search results, non-compliance, unknown-member handling, the PDP outcome rules, binding, and discovery. This profile does not relax any of them.
+Following the AuthZEN Extensibility Model {{AUTHZEN-EXT}}, this document is a profile. It selects and constrains the Obligations Core, defines a type vocabulary, and defines conformance. All processing rules are defined in {{OBLIGATIONS-CORE}} and apply unchanged. These include the Obligation object, PEP compliance on PERMIT and DENY decisions, the handling of Search results, non-compliance, unknown-member handling, the PDP outcome rules, binding, and discovery. This profile does not relax any of them.
 
-The profile carries mandatory-to-understand elements only through the Obligations Extension. It is therefore adopted on the wire by opting in to that extension, by listing `obligations` in `supported_mandatory_extensions` in the request context. It requires no separate negotiation signal. Whether a party implements a given type of this profile is reflected in the `supported_obligations` values it advertises (PDP) or declares (PEP).
+The profile carries mandatory-to-understand elements only through the Obligations Core. It is therefore adopted on the wire by opting in to that extension, by listing `obligations` in `supported_mandatory_extensions` in the request context. It requires no separate negotiation signal. Whether a party implements a given type of this profile is reflected in the `supported_obligations` values it advertises (PDP) or declares (PEP).
 
 ## Requirements Notation and Conventions
 
@@ -131,31 +131,31 @@ when, and only when, they appear in all capitals, as shown here.
 
 ## Terminology
 
-This specification uses the terms "Policy Enforcement Point" (PEP), "Policy Decision Point" (PDP), "subject", "resource", "action", and "context" as defined in {{AUTHZEN}}. It uses the terms "Obligation", "Obligation Type", "Obligations Extension", "Enforcing PEP", and "Adopting PEP" as defined in {{OBLIGATIONS-EXT}}. Additionally, this specification uses the following term:
+This specification uses the terms "Policy Enforcement Point" (PEP), "Policy Decision Point" (PDP), "subject", "resource", "action", and "context" as defined in {{AUTHZEN}}. It uses the terms "Obligation", "Obligation Type", "Obligations Core", "Enforcing PEP", and "Adopting PEP" as defined in {{OBLIGATIONS-CORE}}. Additionally, this specification uses the following term:
 
-Normative Obligation Type:
+Standard Obligation Type:
 
 : An Obligation Type defined by this profile. It has fixed, standardized semantics and member names, and is intended to be interoperably implementable without further bilateral agreement between PDP and PEP implementers.
 
 # Conformance {#conformance}
 
-A PDP conforms to the Obligations Profile if it:
+A PDP conforms to the Standard Types Profile if it:
 
-- implements the Obligations Extension {{OBLIGATIONS-EXT}};
-- lists, in its `supported_obligations` metadata, each Normative Obligation Type it can issue;
-- emits each Normative Obligation Type only with the members, and in the circumstances, defined for that type in {{normative-obligation-types}}.
+- implements the Obligations Core {{OBLIGATIONS-CORE}};
+- lists, in its `supported_obligations` metadata, each Standard Obligation Type it can issue;
+- emits each Standard Obligation Type only with the members, and in the circumstances, defined for that type in {{standard-obligation-types}}.
 
-A PEP conforms to the Obligations Profile if it:
+A PEP conforms to the Standard Types Profile if it:
 
-- implements the Obligations Extension, and lists `obligations` in `supported_mandatory_extensions` on every request for which it is the Enforcing PEP;
-- lists in `supported_obligations` exactly the Normative Obligation Types (and `custom`, where applicable) that it implements;
-- implements each Normative Obligation Type it lists, as defined in {{normative-obligation-types}}.
+- implements the Obligations Core, and lists `obligations` in `supported_mandatory_extensions` on every request for which it is the Enforcing PEP;
+- lists in `supported_obligations` exactly the Standard Obligation Types (and `custom`, where applicable) that it implements;
+- implements each Standard Obligation Type it lists, as defined in {{standard-obligation-types}}.
 
-# Normative Obligation Types {#normative-obligation-types}
+# Standard Obligation Types {#standard-obligation-types}
 
-This section defines the Normative Obligation Types. Each is registered in the "AuthZEN Obligation Types" registry established by {{OBLIGATIONS-EXT}} ({{iana-considerations}}).
+This section defines the Standard Obligation Types. Each is registered in the "AuthZEN Obligation Types" registry established by {{OBLIGATIONS-CORE}} ({{iana-considerations}}).
 
-Each type below is carried in the `properties` member of an Obligation object, as defined in {{OBLIGATIONS-EXT}}. Unless stated otherwise, an unrecognized member in the `properties` of a Normative Obligation Type means that the PEP cannot comply with the obligation. A PEP that cannot comply with an obligation applies the non-compliance rules of {{OBLIGATIONS-EXT}}: it treats a PERMIT as a DENY, keeps a DENY as a DENY while still executing the obligations it can, and, for Search, excludes only the results to which the obligation applies.
+Each type below is carried in the `properties` member of an Obligation object, as defined in {{OBLIGATIONS-CORE}}. Unless stated otherwise, an unrecognized member in the `properties` of a Standard Obligation Type means that the PEP cannot comply with the obligation. A PEP that cannot comply with an obligation applies the non-compliance rules of {{OBLIGATIONS-CORE}}: it treats a PERMIT as a DENY, keeps a DENY as a DENY while still executing the obligations it can, and, for Search, excludes only the results to which the obligation applies.
 
 ## step-up {#obligation-step-up}
 
@@ -286,7 +286,7 @@ The following is a non-normative example of a request from a PEP that conforms t
   }
 }
 ~~~
-{: #fig-example-request title="Request from a PEP conforming to the Obligations Profile"}
+{: #fig-example-request title="Request from a PEP conforming to the Standard Types Profile"}
 
 ## Example: PERMIT with a Notification Obligation
 
@@ -352,11 +352,11 @@ A PEP capable of driving the subject through step-up authentication MAY re-submi
   ]
 }
 ~~~
-{: #fig-example-metadata title="Metadata of a PDP that supports all Normative Obligation Types"}
+{: #fig-example-metadata title="Metadata of a PDP that supports all Standard Obligation Types"}
 
 # Security Considerations
 
-The security considerations of {{OBLIGATIONS-EXT}} apply. In addition:
+The security considerations of {{OBLIGATIONS-CORE}} apply. In addition:
 
 **Abuse of notification.** A malicious or compromised PDP could attempt to abuse the `notification` Obligation Type to make a PEP relay attacker-controlled content to an arbitrary destination (e.g., using the PEP's trusted mail relay to send spam or phishing content). PEPs SHOULD treat `to` and `body` values in `notification` Obligations as untrusted input. They SHOULD apply the same validation, rate-limiting, and content-safety controls they would apply to any other externally influenced message-sending operation.
 
@@ -366,13 +366,13 @@ The security considerations of {{OBLIGATIONS-EXT}} apply. In addition:
 
 # Privacy Considerations
 
-The privacy considerations of {{OBLIGATIONS-EXT}} apply. In addition, `notification` Obligations may carry personal data in their `body` or other members, for example a subject's identifier or the details of the resource accessed. The `decision_subject` mechanism ({{decision-subject}}) sends such data to the person the request pertains to. Implementers SHOULD apply data minimization to notification content, and PDPs SHOULD ensure that policies adding `decision_subject` as a destination are consistent with the applicable privacy requirements.
+The privacy considerations of {{OBLIGATIONS-CORE}} apply. In addition, `notification` Obligations may carry personal data in their `body` or other members, for example a subject's identifier or the details of the resource accessed. The `decision_subject` mechanism ({{decision-subject}}) sends such data to the person the request pertains to. Implementers SHOULD apply data minimization to notification content, and PDPs SHOULD ensure that policies adding `decision_subject` as a destination are consistent with the applicable privacy requirements.
 
 # IANA Considerations {#iana-considerations}
 
 ## AuthZEN Obligation Types Registry
 
-This specification requests the following registrations in the "AuthZEN Obligation Types" registry established by {{OBLIGATIONS-EXT}}:
+This specification requests the following registrations in the "AuthZEN Obligation Types" registry established by {{OBLIGATIONS-CORE}}:
 
 | Type | Description | Reference |
 |---|---|---|
@@ -388,8 +388,8 @@ When a registry of AuthZEN JSON member names is established, the following membe
 | Member | Location | Processing strength | Reference |
 |---|---|---|---|
 | `decision_subject` | Request context | Advisory | {{decision-subject}} |
-{: #tab-iana-members title="JSON members defined by the Obligations Profile"}
+{: #tab-iana-members title="JSON members defined by the Standard Types Profile"}
 
 # Acknowledgements
 
-The author acknowledges the OpenID AuthZEN Working Group for the base specification on which this profile builds, and prior obligation-bearing access-control models, notably {{XACML}}, for informing the choice of Normative Obligation Types.
+The author acknowledges the OpenID AuthZEN Working Group for the base specification on which this profile builds, and prior obligation-bearing access-control models, notably {{XACML}}, for informing the choice of Standard Obligation Types.
