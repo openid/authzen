@@ -822,7 +822,7 @@ The PEP MUST construct the re-evaluation request's `context` using the same rule
 
 Presenting an approval MUST NOT cause the PEP to remove Context members or to substitute an approval-only object for its ordinary construction.  Changes of membership or value that those ordinary rules require remain permitted: a member carrying a current condition is obtained fresh, and a bound value that has changed means this is not the request that was approved, which correctly fails the approval-scope comparison ({{approval-scope}}) rather than being replayed.
 
-The inputs those rules need MUST remain reachable at re-evaluation, including where a Task Handle is resumed in another process ({{task-handle-portability}}).  A PEP that can no longer reach an input its rules require cannot construct the request; where that input was bound, the approval cannot be applied and the deployment obtains a new one.
+The inputs those rules need MUST remain reachable at re-evaluation, including where a Task Handle is resumed in another process ({{task-handle-portability}}).  A PEP that can no longer reach an input its rules require cannot construct the request, and where that input was bound the approval cannot be applied.  A new approval does not restore a missing input, so the PEP stops until the inputs are available; a fresh evaluation and, where it is eligible, a new Access Request follow from there.
 
 The PEP MUST preserve the JSON value exactly and MUST NOT modify or interpret the contents of `approval.state`.
 
