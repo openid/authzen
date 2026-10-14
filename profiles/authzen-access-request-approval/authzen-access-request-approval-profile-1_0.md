@@ -833,8 +833,7 @@ A PEP handles `next_action` as follows:
 
 * A PEP MUST drive its behavior from `next_action` when the value is recognized.
 * A PEP that receives `next_action: "request"` without `context.access_request` MUST NOT submit a new Access Request and treats the denial as `none`.
-* A PEP that receives no `next_action`, or an unrecognized value, falls back first to the default next action for a recognized `reason`, then to the requestable-denial signal.
-* When the fallback action is `request`, the PEP treats the denial as `request` only when `context.access_request` is present; otherwise it treats the denial as `none`.
+* A PEP that receives no `next_action`, a value that is not a string, or an unrecognized value, MUST treat the denial as `none`.
 
 A PEP that receives `next_action: "retry"` without `retry_after` SHOULD apply bounded exponential backoff with jitter, starting at several seconds and growing to no more than one minute between attempts.
 
@@ -842,15 +841,7 @@ A PEP MUST stop retrying at the Approval Result's `approved_until` ({{approval-r
 
 A PEP MUST enforce a finite attempt budget for the chain of Access Requests arising automatically from one attempted operation, and MUST stop submitting when it is exhausted.  The chain is scoped to that operation: not to the Subject, Resource and Action alone, which would conflate unrelated operations, and not to request packaging, which would merge operations that were bundled together.  The budget MUST survive automatic continuation or handoff.
 
-A PEP uses a recognized `reason`'s registered default only when `next_action` is absent or unrecognized.  A PEP treats an unrecognized `reason` as informational and relies on `next_action` or the fallback rule above.
-
-This non-normative table summarizes the fallback order defined above.  Use the first matching row.
-
-| Decision Context | Action source |
-|---|---|
-| Recognized `next_action` | Use `next_action`, even if a reason code suggests a different default. |
-| Absent or unrecognized `next_action`, with a recognized `reason` | Use the reason's default next action. |
-| Neither a recognized `next_action` nor a recognized `reason` | Use the requestable-denial signal: `request` when `context.access_request` is present, otherwise `none`. |
+`reason` is informational and drives no PEP behavior.  A PEP treats an unrecognized `reason` as informational and relies on `next_action`.
 
 ## Enforce and Reuse the Approval {#approval-lifetime}
 
