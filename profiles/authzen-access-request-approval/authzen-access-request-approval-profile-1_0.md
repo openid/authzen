@@ -622,7 +622,7 @@ When the PDP denies a re-evaluation that presented an `approval` reference, it c
     * `policy_denied` (`none`): the approval is valid and in scope, but current policy, subject status, or risk state denies the request; re-requesting will not help.
     * `approval_unverifiable` (`none`): the presented `approval.id` or `approval.state` could not be resolved or verified, or its binding did not match.
 
-  Implementations MAY register additional reason codes (for example, a more specific `approval_revoked`).  These codes are registered in the AuthZEN Access Request Re-evaluation Denial Reason registry ({{iana-reeval-reasons}}).
+  Implementations MAY register additional reason codes.  These codes are registered in the AuthZEN Access Request Re-evaluation Denial Reason registry ({{iana-reeval-reasons}}).
 
 ## Re-evaluation Example {#lookup-reevaluation-example}
 
