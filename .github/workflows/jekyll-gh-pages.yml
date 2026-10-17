@@ -49,9 +49,15 @@ jobs:
           - name: access-request-actor-profile
             source: profiles/authzen-access-request-approval/authzen-access-request-actor-profile-1_0.md
             html: authzen-access-request-actor-profile-1_0.html
-          - name: obligations-profile
-            source: profiles/authzen-obligations-profile-1_0.md
-            html: authzen-obligations-profile-1_0.html
+          - name: extensibility-model
+            source: profiles/authzen-extensibility-model-1_0.md
+            html: authzen-extensibility-model-1_0.html
+          - name: obligations-core
+            source: profiles/authzen-obligations-core-1_0.md
+            html: authzen-obligations-core-1_0.html
+          - name: obligations-standard-types-profile
+            source: profiles/authzen-obligations-standard-types-profile-1_0.md
+            html: authzen-obligations-standard-types-profile-1_0.html
           - name: oauth-token-issuance
             source: profiles/authzen-oauth/authzen-oauth-token-issuance-1_0.md
             html: authzen-oauth-token-issuance-1_0.html
