@@ -1174,7 +1174,7 @@ This profile does not mandate a specific JWS payload; the contents are deploymen
 * `aud`: REQUIRED.  Access Request Service identifier, or an array of identifiers including the Access Request Service.  An array supports multiple verifiers of the same JWT; audience validation prevents replay to an unintended service.  The Access Request Service MUST reject a `binding_token` JWT that lacks `aud` or whose `aud` does not include the Access Request Service's identifier.
 * `iss`: PDP identifier.  Lets the Access Request Service select the correct verification key from the PDP's JWK Set ({{binding-keys}}).
 * `iat`, `exp`: issued-at and expiry.  Expiry SHOULD be short (typically minutes, aligned with the requestable-denial hint lifetime).
-* `jti`: unique token identifier.  The Access Request Service SHOULD track recently-seen `jti` values until the token's `exp` to detect replay of an otherwise valid token.
+* `jti`: unique token identifier.  The Access Request Service SHOULD track recently-seen `jti` values until the token's `exp` to detect replay of an otherwise valid token.  A `jti` seen again within a recognized idempotent retry is reuse of one request by its original requester and is not replay ({{submission-idempotency}}).
 * `denial_expires_at`: the `context.access_request.expires_at` value from the requestable denial, unless the token's `exp` is no later than that value.  This lets the Access Request Service verify the PEP-echoed `denial.expires_at` value or enforce the token expiry as an equal-or-stricter freshness deadline.
 * `evaluation_id`: the PDP's identifier for the evaluation, when present in `context.evaluation_id` ({{evaluation-identifier}}).
 
@@ -1208,7 +1208,7 @@ The bulk construction is defined in {{BULK}}.
 
 ### Verifying the Denial Binding {#verifying-denial-binding}
 
-When `binding_token` is a JWS-signed JWT using the claims defined in {{binding-token-integrity}}, the Access Request Service, on receipt:
+When `binding_token` is a JWS-signed JWT using the claims defined in {{binding-token-integrity}}, the Access Request Service, on receipt of a submission it did not recognize as an idempotent retry ({{submission-idempotency}}):
 
 1. parses the JWS header and resolves the verification key from the JWK Set at the PDP's `jwks_uri`;
 2. verifies the signature, the `aud` claim, and the expiry;
