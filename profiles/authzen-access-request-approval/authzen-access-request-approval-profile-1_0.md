@@ -1076,7 +1076,7 @@ A task remains retrievable from the Task Status Endpoint after it has reached a 
 
 The `approval.id` value ({{approval-result}}) MUST contain sufficient entropy to prevent practical guessing and MUST NOT encode semantics that a PEP is expected to parse.
 
-The Access Request Service SHOULD retain the original `evaluation_id` in the approval record so the sequence from denied evaluation through Access Request, approval, and re-evaluation can be reconstructed for audit.
+The Access Request Service SHOULD retain, in the approval record, the original `evaluation_id` together with enough to identify the particular denied evaluation, such as the time of that evaluation, so the sequence from denied evaluation through Access Request, approval, and re-evaluation can be reconstructed for audit.  An approval record outlives the binding window, after which {{denial-issuance}} permits the identifier to be reused, so the identifier on its own does not pick out one evaluation in a record read later.  A `task.id` serves only where retained state maps that task to the evaluation it was submitted against, since the evaluation precedes the task.
 
 Implementations SHOULD apply privacy controls before populating `progress.awaiting`; see {{privacy-considerations}}.
 
