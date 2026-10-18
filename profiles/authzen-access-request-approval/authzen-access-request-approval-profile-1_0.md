@@ -1209,8 +1209,8 @@ This profile does not mandate a specific JWS payload; the contents are deploymen
 
 #### JWT Claim Reference {#denial-jwt-claims}
 
-* `aud`: REQUIRED.  Access Request Service identifier, or an array of identifiers including the Access Request Service.  An array supports multiple verifiers of the same JWT; audience validation prevents replay to an unintended service.  The Access Request Service MUST reject a `binding_token` JWT that lacks `aud` or whose `aud` does not include the Access Request Service's identifier.
-* `iss`: PDP identifier.  Lets the Access Request Service select the correct verification key from the PDP's JWK Set ({{binding-keys}}).
+* `aud`: REQUIRED.  The Access Request Service's identifier, which is the `access_request_endpoint` value in the PDP metadata that advertises it ({{discovery}}), or an array of identifiers including that value.  A requestable denial that also carries `context.access_request.endpoint` supplies a submission URL for the PEP, not a second identifier.  An array supports multiple verifiers of the same JWT; audience validation prevents replay to an unintended service.  The Access Request Service MUST reject a `binding_token` JWT that lacks `aud` or whose `aud` does not include its own identifier.
+* `iss`: REQUIRED.  The PDP's identifier, which is the `policy_decision_point` value in that same PDP metadata ({{AuthZEN}}).  Key selection starts from it ({{binding-keys}}).
 * `iat`, `exp`: issued-at and expiry.  Expiry SHOULD be short (typically minutes, aligned with the requestable-denial hint lifetime).
 * `jti`: unique token identifier.  The Access Request Service SHOULD track recently-seen `jti` values until the token's `exp` to detect replay of an otherwise valid token.
 * `denial_expires_at`: the `context.access_request.expires_at` value from the requestable denial, unless the token's `exp` is no later than that value.  This lets the Access Request Service verify the PEP-echoed `denial.expires_at` value or enforce the token expiry as an equal-or-stricter freshness deadline.
@@ -1278,9 +1278,9 @@ A deployment MUST therefore provide at least one approval-verification path: eit
 When `approval.state` is carried by value as a JWS:
 
 * The verifying PDP MUST be able to discover the signer's verification key.
-* The JWS MUST carry an `iss` claim identifying the signer (the Access Request Service, or the PDP acting through it) and SHOULD carry a `kid` header.
+* The JWS MUST carry an `iss` claim identifying the signer and SHOULD carry a `kid` header.  The signer is the Access Request Service, or the PDP acting through it, and the identifier is the `access_request_endpoint` value in the PDP metadata that advertises it ({{discovery}}).
 * The deployment publishes the Access Request Service's approval-state verification keys in the PDP's `jwks_uri` JWK Set ({{binding-keys}}); the PDP selects the key by `iss` and `kid`.  Publishing a signer's key there is the PDP's statement that it trusts that signer for approval-state verification; the JWK Set is a discovery surface and a trust declaration at once.
-* A JWS `approval.state` MUST carry an `aud` (or equivalent intended-recipient) claim identifying the verifying PDP, which the PDP MUST verify, so the value cannot be replayed to a different PDP that shares the signer's key.
+* A JWS `approval.state` MUST carry an `aud` (or equivalent intended-recipient) claim identifying the verifying PDP, which the PDP MUST verify, so the value cannot be replayed to a different PDP that shares the signer's key.  The PDP's identifier is its `policy_decision_point` metadata value ({{AuthZEN}}).
 * A PDP that cannot resolve the signer's key, or resolves it to a key not trusted for the claimed `iss`, MUST reject the `approval.state`.
 
 In the bound-reference pattern, the PDP verifies `approval.state`, carrying integrity-protected proof or verifier state.  {{approval-reference-lookup}} defines the lookup alternative.
