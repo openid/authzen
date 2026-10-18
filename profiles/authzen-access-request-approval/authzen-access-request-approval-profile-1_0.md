@@ -1147,13 +1147,13 @@ Signed Approval State:
 
 A deployment declares the capabilities it supports in PDP metadata ({{pdp-metadata-rules}}).
 
-Under a declared Signed Denial Binding capability, the PDP MUST support issuing `binding_token` as a JWS in compact serialization and the Access Request Service MUST support verifying a `binding_token` presented in that form.  Under a declared Signed Approval State capability, the Access Request Service MUST support issuing `approval.state` as a JWS in compact serialization and the PDP MUST support verifying an `approval.state` presented in that form.  Within a declared capability the artifact is a JWS in compact serialization, so two peers operating under the same declaration cannot diverge on format; the payload, algorithms, and trust configuration are defined elsewhere in this section.
+Under a declared Signed Denial Binding capability, the PDP MUST support issuing `binding_token` as a JWS in compact serialization and the Access Request Service MUST support verifying a `binding_token` presented in that form.  Under a declared Signed Approval State capability, the Access Request Service MUST support issuing `approval.state` as a JWS in compact serialization and the PDP MUST support verifying an `approval.state` presented in that form.  A JWS in compact serialization is therefore the form both roles support under a declaration, so two peers operating under the same declaration always have a format in common; the payload, algorithms, and trust configuration are defined elsewhere in this section.
 
 A declaration also governs what is emitted.  A PDP MUST NOT include `context.access_request.binding_token` in a requestable denial unless Signed Denial Binding is declared for the deployment, and an Access Request Service MUST NOT include `approval.state` in an Approval Result unless Signed Approval State is declared.  An absent declaration therefore means the artifact is not sent, which is what allows the other role to rely on it.
 
 Declaration and validation are distinct.  The requirements above govern which artifacts an implementation issues and which verification paths it provides.  Every rule in this section that is conditioned on an artifact being present applies whenever an implementation receives that artifact, whether or not the corresponding capability is declared.
 
-Other integrity-protected formats MAY be used by bilateral agreement between the issuer and the verifier.  Such use lies outside the declared capabilities, and this profile defines no interoperability for it.
+Another integrity-protected format MAY be used in place of the compact JWS where the issuer and the verifier have agreed on it bilaterally, including a JWS wrapped in JWE where the payload must not be visible to the PEP ({{binding-token-integrity}}).  The declaration is still required, because it is what permits the artifact to be sent at all; what the declaration fixes is the baseline both roles support, not the only form they may exchange.  This profile defines no interoperability for such a format, and a verifier presented with one it has not agreed to rejects the artifact.
 
 ## Keys and Metadata {#binding-keys}
 
