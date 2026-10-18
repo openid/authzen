@@ -1320,7 +1320,7 @@ The following protocol members and status value are defined by normative referen
 | Task Handle | `items`; `partial` value of `status` | Bulk Access Requests {{BULK}} |
 | Access Request submission | `callback` | Callback Notifications {{CALLBACK}} |
 
-A normative reference to a companion profile makes its definitions authoritative when the feature is used; conformance to this profile does not require implementing a companion unless a rule here says so.  These are defined protocol names, not unrecognized extension names under the forward-compatibility rule.  A companion definition does not itself widen the submission or the Task Handle; additional members may appear only at the locations listed in {{extension-points}} and follow the naming rules in {{extension-naming}}.
+A normative reference to a companion profile makes its definitions authoritative when the feature is used; conformance to this profile does not require implementing a companion unless a rule here says so.  These are defined protocol names, not unrecognized extension names under the forward-compatibility rule.  A companion definition does not itself widen the submission or the Task Handle: a member added by any specification, companion or not, appears under the recursive rule in {{extension-points}} and follows the naming rules in {{extension-naming}}.
 
 ## Extension Points {#extension-points}
 
