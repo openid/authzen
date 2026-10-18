@@ -64,6 +64,7 @@ normative:
   RFC7517:
   RFC7519:
   RFC8785:
+  RFC8725:
   I-D.bhutton-json-schema:
   I-D.bhutton-json-schema-validation:
   I-D.ietf-httpapi-idempotency-key-header:
@@ -1159,7 +1160,15 @@ Other integrity-protected formats MAY be used by bilateral agreement between the
 
 A PDP that issues or verifies signed values for use under this profile (for example, a JWS-signed `binding_token` or a JWS `approval.state`, defined in {{approval-state}}) MUST publish a `jwks_uri` in PDP metadata.
 
-The value is an HTTPS URI of a JWK Set {{RFC7517}} document containing the verification keys for the signed artifacts this profile defines: PDP-issued `binding_token` values and `approval.state` values signed by the PDP's Access Request Service.  Keys are distinguished by their `kid` and by the JWS `iss`.
+The value is an HTTPS URI of a JWK Set {{RFC7517}} document containing the verification keys for the signed artifacts this profile defines: PDP-issued `binding_token` values and `approval.state` values signed by the PDP's Access Request Service.
+
+A verifier resolves the key as follows.  It first checks the JWS `iss` against the identifier expected for the artifact it is verifying: the `policy_decision_point` value for a `binding_token`, and the `access_request_endpoint` value for an `approval.state` ({{discovery}}).  It then resolves the verification key from the JWK Set, matching the JWS `kid` header against JWK `kid` parameters; where the JWS carries no `kid`, it tries the keys authorized for that issuer and artifact type.  It then confirms that the resolved key is authorized for the claimed issuer and for that artifact type.  A verifier MUST reject an artifact whose `iss` is not the expected identifier for that artifact, an artifact whose key it cannot resolve from the set, and an artifact whose resolved key is not authorized for the claimed issuer.
+
+The last step is required by Section 3.8 of {{RFC8725}}, which obliges an application to validate that the keys used belong to the issuer.  Checking the `iss` value does not establish that.  One set holds the keys of two signers, so without the mapping a compromised denial-signing key would verify an `approval.state` claiming the Access Request Service's issuer value, even though the approval-signing key remained secure.
+
+The same section makes the means of binding keys to an issuer application-specific, so this profile does not define a new JWK member for it.  Publishing a key in the set is discovery; authorizing a key for an issuer and an artifact type is deployment configuration the verifier holds.  A deployment with a single Access Request Service, which is the common case, configures two entries.
+
+The PDP MUST NOT publish two keys with the same `kid` for different signers, because a verifier that resolved such a `kid` could not tell which role the key belongs to.  The PDP controls the content of the set, including keys it does not hold, and coordinates rotation with the Access Request Service.
 
 Each JWK in the set SHOULD include a `kid` parameter so JWS signatures issued with a `kid` header can be resolved to the corresponding verification key, and SHOULD include a `use` parameter distinguishing signing keys (`use: "sig"`) from any other keys advertised.
 
