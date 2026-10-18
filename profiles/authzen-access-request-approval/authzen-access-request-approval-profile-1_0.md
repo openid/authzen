@@ -1042,6 +1042,8 @@ The Access Request Service applies the artifact-specific verification rules in {
 
 The Access Request Service SHOULD treat a repeated submission with the same `Idempotency-Key`, the same authenticated requester, and an equivalent submission body as the same request, returning the same Task Handle while the original request remains available.  A submission with the same `Idempotency-Key` and authenticated requester but a materially different submission body MUST be rejected with `urn:openid:authzen:access-request:error:duplicate_request`.
 
+Retry recognition precedes replay rejection.  A `binding_token` and its `jti` arriving again within a recognized retry is reuse of one request by its original requester, and the service returns the original Task Handle without re-verifying the token.  The same token is a replay when it arrives with no matching `Idempotency-Key` record for the authenticated requester, or from a different requester, and the `jti` check in {{verifying-denial-binding}} applies to it.
+
 Bodies are equivalent when identical under the Access Request Service's deterministic comparison; otherwise they are materially different.  For example, stable JSON canonicalization can ignore insignificant whitespace and object-member ordering; the `Idempotency-Key` header is outside the body.  The same service records keys and evaluates retries, so the comparison need not be interoperable across implementations.
 
 The Access Request Service SHOULD retain Idempotency-Key state at least until `task.expires_at` and SHOULD continue to retain it for at least 24 hours after the task reaches a terminal status.  This window lets retries from delayed PEP restarts find the original task rather than spawning a duplicate.
