@@ -790,7 +790,7 @@ Submission-time augmentations MUST NOT change or remove authorization-relevant c
 
 When the requestable denial includes `request_schema_url`, the PEP MUST construct the augmentations to the submission's `context` and `requested_access` objects according to {{machine-readable-forms}}.  If the schema requires information the PEP cannot obtain or is not authorized to supply, the PEP MUST NOT fabricate values or submit an incomplete request; it MUST either surface the request for additional input, hand it to another authorized component, or treat the denial as not requestable by that PEP.
 
-A PEP SHOULD include an `Idempotency-Key` header, following the conventions described in {{I-D.ietf-httpapi-idempotency-key-header}}.
+A PEP SHOULD include an `Idempotency-Key` header, following the conventions described in {{I-D.ietf-httpapi-idempotency-key-header}}.  When the original submission carried an `Idempotency-Key`, a PEP resubmitting it after a lost or inconclusive response MUST reuse that key; a fresh key makes the resubmission a second request rather than a retry, and the Access Request Service cannot tell the two apart ({{submission-idempotency}}).  A submission made without an `Idempotency-Key` has no idempotent recovery path, and a resubmission of it is a new Access Request.
 
 ## Handle the Response {#pep-submit}
 
@@ -1006,11 +1006,14 @@ An Access Request Service implementing this profile:
 * MUST validate that the submission is based on a requestable denial, rejecting a submission that is not with `urn:openid:authzen:access-request:error:not_requestable`.
 * MUST verify the denial-binding material for every requested item, applying the following rules:
     * When `denial.binding_token` is absent, the service MUST apply the `evaluation_id` verification path defined in {{shared-state-deployments}}.
-    * The service MUST reject submissions received after the verified `denial.expires_at` with `urn:openid:authzen:access-request:error:expired_denial`, after applying any clock-skew tolerance it has configured (see {{time-and-clock-skew}}).
     * The service MUST reject submissions whose binding material cannot be verified, or whose claims do not bind to the submitted denial, with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
+    * The service MUST reject submissions received after the verified `denial.expires_at` with `urn:openid:authzen:access-request:error:expired_denial`, after applying any clock-skew tolerance it has configured (see {{time-and-clock-skew}}).
+    * A submission that is both unverifiable and past its freshness deadline MUST be rejected with `urn:openid:authzen:access-request:error:invalid_denial_binding`.  Binding is verified before freshness is enforced, in both binding forms, because an unverified `denial.expires_at` does not establish the deadline it states.
 * MUST bind the task to the submitted Subject, Resource, Action, Context, denial, requester, and client.
 * MUST return an opaque Task Handle for accepted requests.
 * SHOULD support idempotent request submission using the `Idempotency-Key` header ({{submission-idempotency}}).
+
+The Access Request Service applies these rules in a fixed order: it authenticates the requester ({{endpoint-protection}}), then resolves any `Idempotency-Key` record for that requester, then verifies binding material and freshness for a submission that is not a recognized retry.  Authentication precedes the lookup so that a guessed key cannot return another requester's Task Handle.  Retry recognition precedes replay rejection and freshness enforcement, because a retry after a lost response carries the same token, the same `jti`, and the same freshness deadline as the submission it repeats.
 
 The submitted `denial` object for each requested item MUST include either `denial.binding_token` or `denial.evaluation_id`.  The Access Request Service MUST reject a submission that lacks verifiable denial-binding material with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
 
@@ -1042,6 +1045,8 @@ The Access Request Service applies the artifact-specific verification rules in {
 
 The Access Request Service SHOULD treat a repeated submission with the same `Idempotency-Key`, the same authenticated requester, and an equivalent submission body as the same request, returning the same Task Handle while the original request remains available.  A submission with the same `Idempotency-Key` and authenticated requester but a materially different submission body MUST be rejected with `urn:openid:authzen:access-request:error:duplicate_request`.
 
+Retry recognition precedes replay rejection.  A `binding_token` and its `jti` arriving again within a recognized retry is reuse of one request by its original requester, and the service returns the original Task Handle without re-verifying the token.  The same token is a replay when it arrives with no matching `Idempotency-Key` record for the authenticated requester, or from a different requester, and the `jti` check in {{verifying-denial-binding}} applies to it.
+
 Bodies are equivalent when identical under the Access Request Service's deterministic comparison; otherwise they are materially different.  For example, stable JSON canonicalization can ignore insignificant whitespace and object-member ordering; the `Idempotency-Key` header is outside the body.  The same service records keys and evaluates retries, so the comparison need not be interoperable across implementations.
 
 The Access Request Service SHOULD retain Idempotency-Key state at least until `task.expires_at` and SHOULD continue to retain it for at least 24 hours after the task reaches a terminal status.  This window lets retries from delayed PEP restarts find the original task rather than spawning a duplicate.
@@ -1071,7 +1076,7 @@ A task remains retrievable from the Task Status Endpoint after it has reached a 
 
 The `approval.id` value ({{approval-result}}) MUST contain sufficient entropy to prevent practical guessing and MUST NOT encode semantics that a PEP is expected to parse.
 
-The Access Request Service SHOULD retain the original `evaluation_id` in the approval record so the sequence from denied evaluation through Access Request, approval, and re-evaluation can be reconstructed for audit.
+The Access Request Service SHOULD retain, in the approval record, the original `evaluation_id` together with enough to identify the particular denied evaluation, such as the time of that evaluation, so the sequence from denied evaluation through Access Request, approval, and re-evaluation can be reconstructed for audit.  An approval record outlives the binding window, after which {{denial-issuance}} permits the identifier to be reused, so the identifier on its own does not pick out one evaluation in a record read later.  A `task.id` serves only where retained state maps that task to the evaluation it was submitted against, since the evaluation precedes the task.
 
 Implementations SHOULD apply privacy controls before populating `progress.awaiting`; see {{privacy-considerations}}.
 
@@ -1174,7 +1179,7 @@ This profile does not mandate a specific JWS payload; the contents are deploymen
 * `aud`: REQUIRED.  Access Request Service identifier, or an array of identifiers including the Access Request Service.  An array supports multiple verifiers of the same JWT; audience validation prevents replay to an unintended service.  The Access Request Service MUST reject a `binding_token` JWT that lacks `aud` or whose `aud` does not include the Access Request Service's identifier.
 * `iss`: PDP identifier.  Lets the Access Request Service select the correct verification key from the PDP's JWK Set ({{binding-keys}}).
 * `iat`, `exp`: issued-at and expiry.  Expiry SHOULD be short (typically minutes, aligned with the requestable-denial hint lifetime).
-* `jti`: unique token identifier.  The Access Request Service SHOULD track recently-seen `jti` values until the token's `exp` to detect replay of an otherwise valid token.
+* `jti`: unique token identifier.  The Access Request Service SHOULD track recently-seen `jti` values until the token's `exp` to detect replay of an otherwise valid token.  A `jti` seen again within a recognized idempotent retry is reuse of one request by its original requester and is not replay ({{submission-idempotency}}).
 * `denial_expires_at`: the `context.access_request.expires_at` value from the requestable denial, unless the token's `exp` is no later than that value.  This lets the Access Request Service verify the PEP-echoed `denial.expires_at` value or enforce the token expiry as an equal-or-stricter freshness deadline.
 * `evaluation_id`: the PDP's identifier for the evaluation, when present in `context.evaluation_id` ({{evaluation-identifier}}).
 
@@ -1208,10 +1213,10 @@ The bulk construction is defined in {{BULK}}.
 
 ### Verifying the Denial Binding {#verifying-denial-binding}
 
-When `binding_token` is a JWS-signed JWT using the claims defined in {{binding-token-integrity}}, the Access Request Service, on receipt:
+When `binding_token` is a JWS-signed JWT using the claims defined in {{binding-token-integrity}}, the Access Request Service, on receipt of a submission it did not recognize as an idempotent retry ({{submission-idempotency}}):
 
 1. parses the JWS header and resolves the verification key from the JWK Set at the PDP's `jwks_uri`;
-2. verifies the signature, the `aud` claim, and the expiry;
+2. verifies the signature and the `aud` claim;
 3. checks `jti` against recently-seen tokens to detect replay;
 4. compares the binding claims (inline or hashed) against the submission's Subject, Resource, Action, and authorization-relevant Context (or per-item for bulk submissions), rejecting a mismatch with `urn:openid:authzen:access-request:error:invalid_denial_binding`;
 5. enforces freshness (the earlier of the token `exp` and `denial.expires_at`), rejecting a submission past that deadline with `urn:openid:authzen:access-request:error:expired_denial`.
@@ -1383,6 +1388,8 @@ This section describes threats and cites their mitigations.  It introduces no re
 **Denial remains denial.** Treating `context.access_request` as permission would grant access without an allow decision.  The PEP rules in {{pep-processing-rules}} preserve denial and treat unknown task statuses and completion modes as not approved.
 
 **Confused deputy and request substitution.** An attacker could substitute a Subject or Resource.  Submission checks compare signed denial claims ({{verifying-denial-binding}}) or, when no token is present, recorded state ({{shared-state-deployments}}).  Task binding covers the denial, requester, and client ({{ars-processing-rules}}), and re-evaluation checks approval applicability and scope ({{approval-verification}} and {{approval-scope}}).
+
+**Retry recognition, lookup, and error precedence.** Rejecting a repeated token before recognizing a retry turns a lost response into a permanent failure, resolving an `Idempotency-Key` before authenticating the caller would answer for another requester's task, and enforcing freshness on binding material the service has not verified reports a deadline it cannot establish.  {{submission-processing}} fixes the order as authentication, retry recognition, then verification, and gives `urn:openid:authzen:access-request:error:invalid_denial_binding` precedence over `urn:openid:authzen:access-request:error:expired_denial`; {{idempotency-key-abuse}} covers key scoping and retention.
 
 **Binding-token integrity.** A buggy or hostile PEP could alter or fabricate PDP-issued state to influence approval routing or scope.  {{binding-token-integrity}} and {{verifying-denial-binding}} define integrity, binding, and freshness checks; {{denial-binding-alternatives}} covers other formats.
 
