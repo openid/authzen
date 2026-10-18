@@ -1373,7 +1373,7 @@ The contents of `approval.state` are opaque to this specification and are not su
 
 ## Forward Compatibility
 
-An implementation receiving a member or value it does not recognize at an extension point MUST ignore it and MUST NOT fail processing on the basis of the unrecognized name.  This default does not override fail-safe rules defined elsewhere in this profile, such as the PEP rule in {{pep-processing-rules}} that treats unknown `result.mode` values as not approved rather than as ignorable.  An implementation MAY surface unrecognized members in audit records or pass them through unchanged when echoing wire content (for example, in callbacks).
+An implementation receiving a member or value it does not recognize at an extension point MUST ignore it and MUST NOT fail processing on the basis of the unrecognized name.  This default does not override a fail-safe rule defined elsewhere in this profile, such as the PEP rule in {{pep-processing-rules}} that treats unknown `result.mode` values as not approved rather than as ignorable, and it does not override the mandatory-to-understand processing that {{EXT-MODEL}} requires of a PEP for an extension it has adopted, which is defined by that extension.  Where no such obligation applies, an unrecognized member is ignorable.  An implementation MAY surface unrecognized members in audit records or pass them through unchanged when echoing wire content (for example, in callbacks).
 
 ## Profiles
 
