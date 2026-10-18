@@ -1192,6 +1192,8 @@ Denial binding uses `binding_token` by value or `evaluation_id` by reference.
 
 For that independent topology the `binding_token` MUST be self-contained: it carries the denied Subject, Resource, Action, and authorization-relevant Context by value (inline or as a `binding_hash`) and the Access Request Service verifies it offline against the PDP's published key, per {{binding-token-integrity}}.  A `binding_token` that only references shared state, for example one carrying `evaluation_id` alone, does not satisfy the independent-Access-Request-Service requirement.
 
+A deployment whose Access Request Service is independent of the PDP MUST therefore declare Signed Denial Binding ({{binding-capabilities}}), because the form it is required to use is one it may not emit without the declaration.  A deployment that is independent and does not declare it has no conformant requestable denial, which is a configuration error rather than a condition a role reports at request time.  This mirrors the approval side ({{approval-state}}).
+
 A PDP MAY emit both forms.  When a `binding_token` is present it is the authoritative denial binding, and any accompanying `evaluation_id` serves only as a correlation and audit identifier rather than a second binding form; the Access Request Service resolves `evaluation_id` as a binding form only when no `binding_token` is present.  This is why a PDP MAY follow the conformance recommendation to return a stable `context.evaluation_id` ({{evaluation-identifier}}) even when it also emits a `binding_token`.
 
 The following protection rules apply to `binding_token`:
