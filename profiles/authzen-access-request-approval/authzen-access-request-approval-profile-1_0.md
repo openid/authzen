@@ -1174,6 +1174,8 @@ Each JWK in the set SHOULD include a `kid` parameter so JWS signatures issued wi
 
 Verifiers cache the JWK Set per HTTP cache headers and refresh it on key-rotation events.  An unrecognized `kid` SHOULD cause the verifier to refresh the JWK Set before rejecting the input.
 
+This arrangement suits a deployment with a single Access Request Service, where one operator controls both signers.  A deployment whose PDP accepts approvals from services it does not operate would want the Access Request Service to carry an issuer identifier of its own, resolving its signing keys through its own metadata, so that each authority controls its own rotation.  That is a larger change than this draft carries, and it would redefine the identifier values above rather than extend them.
+
 Non-normative metadata example:
 
 ~~~ json
