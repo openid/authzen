@@ -984,6 +984,10 @@ The Access Request Service's workflow policy determines approval breadth, subjec
 
 When the PDP denies a re-evaluation that presented an `approval` reference, it MUST tell the PEP what to do next using `next_action`, and MAY add the other Decision Context members defined in {{reevaluation-denials}}.
 
+The action follows from what would change the outcome, not from the reason code.  A PDP chooses `retry` where it expects the condition to clear within the approval's remaining lifetime and nothing about the request need change, `request` where a new approval would resolve the condition and the request is still eligible for one, and `none` otherwise.  Two denials carrying the same reason can take different actions, because the same observation can have a recoverable and an unrecoverable cause.
+
+`approval_unverifiable` is the clearest case.  A status source that is briefly unreachable clears on its own and takes `retry`; a record the Access Request Service no longer holds, or a signing key that has been retired, does not, and a fresh approval is what resolves it, so it takes `request` where the request is eligible and `none` where it is not.  A reference that was resolved and failed its binding comparison takes `none`.
+
 When `next_action` is `request`, the PDP MUST also include a fresh `context.access_request` ({{requestable-denial-context}}) so the PEP has a valid requestable-denial signal for the new submission.
 
 # Access Request Service Processing {#ars-processing-rules}
