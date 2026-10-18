@@ -1006,8 +1006,9 @@ An Access Request Service implementing this profile:
 * MUST validate that the submission is based on a requestable denial, rejecting a submission that is not with `urn:openid:authzen:access-request:error:not_requestable`.
 * MUST verify the denial-binding material for every requested item, applying the following rules:
     * When `denial.binding_token` is absent, the service MUST apply the `evaluation_id` verification path defined in {{shared-state-deployments}}.
-    * The service MUST reject submissions received after the verified `denial.expires_at` with `urn:openid:authzen:access-request:error:expired_denial`, after applying any clock-skew tolerance it has configured (see {{time-and-clock-skew}}).
     * The service MUST reject submissions whose binding material cannot be verified, or whose claims do not bind to the submitted denial, with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
+    * The service MUST reject submissions received after the verified `denial.expires_at` with `urn:openid:authzen:access-request:error:expired_denial`, after applying any clock-skew tolerance it has configured (see {{time-and-clock-skew}}).
+    * A submission that is both unverifiable and past its freshness deadline MUST be rejected with `urn:openid:authzen:access-request:error:invalid_denial_binding`.  Binding is verified before freshness is enforced, in both binding forms, because an unverified `denial.expires_at` does not establish the deadline it states.
 * MUST bind the task to the submitted Subject, Resource, Action, Context, denial, requester, and client.
 * MUST return an opaque Task Handle for accepted requests.
 * SHOULD support idempotent request submission using the `Idempotency-Key` header ({{submission-idempotency}}).
@@ -1215,7 +1216,7 @@ The bulk construction is defined in {{BULK}}.
 When `binding_token` is a JWS-signed JWT using the claims defined in {{binding-token-integrity}}, the Access Request Service, on receipt of a submission it did not recognize as an idempotent retry ({{submission-idempotency}}):
 
 1. parses the JWS header and resolves the verification key from the JWK Set at the PDP's `jwks_uri`;
-2. verifies the signature, the `aud` claim, and the expiry;
+2. verifies the signature and the `aud` claim;
 3. checks `jti` against recently-seen tokens to detect replay;
 4. compares the binding claims (inline or hashed) against the submission's Subject, Resource, Action, and authorization-relevant Context (or per-item for bulk submissions), rejecting a mismatch with `urn:openid:authzen:access-request:error:invalid_denial_binding`;
 5. enforces freshness (the earlier of the token `exp` and `denial.expires_at`), rejecting a submission past that deadline with `urn:openid:authzen:access-request:error:expired_denial`.
