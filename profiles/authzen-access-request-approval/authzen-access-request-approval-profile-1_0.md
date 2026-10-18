@@ -1391,6 +1391,10 @@ This section describes threats and cites their mitigations.  It introduces no re
 
 **Approval reference substitution and replay.** A compromised PEP could present another request's approval or replay an expired or inapplicable reference.  {{approval-verification}} defines applicability checks; {{decision-and-binding-integrity}} defines verification of by-value material and protection of backing records.  An approval reference is not a bearer grant.
 
+**Denial reasons as a disclosure channel.** A PDP cannot tell an honest failure from a forged reference: in the lookup topology an `approval.id` that was never issued and one that was forged are the same observation.  A reason code that claimed to distinguish them would instead answer whether a given identifier exists.
+
+Splitting a code by whether verification completed is better defined, and is not automatically safer.  A lookup that completes and fails for an identifier the service never issued is distinguishable from a status check that could not run for one it did, so that split can carry the same disclosure.  Any externally distinguishable response can, whether it is carried in `reason` or in `next_action` ({{pdp-reevaluation-denial}}), so a PDP varies its response by what the caller is authorized to learn and {{iana-reeval-reasons}} registers codes for what the PDP observed rather than for who was at fault.
+
 ## Policy and Approver Hygiene
 
 **Overbroad approval.** Treating `template`, `requested_access`, or `display` as sufficient policy would let a requester set their own approval scope.  These members are request signals, not authorization policy ({{overbroad-approval}}).
