@@ -1324,19 +1324,18 @@ A normative reference to a companion profile makes its definitions authoritative
 
 ## Extension Points {#extension-points}
 
-Additional members beyond those defined in this document or by {{companion-profiles}} MAY appear only at the following locations, and those members MUST follow the naming rules in {{extension-naming}}.  No other object members may be extended without a revision of this specification or a profile that explicitly redefines them.  The AuthZEN extensibility model proposes a recursive rule under which any named object carries registered, namespaced members; aligning this list with that rule is a decision for a revision of this specification.
+Any named object this document defines MAY carry registered, namespaced extension members, under the recursive rule in {{EXT-MODEL}}: the presence of a registered member is itself the signal that the extension applies.  Those members MUST follow the naming rules in {{extension-naming}}.  {{EXT-MODEL}} names the task and result objects of this profile among the objects it covers.
 
-* `context.access_request`: additional members of the requestable denial, such as URLs of profile-defined companion documents the PEP consults when constructing a submission.
-* `context.access_request.display`: user-interface hints in a requestable denial.
-* AuthZEN Decision Context members defined by this profile.
-* `context` in an Access Request submission: augments the AuthZEN Context.
-* `requested_access` in an Access Request submission.
-* `client` in an Access Request submission.
-* `task`: Task Handle members, including the registered members defined in {{task-handle-extension-members}}.
-* `task.display`: user-interface hints attached to a Task Handle.
-* `task.links`: link relations to related URLs.
+The named objects this document defines are:
+
+* `context.access_request`, the requestable denial, carrying additional members such as URLs of profile-defined companion documents the PEP consults when constructing a submission, and `context.access_request.display`, user-interface hints in a requestable denial.
+* The AuthZEN Decision Context members defined by this profile.
+* `context` in an Access Request submission, which augments the AuthZEN Context, together with `requested_access` and `client`.
+* `task`, the Task Handle, including the registered members defined in {{task-handle-extension-members}}, with `task.display` for user-interface hints and `task.links` for link relations to related URLs.
 * `result` and the additions defined under each `result.mode`.
 * `approval.state` in a result under the `reevaluate` completion mode: opaque profile-specific or deployment-specific verifier state carried through the PEP to the PDP at re-evaluation time.
+
+This inventory is not a limit.  A revision of this document that defines a new object brings it under the same rule.
 
 This specification also defines extensibility for enumerated values:
 
