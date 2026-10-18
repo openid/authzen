@@ -784,7 +784,7 @@ PEPs MUST NOT submit credentials to a host that is not trusted to receive them.
 * MUST NOT interpret the `template` value except for display or request submission; the value is not a policy language.
 * MAY ignore `display`.
 
-The PEP MUST preserve the principal identity of the Subject, and MUST preserve the Resource, Action, and relevant Context of the denied evaluation when submitting the Access Request.  When the original evaluation conveyed an actor identity in the Subject (for example, via `subject.properties.act`), the PEP MAY preserve the actor in the submission's `subject` or normalize it to `client.actor` ({{ACTOR}}); the actor identity itself MUST NOT be dropped.
+The PEP MUST preserve the principal identity of the Subject, and MUST preserve the Resource, Action, and authorization-relevant Context of the denied evaluation when submitting the Access Request.  When the original evaluation conveyed an actor identity in the Subject (for example, via `subject.properties.act`), the PEP MUST carry it there unchanged, and MAY additionally express it as `client.actor` ({{ACTOR}}).  The actor is covered by denial binding ({{denial-request-binding}}) and compared in approval scope ({{approval-scope}}), so the PEP MUST NOT move it out of the Subject.
 
 Submission-time augmentations MUST NOT change or remove authorization-relevant context from the denied evaluation.  When the Access Request Service needs to distinguish original evaluation context from submission-time input, deployments SHOULD place the latter in well-defined extension members rather than overwriting original context members.
 
