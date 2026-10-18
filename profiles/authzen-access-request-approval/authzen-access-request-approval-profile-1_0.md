@@ -455,6 +455,18 @@ The `task` object has the following members:
 `display`:
 : OPTIONAL.  Object containing user-interface hints for the pending request.
 
+`links`:
+: OPTIONAL.  Object containing related URLs.  Each member name is a link relation type and the value is an HTTPS URI.  The following relation types are defined; implementations MAY define additional relation types.
+
+  * `ticket`: URL where the requester (Subject) can view the request and its status.
+  * `cancel`: URL where the PEP can cancel the request, when PEP-initiated cancellation is supported.
+
+The `items` member of this object, present for bulk submissions, is defined in {{BULK}}.
+
+### Registered Task Handle Members {#task-handle-extension-members}
+
+The following members are registered in the AuthZEN Access Request Member Names registry ({{iana-member-names}}) rather than defined as part of the base Task Handle.  They carry approval workflow state, which the Introduction places out of scope, and a conforming implementation need not emit or consume them.  A deployment that uses them registers nothing new: the names and semantics are those below.
+
 `progress`:
 : OPTIONAL.  Object describing approval workflow progress for tasks with multi-step approvals.  The following members are defined:
 
@@ -463,14 +475,8 @@ The `task` object has the following members:
   * `step_name`: OPTIONAL.  String.  Short identifier of the current step (for example, `manager_approval` or `resource_owner_review`).
   * `awaiting`: OPTIONAL.  Array.  Identifiers of approvers whose action is currently expected.
 
-`links`:
-: OPTIONAL.  Object containing related URLs.  Each member name is a link relation type and the value is an HTTPS URI.  The following relation types are defined; implementations MAY define additional relation types.
-
-  * `ticket`: URL where the requester (Subject) can view the request and its status.
-  * `review`: URL where an approver or administrator can review or act on the request.
-  * `cancel`: URL where the PEP can cancel the request, when PEP-initiated cancellation is supported.
-
-The `items` member of this object, present for bulk submissions, is defined in {{BULK}}.
+`links.review`:
+: OPTIONAL.  URL where an approver or administrator can review or act on the request.  {{pep-facing-surfaces}} restricts its disclosure.
 
 ## Task Status and Transitions {#task-status}
 
@@ -535,7 +541,7 @@ Completion notification is defined by {{CALLBACK}}.
 
 ## Pending Task Response
 
-A response with `task.status: pending` echoes the submission's Task Handle ({{task-handle-object}}).  Polls use the same shape, updating status, progress, and links as the task advances.  {{completed-task-response}} defines the response at terminal status.
+A response with `task.status: pending` echoes the submission's Task Handle ({{task-handle-object}}).  Polls use the same shape, updating status and links as the task advances.  {{completed-task-response}} defines the response at terminal status.
 
 Non-normative example:
 
