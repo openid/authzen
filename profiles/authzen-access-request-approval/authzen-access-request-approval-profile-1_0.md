@@ -1200,7 +1200,7 @@ Binding claims identify the original denied evaluation using either of the follo
 }
 ~~~
 
-`<Subject>` is the bound Subject with `subject.properties.act` removed (matching the exclusion in {{structural-comparison}}).  `<authorization-relevant Context>` is the set enumerated by `binding_context_members`, which the Access Request Service recomputes from the submission.
+`<Subject>` is the bound Subject in full, including `subject.properties.act` when the evaluation carried an actor.  `<authorization-relevant Context>` is the set enumerated by `binding_context_members`, which the Access Request Service recomputes from the submission.
 
 Implementations that use the hashed form MUST use exactly this construction so that a PDP and an independently implemented Access Request Service compute identical digests.
 
