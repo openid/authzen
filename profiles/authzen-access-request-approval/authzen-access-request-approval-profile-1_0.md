@@ -1494,13 +1494,13 @@ The capability and problem-type URNs ({{error-responses}}) use the OpenID Founda
 
 This specification requests creation of a new registry: the AuthZEN Access Request Member Names registry.
 
-The registry tracks well-known member names that may appear at the extension points defined in {{extensibility}}.  In the terms of the AuthZEN extensibility model this is a member-name registry; each entry's processing strength is that of the object it extends, as stated by its specification document.  Registration policy is Specification Required.  Each entry has the following fields:
+The registry tracks well-known member names that may appear on the named objects defined in {{extensibility}}.  In the terms of {{EXT-MODEL}} this is a member-name registry; each entry's processing strength is that of the object it extends, as stated by its specification document.  Registration policy is Specification Required.  Each entry has the following fields:
 
 Name:
 : The member name as it appears on the wire.
 
-Extension Point:
-: One of the extension points listed in {{extensibility}}, or an extension point defined by a profile of this specification.
+Location:
+: The named object on which the member appears, as defined in {{extension-points}} or by a profile of this specification.  {{EXT-MODEL}} establishes an AuthZEN JSON Members registry recording the same kind of entry; whether the two registries consolidate is a decision for the working group.
 
 Description:
 : A short description of the member's semantics.
@@ -1513,7 +1513,7 @@ Specification Document:
 
 Initial entries registered by this specification:
 
-| Name | Extension Point | Description |
+| Name | Location | Description |
 |---|---|---|
 | `requested_until` | `requested_access` | RFC 3339 timestamp requesting access through a specific absolute time. |
 | `emergency` | `requested_access` | Boolean requesting an expedited or emergency-access path. |
