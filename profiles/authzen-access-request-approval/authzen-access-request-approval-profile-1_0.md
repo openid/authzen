@@ -1315,7 +1315,7 @@ The following protocol members and status value are defined by normative referen
 
 A normative reference to a companion profile makes its definitions authoritative when the feature is used; conformance to this profile does not require implementing a companion unless a rule here says so.  These are defined protocol names, not unrecognized extension names under the forward-compatibility rule.  The companion definitions do not open the submission or Task Handle to arbitrary additional members.
 
-## Extension Points
+## Extension Points {#extension-points}
 
 Additional members beyond those defined in this document or by {{companion-profiles}} MAY appear only at the following locations, and those members MUST follow the naming rules in {{extension-naming}}.  No other object members may be extended without a revision of this specification or a profile that explicitly redefines them.  The AuthZEN extensibility model proposes a recursive rule under which any named object carries registered, namespaced members; aligning this list with that rule is a decision for a revision of this specification.
 
@@ -1325,6 +1325,7 @@ Additional members beyond those defined in this document or by {{companion-profi
 * `context` in an Access Request submission: augments the AuthZEN Context.
 * `requested_access` in an Access Request submission.
 * `client` in an Access Request submission.
+* `task`: Task Handle members, including the registered members defined in {{task-handle-extension-members}}.
 * `task.display`: user-interface hints attached to a Task Handle.
 * `task.links`: link relations to related URLs.
 * `result` and the additions defined under each `result.mode`.
@@ -1508,6 +1509,7 @@ Initial entries registered by this specification:
 |---|---|---|
 | `requested_until` | `requested_access` | RFC 3339 timestamp requesting access through a specific absolute time. |
 | `emergency` | `requested_access` | Boolean requesting an expedited or emergency-access path. |
+| `progress` | `task` | Object describing approval workflow progress for tasks with multi-step approvals. |
 | `ticket` | `task.links` | URL where the requester can view the request and its status. |
 | `review` | `task.links` | URL where an approver or administrator can review or act on the request. |
 | `cancel` | `task.links` | URL where the PEP can cancel the request. |
