@@ -1494,7 +1494,7 @@ The capability and problem-type URNs ({{error-responses}}) use the OpenID Founda
 
 This specification requests creation of a new registry: the AuthZEN Access Request Member Names registry.
 
-The registry tracks well-known member names that may appear on the named objects defined in {{extensibility}}.  In the terms of {{EXT-MODEL}} this is a member-name registry; each entry's processing strength is that of the object it extends, as stated by its specification document.  Registration policy is Specification Required.  Each entry has the following fields:
+The registry tracks well-known member names that may appear on the named objects defined in {{extensibility}}.  In the terms of {{EXT-MODEL}} this is a member-name registry.  Processing strength is a property of the member rather than of the object it appears on, is fixed by the registering specification, and cannot be changed afterwards; a single Decision Context can carry both advisory and mandatory-to-understand members.  Every Decision Context member registered by this document is advisory ({{decision-context-members}}), and the members it registers elsewhere have no processing strength.  Registration policy is Specification Required.  Each entry has the following fields:
 
 Name:
 : The member name as it appears on the wire.
