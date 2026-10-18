@@ -1365,7 +1365,7 @@ Composition with obligations is defined by {{OBLIGATIONS}}: a denial MAY carry b
 
 A member name or value added at an extension point MUST be one of the following:
 
-1. A name registered in the AuthZEN Access Request Member Names registry ({{iana-member-names}}).  Registry-eligible names are short, lowercase, snake_case identifiers carrying semantics that are useful across multiple implementations.
+1. A name registered in the AuthZEN Access Request Member Names registry ({{iana-member-names}}), or in the AuthZEN JSON Members registry established by {{EXT-MODEL}}.  Registry-eligible names are short, lowercase, snake_case identifiers carrying semantics that are useful across multiple implementations.
 2. An absolute URI (HTTPS or URN) when the member is profile-specific and not appropriate for the registry.  Profiles SHOULD use a stable URI under the profile's change controller.
 3. A reverse-DNS-prefixed identifier (for example, `vendor.example.com/foo`) when the member is private to a single deployment and not intended for cross-implementation use.
 
