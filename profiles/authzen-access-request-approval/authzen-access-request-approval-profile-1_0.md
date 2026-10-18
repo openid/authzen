@@ -81,15 +81,23 @@ normative:
         ins: A. Tulshibagwale
         name: Atul Tulshibagwale
     date: 2026-04-29
-
-informative:
-  OBLIGATIONS:
-    title: "AuthZEN Profile for Obligations 1.0"
-    target: "https://openid.github.io/authzen/authzen-obligations-profile-1_0.html"
+  EXT-MODEL:
+    title: "AuthZEN Extensibility Model 1.0"
+    target: "https://openid.github.io/authzen/authzen-extensibility-model-1_0.html"
     author:
       -
         org: OpenID AuthZEN Working Group
     date: 2026
+
+  OBLIGATIONS:
+    title: "AuthZEN Obligations Core 1.0"
+    target: "https://openid.github.io/authzen/authzen-obligations-core-1_0.html"
+    author:
+      -
+        org: OpenID AuthZEN Working Group
+    date: 2026
+
+informative:
   CATALOG:
     title: "AuthZEN Access Request Catalog Profile 1.0"
     target: "https://openid.github.io/authzen/authzen-access-request-catalog-profile-1_0.html"
@@ -1313,23 +1321,22 @@ The following protocol members and status value are defined by normative referen
 | Task Handle | `items`; `partial` value of `status` | Bulk Access Requests {{BULK}} |
 | Access Request submission | `callback` | Callback Notifications {{CALLBACK}} |
 
-A normative reference to a companion profile makes its definitions authoritative when the feature is used; conformance to this profile does not require implementing a companion unless a rule here says so.  These are defined protocol names, not unrecognized extension names under the forward-compatibility rule.  A companion definition does not itself widen the submission or the Task Handle; additional members may appear only at the locations listed in {{extension-points}} and follow the naming rules in {{extension-naming}}.
+A normative reference to a companion profile makes its definitions authoritative when the feature is used; conformance to this profile does not require implementing a companion unless a rule here says so.  These are defined protocol names, not unrecognized extension names under the forward-compatibility rule.  A companion definition does not itself widen the submission or the Task Handle: a member added by any specification, companion or not, appears under the recursive rule in {{extension-points}} and follows the naming rules in {{extension-naming}}.
 
 ## Extension Points {#extension-points}
 
-Additional members beyond those defined in this document or by {{companion-profiles}} MAY appear only at the following locations, and those members MUST follow the naming rules in {{extension-naming}}.  No other object members may be extended without a revision of this specification or a profile that explicitly redefines them.  The AuthZEN extensibility model proposes a recursive rule under which any named object carries registered, namespaced members; aligning this list with that rule is a decision for a revision of this specification.
+Any named object this document defines MAY carry registered, namespaced extension members, under the recursive rule in {{EXT-MODEL}}: the presence of a registered member is itself the signal that the extension applies.  Those members MUST follow the naming rules in {{extension-naming}}.  {{EXT-MODEL}} names the task and result objects of this profile among the objects it covers.
 
-* `context.access_request`: additional members of the requestable denial, such as URLs of profile-defined companion documents the PEP consults when constructing a submission.
-* `context.access_request.display`: user-interface hints in a requestable denial.
-* AuthZEN Decision Context members defined by this profile.
-* `context` in an Access Request submission: augments the AuthZEN Context.
-* `requested_access` in an Access Request submission.
-* `client` in an Access Request submission.
-* `task`: Task Handle members, including the registered members defined in {{task-handle-extension-members}}.
-* `task.display`: user-interface hints attached to a Task Handle.
-* `task.links`: link relations to related URLs.
+The named objects this document defines are:
+
+* `context.access_request`, the requestable denial, carrying additional members such as URLs of profile-defined companion documents the PEP consults when constructing a submission, and `context.access_request.display`, user-interface hints in a requestable denial.
+* The AuthZEN Decision Context members defined by this profile.
+* `context` in an Access Request submission, which augments the AuthZEN Context, together with `requested_access` and `client`.
+* `task`, the Task Handle, including the registered members defined in {{task-handle-extension-members}}, with `task.display` for user-interface hints and `task.links` for link relations to related URLs.
 * `result` and the additions defined under each `result.mode`.
 * `approval.state` in a result under the `reevaluate` completion mode: opaque profile-specific or deployment-specific verifier state carried through the PEP to the PDP at re-evaluation time.
+
+This inventory is not a limit.  A revision of this document that defines a new object brings it under the same rule.
 
 This specification also defines extensibility for enumerated values:
 
@@ -1351,13 +1358,15 @@ The AuthZEN Decision Context and request Context members this document defines, 
 | `next_action`, `retry_after`, `reason` | re-evaluation Decision; `reason` also on a requestable denial | directs the PEP's next step | unrecognized `next_action` or `reason` falls back as defined in {{pep-reevaluation-handling}}; the Decision itself is unchanged |
 | response-side `approval` members | re-evaluation Decision | `approved_until` bounds reuse and enforcement | unrecognized: the permit stands as an ordinary AuthZEN permit ({{approval-lifetime}}) |
 
-No member in this table widens a denial or narrows a permit for a PEP that does not implement this profile; in particular, `approved_until` is an enforcement and reuse bound for an implementer of this profile and does not narrow an ordinary AuthZEN permit for any other PEP.  Composition with other extensions that add Decision Context members, such as obligations, is not defined by this document.
+No member in this table widens a denial or narrows a permit for a PEP that does not implement this profile; in particular, `approved_until` is an enforcement and reuse bound for an implementer of this profile and does not narrow an ordinary AuthZEN permit for any other PEP.  Every member defined by this profile is therefore advisory in the sense of {{EXT-MODEL}}, so this profile registers no Extension Identifier and a PEP never lists it in `supported_mandatory_extensions`.  A future member that a PEP could not safely ignore would be mandatory-to-understand and would change both.
+
+Composition with obligations is defined by {{OBLIGATIONS}}: a denial MAY carry both `context.access_request` and obligations, neither member changes the meaning of the other, and the decision remains a denial.  The PEP executes the obligations as that profile requires for a denial and, independently, MAY pursue the Access Request; this document imposes no ordering between the two.  A re-evaluation after approval is a new evaluation, so obligations on its Decision are subject to that profile's rules for that request, including its fail-closed rule, exactly as on any other permit.  Composition with other extensions that add Decision Context members is not defined by this document.
 
 ## Naming Extensions {#extension-naming}
 
 A member name or value added at an extension point MUST be one of the following:
 
-1. A name registered in the AuthZEN Access Request Member Names registry ({{iana-member-names}}).  Registry-eligible names are short, lowercase, snake_case identifiers carrying semantics that are useful across multiple implementations.
+1. A name registered in the AuthZEN Access Request Member Names registry ({{iana-member-names}}), or in the AuthZEN JSON Members registry established by {{EXT-MODEL}}.  Registry-eligible names are short, lowercase, snake_case identifiers carrying semantics that are useful across multiple implementations.
 2. An absolute URI (HTTPS or URN) when the member is profile-specific and not appropriate for the registry.  Profiles SHOULD use a stable URI under the profile's change controller.
 3. A reverse-DNS-prefixed identifier (for example, `vendor.example.com/foo`) when the member is private to a single deployment and not intended for cross-implementation use.
 
@@ -1365,7 +1374,7 @@ The contents of `approval.state` are opaque to this specification and are not su
 
 ## Forward Compatibility
 
-An implementation receiving a member or value it does not recognize at an extension point MUST ignore it and MUST NOT fail processing on the basis of the unrecognized name.  This default does not override fail-safe rules defined elsewhere in this profile, such as the PEP rule in {{pep-processing-rules}} that treats unknown `result.mode` values as not approved rather than as ignorable.  An implementation MAY surface unrecognized members in audit records or pass them through unchanged when echoing wire content (for example, in callbacks).
+An implementation receiving a member or value it does not recognize at an extension point MUST ignore it and MUST NOT fail processing on the basis of the unrecognized name.  This default does not override a fail-safe rule defined elsewhere in this profile, such as the PEP rule in {{pep-processing-rules}} that treats unknown `result.mode` values as not approved rather than as ignorable, and it does not override the mandatory-to-understand processing that {{EXT-MODEL}} requires of a PEP for an extension it has adopted, which is defined by that extension.  Where no such obligation applies, an unrecognized member is ignorable.  An implementation MAY surface unrecognized members in audit records or pass them through unchanged when echoing wire content (for example, in callbacks).
 
 ## Profiles
 
@@ -1486,13 +1495,13 @@ The capability and problem-type URNs ({{error-responses}}) use the OpenID Founda
 
 This specification requests creation of a new registry: the AuthZEN Access Request Member Names registry.
 
-The registry tracks well-known member names that may appear at the extension points defined in {{extensibility}}.  In the terms of the AuthZEN extensibility model this is a member-name registry; each entry's processing strength is that of the object it extends, as stated by its specification document.  Registration policy is Specification Required.  Each entry has the following fields:
+The registry tracks well-known member names that may appear on the named objects defined in {{extensibility}}.  In the terms of {{EXT-MODEL}} this is a member-name registry.  Processing strength is a property of the member rather than of the object it appears on, is fixed by the registering specification, and cannot be changed afterwards; a single Decision Context can carry both advisory and mandatory-to-understand members.  Every Decision Context member registered by this document is advisory ({{decision-context-members}}), and the members it registers elsewhere have no processing strength.  Registration policy is Specification Required.  Each entry has the following fields:
 
 Name:
 : The member name as it appears on the wire.
 
-Extension Point:
-: One of the extension points listed in {{extensibility}}, or an extension point defined by a profile of this specification.
+Location:
+: The named object on which the member appears, as defined in {{extension-points}} or by a profile of this specification.  {{EXT-MODEL}} establishes an AuthZEN JSON Members registry recording the same kind of entry; whether the two registries consolidate is a decision for the working group.
 
 Description:
 : A short description of the member's semantics.
@@ -1505,7 +1514,7 @@ Specification Document:
 
 Initial entries registered by this specification:
 
-| Name | Extension Point | Description |
+| Name | Location | Description |
 |---|---|---|
 | `requested_until` | `requested_access` | RFC 3339 timestamp requesting access through a specific absolute time. |
 | `emergency` | `requested_access` | Boolean requesting an expedited or emergency-access path. |
