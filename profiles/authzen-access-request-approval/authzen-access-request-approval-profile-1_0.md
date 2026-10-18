@@ -894,7 +894,7 @@ Human-facing members are intended only for callers authorized for the correspond
 * `task.links.review`: URL where an approver or administrator can review or act on the request.
 * `task.display`: localizable user-interface hints.
 
-When a PEP renders requester-facing status to an end client, it SHOULD do so by rendering `task.display` and `task.links.ticket` rather than by exposing the machine surfaces.  A PEP MUST NOT expose `task.links.review` to a requester or other end client unless that caller has been authenticated and authorized as an approver or administrator for the task.
+When a PEP renders requester-facing status to an end client, it SHOULD do so by rendering `task.display` and `task.links.ticket` rather than by exposing the machine surfaces.  A PEP MUST NOT expose `task.links.review`, when present, to a requester or other end client unless that caller has been authenticated and authorized as an approver or administrator for the task.  A PEP MUST NOT forward a `task.links` relation it does not recognize to an end client: the forward-compatibility rule in {{extensibility}} permits passing unrecognized members through unchanged, and a relation name does not establish who the URL is for.
 
 Cancellation ({{cancellation}}), actor delegation ({{ACTOR}}), and machine-readable forms ({{machine-readable-forms}}) define further PEP rules where those mechanisms are used.
 
@@ -1409,7 +1409,7 @@ This section describes threats and cites their mitigations.  It introduces no re
 
 **Task handle leakage.** A leaked handle could expose workflow state or sensitive information.  Opacity and unguessability do not replace authorization for each operation ({{task-handle-leakage}} and {{authorization-and-authentication}}).  Cancellation requires separate authorization ({{cancellation}}).
 
-**PEP-facing and end-client-facing surfaces.** Exposed machine endpoints let end clients bypass the PEP; exposed approval references enable injection attempts in other evaluations.  {{pep-facing-surfaces}} separates machine and human-facing members and restricts disclosure of approver links.
+**PEP-facing and end-client-facing surfaces.** Exposed machine endpoints let end clients bypass the PEP; exposed approval references enable injection attempts in other evaluations.  {{pep-facing-surfaces}} separates machine and human-facing members and restricts disclosure of approver links and of link relations the PEP does not recognize.
 
 ## Operational and Integration
 
