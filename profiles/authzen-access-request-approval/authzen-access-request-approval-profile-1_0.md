@@ -1012,6 +1012,8 @@ An Access Request Service implementing this profile:
 * MUST return an opaque Task Handle for accepted requests.
 * SHOULD support idempotent request submission using the `Idempotency-Key` header ({{submission-idempotency}}).
 
+The Access Request Service applies these rules in a fixed order: it authenticates the requester ({{endpoint-protection}}), then resolves any `Idempotency-Key` record for that requester, then verifies binding material and freshness for a submission that is not a recognized retry.  Authentication precedes the lookup so that a guessed key cannot return another requester's Task Handle.  Retry recognition precedes replay rejection and freshness enforcement, because a retry after a lost response carries the same token, the same `jti`, and the same freshness deadline as the submission it repeats.
+
 The submitted `denial` object for each requested item MUST include either `denial.binding_token` or `denial.evaluation_id`.  The Access Request Service MUST reject a submission that lacks verifiable denial-binding material with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
 
 An Access Request whose denial binding does not cover the submitted Subject, Resource, Action, and authorization-relevant Context (for every item when `items` is present) MUST be rejected with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
