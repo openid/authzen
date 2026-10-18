@@ -790,7 +790,7 @@ Submission-time augmentations MUST NOT change or remove authorization-relevant c
 
 When the requestable denial includes `request_schema_url`, the PEP MUST construct the augmentations to the submission's `context` and `requested_access` objects according to {{machine-readable-forms}}.  If the schema requires information the PEP cannot obtain or is not authorized to supply, the PEP MUST NOT fabricate values or submit an incomplete request; it MUST either surface the request for additional input, hand it to another authorized component, or treat the denial as not requestable by that PEP.
 
-A PEP SHOULD include an `Idempotency-Key` header, following the conventions described in {{I-D.ietf-httpapi-idempotency-key-header}}.
+A PEP SHOULD include an `Idempotency-Key` header, following the conventions described in {{I-D.ietf-httpapi-idempotency-key-header}}.  When the original submission carried an `Idempotency-Key`, a PEP resubmitting it after a lost or inconclusive response MUST reuse that key; a fresh key makes the resubmission a second request rather than a retry, and the Access Request Service cannot tell the two apart ({{submission-idempotency}}).  A submission made without an `Idempotency-Key` has no idempotent recovery path, and a resubmission of it is a new Access Request.
 
 ## Handle the Response {#pep-submit}
 
