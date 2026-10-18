@@ -1079,7 +1079,7 @@ The `approval.id` value ({{approval-result}}) MUST contain sufficient entropy to
 
 The Access Request Service SHOULD retain the original `evaluation_id` in the approval record so the sequence from denied evaluation through Access Request, approval, and re-evaluation can be reconstructed for audit.
 
-Implementations SHOULD apply privacy controls before populating `progress.awaiting`; see {{privacy-considerations}}.
+An Access Request Service that uses the registered `progress` member ({{task-handle-extension-members}}) SHOULD apply privacy controls before populating `progress.awaiting`, which carries approver identifiers; see {{privacy-considerations}}.
 
 ### Status Mapping Obligation {#status-mapping-obligation}
 
