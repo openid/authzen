@@ -255,7 +255,9 @@ Non-normative metadata example:
   "access_evaluations_endpoint": "https://pdp.example.com/access/v1/evaluations",
   "access_request_endpoint": "https://pdp.example.com/access/v1/requests",
   "capabilities": [
-    "urn:openid:authzen:capability:access-request"
+    "urn:openid:authzen:capability:access-request",
+    "urn:openid:authzen:capability:access-request:signed-denial-binding",
+    "urn:openid:authzen:capability:access-request:signed-approval-state"
   ]
 }
 ~~~
