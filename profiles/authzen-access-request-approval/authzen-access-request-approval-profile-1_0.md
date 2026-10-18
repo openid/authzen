@@ -81,11 +81,18 @@ normative:
         ins: A. Tulshibagwale
         name: Atul Tulshibagwale
     date: 2026-04-29
+  EXT-MODEL:
+    title: "AuthZEN Extensibility Model 1.0"
+    target: "https://openid.github.io/authzen/authzen-extensibility-model-1_0.html"
+    author:
+      -
+        org: OpenID AuthZEN Working Group
+    date: 2026
 
 informative:
   OBLIGATIONS:
-    title: "AuthZEN Profile for Obligations 1.0"
-    target: "https://openid.github.io/authzen/authzen-obligations-profile-1_0.html"
+    title: "AuthZEN Obligations Core 1.0"
+    target: "https://openid.github.io/authzen/authzen-obligations-core-1_0.html"
     author:
       -
         org: OpenID AuthZEN Working Group
