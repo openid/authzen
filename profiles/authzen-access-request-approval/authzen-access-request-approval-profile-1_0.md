@@ -89,7 +89,6 @@ normative:
         org: OpenID AuthZEN Working Group
     date: 2026
 
-informative:
   OBLIGATIONS:
     title: "AuthZEN Obligations Core 1.0"
     target: "https://openid.github.io/authzen/authzen-obligations-core-1_0.html"
@@ -97,6 +96,8 @@ informative:
       -
         org: OpenID AuthZEN Working Group
     date: 2026
+
+informative:
   CATALOG:
     title: "AuthZEN Access Request Catalog Profile 1.0"
     target: "https://openid.github.io/authzen/authzen-access-request-catalog-profile-1_0.html"
