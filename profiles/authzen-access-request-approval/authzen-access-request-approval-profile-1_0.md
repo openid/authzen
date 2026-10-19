@@ -64,6 +64,7 @@ normative:
   RFC7517:
   RFC7519:
   RFC8785:
+  RFC8725:
   I-D.bhutton-json-schema:
   I-D.bhutton-json-schema-validation:
   I-D.ietf-httpapi-idempotency-key-header:
@@ -1059,7 +1060,7 @@ When `denial.binding_token` is absent, the Access Request Service MUST resolve o
 
 The Access Request Service applies the artifact-specific verification rules in {{binding-artifacts}} to every requested item:
 
-* When `denial.binding_token` is present, the service MUST verify its integrity.  When the value is a JWS, the service MUST verify the signature using a key resolved from the JWK Set advertised at the PDP's `jwks_uri` ({{binding-keys}}); JWS `kid` headers are matched against JWK `kid` parameters.
+* When `denial.binding_token` is present, the service MUST verify its integrity.  When the value is a JWS, the service MUST verify the signature using a key resolved by the procedure in {{binding-keys}}.
 * When `denial.binding_token` is present in a form the service cannot verify, the service MUST NOT resolve an accompanying `denial.evaluation_id` as the binding form instead ({{denial-binding}}); the submission is rejected with `urn:openid:authzen:access-request:error:invalid_denial_binding`.
 
 ### Idempotency and Retries {#submission-idempotency}
@@ -1161,11 +1162,21 @@ Another integrity-protected format MAY be used in place of the compact JWS where
 
 A PDP that issues or verifies signed values for use under this profile (for example, a JWS-signed `binding_token` or a JWS `approval.state`, defined in {{approval-state}}) MUST publish a `jwks_uri` in PDP metadata.
 
-The value is an HTTPS URI of a JWK Set {{RFC7517}} document containing the verification keys for the signed artifacts this profile defines: PDP-issued `binding_token` values and `approval.state` values signed by the PDP's Access Request Service.  Keys are distinguished by their `kid` and by the JWS `iss`.
+The value is an HTTPS URI of a JWK Set {{RFC7517}} document containing the verification keys for the signed artifacts this profile defines: PDP-issued `binding_token` values and `approval.state` values signed by the PDP's Access Request Service.
+
+A verifier resolves the key as follows.  It first checks the JWS `iss` against the identifier expected for the artifact it is verifying: the `policy_decision_point` value for a `binding_token`, and the `access_request_endpoint` value for an `approval.state` ({{discovery}}).  It then resolves the verification key from the JWK Set, matching the JWS `kid` header against JWK `kid` parameters; where the JWS carries no `kid`, it tries the keys authorized for that issuer and artifact type.  It then confirms that the resolved key is authorized for the claimed issuer and for that artifact type.  A verifier MUST reject an artifact whose `iss` is not the expected identifier for that artifact, an artifact whose key it cannot resolve from the set, and an artifact whose resolved key is not authorized for the claimed issuer.
+
+The last step is required by Section 3.8 of {{RFC8725}}, which obliges an application to validate that the keys used belong to the issuer.  Checking the `iss` value does not establish that.  One set holds the keys of two signers, so without the mapping a compromised denial-signing key would verify an `approval.state` claiming the Access Request Service's issuer value, even though the approval-signing key remained secure.
+
+The same section makes the means of binding keys to an issuer application-specific, so this profile does not define a new JWK member for it.  Publishing a key in the set is discovery; authorizing a key for an issuer and an artifact type is deployment configuration the verifier holds.  A deployment with a single Access Request Service, which is the common case, configures two entries.
+
+The PDP MUST NOT publish two keys with the same `kid` for different signers, because a verifier that resolved such a `kid` could not tell which role the key belongs to.  The PDP controls the content of the set, including keys it does not hold, and coordinates rotation with the Access Request Service.
 
 Each JWK in the set SHOULD include a `kid` parameter so JWS signatures issued with a `kid` header can be resolved to the corresponding verification key, and SHOULD include a `use` parameter distinguishing signing keys (`use: "sig"`) from any other keys advertised.
 
 Verifiers cache the JWK Set per HTTP cache headers and refresh it on key-rotation events.  An unrecognized `kid` SHOULD cause the verifier to refresh the JWK Set before rejecting the input.
+
+This arrangement suits a deployment with a single Access Request Service, where one operator controls both signers.  A deployment whose PDP accepts approvals from services it does not operate would want the Access Request Service to carry an issuer identifier of its own, resolving its signing keys through its own metadata, so that each authority controls its own rotation.  That is a larger change than this draft carries, and it would redefine the identifier values above rather than extend them.
 
 Non-normative metadata example:
 
@@ -1213,8 +1224,8 @@ This profile does not mandate a specific JWS payload; the contents are deploymen
 
 #### JWT Claim Reference {#denial-jwt-claims}
 
-* `aud`: REQUIRED.  Access Request Service identifier, or an array of identifiers including the Access Request Service.  An array supports multiple verifiers of the same JWT; audience validation prevents replay to an unintended service.  The Access Request Service MUST reject a `binding_token` JWT that lacks `aud` or whose `aud` does not include the Access Request Service's identifier.
-* `iss`: PDP identifier.  Lets the Access Request Service select the correct verification key from the PDP's JWK Set ({{binding-keys}}).
+* `aud`: REQUIRED.  The Access Request Service's identifier, which is the `access_request_endpoint` value in the PDP metadata that advertises it ({{discovery}}), or an array of identifiers including that value.  A requestable denial that also carries `context.access_request.endpoint` supplies a submission URL for the PEP, not a second identifier.  An array supports multiple verifiers of the same JWT; audience validation prevents replay to an unintended service.  The Access Request Service MUST reject a `binding_token` JWT that lacks `aud` or whose `aud` does not include its own identifier.
+* `iss`: REQUIRED.  The PDP's identifier, which is the `policy_decision_point` value in that same PDP metadata ({{AuthZEN}}).  Key selection starts from it ({{binding-keys}}).
 * `iat`, `exp`: issued-at and expiry.  Expiry SHOULD be short (typically minutes, aligned with the requestable-denial hint lifetime).
 * `jti`: unique token identifier.  The Access Request Service SHOULD track recently-seen `jti` values until the token's `exp` to detect replay of an otherwise valid token.
 * `denial_expires_at`: the `context.access_request.expires_at` value from the requestable denial, unless the token's `exp` is no later than that value.  This lets the Access Request Service verify the PEP-echoed `denial.expires_at` value or enforce the token expiry as an equal-or-stricter freshness deadline.
@@ -1252,7 +1263,7 @@ The bulk construction is defined in {{BULK}}.
 
 When `binding_token` is a JWS-signed JWT using the claims defined in {{binding-token-integrity}}, the Access Request Service, on receipt:
 
-1. parses the JWS header and resolves the verification key from the JWK Set at the PDP's `jwks_uri`;
+1. parses the JWS header and resolves the verification key by the procedure in {{binding-keys}};
 2. verifies the signature, the `aud` claim, and the expiry;
 3. checks `jti` against recently-seen tokens to detect replay;
 4. compares the binding claims (inline or hashed) against the submission's Subject, Resource, Action, and authorization-relevant Context (or per-item for bulk submissions), rejecting a mismatch with `urn:openid:authzen:access-request:error:invalid_denial_binding`;
@@ -1282,10 +1293,10 @@ A deployment MUST therefore provide at least one approval-verification path: eit
 When `approval.state` is carried by value as a JWS:
 
 * The verifying PDP MUST be able to discover the signer's verification key.
-* The JWS MUST carry an `iss` claim identifying the signer (the Access Request Service, or the PDP acting through it) and SHOULD carry a `kid` header.
-* The deployment publishes the Access Request Service's approval-state verification keys in the PDP's `jwks_uri` JWK Set ({{binding-keys}}); the PDP selects the key by `iss` and `kid`.  Publishing a signer's key there is the PDP's statement that it trusts that signer for approval-state verification; the JWK Set is a discovery surface and a trust declaration at once.
-* A JWS `approval.state` MUST carry an `aud` (or equivalent intended-recipient) claim identifying the verifying PDP, which the PDP MUST verify, so the value cannot be replayed to a different PDP that shares the signer's key.
-* A PDP that cannot resolve the signer's key, or resolves it to a key not trusted for the claimed `iss`, MUST reject the `approval.state`.
+* The JWS MUST carry an `iss` claim identifying the signer and SHOULD carry a `kid` header.  The signer is the Access Request Service, or the PDP acting through it, and the identifier is the `access_request_endpoint` value in the PDP metadata that advertises it ({{discovery}}).
+* The deployment publishes the Access Request Service's approval-state verification keys in the PDP's `jwks_uri` JWK Set, and the PDP resolves the key by the procedure in {{binding-keys}}.
+* A JWS `approval.state` MUST carry an `aud` (or equivalent intended-recipient) claim identifying the verifying PDP, which the PDP MUST verify, so the value cannot be replayed to a different PDP that shares the signer's key.  The PDP's identifier is its `policy_decision_point` metadata value ({{AuthZEN}}).
+* A PDP that cannot resolve the signer's key under {{binding-keys}}, or resolves a key that is not authorized for the claimed `iss`, MUST reject the `approval.state`.
 
 In the bound-reference pattern, the PDP verifies `approval.state`, carrying integrity-protected proof or verifier state.  {{approval-reference-lookup}} defines the lookup alternative.
 
@@ -1490,7 +1501,7 @@ Name:
 : `jwks_uri`
 
 Description:
-: HTTPS URI of a JWK Set ({{RFC7517}}) document containing the verification keys for the signed artifacts this profile defines: PDP-issued `binding_token` values and `approval.state` values signed by the PDP's Access Request Service, distinguished by `kid` and JWS `iss`.
+: HTTPS URI of a JWK Set ({{RFC7517}}) document containing the verification keys for the signed artifacts this profile defines: PDP-issued `binding_token` values and `approval.state` values signed by the PDP's Access Request Service.  {{binding-keys}} defines how a verifier selects a key from the set.
 
 Change Controller:
 : OpenID Foundation AuthZEN Working Group
