@@ -41,7 +41,7 @@ This profile defines how a Policy Enforcement Point that acts on behalf of upstr
 
 # Introduction
 
-This companion to the AuthZEN Access Request and Approval Profile {{ARAP}} defines the `client.actor` and `client.source` members of an Access Request submission, the delegation model they express, and the verification an Access Request Service applies to a claimed actor chain.  The base profile's rules that reference these members remain there: the PEP preserves the actor identity when it submits, the Access Request Service does not treat unverified actor content as authorization input, and structural comparison excludes `subject.properties.act` because the PEP may carry the actor here instead.
+This companion to the AuthZEN Access Request and Approval Profile {{ARAP}} defines the `client.actor` and `client.source` members of an Access Request submission, the delegation model they express, and the verification an Access Request Service applies to a claimed actor chain.  The base profile's rules that reference these members remain there: the PEP carries the actor identity in the Subject when it submits and may additionally express it here, and the Access Request Service does not treat unverified actor content as authorization input.
 
 # Requirements Notation and Conventions
 
@@ -93,7 +93,7 @@ The base profile states three rules that reference the members defined here; thi
 
 * A PEP preserves the actor identity conveyed in the denied evaluation's Subject, either in the submission's `subject` or normalized to `client.actor` ([Construct the Submission](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#pep-construct)).
 * An Access Request Service does not rely on `client.actor` or `client.source` as authorization input unless it has independently verified them ([Submission Processing](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#submission-processing)).
-* Structural comparison for denial binding and approval scope excludes `subject.properties.act` ([Structural Comparison](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#structural-comparison)).
+* Structural comparison for denial binding and approval scope includes `subject.properties.act` ([Structural Comparison](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#structural-comparison)).  `client.actor` is an additional expression of the actor, not a substitute for it in the Subject.
 
 # Security Considerations
 

@@ -11,7 +11,7 @@ digest in hexadecimal and unpadded base64url forms.
 The corpus covers:
 
 - single-item and bulk hash inputs;
-- removal of `subject.properties.act`;
+- inclusion of `subject.properties.act` in the bound Subject;
 - authorization-relevant Context selection and an empty selection;
 - the distinction between an absent member and a member whose value is `null`;
 - JCS number serialization;
