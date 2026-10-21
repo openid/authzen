@@ -98,6 +98,14 @@ informative:
         ins: K. McGuinness
         name: Karl McGuinness
     date: 2026
+  COMPOSITION:
+    title: "Mission Composition Profile for AuthZEN"
+    target: "https://github.com/xmuruaga/authzen-composition"
+    author:
+      -
+        ins: X. Muruaga
+        name: Xabier Muruaga
+    date: 2026
 
 --- abstract
 
@@ -975,6 +983,8 @@ The exact-match baseline is the default unless the Access Request Service or PDP
 
 The PDP MUST only consider an Approval Result applicable when the current evaluation request is within the approval scope recorded for that Approval Result.
 
+Scope determines which evaluations an approval covers, not how many times it can be used: within scope, an approval remains usable until `approved_until`, subject to current policy and approval status ({{approval-current-status}}).  A limit on the number of uses is a separate property from scope.  This document does not define one; a companion profile can ({{companion-profiles}}).  {{denial-and-approval-integrity}} describes the hazard of unlimited reuse for actions that cannot be undone.
+
 #### Approval Scope Extensions {#approval-scope-extensions}
 
 Broader approvals can cover a resource class, role, entitlement, or time-bounded tool class.  Their representation and matching are deployment-specific or defined by downstream profiles, not portable across policy engines.  This profile does not define context-constraint matching.
@@ -1378,7 +1388,7 @@ This specification neither enumerates profiles nor requires declarative profile 
 
 This section describes threats and cites their mitigations.  It introduces no requirements.
 
-## Denial and Approval Integrity
+## Denial and Approval Integrity {#denial-and-approval-integrity}
 
 **Denial remains denial.** Treating `context.access_request` as permission would grant access without an allow decision.  The PEP rules in {{pep-processing-rules}} preserve denial and treat unknown task statuses and completion modes as not approved.
 
@@ -1387,6 +1397,8 @@ This section describes threats and cites their mitigations.  It introduces no re
 **Binding-token integrity.** A buggy or hostile PEP could alter or fabricate PDP-issued state to influence approval routing or scope.  {{binding-token-integrity}} and {{verifying-denial-binding}} define integrity, binding, and freshness checks; {{denial-binding-alternatives}} covers other formats.
 
 **Approval reference substitution and replay.** A compromised PEP could present another request's approval or replay an expired or inapplicable reference.  {{approval-verification}} defines applicability checks; {{decision-and-binding-integrity}} defines verification of by-value material and protection of backing records.  An approval reference is not a bearer grant.
+
+**Repeated irreversible actions.** Exact-match reuse until `approved_until` lets a PEP repeat an action that cannot be undone.  A PEP whose call times out may not know whether the action ran; re-evaluating with the same approval can return another permit while the approval remains applicable and current policy permits access, because reuse within scope is intended ({{approval-scope}}) and the replay check in {{approval-verification}} does not catch it.  An idempotency key at the resource covers a retry of the same call, not a deliberate second execution, and a fresh approval does not resolve an uncertain outcome: if the first call went through, a newly approved retry repeats it.  Where the resource offers neither idempotency nor a way to learn the outcome, the mitigation is for the PEP to stop executing automatically and for the next Access Request to show the approver that the earlier outcome is unknown.  This document does not limit the number of uses ({{approval-scope}}).  Enforcing such a limit across PDP replicas needs coordinated state, held either by a shared approval service or by a service that admits actions in order, one per position, as in {{COMPOSITION}}.
 
 ## Policy and Approver Hygiene
 
