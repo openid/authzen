@@ -2,8 +2,6 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "CommonJS",
-    "moduleResolution": "node",
-    "baseUrl": "src",
     "outDir": "./build",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

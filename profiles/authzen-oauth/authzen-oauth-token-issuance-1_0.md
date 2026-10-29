@@ -41,16 +41,25 @@ informative:
   RFC7515:
   RFC7643:
   RFC8176:
+  RFC8628:
   RFC8707:
   RFC9068:
   RFC9126:
-  RFC9470:
   RFC9700:
+  RFC9728:
   I-D.brossard-oauth-rar-authzen:
   I-D.gerber-oauth-deferred-token-response:
   I-D.ietf-oauth-identity-chaining:
   I-D.ietf-oauth-identity-assertion-authz-grant:
   I-D.ietf-oauth-transaction-tokens:
+  OBLIGATIONS:
+    title: "AuthZEN Profile for Obligations 1.0"
+    target: "https://openid.github.io/authzen/authzen-obligations-profile-1_0"
+    date: 2026-09-17
+    author:
+      - ins: A. Babeanu
+        name: "Alexandre Babeanu"
+        org: "IndyKite"
   ARAP:
     title: "AuthZEN Access Request and Approval Profile 1.0"
     target: "https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0"
@@ -208,7 +217,7 @@ Gate tuple:
 
 Scope tuple:
 : An evaluation request whose action is a requested scope, expressing
-  *access authority*. See {{gate-and-scope}}.
+  *access authority* at the issuance target. See {{gate-and-scope}}.
 
 # Architecture {#architecture}
 
@@ -317,15 +326,31 @@ PDP authorizes is the identifier the token carries.
 
 ## Resource {#resource}
 
-For the gate and scope tuples of {{gate-and-scope}}, `resource.type` MUST be
-`audience` and each `resource.id` MUST be an issuance target. Authorization
-detail tuples name their resource differently, as {{rar-tuple}} sets out.
+For the gate and scope tuples of {{gate-and-scope}}, each `resource.id` MUST be
+an issuance target, except for the ID token gate of {{id-token-gate}}.
+`resource.type` MUST be `audience` for a gate tuple and `protected_resource`
+for a scope tuple. Authorization detail tuples name their resource
+differently, as {{rar-tuple}} sets out.
 
-A single registered type is used rather than a type per kind of target
-(service, trust domain, peer authorization server) because the type names
-the *protocol role* the target plays, not a guess at its nature. Policies
-written against `audience` port across deployments; policies written against
-locally invented type names do not.
+The two types carry the difference between the two questions of
+{{gate-and-scope}} structurally, rather than in the spelling of `action.name`.
+A gate asks whether a token may be minted for a target: `audience` is what
+{{RFC8707}} and {{RFC8693}} call that target, and the value the AS intends for
+the token's `aud`. A scope tuple asks whether the subject may exercise a
+privilege at that target, which is the role {{RFC9728}} gives a protected
+resource. One target therefore appears under both types in a single batch,
+answering to a different question under each.
+
+The consequence is that an AS-composed gate action and a client-chosen scope
+value cannot collide however either is spelled, so the profile reserves no
+scope values and a deployment keeps the whole scope namespace. Gate actions and
+scope values are controlled by different parties, and nothing requires them to
+share a namespace.
+
+Both are registered types naming the *protocol role* the target plays, not a
+guess at its nature (service, trust domain, peer authorization server).
+Policies written against them port across deployments; policies written
+against locally invented type names do not.
 
 The **requested targets** of a request are the values it carries in a
 `resource` parameter in the sense of {{RFC8707}}, in an `audience` parameter
@@ -371,6 +396,18 @@ narrowed if the request was able to put more than one member in it.
 
 {{ex-rar-two}} shows a two-target request on the wire.
 
+### The ID Token Gate {#id-token-gate}
+
+A gate tuple's resource is the audience of the token that gate governs, which
+for an access token or a refresh token is an issuance target. An ID token is
+addressed elsewhere: {{RFC8707}} resource indicators do not apply to it, its
+`aud` is the `client_id`, and one is minted for the request however many
+targets the request names.
+
+A gate tuple whose token type is `id_token` therefore carries a `resource.id`
+of the `client_id`, with `resource.type` still `audience`, and is formed once
+for the request rather than once per target ({{batch}}).
+
 ## Actions: Gate, Scope, and Authorization Detail Tuples {#gate-and-scope}
 
 Token issuance asks two questions that are frequently conflated:
@@ -411,9 +448,9 @@ mint an access token under `grant_type=authorization_code`;
 read the same way. The last segment always names the grant, never a second
 token type.
 
-The `issue:` prefix is reserved. A deployment MUST NOT use a scope value
-beginning with `issue:` as a scope tuple action. {{ex-cc}} shows a gate tuple
-in a request.
+A gate tuple always names a resource whose type is `audience` ({{resource}}), so
+a scope value spelled the same way as a gate action is a different question and
+not a collision. {{ex-cc}} shows a gate tuple in a request.
 
 The grant is part of the action because nothing else in the tuple determines
 it. The same subject, audience, and token type arise from an authorization
@@ -425,8 +462,8 @@ client to hold a token but not to exchange for one - has nothing to attach
 to unless the grant is in the five-tuple.
 
 Neither segment subsumes the other. A single authorization code request may
-mint an access token, a refresh token, and an ID token, which are separately
-gateable; and a token exchange selects its output through
+mint an access token, a refresh token, and an ID token, each of which takes
+its own gate ({{batch}}); and a token exchange selects its output through
 `requested_token_type`, so its token type is a variable of the request.
 Together the two segments name one privilege: what may be minted, and by
 what means.
@@ -456,14 +493,16 @@ such grammar admits; mapping them remains internal to the PDP.
 ### Scope Tuple {#scope-tuple}
 
 A scope tuple is an evaluation whose `action.name` is a single requested
-scope value, carried verbatim.
+scope value, carried verbatim, and whose resource is the issuance target under
+the type `protected_resource` ({{resource}}).
 
 Scope values are not transformed into policy-engine relation names by the
 AS. Any such mapping is internal to the PDP. This keeps `action.name` a
 stable interface: the AS reports what the client asked for, and the PDP
 decides what that means in its own policy vocabulary.
 
-{{ex-downscope}} shows three scope tuples behind a gate, one of them denied.
+{{ex-downscope}} shows three scope tuples behind a pair of gates, one of the
+three denied.
 
 ### Authorization Detail Tuple {#rar-tuple}
 
@@ -504,11 +543,11 @@ MUST NOT form a compound name where the `datatypes` value itself contains a
 colon; such an entry is decomposed on `locations` and `actions` only, and its
 datatype axis is narrowed on the response side alone ({{rar-response}}).
 
-These names cannot be confused with the gate names of {{gate-tuple}}. A gate
-tuple always names a resource whose type is `audience`; an authorization
-detail tuple never does, because `resource.type` is the entry's own `type`.
-The two may name the same `resource.id` and remain distinct questions, which
-{{ex-rar-one}} shows.
+Each of the three tuple kinds is identified by its resource type rather than by
+the shape of its action name: `audience` for a gate ({{gate-tuple}}),
+`protected_resource` for a scope tuple ({{scope-tuple}}), and the entry's own
+`type` here. Tuples of different kinds may name the same `resource.id` and
+remain distinct questions, which {{ex-rar-one}} shows.
 
 {{ex-rar-two}} shows an entry decomposing into the four cells of a two by two
 product, and one of them denied.
@@ -617,27 +656,48 @@ response.
 
 For each requested target ({{resource}}), the AS forms:
 
-- a gate tuple ({{gate-tuple}}), and
+- one gate tuple ({{gate-tuple}}) for each token type other than `id_token`
+  that it would mint, and
 - one scope tuple ({{scope-tuple}}) for each requested scope,
 
-each carrying that target as its `resource`. Where the request carries
-`authorization_details`, the AS also forms the authorization detail tuples of
-{{rar-tuple}}, which carry a resource of their own.
+each carrying that target as its `resource`, under the type its kind takes
+({{resource}}). A batch therefore mixes resource types, and the top-level
+`resource` of {{AUTHZEN}} Section 7.1.1 can serve as the default for at most
+one of them; the rest carry a `resource` on the individual evaluation object.
+Where the AS would mint an ID token, it forms one further gate tuple, carrying
+the `client_id` as its
+resource and standing outside the per-target set ({{id-token-gate}}). Where
+the request carries `authorization_details`, the AS also forms the
+authorization detail tuples of {{rar-tuple}}, which carry a resource of their
+own.
 
-This document produces one gate tuple per target. Bindings may produce more:
-the token exchange family evaluates the authority of the requesting party
-separately from that of the subject, and so produces two per target.
+A token request may mint more than one token. An `authorization_code` request
+returns an access token and, where the AS issues one, a refresh token; where
+the request is an OpenID Connect request it returns an ID token as well. Each
+of those is a separate privilege, so each takes its own gate: a request
+minting an access token and a refresh token for one target forms two gate
+tuples at that target, `issue:access_token:authorization_code` and
+`issue:refresh_token:authorization_code`. An AS forms a gate only for a token
+type it would otherwise mint, so the gates it forms are those its own
+configuration has already admitted.
+
+This document therefore produces one gate tuple per target per token type,
+and one ID token gate for the request. Bindings may produce more: the token exchange family evaluates the authority
+of the requesting party separately from that of the subject, and so produces
+two per target for the token type it mints.
 
 Where a request yields more than one tuple, the AS MUST use the Access
 Evaluations API of {{AUTHZEN}} with `options.evaluations_semantic` set to
 `execute_all`, and MUST place gate tuples at the leading indices of the
 `evaluations` array, beginning at index 0. The response lists decisions in
 request order ({{AUTHZEN}} Section 7.2), so the AS recovers which target,
-scope, or authorization detail cell each decision belongs to by position.
+token type, scope, or authorization detail cell each decision belongs to by
+position.
 
-A request reduces to a single evaluation only when it names one target, no
-scopes, and no authorization details, in which case the gate tuple stands
-alone. {{ex-no-scopes}} is that case, and {{ex-cc}} the smallest batch.
+A request reduces to a single evaluation only when it names one target and
+mints one token type, with no scopes and no authorization details, in which
+case the gate tuple stands alone. {{ex-no-scopes}} is that case, and
+{{ex-cc}} the smallest batch.
 
 `execute_all` is required because a denial must be able to narrow the grant
 rather than fail it. {{AUTHZEN}} evaluation semantics are selected per request
@@ -687,30 +747,56 @@ The error is the one belonging to the parameter that overran the bound:
 `invalid_request` is not, because it does not tell the client what to
 shorten.
 
-### A Denied Gate Removes a Target {#gate-denial}
+### A Denied Gate {#gate-denial}
 
-A gate tuple governs one target. Where its decision is `false`, that target
-is removed from the request: the AS MUST NOT name it in the audience of any
-token it issues, and MUST disregard the scope tuples formed for it and any
-authorization detail tuple naming it as `resource.id`.
+A gate tuple governs one token type at one target.
 
-Where every target is removed, the AS MUST fail the request and MUST NOT
-issue a token. For token exchange requests the appropriate error is
-`invalid_target` ({{RFC8693}}).
+Where the denied gate names a token type the request cannot proceed without -
+the access token of an `authorization_code`, `client_credentials` or
+`refresh_token` request, or the token named by `requested_token_type` on a
+token exchange - the AS MUST fail the request and MUST NOT issue a token.
 
-An AS MAY instead fail the whole request when any gate is denied.
-{{one-target}} already permits it to refuse a multi-target request outright,
-and an AS unwilling to issue a token for a subset of what was asked for is
-exercising the same discretion later. {{ex-rar-two}} closes on what a denied
-gate would have removed from the batch shown there.
+This holds even where the request named other targets and their gates were
+permitted. A narrowed audience is invisible to the client: {{RFC8707}}
+defines `resource` as a request parameter with no response counterpart, so a
+token good for fewer audiences than were asked for cannot be told apart from
+one good for all of them until a resource server rejects it. Scope and
+authorization details narrow observably, since {{RFC6749}} Section 5.1
+reports the granted `scope` and {{RFC9396}} Section 7 the granted
+`authorization_details`; an audience has no such carrier, so it is not
+narrowed at all. {{one-target}} already permits an AS to refuse a
+multi-target request outright, and this requires it once policy has removed
+any part of one. {{ex-rar-two}} closes on what a denied gate would do to the
+batch shown there.
 
-Where one target was requested, both rules coincide: a denied gate fails the
-request.
+The error is `access_denied`, or `invalid_target` ({{RFC8693}}) for a token
+exchange request, where that code is already defined for a target the AS is
+unwilling to serve. `access_denied` is defined at the authorization endpoint
+({{RFC6749}} Section 4.1.2.1), but {{RFC8628}} Section 3.5 already returns it
+from the token endpoint, and its meaning is what a gate denial is. The
+alternatives mislead: `invalid_request` means the request was malformed
+({{RFC6749}} Section 5.2) and would send a client to correct syntax that is
+already correct, and `invalid_grant` would send it to discard a credential
+that is still good.
+
+An AS MUST return the same error for every gate denial. The client learns
+that policy refused it, which tells it not to retry and not to discard its
+grant, and learns nothing about which target or token type failed. An error
+that varied with the gate would let a client map policy by probing.
+
+Where the denied gate names any other token type, the request is narrowed
+rather than failed: the AS MUST NOT mint a token of that type, and MUST
+otherwise proceed. A denied `issue:refresh_token:authorization_code` yields an
+access token and no refresh token, which is the response {{RFC6749}} Section
+5.1 already permits, since `refresh_token` is OPTIONAL there. A denied
+`issue:id_token:authorization_code` yields a token response with no `id_token`
+member. Neither narrowing is silent in the way an audience narrowing would
+be, since the absent member is visible to the client in the token response.
 
 ### A Denied Scope Must Narrow Every Target {#scope-denial}
 
 A scope tuple governs one scope at one target. A scope is carried in the
-issued token only where it was permitted at *every* surviving target. The AS
+issued token only where it was permitted at *every* requested target. The AS
 reports the reduced set in the `scope` response parameter, as {{RFC6749}}
 already requires.
 
@@ -750,7 +836,7 @@ containing the survivors, which would return a cell the PDP denied.
 
 Where an entry's `locations` was absent and its tuples were therefore fanned
 across several targets, a cell survives only where it was permitted at every
-surviving target, for the reason given in {{scope-denial}}.
+requested target, for the reason given in {{scope-denial}}.
 
 An entry with no surviving cells is dropped. Where the request carried
 `authorization_details` and no entry survives, the AS MUST fail the request
@@ -875,9 +961,10 @@ that target while still permitting the request; it does not let one
 evaluation speak for another.
 
 An empty array therefore withdraws the target that evaluation was about,
-with the same effect as the denied gate of {{gate-denial}}. Where no target
-survives, the AS MUST fail the request; for token exchange requests the
-appropriate error is `invalid_target` ({{RFC8693}}).
+with the same effect as the denied gate of {{gate-denial}} and the same
+consequence: the AS MUST fail the request, with the error {{gate-denial}}
+names. A target withdrawn here is as invisible to the client as a target
+denied at its gate.
 
 The value is an array even when it names a single target, per the
 single-type rule above. An AS remains free to render a single-element set as
@@ -1007,29 +1094,49 @@ one, and MUST be evaluated as such.
 
 An Access Evaluations response in {{AUTHZEN}} carries no top-level context;
 each element of the `evaluations` array is a decision with its own optional
-context. Token shaping, however, is a property of the token: there is one
-lifetime, one claim set, one authorization details array for the token being
-minted, while this profile fans scopes, targets, and authorization detail
-cells out across many evaluations.
+context. Token shaping, however, is a property of a token: each token minted
+has one lifetime, one claim set, one authorization details array, while this
+profile fans token types, scopes, targets, and authorization detail cells out
+across many evaluations.
 
-An AS MUST therefore compose per-item shaping as follows:
+Aggregation is therefore **per token type**. Each shaping key is composed only
+from the items that speak for the token being minted, which are:
+
+- the gate tuple naming that token type ({{batch}}), and
+- for the access token, the scope tuples and authorization detail tuples of
+  the same target, which describe what that access token carries and speak
+  for no other token type.
+
+A `token_lifetime` returned on `issue:refresh_token:authorization_code`
+therefore bounds the refresh token and not the access token issued beside it,
+and a `claims` value returned on an ID token gate does not reach the access
+token. A PDP that intends a bound to apply to more than one token returns it
+on each of their gates.
+
+Within a token type, an AS MUST compose per-item shaping as follows:
 
 | Key | Aggregation |
 |---|---|
 | `token_lifetime` | Minimum over permitted items |
 | `granted_scope` | Union over permitted items, intersected with what the AS would otherwise grant and with the surviving scopes of {{scope-denial}} |
-| `audience` | The surviving targets of {{gate-denial}}, less any target whose item returned an empty array |
+| `audience` | The requested targets; a target withheld by any item fails the request ({{gate-denial}}) |
 | `authorization_details` | Union of entries, then the per-entry structural check, intersected with the entries reassembled under {{rar-denial}} |
 | `claims` | Merge; see below |
 | `crit` | Union |
 
+`granted_scope` and `authorization_details` are meaningful only for the access
+token, since no other token type carries them. An AS MUST ignore either key
+where it is returned on a gate tuple naming another token type.
+
 Shaping keys appearing in the context of a **denied** item MUST be ignored.
 
-Where two permitted items return different values for the same member of
-`claims`, the AS MUST reject the decision. There is no general narrowing
-merge for arbitrary JSON values, and choosing one arbitrarily could
-broaden the result. Identical values are not a conflict. A PDP SHOULD return
-token-level shaping on a single item to avoid the situation.
+Where two permitted items speaking for the same token type return different
+values for the same member of `claims`, the AS MUST reject the decision. There
+is no general narrowing merge for arbitrary JSON values, and choosing one
+arbitrarily could broaden the result. Identical values are not a conflict.
+Values returned for different token types are not a conflict either, since
+they shape different tokens. A PDP SHOULD return token-level shaping on a
+single item per token type to avoid the situation.
 
 # Discovery {#discovery}
 
@@ -1092,41 +1199,30 @@ be denied. That question is about policy content, so its answer belongs on
 the authenticated evaluation surface rather than in metadata; {{AUTHZEN}}
 notes that an unauthenticated PDP can be probed for the shape of its policy.
 The Action Search API of {{AUTHZEN}} answers it directly: a search for a
-representative subject and an `audience` resource returns the action names
-policy would permit, and gate actions among them indicate the issuances the
-deployment is prepared for. This is a deployment-time check, not a
+representative subject and an `audience` resource returns the gate actions
+policy would permit, which are the issuances the deployment is prepared for.
+Only gates are returned, since scope questions are asked of the same target
+under a different type ({{resource}}). This is a deployment-time check, not a
 per-request one, and nothing in this profile requires it.
 
 # Error Mapping
 
 | Condition | Authorization server behavior |
 |---|---|
-| Gate tuple denied | Fail the request; do not issue |
+| Gate denied for a required token type, or target withheld by an empty `audience` | Fail the request; `access_denied`, or `invalid_target` ({{RFC8693}}) on a token exchange |
+| Gate denied for any other token type | Issue without that token; no error |
 | All scope tuples denied | Fail the request; `invalid_scope` |
 | Some scope tuples denied | Issue with the permitted subset; report via `scope` |
-| Target denied or empty audience set | `invalid_target` ({{RFC8693}}) |
 | No authorization detail entry survives | `invalid_authorization_details` ({{RFC9396}}) |
 | Batch would exceed the bound of {{bounded}} | The error of the parameter that overran it |
 | Shaping key violates {{no-broadening}} | Treat as denial; fail the request |
 | Unknown `crit` member | Treat as denial; fail the request |
-| PDP unreachable or malformed response | Fail closed; do not issue |
+| PDP unreachable or malformed response | Fail closed; HTTP 503 with `Retry-After` ({{fail-closed}}) |
 
 Reason information returned by a PDP is diagnostic and intended for the
 operator of the AS. An AS MUST NOT relay PDP reason strings to the client,
 as they may disclose policy structure to a party that is not authorized to
 learn it.
-
-Where a PDP returns a denial accompanied by authentication requirements -
-the step-up pattern of {{AUTHZEN}}, in which the required `acr` and `amr`
-values are named - an AS SHOULD surface the requirement to the client. This
-document does not define that mapping, and neither end of it is presently
-specified. {{AUTHZEN}} illustrates the pattern in a non-normative example
-rather than defining the response context keys that carry it, leaving a
-profile nothing normative to reference; and on the OAuth side,
-`insufficient_user_authentication` in {{RFC9470}} is defined for resource
-servers rather than for the token endpoint, where no equivalent signal
-exists. This is an open item, and closing it requires work in both
-specifications.
 
 # Examples {#examples}
 
@@ -1146,9 +1242,10 @@ provides no value.
 
 One scope is requested, so the request is one gate tuple ({{gate-tuple}}) and
 one scope tuple ({{scope-tuple}}). This is the floor: two evaluations, so the
-Access Evaluations API. One target is shared by both, so `resource` is carried
-once at the top level; the examples below that need a resource per evaluation
-carry it there instead, as {{several-targets}} provides.
+Access Evaluations API. Both name the same target, the gate under `audience`
+and the scope tuple under `protected_resource` ({{resource}}), so the top-level
+`resource` serves the gate and the scope tuple carries its own, as
+{{several-targets}} provides.
 
 ~~~ http-message
 POST /access/v1/evaluations HTTP/1.1
@@ -1169,7 +1266,13 @@ Authorization: Bearer <token>
         "name": "issue:access_token:client_credentials"
       }
     },
-    { "action": { "name": "telemetry.write" } }
+    {
+      "action": { "name": "telemetry.write" },
+      "resource": {
+        "type": "protected_resource",
+        "id": "https://telemetry.example"
+      }
+    }
   ],
   "options": { "evaluations_semantic": "execute_all" }
 }
@@ -1192,8 +1295,9 @@ Content-Type: application/json
 
 ## Authorization Code, Downscoping {#ex-downscope}
 
-Three scopes are requested. The gate leads at index 0 and `execute_all`
-allows the AS to issue the permitted subset of the rest, per
+The AS would mint an access token and a refresh token, so the batch carries a
+gate for each ({{batch}}). Three scopes are requested behind them, and
+`execute_all` allows the AS to issue the permitted subset, per
 {{scope-denial}}.
 
 ~~~ json
@@ -1213,9 +1317,32 @@ allows the AS to issue the permitted subset of the rest, per
         "name": "issue:access_token:authorization_code"
       }
     },
-    { "action": { "name": "files.read"   } },
-    { "action": { "name": "files.write"  } },
-    { "action": { "name": "files.delete" } }
+    {
+      "action": {
+        "name": "issue:refresh_token:authorization_code"
+      }
+    },
+    {
+      "action": { "name": "files.read" },
+      "resource": {
+        "type": "protected_resource",
+        "id": "https://api.example/files"
+      }
+    },
+    {
+      "action": { "name": "files.write" },
+      "resource": {
+        "type": "protected_resource",
+        "id": "https://api.example/files"
+      }
+    },
+    {
+      "action": { "name": "files.delete" },
+      "resource": {
+        "type": "protected_resource",
+        "id": "https://api.example/files"
+      }
+    }
   ],
   "options": { "evaluations_semantic": "execute_all" }
 }
@@ -1224,7 +1351,18 @@ allows the AS to issue the permitted subset of the rest, per
 ~~~ json
 {
   "evaluations": [
-    { "decision": true },
+    {
+      "decision": true,
+      "context": {
+        "issuance": { "token_lifetime": 900 }
+      }
+    },
+    {
+      "decision": true,
+      "context": {
+        "issuance": { "token_lifetime": 86400 }
+      }
+    },
     {
       "decision": true,
       "context": {
@@ -1240,13 +1378,21 @@ allows the AS to issue the permitted subset of the rest, per
 }
 ~~~
 
-The AS issues a token bearing `files.read files.write`, a `groups` claim,
-and reports the reduced scope set in the token response.
+The AS issues an access token bearing `files.read files.write` and a `groups`
+claim, and reports the reduced scope set in the token response. It issues a
+refresh token beside it.
+
+The two lifetimes do not compete. Aggregation is per token type
+({{aggregation}}), so the access token expires in 900 seconds and the refresh
+token in a day. The `claims` value returned at index 2 is a scope tuple of this
+target and so shapes the access token; it does not reach the refresh token. Had
+the PDP denied index 1, the AS would have returned the access token with no
+refresh token ({{gate-denial}}).
 
 Had the same subject arrived at the same audience with the same scopes on a
-refresh, index 0 would have read
-`issue:access_token:refresh_token`, and a policy that requires fresh
-authorization here could deny it while leaving the scope tuples untouched.
+refresh, index 0 would have read `issue:access_token:refresh_token`, and a
+policy that requires fresh authorization here could deny it while leaving the
+scope tuples untouched.
 
 ## No Scopes Requested {#ex-no-scopes}
 
@@ -1482,9 +1628,10 @@ type, as {{rar-denial}} requires:
 ~~~
 
 Both gates permitted, so both targets remain in the audience. Had the second
-gate been denied instead, {{gate-denial}} would have removed that target and
-the AS would have disregarded both evaluations naming it, denied or not,
-leaving the first entry alone and no second entry at all.
+gate been denied instead, {{gate-denial}} would have failed the whole request
+with `access_denied`, rather than issuing a token for the first target alone:
+the client asked for both, and a token carrying one of them would not have
+told it otherwise.
 
 # Relationship to Companion Documents {#companions}
 
@@ -1567,6 +1714,20 @@ shaping value that violates {{no-broadening}}, an unrecognized `crit`
 member - MUST result in no token being issued. A PDP that cannot be
 consulted is not an authorization to proceed.
 
+A failure of this kind is not a decision, and an AS MUST NOT report it as
+one. Where the PDP could not be reached or its response could not be
+understood, the AS SHOULD respond with HTTP 503 and a `Retry-After` header.
+{{RFC6749}} defines no token endpoint error code for a condition that is
+temporary and is nobody's fault, and the HTTP status carries the two things
+the client needs: that the request may be repeated, and roughly when.
+
+An AS MUST NOT answer such a failure with a deferred token response
+({{I-D.gerber-oauth-deferred-token-response}}), which {{deferred}} names as the
+mechanism for a decision that cannot be reached synchronously. A slow PDP and
+an absent one must not look the same to a client: deferral asks the client to
+wait for a result that is coming, and a fail-closed denial has no result
+coming at all.
+
 Because the PDP is on the token issuance path, its availability becomes the
 AS's availability. Deployments should consider caching of decisions, local
 policy fallback that is explicitly configured rather than implicit, and the
@@ -1612,6 +1773,24 @@ This is why the reservations in {{claims}} are normative rather than
 advisory. An implementation that passed PDP-supplied claims into a token
 without checking them against that list would give the PDP the ability to
 mint arbitrary identities.
+
+## A Step-Up Obligation Is Not Actionable Here {#step-up}
+
+{{OBLIGATIONS}} defines a `step-up` obligation, which requires an enforcement
+point to put the subject through further authentication before honoring a
+decision. An authorization server at the token endpoint cannot do that: the
+subject is not a party to that exchange, and only the client can return them
+to the authorization endpoint with a stronger `acr_values`.
+
+A PDP governing token issuance therefore SHOULD NOT return one. On a denial it
+changes nothing, since the request already fails. On a permit it is
+destructive: {{OBLIGATIONS}} requires an enforcement point that cannot comply
+with an obligation to treat the response as a denial whatever `decision` said,
+so a step-up obligation attached to a permit does not produce a step-up, it
+produces no token.
+
+An AS implementing {{OBLIGATIONS}} SHOULD declare its supported obligation
+types in the request `context` and omit `step-up` from them.
 
 ## Integrity of the Decision Response
 
@@ -1688,6 +1867,7 @@ is Specification Required. Initial entries:
 | `client` | subject | An OAuth client acting on its own behalf |
 | `workload` | subject | A non-human software identity |
 | `audience` | resource | The audience of the access being granted |
+| `protected_resource` | resource | The same target, asked about access rather than issuance |
 
 Change Controller for all initial entries: OpenID Foundation AuthZEN Working
 Group. Specification Document for all initial entries: This document.
@@ -1696,8 +1876,8 @@ Group. Specification Document for all initial entries: This document.
 
 This specification requests creation of a new registry: the AuthZEN Token
 Issuance Action Names registry, which tracks the two short-name vocabularies
-from which action names in the reserved `issue:` space are composed.
-Registration policy is Specification Required.
+from which gate action names are composed. Registration policy is
+Specification Required.
 
 A gate action name is `issue:<token-type>:<grant-type>`, so the registry
 grows with the number of token types plus the number of grant types, not
@@ -1736,11 +1916,11 @@ Group. Specification Document for all initial entries: This document.
 
 Registrations MUST give the URI or parameter value the short name
 corresponds to, and MUST state which of the two vocabularies they join.
-Names outside the `issue:` prefix are not registered here, since scope values
-and the action names of {{rar-tuple}} are carried verbatim and are not
-registered vocabularies.
+Gate action names alone are registered here, since scope values and the action
+names of {{rar-tuple}} are carried verbatim and are not registered
+vocabularies.
 
-This document reserves one further name outside the `issue:` prefix:
+This document defines one further name outside the `issue:` prefix:
 `authorization_detail`, which {{rar-tuple}} substitutes for the action of an
 authorization details entry that names none.
 
@@ -1754,6 +1934,9 @@ bridge OAuth and AuthZEN - in {{ARAP}} and its OAuth completion mode -
 established that a Policy Decision Point belongs behind the token endpoint,
 and that the response of such a Policy Decision Point may legitimately shape
 what is issued. This document takes up the other half of that decision.
+
+Thanks to Roland Baum and Dave Hyland, each of whom gave the profile a detailed
+review that led to material changes.
 
 Thanks also to the participants in the OpenID AuthZEN interoperability
 events, whose December 2025 identity provider scenario demonstrated AuthZEN
