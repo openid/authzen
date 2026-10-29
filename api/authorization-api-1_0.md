@@ -866,6 +866,7 @@ The following is a non-normative example of a Access Evaluations Response to an 
 ### Errors
 
 There are two types of errors, and they are handled differently:
+
 1. Transport-level errors, or errors that pertain to the entire payload.
 2. Errors in individual evaluations.
 
