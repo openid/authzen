@@ -152,9 +152,15 @@ The PDP MUST implement a policy such that:
 7. For subject `alice` performing action `delete` with `properties.soft` = `true` on resource `record-1`: the decision MUST be `true`.
 8. For subject `alice` performing action `delete` with `properties.soft` = `false` on resource `record-1`: the decision MUST be `false`.
 
-Rules 1–4 use only identifier fields. Rules 5–8 require the PDP to evaluate `properties` values passed in the request.
+**Core (continued):**
 
-These eight decisions are the **only** decision values the harness validates. All other requests to the PDP use fixture entity identifiers but the harness only validates response structure, not the decision value.
+9. For subject `alice` performing action `read` on resource `record-2`: the decision MUST be `true`.
+
+Rules 1–4 and rule 9 use only identifier fields. Rules 5–8 require the PDP to evaluate `properties` values passed in the request.
+
+> **Note:** Rule 9 is a Core rule. It is numbered 9 rather than inserted after rule 4 so that the existing rule numbers, which are cross-referenced throughout this document, keep their meaning.
+
+These nine decisions are the **only** decision values the harness validates. All other requests to the PDP use fixture entity identifiers but the harness only validates response structure, not the decision value.
 
 How the PDP implements this policy is entirely at the implementer's discretion. The fixture could be a single hard-coded rule, a full RBAC model, or anything in between.
 
@@ -167,7 +173,7 @@ The requirements below are labelled `S1`–`S6` to distinguish them from the dec
 **Core:**
 
 - **S1** — A Subject Search for subjects of type `user` who can perform `read` on resource `record-1` MUST return a non-empty `results` array that includes at least `alice` and `bob`.
-- **S2** — A Resource Search for resources of type `record` that subject `alice` can perform `read` on MUST return a non-empty `results` array that includes at least `record-1`.
+- **S2** — A Resource Search for resources of type `record` that subject `alice` can perform `read` on MUST return a non-empty `results` array that includes at least `record-1` and `record-2` (per decision rules 1 and 9).
 - **S3** — An Action Search for subject `alice` on resource `record-1` MUST return a non-empty `results` array that includes at least `read` and `write` (per decision rules 1 and 2).
 
 **Properties:**
@@ -177,15 +183,17 @@ The requirements below are labelled `S1`–`S6` to distinguish them from the dec
 - **S6** — An Action Search for subject `bob` with `properties.role` = `"admin"` on resource `record-2` with `properties.status` = `"archived"` MUST return a non-empty `results` array that includes at least `write` (per decision rule 6).
 
 > **Note:** `delete` is excluded from the Properties Action Search fixture. Action Search omits the `action` key from requests per the spec, so `action.properties.soft` cannot be provided. Action Search results return action names only, without constraining properties.
+>
+> For the same reason, `delete` is excluded from the check that a Search result re-evaluates to a permit (specification Section 8.1). Its fixture decision depends on `action.properties.soft` (decision rules 7 and 8), and the follow-up Access Evaluation built from an Action Search result cannot carry that property. A PDP MAY list `delete` in Action Search results; the harness neither requires nor rejects it.
 
 These conditions ensure the harness can validate that search responses contain structurally valid, non-empty result sets. The harness validates that the expected entities appear in the results but does not reject additional results.
 
 ## Fixture Notes {#c-1-6}
 
-- **Rules 1-4 use identifier fields only.** The harness sends `type`, `id`, and `name` without `properties`. The PDP may resolve attributes internally or the policy may not require them.
+- **Rules 1-4 and rule 9 use identifier fields only.** The harness sends `type`, `id`, and `name` without `properties`. The PDP may resolve attributes internally or the policy may not require them.
 - **Rules 5-8 require properties.** The harness sends `properties` on subject, resource, and/or action. The PDP MUST evaluate these values to produce the correct decision.
-- **The `context` field is not required for fixture decisions.** The eight required decisions in [](#c-1-4) MUST hold regardless of whether `context` is present or absent in the request.
-- **Additional entities are permitted.** The PDP MAY have additional subjects, resources, actions, and policies beyond the fixture. The harness only sends requests using the fixture identifiers defined above.
+- **The `context` field is not required for fixture decisions.** The nine required decisions in [](#c-1-4) MUST hold regardless of whether `context` is present or absent in the request.
+- **Additional entities are permitted.** The PDP MAY have additional subjects, resources, actions, and policies beyond the fixture. The harness sends fixture identifiers for every case in which it validates a decision or a search result. It also sends identifiers and types that the fixture does not define, for the empty-results cases in [](#c-4-6), where it does not validate which entities are returned.
 
 
 # Basic Certification: Access Evaluation API {#c-2}
@@ -572,7 +580,7 @@ The PDP MUST return HTTP 400 when a required sub-field is missing.
 
 ### Invalid content type {#c-2-4-3}
 
-The PDP MUST return HTTP 400 when the request `Content-Type` is not `application/json`.
+The PDP MUST return HTTP 400 or HTTP 415 when the request `Content-Type` is not `application/json`. 415 Unsupported Media Type is the status HTTP defines for this condition; both are accepted.
 
 ### Malformed JSON {#c-2-4-4}
 
@@ -614,7 +622,11 @@ The PDP MUST return HTTP 400 when a field has an invalid type.
 
 ### X-Request-ID echo {#c-2-5-1}
 
-If the request includes an `X-Request-ID` header, the PDP MUST include the same `X-Request-ID` value in the response headers.
+If the request includes an `X-Request-ID` header, the PDP MUST include the same `X-Request-ID` value in the response headers. This applies to error responses as well as successful ones, since the specification places no limit on which responses must carry the identifier.
+
+> **Note:** Specification Section 10.1.3 makes echoing the request identifier a MUST but makes the `X-Request-ID` header itself only RECOMMENDED as the carrier. This scenario narrows that for certification: an unnamed carrier cannot be tested, so the harness requires the RECOMMENDED header. A PDP that conveys the identifier some other way does not satisfy this requirement.
+>
+> Where a component in front of the PDP answers a request on its own, for example a gateway returning `401`, the echo requirement still applies to that response.
 
 ### X-Request-ID absent {#c-2-5-2}
 
@@ -673,7 +685,9 @@ Or at a path discoverable via the PDP metadata endpoint.
 }
 ~~~
 
-This case validates response **structure** only: the harness asserts that `evaluations` is an array of two objects, each containing a `decision` boolean. It does not assert the decision values. The first evaluation (`alice`/`read`/`record-1`) corresponds to fixture rule 1 ([](#c-1-4)) and the second (`alice`/`read`/`record-2`) is unspecified by the fixture and therefore implementer-defined. Decision **values** in batch responses are validated separately in [](#c-3-2-2).
+This case validates response **structure** only: the harness asserts that `evaluations` is an array of two objects, each containing a `decision` boolean. It does not assert the decision values.
+
+Both evaluations do correspond to fixture rules, the first (`alice`/`read`/`record-1`) to rule 1 and the second (`alice`/`read`/`record-2`) to rule 9 ([](#c-1-4)), so the harness is permitted to validate them. It does not do so here because decision values for this request shape are validated in [](#c-3-2-2), which supplies `subject` and `resource` at the top level and checks both decisions against rules 3 and 4.
 
 ### Batch with fixture decisions validated {#c-3-2-2}
 
@@ -855,7 +869,9 @@ Top-level `context` applies to all evaluations unless overridden per-evaluation.
 }
 ~~~
 
-**Expected:** HTTP 200 with two evaluations. The harness validates that the request is accepted; the decision values are not validated (not fixture rules).
+**Expected:** HTTP 200 with two evaluations. The harness validates that the request is accepted and does not validate the decision values here.
+
+> **Note:** Both evaluations correspond to fixture rules (rules 1 and 9), and [](#c-1-6) requires those decisions to hold whether or not `context` is present, so both are `true` for a conformant PDP. The harness could therefore assert them as a check that per-evaluation `context` does not alter a fixture decision. It does not today, and whether it should is left to the working group.
 
 ~~~
 {
@@ -921,7 +937,7 @@ Each element in the response `evaluations` array MUST contain a `decision` field
 
 ### Top-level decision field {#c-3-3-4}
 
-When the response contains an `evaluations` array, the top-level `decision` field SHOULD be omitted. If present, the harness ignores it.
+When the response contains an `evaluations` array, the top-level `decision` field SHOULD be omitted. The harness reports it as a warning if present, and does not treat it as a failure.
 
 ## Error Handling {#c-3-4}
 
@@ -931,25 +947,30 @@ This test exercises the default `execute_all` evaluation semantic, under which t
 
 For an otherwise valid batch payload in which a single evaluation is missing a required field, the PDP MUST return HTTP 200 with an `evaluations` array matching the request cardinality and ordering ([](#c-3-3-1), [](#c-3-3-2)), and MUST denote the failed item with `"decision": false` (it MAY include error details in that item's `context`).
 
+"Otherwise valid" means valid under specification Section 7.1.1: every one of `subject`, `action` and `resource` that an evaluation omits is supplied as a top-level key. A payload that does not meet that condition is invalid as a whole rather than per-item, and is covered by [](#c-3-4-4).
+
 > **Note:** The specification permits, but does not require, this `decision: false` denotation for per-item failures under `execute_all`, and it separately requires a `400 Bad Request` when a required attribute is omitted from a (whole) request. This scenario adopts the per-item `execute_all` interpretation for failures *inside* an otherwise valid batch; transport-level or whole-payload failures (for example malformed JSON, or a request that is invalid at the top level) remain HTTP error responses as defined in [](#c-2-4). The short-circuit semantics (`deny_on_first_deny`, `permit_on_first_permit`) are out of scope for this test.
 
-**Request (second evaluation missing resource):**
+**Request (second evaluation supplies an incomplete resource):**
 
 ~~~ json
 {
   "subject": { "type": "user", "id": "alice" },
   "action": { "name": "read" },
+  "resource": { "type": "record", "id": "record-1" },
   "options": { "evaluations_semantic": "execute_all" },
   "evaluations": [
+    {},
     {
-      "resource": { "type": "record", "id": "record-1" }
-    },
-    {}
+      "resource": { "type": "record" }
+    }
   ]
 }
 ~~~
 
-**Expected:** HTTP 200 with two evaluations. The second evaluation MUST have `"decision": false`.
+The top level supplies a complete `subject`, `action` and `resource`, so the payload satisfies specification Section 7.1.1 and the failure is confined to one item. The first evaluation is empty and inherits all three defaults, giving alice reading `record-1` (rule 1). The second supplies a `resource` that replaces the top-level default wholesale, per [](#c-3-2-7), and that resource has no `id`, so the item cannot be evaluated.
+
+**Expected:** HTTP 200 with two evaluations. The first MUST have `"decision": true` (rule 1). The second MUST have `"decision": false`.
 
 ~~~
 {
@@ -1010,6 +1031,31 @@ Per the specification, if the `evaluations` array is empty, the Access Evaluatio
 This is a fixture request ([](#c-1-4), rule 1). The harness validates both the response structure and the decision value.
 
 
+### Evaluation missing a required entity with no top-level default {#c-3-4-4}
+
+Specification Section 7.1.1 requires that any of `subject`, `action` and `resource` omitted from an evaluation object be supplied as a top-level key. A payload that breaks this is invalid as a whole, and specification Section 10.1.1 requires a `400 Bad Request` when a required attribute of the information model is omitted.
+
+The PDP MUST return HTTP 400. This is a whole-payload failure, so the per-item `decision: false` denotation of [](#c-3-4-1) does not apply.
+
+**Request (second evaluation has no resource, and the top level supplies none):**
+
+~~~ json
+{
+  "subject": { "type": "user", "id": "alice" },
+  "action": { "name": "read" },
+  "options": { "evaluations_semantic": "execute_all" },
+  "evaluations": [
+    {
+      "resource": { "type": "record", "id": "record-1" }
+    },
+    {}
+  ]
+}
+~~~
+
+**Expected:** HTTP 400.
+
+
 # Search Certification {#c-4}
 
 ## Endpoints {#c-4-1}
@@ -1062,7 +1108,7 @@ The harness validates:
 
 ### Subject search with context {#c-4-2-2}
 
-The PDP MUST accept a Subject Search request that includes the optional `context` field without error. Per [](#c-1-6), `context` does not affect fixture decisions, so the results MUST match those of [](#c-4-2-1).
+The PDP MUST accept a Subject Search request that includes the optional `context` field without error. Per [](#c-1-6), `context` does not affect fixture decisions, so the fixture entities in the results MUST match those of [](#c-4-2-1).
 
 **Request:**
 
@@ -1078,7 +1124,7 @@ The PDP MUST accept a Subject Search request that includes the optional `context
 }
 ~~~
 
-**Expected:** HTTP 200 with a `results` array including at least `alice` and `bob`, identical to [](#c-4-2-1).
+**Expected:** HTTP 200 with a `results` array including at least `alice` and `bob`, which MUST be the same fixture entities as [](#c-4-2-1). Entities outside the fixture MAY differ, since [](#c-1-6) permits policies beyond the fixture and specification Section 8.1 allows results to depend on variables such as time.
 
 ### Subject search with subject id present {#c-4-2-3}
 
@@ -1161,7 +1207,7 @@ The harness validates:
 
 ### Resource search with context {#c-4-3-2}
 
-The PDP MUST accept a Resource Search request that includes the optional `context` field without error. Per [](#c-1-6), `context` does not affect fixture decisions, so the results MUST match those of [](#c-4-3-1).
+The PDP MUST accept a Resource Search request that includes the optional `context` field without error. Per [](#c-1-6), `context` does not affect fixture decisions, so the fixture entities in the results MUST match those of [](#c-4-3-1).
 
 **Request:**
 
@@ -1177,7 +1223,7 @@ The PDP MUST accept a Resource Search request that includes the optional `contex
 }
 ~~~
 
-**Expected:** HTTP 200 with a `results` array including at least `record-1`, identical to [](#c-4-3-1).
+**Expected:** HTTP 200 with a `results` array including at least `record-1`, which MUST be the same fixture entities as [](#c-4-3-1). Entities outside the fixture MAY differ, since [](#c-1-6) permits policies beyond the fixture and specification Section 8.1 allows results to depend on variables such as time.
 
 ### Resource search with resource id present {#c-4-3-3}
 
@@ -1261,7 +1307,7 @@ The harness validates:
 
 ### Action search with context {#c-4-4-2}
 
-The PDP MUST accept an Action Search request that includes the optional `context` field without error. Per [](#c-1-6), `context` does not affect fixture decisions, so the results MUST match those of [](#c-4-4-1).
+The PDP MUST accept an Action Search request that includes the optional `context` field without error. Per [](#c-1-6), `context` does not affect fixture decisions, so the fixture entities in the results MUST match those of [](#c-4-4-1).
 
 **Request:**
 
@@ -1276,7 +1322,7 @@ The PDP MUST accept an Action Search request that includes the optional `context
 }
 ~~~
 
-**Expected:** HTTP 200 with a `results` array including at least `read` and `write`, identical to [](#c-4-4-1).
+**Expected:** HTTP 200 with a `results` array including at least `read` and `write`, which MUST be the same fixture entities as [](#c-4-4-1). Entities outside the fixture MAY differ, since [](#c-1-6) permits policies beyond the fixture and specification Section 8.1 allows results to depend on variables such as time.
 
 **Properties (Search Properties certification):**
 
@@ -1339,7 +1385,7 @@ The harness validates:
 
 ### Request with page token {#c-4-5-2}
 
-If the PDP returned a non-empty `next_token` in a previous response, the harness sends a follow-up request with that token.
+If the PDP returned a non-empty `next_token` in a previous response, the harness sends a follow-up request with that token. Per specification Section 8.2, every other value from the initial request, `page.limit` included, is repeated unchanged.
 
 **Request:**
 
@@ -1349,6 +1395,7 @@ If the PDP returned a non-empty `next_token` in a previous response, the harness
   "action": { "name": "read" },
   "resource": { "type": "record", "id": "record-1" },
   "page": {
+    "limit": 1,
     "token": "<next_token from previous response>"
   }
 }
@@ -1386,7 +1433,9 @@ The PDP MAY support pagination on search endpoints. If it does not support pagin
 
 ## Empty results {#c-4-6}
 
-The PDP MUST return an empty `results` array (not an error) when no entities match the search criteria. This applies both when the entity identifier is unknown and when the entity type itself is unrecognised by the PDP, and it applies to all three search endpoints (Subject, Resource, and Action Search). The examples below illustrate the requirement against a representative endpoint; the same behaviour is required of the other two.
+The PDP MUST return a `results` array, and not an error, when a search carries an identifier or a type it does not recognise. This applies to all three search endpoints (Subject, Resource, and Action Search). The examples below illustrate the requirement against a representative endpoint; the same behaviour is required of the other two.
+
+An empty array is the expected answer from a PDP whose policies cover only the fixture, and the examples show it. A non-empty array is also conformant: [](#c-1-6) permits policies beyond the fixture, and such a policy may legitimately match an identifier the fixture does not define. The harness validates that the response is a well-formed search response and does not validate which entities it contains.
 
 ### Unknown entity identifier {#c-4-6-1}
 
@@ -1411,7 +1460,7 @@ The example below is an Action Search (the `action` key is omitted) whose input 
 
 ### Unknown entity type {#c-4-6-2}
 
-The PDP MUST return an empty `results` array (not HTTP 400) when the search specifies an entity type the PDP does not recognise. The example below is a Subject Search whose searched-for subject type does not exist in the fixture.
+The PDP MUST NOT return HTTP 400 when the search specifies an entity type it does not recognise. The example below is a Subject Search whose searched-for subject type does not exist in the fixture.
 
 **Request (Subject Search, unrecognised subject type):**
 
