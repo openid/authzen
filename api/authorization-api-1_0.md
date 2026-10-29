@@ -140,10 +140,10 @@ A Subject is the user or machine principal about whom the Authorization API is b
 A Subject is an object that contains two REQUIRED keys, `type` and `id`, which have a string value, and an OPTIONAL key, `properties`, with a value of an object.
 
 `type`:
-: REQUIRED. A string value that specifies the type of the Subject.
+: REQUIRED. A string value that specifies the type of the Subject. This value MUST NOT be empty.
 
 `id`:
-: REQUIRED. A string value containing the unique identifier of the Subject, scoped to the `type`.
+: REQUIRED. A string value containing the unique identifier of the Subject, scoped to the `type`. This value MUST NOT be empty.
 
 `properties`:
 : OPTIONAL. An object which can be used to express additional attributes of a Subject.
@@ -202,10 +202,10 @@ The following is a non-normative example of a subject which adds IP address and 
 A Resource is the target of an access request. It is an object that is constructed similar to a Subject entity. It has the following keys:
 
 `type`:
-: REQUIRED. A string value that specifies the type of the Resource.
+: REQUIRED. A string value that specifies the type of the Resource. This value MUST NOT be empty.
 
 `id`:
-: REQUIRED. A string value containing the unique identifier of the Resource, scoped to the `type`.
+: REQUIRED. A string value containing the unique identifier of the Resource, scoped to the `type`. This value MUST NOT be empty.
 
 `properties`:
 : OPTIONAL. An object which can be used to express additional attributes of a Resource.
@@ -250,7 +250,7 @@ An Action is the type of access that the requester intends to perform.
 Action is an object that contains a REQUIRED `name` key with a string value, and an OPTIONAL `properties` key with an object value.
 
 `name`:
-: REQUIRED. A string value containing the name of the Action.
+: REQUIRED. A string value containing the name of the Action. This value MUST NOT be empty.
 
 `properties`:
 : OPTIONAL. An object which can be used to express additional attributes of an Action.
@@ -669,7 +669,7 @@ To select the desired evaluation semantic, a PEP can pass in `options.evaluation
   * `deny_on_first_deny`
   * `permit_on_first_permit`
 
-`execute_all` is the default semantic, so an `evaluations` request without the `options.evaluations_semantic` flag will execute using this semantic.
+`execute_all` is the default semantic, so an `evaluations` request without the `options.evaluations_semantic` flag will execute using this semantic. A PDP MUST reject a request whose `options.evaluations_semantic` is not one of the values listed above.
 
 ##### Example: Evaluate `read` action for three documents using all three semantics
 
@@ -926,7 +926,7 @@ A paginated response MUST be clearly identified by the inclusion of a `page` obj
 
 To retrieve the next page, the PEP sends a subsequent request containing a `page` object with the `token` field set to the `next_token` value from the previous response. This process is repeated until the PDP returns a `page` object in which the value of the `next_token` field is an empty string, signaling the end of the result set.
 
-When a request contains a token, all entities (e.g., `subject`, `resource`, `action`, `context`) and pagination parameters (e.g., `limit`)  MUST be identical to the preceding request. PDPs SHOULD return an error when any entity or parameter has been changed.
+When a request contains a token, all entities (e.g., `subject`, `resource`, `action`, `context`) and pagination parameters (e.g., `limit`)  MUST be identical to the preceding request. PDPs MUST return an error when any entity or parameter has been changed.
 
 PEPs that wish to sequentially iterate through the entire result set SHOULD use the core pagination mechanism described above, which is designed to work consistently across all PDPs that support the search APIs.
 
@@ -940,12 +940,12 @@ The `page` object in a Search API Request consists of the following keys:
 : OPTIONAL. An opaque string value from the `next_token` of a previous response.
 
 `limit`:
-: OPTIONAL. A non-negative integer indicating the maximum number of results to return in the response.
+: OPTIONAL. A non-negative integer indicating the maximum number of results to return in the response. A PDP that paginates MUST NOT return more results in a single response than the value of `limit`.
 
 `properties`:
 : OPTIONAL. An object containing additional implementation-specific pagination request attributes, such as, but not limited to, sorting and filtering.
 
-Apart from the `token`, all values from the initial request MUST remain identical for subsequent pages. If a different value is provided mid-pagination the PDP SHOULD return an error.
+Apart from the `token`, all values from the initial request MUST remain identical for subsequent pages. If a different value is provided mid-pagination the PDP MUST return an error.
 
 Additional keys MAY be included in the `page` object. If they are, they MUST be defined in a specification referenced in the AuthZEN Policy Decision Point Capabilities Registry ({{iana-pdp-capabilities-registry}}). Furthermore, the PDP MUST declare support for the corresponding capability URN in its `capabilities` metadata ({{pdp-metadata-data-capabilities}}).
 
@@ -1065,6 +1065,7 @@ The following is a non-normative example of a search response returning resource
 ~~~ json
 {
   "page": {
+    "next_token": "a3M9NDU2O3N6PTI=",
     "count": 2,
     "total": 102
   },
@@ -1376,11 +1377,11 @@ Additional transport bindings (e.g. gRPC or CoAP) MAY be defined in the future i
 
 All API requests within this binding are made via an HTTPS `POST` request. 
 
-Requests MUST include a `Content-Type` header with the value `application/json`, and the request body for each endpoint MUST be a JSON object that conforms to the corresponding request structure, as defined in {{table-api-endpoints}}.
+Requests MUST include a `Content-Type` header with the value `application/json`, and the request body for each endpoint MUST be a JSON object that conforms to the corresponding request structure, as defined in {{table-api-endpoints}}. A PDP MUST accept the `application/json` media type when it carries parameters, such as `charset=utf-8` ({{Section 11 of RFC8259}}).
 
 A successful response is an HTTPS response with a status code of `200` and a `Content-Type` of `application/json`. Its body is a JSON object that conforms to the corresponding response structure, as defined in {{table-api-endpoints}}.
 
-The request URL MUST be the value of the corresponding endpoint parameter, as defined in {{table-api-endpoints}}, if it is provided in the Policy Decision Point metadata ({{pdp-metadata-data-endpoint}}). If the parameter is not provided, the URL SHOULD be formed by appending the default path, as defined in {{table-api-endpoints}}, to the PDP's base URL (which is the `policy_decision_point` value from the Policy Decision Point metadata, if available).
+The request URL MUST be the value of the corresponding endpoint parameter, as defined in {{table-api-endpoints}}, if it is provided in the Policy Decision Point metadata ({{pdp-metadata-data-endpoint}}). If no Policy Decision Point metadata is available, the URL SHOULD be formed by appending the default path, as defined in {{table-api-endpoints}}, to the PDP's base URL (which is the `policy_decision_point` value from the Policy Decision Point metadata, if available).
 
 The following table provides an overview of the API endpoints defined in this binding:
 
@@ -1416,7 +1417,7 @@ Boolean:
 
 If a required attribute in the information model is omitted, the server MUST return a "Bad Request" error, as defined in {{error-responses}}.
 
-To ensure forward compatibility, receivers MUST ignore unknown fields present in request or response bodies. Implementations MUST NOT assume a particular ordering of JSON object members.
+To ensure forward compatibility, receivers MUST ignore fields that are not defined for the request or response in question. Implementations MUST NOT assume a particular ordering of JSON object members.
 
 ### Error Responses {#error-responses}
 The following error responses are common to all methods of the Authorization API. The error response is indicated by an HTTPS status code ({{Section 15 of RFC9110}}) that indicates error.
@@ -1774,7 +1775,7 @@ To ensure the unambiguous interpretation of JSON payloads, implementations SHOUL
 - Numeric values do not exceed the magnitude or precision supported by IEEE 754 double-precision ({{Section 2.2 of RFC7493}}).  
 - Member names within a JSON object are unique after processing escape characters ({{Section 2.3 of RFC7493}}).
 
-To avoid ambiguity between a property that is absent and one that is present with a null value, properties with a value of null SHOULD be omitted from JSON objects.
+To avoid ambiguity between a property that is absent and one that is present with a null value, properties with a value of null SHOULD be omitted from JSON objects. A receiver MUST accept a property whose value is null, and MAY treat it as absent.
 
 ## Authorization Response Integrity {#security-authorization-response-integrity}
 
