@@ -148,14 +148,14 @@ The following is a non-normative example:
 {
   "decision": false,
   "context": {
-    "evaluation_id": "eval_01HX4Y2P8BQ4Y3F0V0K9D6Z7M1",
+    "evaluation_id": "eval_01HX4Y2P8BQ4Y3F0V0K9D6Z7M4",
     "evaluated_at": "2026-04-30T20:15:00Z",
     "reason": "approval_required",
     "access_request": {
       "endpoint": "https://pdp.example.com/access/v1/requests",
       "template": "application_access",
       "expires_at": "2026-04-30T20:25:00Z",
-      "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJldmFsdWF0aW9uX2lkIjoiZXZhbF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNMSJ9.bXBfc2lnbmF0dXJl",
+      "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJhdWQiOiJodHRwczovL3BkcC5leGFtcGxlLmNvbS9hY2Nlc3MvdjEvcmVxdWVzdHMiLCJiaW5kaW5nX2NvbnRleHRfbWVtYmVycyI6W10sImJpbmRpbmdfaGFzaCI6Imp5Mk5hMG9sazhUdUlRRTN3eE9qWFdEQ0t4dHZpWWJyUGpCWVNteUY2bzgiLCJkZW5pYWxfZXhwaXJlc19hdCI6IjIwMjYtMDQtMzBUMjA6MjU6MDBaIiwiZXZhbHVhdGlvbl9pZCI6ImV2YWxfMDFIWDRZMlA4QlE0WTNGMFYwSzlENlo3TTQiLCJleHAiOjE3Nzc1ODA3MDAsImlhdCI6MTc3NzU4MDEwMCwiaXNzIjoiaHR0cHM6Ly9wZHAuZXhhbXBsZS5jb20iLCJqdGkiOiJidF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNNCJ9.Qd8CLJvXzNangiW5jPh9tW8fu411EXrTZiLw2RlWbN-k3UlDfdHxvS7fRH8Ea8yPXeO8KdDR24bOmwcWSMoDiw",
       "form_url": "https://requests.example.com/forms/application_access",
       "request_schema_url": "https://requests.example.com/schemas/application_access.json",
       "request_catalogs_url": "https://requests.example.com/catalogs/application_access.json",
@@ -418,14 +418,14 @@ Content-Type: application/json
 {
   "decision": false,
   "context": {
-    "evaluation_id": "eval_01HX4Y2P8BQ4Y3F0V0K9D6Z7M1",
+    "evaluation_id": "eval_01HX4Y2P8BQ4Y3F0V0K9D6Z7M4",
     "evaluated_at": "2026-04-30T20:15:00Z",
     "reason": "approval_required",
     "access_request": {
       "endpoint": "https://pdp.example.com/access/v1/requests",
       "template": "application_access",
       "expires_at": "2026-04-30T20:25:00Z",
-      "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJldmFsdWF0aW9uX2lkIjoiZXZhbF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNMSJ9.bXBfc2lnbmF0dXJl",
+      "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJhdWQiOiJodHRwczovL3BkcC5leGFtcGxlLmNvbS9hY2Nlc3MvdjEvcmVxdWVzdHMiLCJiaW5kaW5nX2NvbnRleHRfbWVtYmVycyI6W10sImJpbmRpbmdfaGFzaCI6Imp5Mk5hMG9sazhUdUlRRTN3eE9qWFdEQ0t4dHZpWWJyUGpCWVNteUY2bzgiLCJkZW5pYWxfZXhwaXJlc19hdCI6IjIwMjYtMDQtMzBUMjA6MjU6MDBaIiwiZXZhbHVhdGlvbl9pZCI6ImV2YWxfMDFIWDRZMlA4QlE0WTNGMFYwSzlENlo3TTQiLCJleHAiOjE3Nzc1ODA3MDAsImlhdCI6MTc3NzU4MDEwMCwiaXNzIjoiaHR0cHM6Ly9wZHAuZXhhbXBsZS5jb20iLCJqdGkiOiJidF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNNCJ9.Qd8CLJvXzNangiW5jPh9tW8fu411EXrTZiLw2RlWbN-k3UlDfdHxvS7fRH8Ea8yPXeO8KdDR24bOmwcWSMoDiw",
       "form_url": "https://requests.example.com/forms/application_access",
       "request_schema_url": "https://requests.example.com/schemas/application_access.json",
       "request_catalogs_url": "https://requests.example.com/catalogs/application_access.json"
@@ -552,7 +552,7 @@ POST /access/v1/requests HTTP/1.1
 Host: pdp.example.com
 Authorization: Bearer 2YotnFZFEjr1zCsicMWpAA
 Content-Type: application/json
-Idempotency-Key: 7b8d0f0d-65a1-4af1-9fd3-a684f08a5d13
+Idempotency-Key: 7b8d0f0d-65a1-4af1-9fd3-a684f08a5d16
 
 {
   "subject": {
@@ -575,11 +575,11 @@ Idempotency-Key: 7b8d0f0d-65a1-4af1-9fd3-a684f08a5d13
     "requested_until": "2026-05-01T00:15:00Z"
   },
   "denial": {
-    "evaluation_id": "eval_01HX4Y2P8BQ4Y3F0V0K9D6Z7M1",
+    "evaluation_id": "eval_01HX4Y2P8BQ4Y3F0V0K9D6Z7M4",
     "evaluated_at": "2026-04-30T20:15:00Z",
     "expires_at": "2026-04-30T20:25:00Z",
     "reason": "approval_required",
-    "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJldmFsdWF0aW9uX2lkIjoiZXZhbF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNMSJ9.bXBfc2lnbmF0dXJl",
+    "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJhdWQiOiJodHRwczovL3BkcC5leGFtcGxlLmNvbS9hY2Nlc3MvdjEvcmVxdWVzdHMiLCJiaW5kaW5nX2NvbnRleHRfbWVtYmVycyI6W10sImJpbmRpbmdfaGFzaCI6Imp5Mk5hMG9sazhUdUlRRTN3eE9qWFdEQ0t4dHZpWWJyUGpCWVNteUY2bzgiLCJkZW5pYWxfZXhwaXJlc19hdCI6IjIwMjYtMDQtMzBUMjA6MjU6MDBaIiwiZXZhbHVhdGlvbl9pZCI6ImV2YWxfMDFIWDRZMlA4QlE0WTNGMFYwSzlENlo3TTQiLCJleHAiOjE3Nzc1ODA3MDAsImlhdCI6MTc3NzU4MDEwMCwiaXNzIjoiaHR0cHM6Ly9wZHAuZXhhbXBsZS5jb20iLCJqdGkiOiJidF8wMUhYNFkyUDhCUTRZM0YwVjBLOUQ2WjdNNCJ9.Qd8CLJvXzNangiW5jPh9tW8fu411EXrTZiLw2RlWbN-k3UlDfdHxvS7fRH8Ea8yPXeO8KdDR24bOmwcWSMoDiw",
     "template": "application_access"
   }
 }
