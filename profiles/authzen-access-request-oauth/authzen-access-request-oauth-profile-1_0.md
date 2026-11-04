@@ -45,22 +45,6 @@ normative:
   RFC8707:
   I-D.ietf-oauth-deferred-token-response:
   I-D.rosomakho-oauth-txn-challenge:
-    title: "OAuth Transaction Authorization Challenge"
-    target: "https://datatracker.ietf.org/doc/draft-rosomakho-oauth-txn-challenge/"
-    author:
-      -
-        ins: Y. Rosomakho
-        name: Yaroslav Rosomakho
-      -
-        ins: B. Campbell
-        name: Brian Campbell
-      -
-        ins: K. McGuinness
-        name: Karl McGuinness
-      -
-        ins: P. Kasselman
-        name: Pieter Kasselman
-    date: 2026-06-25
   OIDC-CIBA:
     title: "OpenID Connect Client-Initiated Backchannel Authentication Flow - Core 1.0"
     target: "https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html"
