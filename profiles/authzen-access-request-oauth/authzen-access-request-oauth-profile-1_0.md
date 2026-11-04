@@ -653,8 +653,8 @@ The continuation handle and the issued access token are sender-constrained using
 
 To cancel a pending request:
 
-- **DTR.**  The client revokes the `deferral_code` at the revocation endpoint {{RFC7009}} (with `token_type_hint` set to `urn:ietf:params:oauth:token-type:deferral-code`).  The AS MUST cancel the underlying access request.
-- **CIBA and transaction challenge.**  These transports define no client-driven cancellation; the pending request resolves on approval, denial, or expiry of its handle.  In all bindings the access request MUST be cancelled when its handle expires.
+- **DTR and transaction challenge.**  The client revokes the `deferral_code` at the revocation endpoint {{RFC7009}} (with `token_type_hint` set to `urn:ietf:params:oauth:token-type:deferral-code`).  The AS MUST cancel the underlying access request.
+- **CIBA.**  This transport defines no client-driven cancellation; the pending request resolves on approval, denial, or expiry of its handle.  In all bindings the access request MUST be cancelled when its handle expires.
 
 # Privacy Considerations
 
