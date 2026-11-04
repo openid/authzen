@@ -580,30 +580,36 @@ WWW-Authenticate: DPoP error="transaction_authorization_required",
   transaction_challenge="eyJ0eXAiOiJ0eG4tYXV0aHotY2hhbGxlbmdlK2p3dC... (signed JWT)"
 ~~~
 
-The agent presents the challenge to the AS:
+The agent relays the challenge to its client, which presents it at the token endpoint under the transaction authorization grant:
 
 ~~~ http
-POST /txn-authorization HTTP/1.1
+POST /token HTTP/1.1
 Host: as.example.com
 Content-Type: application/x-www-form-urlencoded
 DPoP: eyJ...
 
-client_id=agent-7
+grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Atxn-authz-challenge
+&client_id=agent-7
+&completion_mode=deferred
 &transaction_challenge=eyJ0eXAiOiJ0eG4tYXV0aHotY2hhbGxlbmdlK2p3dC...
 ~~~
 
-Here the binding to {{AuthZEN}} differs from the DTR example: the AS does not derive the requestable denial itself, it arrives as the resource-signed challenge.  The AS validates the challenge's signature, treats its `authorization_details` and `txn` as the requestable-denial signal (mapping them to an AuthZEN evaluation only if it also applies its own policy, the "both" case below), submits the access request, and returns a pending response:
+Here the binding to {{AuthZEN}} differs from the DTR example: the AS does not derive the requestable denial itself, it arrives as the resource-signed challenge.  The AS validates the challenge's signature, treats its `authorization_details` and `txn` as the requestable-denial signal (mapping them to an AuthZEN evaluation only if it also applies its own policy, the "both" case below), submits the access request, and returns the DTR deferred response:
 
-~~~ json
+~~~ http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Cache-Control: no-store
+
 {
-  "transaction_authorization_id": "txn-authz-abc123",
+  "error": "authorization_pending",
+  "deferral_code": "LRGidcSAeVs_xYpEDt5pNx0A0TBr7qPHbh_Se6pfdf4",
   "expires_in": 300,
-  "interval": 5,
-  "authorization_uri": "https://as.example.com/txn-authorization/txn-authz-abc123"
+  "interval": 5
 }
 ~~~
 
-The agent polls the transaction authorization endpoint with the `transaction_authorization_id`.  On approval the AS issues a transaction-scoped token carrying the challenge's `txn`, which the agent re-presents on the original operation:
+The client polls the token endpoint with the deferred grant and the `deferral_code`.  On approval the AS issues a transaction-scoped token carrying the challenge's `txn`, which it hands back to the agent to re-present on the original operation:
 
 ~~~ json
 {
