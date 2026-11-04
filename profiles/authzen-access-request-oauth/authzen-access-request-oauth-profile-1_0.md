@@ -43,7 +43,7 @@ normative:
   RFC8693:
   RFC7009:
   RFC8707:
-  I-D.gerber-oauth-deferred-token-response:
+  I-D.ietf-oauth-deferred-token-response:
   I-D.rosomakho-oauth-txn-challenge:
     title: "OAuth Transaction Authorization Challenge"
     target: "https://datatracker.ietf.org/doc/draft-rosomakho-oauth-txn-challenge/"
@@ -118,7 +118,7 @@ This specification is that downstream profile for OAuth 2.1 {{I-D.ietf-oauth-v2-
 
 The completion semantics are the same regardless of how the asynchronous wait is carried: the issued access token is the decision representation, the authoritative decision is made at issuance time, and the issued credential is bounded by the recorded approval expiry.  What varies is the OAuth mechanism that carries the request and the wait.  This profile defines three transport bindings:
 
-- **Deferred Token Response** {{I-D.gerber-oauth-deferred-token-response}} (DTR): the client makes a token request, and rather than returning a token or an error the Authorization Server (AS) returns a `deferral_code`; the client polls the token endpoint until the token is issued or the request is denied.
+- **Deferred Token Response** {{I-D.ietf-oauth-deferred-token-response}} (DTR): the client makes a token request, and rather than returning a token or an error the Authorization Server (AS) returns a `deferral_code`; the client polls the token endpoint until the token is issued or the request is denied.
 - **Client-Initiated Backchannel Authentication** {{OIDC-CIBA}} (CIBA): the client makes a backchannel authentication request, the AS returns an `auth_req_id`, and approval is obtained out of band from a decoupled party; the client polls the token endpoint (or is notified) until completion.
 - **Transaction Authorization Challenge** {{I-D.rosomakho-oauth-txn-challenge}} (transaction challenge): a protected resource returns a signed challenge for an operation it cannot authorize from the presented token; the client presents the challenge to the AS, the AS obtains approval and issues a transaction-scoped token, and the client re-presents that token to the resource.
 
@@ -165,7 +165,7 @@ Resource Server (RS):
 Continuation handle:
 : The opaque value that binds the pending access request in the issuer's state and that the client redeems to obtain the token.  Each binding names it differently: the DTR `deferral_code`, the CIBA `auth_req_id`, and the transaction challenge `transaction_authorization_id`.
 
-This profile also uses `authorization_details` from {{RFC9396}}, and the transport-specific parameters of {{I-D.gerber-oauth-deferred-token-response}}, {{OIDC-CIBA}}, and {{I-D.rosomakho-oauth-txn-challenge}} as defined in the binding sections.
+This profile also uses `authorization_details` from {{RFC9396}}, and the transport-specific parameters of {{I-D.ietf-oauth-deferred-token-response}}, {{OIDC-CIBA}}, and {{I-D.rosomakho-oauth-txn-challenge}} as defined in the binding sections.
 
 # Protocol Overview
 
@@ -206,7 +206,7 @@ In the transaction challenge binding the requestable denial originates at a prot
 
 The mechanism a client uses is the one the issuer advertises, and each transport advertises independently in authorization server metadata.  This profile defines no additional discovery metadata of its own; whether a given request is evaluated as an AuthZEN Access Evaluation and may be deferred for approval is a policy decision and is not separately advertised.
 
-- **DTR.**  The AS advertises `deferred_token_response_supported` ({{I-D.gerber-oauth-deferred-token-response}}).  A client participates by including `completion_mode=deferred` on its token request and being prepared for a synchronous token, a deferred response, or an error.
+- **DTR.**  The AS advertises `deferred_token_response_supported` ({{I-D.ietf-oauth-deferred-token-response}}).  A client participates by including `completion_mode=deferred` on its token request and being prepared for a synchronous token, a deferred response, or an error.
 - **CIBA.**  The AS advertises a `backchannel_authentication_endpoint` and `backchannel_token_delivery_modes_supported` ({{OIDC-CIBA}}); a client uses the delivery mode (`poll`, `ping`, or `push`) the AS supports.
 - **Transaction challenge.**  The AS advertises a `transaction_authorization_endpoint`, and the protected resource advertises the keys it signs challenges with (`txn_challenge_jwks_uri`) and its signing algorithms, per {{I-D.rosomakho-oauth-txn-challenge}}.  Unlike the other two bindings, this introduces a trust relationship in which the AS validates challenges signed by the resource (see {{security}}).
 
@@ -333,7 +333,7 @@ Each binding specializes the {{completion}} model onto one OAuth asynchronous me
 
 ## Deferred Token Response {#binding-dtr}
 
-The client makes an ordinary token request and signals deferred completion with `completion_mode=deferred` ({{I-D.gerber-oauth-deferred-token-response}}).  The requested authorization is expressed with `authorization_details` ({{RFC9396}}), with `scope`, or with both.  The AS maps the request to an AuthZEN Access Evaluation and resolves per {{completion}}.  On a requestable denial it binds the access request to a `deferral_code` and returns the DTR deferred response (`authorization_pending` with `deferral_code`, `expires_in`, and `interval`).
+The client makes an ordinary token request and signals deferred completion with `completion_mode=deferred` ({{I-D.ietf-oauth-deferred-token-response}}).  The requested authorization is expressed with `authorization_details` ({{RFC9396}}), with `scope`, or with both.  The AS maps the request to an AuthZEN Access Evaluation and resolves per {{completion}}.  On a requestable denial it binds the access request to a `deferral_code` and returns the DTR deferred response (`authorization_pending` with `deferral_code`, `expires_in`, and `interval`).
 
 The client polls the token endpoint with the deferred grant type (`urn:ietf:params:oauth:grant-type:deferred`) and the `deferral_code`, and completes per {{completion}}.  This binding rides on any originating grant, including Token Exchange {{RFC8693}}, the authorization code grant, and the refresh token grant.
 
@@ -656,7 +656,7 @@ The OAuth wire surface replaces several {{ARAP}} constructs; the rest map direct
 
 # Sender-Constraining and Cancellation {#sender-constraining}
 
-The continuation handle and the issued access token are sender-constrained using DPoP {{RFC9449}} or mutual TLS {{RFC8705}}; a public client MUST present DPoP on the initial request, and every polling, redemption, and cancellation request MUST carry proof of possession for the same key.  DTR specifies this for the `deferral_code` ({{I-D.gerber-oauth-deferred-token-response}}); the same requirement applies to the CIBA `auth_req_id` and the `transaction_authorization_id` in this profile.  The CIBA binding does not have OAuth public clients in this sense: {{OIDC-CIBA}} requires the client to authenticate to the backchannel authentication endpoint with its registered method, and DPoP sender-constrains the `auth_req_id` and issued token on top of that.
+The continuation handle and the issued access token are sender-constrained using DPoP {{RFC9449}} or mutual TLS {{RFC8705}}; a public client MUST present DPoP on the initial request, and every polling, redemption, and cancellation request MUST carry proof of possession for the same key.  DTR specifies this for the `deferral_code` ({{I-D.ietf-oauth-deferred-token-response}}); the same requirement applies to the CIBA `auth_req_id` and the `transaction_authorization_id` in this profile.  The CIBA binding does not have OAuth public clients in this sense: {{OIDC-CIBA}} requires the client to authenticate to the backchannel authentication endpoint with its registered method, and DPoP sender-constrains the `auth_req_id` and issued token on top of that.
 
 To cancel a pending request:
 
@@ -681,7 +681,7 @@ To cancel a pending request:
 # Relationship to Other Specifications {#relationship}
 
 - {{ARAP}}: this profile is its OAuth token issuance completion mode.  {{ARAP}} owns the requestable denial, access request, approval, and audit lifecycle; this profile binds completion to OAuth token issuance and supports the AS, a protected resource, or both as the PEP.
-- {{I-D.gerber-oauth-deferred-token-response}}: an asynchronous transport for this profile.  It adds no new grant type; the binding uses DTR's `completion_mode`, deferred grant, and polling.
+- {{I-D.ietf-oauth-deferred-token-response}}: an asynchronous transport for this profile.  It adds no new grant type; the binding uses DTR's `completion_mode`, deferred grant, and polling.
 - {{OIDC-CIBA}}: an asynchronous transport built for decoupled approval, where the approving party need not be the client; the binding uses the backchannel endpoint, the CIBA grant, and `auth_req_id`.
 - {{I-D.rosomakho-oauth-txn-challenge}}: a resource-initiated asynchronous transport in which the protected resource asserts the requestable denial as a signed challenge; the binding uses the transaction authorization endpoint and the `txn`-bound token.
 - {{RFC9396}}: carries the requested authorization in the request and the approved authorization in the issued token.
@@ -692,7 +692,7 @@ To cancel a pending request:
 
 # IANA Considerations
 
-This profile defines no new OAuth grant types, parameters, endpoints, or error codes; it reuses {{I-D.gerber-oauth-deferred-token-response}}, {{OIDC-CIBA}}, {{I-D.rosomakho-oauth-txn-challenge}}, and {{RFC9396}}.  It requests no IANA registrations.  Any `authorization_details` type used by a deployment is registered per {{RFC9396}}.
+This profile defines no new OAuth grant types, parameters, endpoints, or error codes; it reuses {{I-D.ietf-oauth-deferred-token-response}}, {{OIDC-CIBA}}, {{I-D.rosomakho-oauth-txn-challenge}}, and {{RFC9396}}.  It requests no IANA registrations.  Any `authorization_details` type used by a deployment is registered per {{RFC9396}}.
 
 --- back
 
