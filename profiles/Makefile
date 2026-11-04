@@ -23,6 +23,7 @@ all:
 	@ $(MAKE) authzen-coaz-mcp-binding-1_0.html
 	@ $(MAKE) authzen-coaz-mcp-binding-1_0.txt
 	@ $(MAKE) -C authzen-access-request-approval all
+	@ $(MAKE) -C authzen-access-request-oauth all
 	@ $(MAKE) authzen-oauth/authzen-oauth-token-issuance-1_0.xml
 	@ $(MAKE) authzen-oauth/authzen-oauth-token-issuance-1_0.html
 	@ $(MAKE) authzen-oauth/authzen-oauth-token-issuance-1_0.txt
