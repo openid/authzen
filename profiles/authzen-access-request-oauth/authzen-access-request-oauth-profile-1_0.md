@@ -143,6 +143,9 @@ Policy Enforcement Point (PEP):
 Client:
 : The OAuth client (an agent, or a Policy Enforcement Point acting for one) that makes the request and polls for, or is notified of, completion.
 
+Agent:
+: In the transaction challenge binding, the component that attempted the operation at the protected resource.  It relays the challenge to the client without modifying it and later presents the issued token to the resource {{I-D.rosomakho-oauth-txn-challenge}}.  Where one component does both, the agent and the client are the same party; the other two bindings have no separate agent.
+
 Resource Server (RS):
 : The server that accepts the issued access token and enforces the authorization it carries.  In this profile the RS is the enforcement point at the time of use: it validates the token, possibly offline, rather than re-evaluating against a PDP per call.  In the transaction challenge binding the RS additionally originates the requestable denial as a signed challenge.
 
@@ -184,7 +187,7 @@ Across all three bindings the shape is the same: an asynchronous authorization r
     |<----------------------------------------|                            |
 ~~~
 
-In the transaction challenge binding the requestable denial originates at a protected resource, which returns a signed challenge to the client before step 1; the client then presents that challenge to the AS, and after completion re-presents the issued token to the resource (see {{binding-txn}}).
+In the transaction challenge binding the requestable denial originates at a protected resource, which returns a signed challenge to the agent before step 1; the agent relays it to the client, which presents it to the AS, and after completion the agent re-presents the issued token to the resource (see {{binding-txn}}).
 
 # Discovery
 
@@ -331,11 +334,11 @@ The AS maps the request to an AuthZEN Access Evaluation and resolves per {{compl
 
 ## Transaction Authorization Challenge {#binding-txn}
 
-In this binding the protected resource is the PEP.  When the resource determines that the token presented for an operation does not authorize it, it returns HTTP 401 with a `WWW-Authenticate` challenge carrying a signed `transaction_challenge` (a JWS whose claims include `txn`, `authorization_details`, the resource as `iss`, the AS as `aud`, and a human-readable `reason`), per {{I-D.rosomakho-oauth-txn-challenge}}.  The client signals that it understands challenges with the `Accept-Txn-Challenge` header.  The challenge is the resource's assertion of a requestable denial, signed so the client cannot forge or broaden the requested operation.
+In this binding the protected resource is the PEP.  When the resource determines that the token presented for an operation does not authorize it, it returns HTTP 401 with a `WWW-Authenticate` challenge carrying a signed `transaction_challenge` (a JWS whose claims include `txn`, `authorization_details`, the resource as `iss`, the AS as `aud`, `iat`, `exp`, `jti`, and a human-readable `reason`, and optionally `act` for the requester context and `cnf` for a binding key), per {{I-D.rosomakho-oauth-txn-challenge}}.  The agent signals that it understands challenges with the `Accept-Txn-Challenge` header, and a resource returns one only to an agent that signalled it or that it knows out of band to support the mechanism.  The challenge is the resource's assertion of a requestable denial, signed so neither the agent nor the client can forge or broaden the requested operation.
 
 The client itself presents the challenge to the AS named in the challenge's `aud`, as a token request under the transaction authorization grant (`urn:ietf:params:oauth:grant-type:txn-authz-challenge`) carrying the challenge in `transaction_challenge` and opting into deferral with `completion_mode=deferred`, per {{I-D.rosomakho-oauth-txn-challenge}}; the originating deployment does not forward anything on the client's behalf, so no server-to-server credential is crossed even when `aud` names an AS the client has not used before.  That AS validates the challenge against the resource's signing keys, treats it as the requestable-denial signal (and MAY additionally evaluate against its own PDP), submits the {{ARAP}} access request to its own Access Request Service, and resolves per {{completion}}.  On a requestable denial it returns the DTR deferred response and the client polls the token endpoint with the deferred grant, exactly as in {{binding-dtr}}.  The challenge supplies the requested authorization; DTR carries the wait.
 
-On approval the AS issues an access token that carries the challenge's `txn` and `authorization_details` and is audience-restricted to the resource.  The client re-presents this token to the resource, which validates that the token's `txn` matches the challenge, that the audience identifies the resource, and that the granted `authorization_details` authorize the operation.  Because the resource originates and consumes the `txn`, this binding is the one case where completion is not "client holds token, done": the token is evidence re-presented to the resource that originated the challenge.  Resources SHOULD treat these tokens as single-use for non-idempotent or high-impact operations.
+On approval the AS issues an access token that carries the challenge's `txn` and `authorization_details` and is audience-restricted to the resource.  The client returns it to the agent, which re-presents it to the resource; the resource validates that the token's `txn` matches the challenge, that the audience identifies the resource, and that the granted `authorization_details` authorize the operation.  Because the resource originates and consumes the `txn`, this binding is the one case where completion is not "client holds token, done": the token is evidence re-presented to the resource that originated the challenge.  Resources SHOULD treat these tokens as single-use for non-idempotent or high-impact operations.
 
 # Examples
 
