@@ -214,7 +214,7 @@ A client engages exactly one binding, selected by the entry point and opt-in it 
 
 ## Idempotent submission
 
-An asynchronous authorization request is not inherently idempotent, so a client that retries an initial request (for example after a lost response or a restart) could otherwise cause the issuer to open a second access request and issue a second continuation handle for one intent.  To prevent duplicate approvals, the issuer SHOULD treat a repeated requestable-denial request from the same client for the same requested authorization (the same `authorization_details` and `scope`, or the same challenge `txn` in the transaction binding) as the same request and return the existing handle rather than open a new access request.  This deduplication is best-effort; a client that requires exactness SHOULD send a stable request identifier where its transport provides one.
+An asynchronous authorization request is not inherently idempotent, so a client that retries an initial request (for example after a lost response or a restart) could otherwise cause the issuer to open a second access request and issue a second continuation handle for one intent.  To prevent duplicate approvals, the issuer SHOULD treat a repeated requestable-denial request from the same client for the same requested authorization (the same `authorization_details` and `scope`) as the same request and return the existing handle rather than open a new access request.  This deduplication is best-effort; a client that requires exactness SHOULD send a stable request identifier where its transport provides one.  The transaction challenge binding needs no best-effort rule: {{I-D.rosomakho-oauth-txn-challenge}} identifies a resubmitted challenge by its `iss` and `jti` and has the AS continue the original transaction authorization request rather than open a second one.
 
 ## Continuation handle
 
@@ -637,7 +637,7 @@ The OAuth wire surface replaces several {{ARAP}} constructs; the rest map direct
 |---|---|
 | Requestable denial (`context.access_request`) | The trigger to defer: derived by the AS (DTR, CIBA) or asserted by a protected resource as a signed challenge (transaction challenge).  Not surfaced to the client as an AuthZEN object. |
 | Access request submission | Performed by the evaluating party on the client's behalf during evaluation. |
-| Idempotency key | Best-effort dedup by client and requested authorization, or by challenge `txn` (see {{completion}}). |
+| Idempotency key | Best-effort dedup by client and requested authorization; in the transaction challenge binding, the challenge's `iss` and `jti` (see {{completion}}). |
 | Task handle | The continuation handle: the `deferral_code` (DTR, and the transaction challenge binding, which defers through DTR) or the CIBA `auth_req_id`. |
 | Task Status Endpoint and polling | Polling the token endpoint: the deferred grant (DTR, transaction challenge) or the CIBA grant. |
 | Callback completion | The optional DTR client callback (`deferred_client_notification_endpoint`), or CIBA `ping` notification or `push` delivery (both via the client notification endpoint). |
