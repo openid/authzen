@@ -1820,7 +1820,7 @@ The reason for the use of the mailing list is to enable public review of registr
 
 ## AuthZEN Policy Decision Point Metadata Registry {#iana-pdp-metadata-registry}
 
-This specification asks IANA to establish the "AuthZEN Policy Decision Point Metadata" registry under the registry group "AuthZEN Parameters". The registry records the Policy Decision Point metadata parameter and a reference to the specification that defines it.
+This specification asks IANA to establish the "AuthZEN Policy Decision Point Metadata" registry under the registry group "AuthZEN". The registry records the Policy Decision Point metadata parameter and a reference to the specification that defines it.
 
 ### Registry Definition
 
@@ -1988,7 +1988,7 @@ Related Information:
 
 ## AuthZEN Policy Decision Point Capabilities Registry {#iana-pdp-capabilities-registry}
 
-This specification asks IANA to establish the "AuthZEN Policy Decision Point Capabilities" registry under the registry group "AuthZEN Parameters". The registry contains PDP-specific capabilities or features. These URNs are intended to be used in Policy Decision Point metadata discovery documents (as described in {{pdp-metadata}}) to allow a PEP to determine the supported functionality of a given PDP instance. The content of this registry will be specified by AuthZEN-compliant PDP vendors that want to declare interoperable capabilities.
+This specification asks IANA to establish the "AuthZEN Policy Decision Point Capabilities" registry under the registry group "AuthZEN". The registry contains PDP-specific capabilities or features. These URNs are intended to be used in Policy Decision Point metadata discovery documents (as described in {{pdp-metadata}}) to allow a PEP to determine the supported functionality of a given PDP instance. The content of this registry will be specified by AuthZEN-compliant PDP vendors that want to declare interoperable capabilities.
 
 ### Registry Definition {#iana-pdp-capabilities-definition}
 
