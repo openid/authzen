@@ -7,6 +7,10 @@ The AuthZEN authorization API is versioned in markdown at `api/authorization-api
 
 The latest published version of the spec is available [here](https://openid.github.io/authzen).
 
+## Draft IANA Registries Specification
+
+An IETF Internet-Draft that establishes the IANA registries required by the Authorization API: the "AuthZEN" registry group, the PDP Metadata and PDP Capabilities registries, the `authzen-configuration` well-known URI, and the `authzen` URN sub-namespace. It is at `api/draft-tulshibagwale-authzen-registries.md`. The HTML version is available [here](https://openid.github.io/authzen/draft-tulshibagwale-authzen-registries.html).
+
 ## Draft COAZ Framework
 
 COAZ (Compatible with OpenID AuthZEN) is a protocol-neutral framework for mapping the information model of an arbitrary protocol or interface into a request to the AuthZEN Authorization API. It is at `profiles/authzen-coaz-framework-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-coaz-framework-1_0.html).

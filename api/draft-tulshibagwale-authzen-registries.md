@@ -79,7 +79,9 @@ Note: the IANA Considerations section of {{AUTHZEN}} refers to the registry grou
 
 The following registration procedure is used for both registries established by this document.
 
-Values are registered on a Specification Required {{RFC8126}} basis after a two-week review period on the openid-specs-authzen@lists.openid.net mailing list, following review and approval by one or more Designated Experts. However, to allow for the allocation of values prior to publication of the final version of a specification, the Designated Experts may approve registration once they are satisfied that the specification will be completed and published. However, if the specification is not completed and published in a timely manner, as determined by the Designated Experts, the Designated Experts may request that IANA withdraw the registration.
+The registration policy for both registries is Specification Required, as defined in {{RFC8126}}. Each registration request is posted to the `openid-specs-authzen@lists.openid.net` mailing list for a two-week public review period, and is approved or denied by one or more Designated Experts.
+
+To allow values to be allocated before the final version of a specification is published, the Designated Experts may approve a registration once they are satisfied that the specification will be completed and published. If the specification is not completed and published in a timely manner, as determined by the Designated Experts, the Designated Experts may request that IANA withdraw the registration.
 
 Registration requests sent to the mailing list for review should use an appropriate subject (e.g., "Request to register AuthZEN Policy Decision Point Metadata: example").
 
@@ -119,125 +121,7 @@ Specification Document(s):
 
 ### Initial Registrations {#iana-pdp-metadata-initial}
 
-The initial registrations in this registry are supplied by Section 12.1.3 of {{AUTHZEN}} and are reproduced below.
-
-Metadata Name:
-: `policy_decision_point`
-
-Metadata Description:
-: Base URL of the Policy Decision Point
-
-Change Controller:
-: OpenID Foundation AuthZEN Working Group
-: mailto:openid-specs-authzen@lists.openid.net
-
-Specification Document(s):
-: Section 9.1.1 of {{AUTHZEN}}
-
-
-
-Metadata Name:
-: `access_evaluation_endpoint`
-
-Metadata Description:
-: URL of the Policy Decision Point's Access Evaluation API endpoint
-
-Change Controller:
-: OpenID Foundation AuthZEN Working Group
-: mailto:openid-specs-authzen@lists.openid.net
-
-Specification Document(s):
-: Section 9.1.1 of {{AUTHZEN}}
-
-
-
-Metadata Name:
-: `access_evaluations_endpoint`
-
-Metadata Description:
-: URL of the Policy Decision Point's Access Evaluations API endpoint
-
-Change Controller:
-: OpenID Foundation AuthZEN Working Group
-: mailto:openid-specs-authzen@lists.openid.net
-
-Specification Document(s):
-: Section 9.1.1 of {{AUTHZEN}}
-
-
-
-Metadata Name:
-: `search_subject_endpoint`
-
-Metadata Description:
-: URL of the Policy Decision Point's Search API endpoint for Subject entities
-
-Change Controller:
-: OpenID Foundation AuthZEN Working Group
-: mailto:openid-specs-authzen@lists.openid.net
-
-Specification Document(s):
-: Section 9.1.1 of {{AUTHZEN}}
-
-
-
-Metadata Name:
-: `search_resource_endpoint`
-
-Metadata Description:
-: URL of the Policy Decision Point's Search API endpoint for Resource entities
-
-Change Controller:
-: OpenID Foundation AuthZEN Working Group
-: mailto:openid-specs-authzen@lists.openid.net
-
-Specification Document(s):
-: Section 9.1.1 of {{AUTHZEN}}
-
-
-
-Metadata Name:
-: `search_action_endpoint`
-
-Metadata Description:
-: URL of the Policy Decision Point's Search API endpoint for Action entities
-
-Change Controller:
-: OpenID Foundation AuthZEN Working Group
-: mailto:openid-specs-authzen@lists.openid.net
-
-Specification Document(s):
-: Section 9.1.1 of {{AUTHZEN}}
-
-
-
-Metadata Name:
-: `capabilities`
-
-Metadata Description:
-: Array of URNs describing specific Policy Decision Point capabilities
-
-Change Controller:
-: OpenID Foundation AuthZEN Working Group
-: mailto:openid-specs-authzen@lists.openid.net
-
-Specification Document(s):
-: Section 9.1.2 of {{AUTHZEN}}
-
-
-
-Metadata Name:
-: `signed_metadata`
-
-Metadata Description:
-: JWT containing metadata parameters about the protected resource as claims
-
-Change Controller:
-: OpenID Foundation AuthZEN Working Group
-: mailto:openid-specs-authzen@lists.openid.net
-
-Specification Document(s):
-: Section 9.1.3 of {{AUTHZEN}}
+The initial registrations in this registry are those defined in Section 12.1.3 of {{AUTHZEN}}. This document does not reproduce them; {{AUTHZEN}} is the authoritative source for their contents.
 
 ## AuthZEN Policy Decision Point Capabilities Registry {#iana-pdp-capabilities-registry}
 
