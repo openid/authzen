@@ -1024,6 +1024,7 @@ The following is a non-normative example of a request-response cycle to retrieve
     "type": "account"
   },
   "page": {
+    "limit": 2,
     "token": "a3M9NDU2O3N6PTI="
   }
 }
