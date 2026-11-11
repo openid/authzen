@@ -46,16 +46,6 @@ normative:
         name: Alexandre Babeanu
         org: Indykite
     date: 2026
-  AUTHZEN-EXT:
-    title: "AuthZEN Extensibility Model"
-    target: https://openid.github.io/authzen/authzen-extensibility-model-1_0.html
-    author:
-      -
-        name: Alexandre Babeanu
-        org: Indykite
-      -
-        name: Karl McGuinness
-    date: 2026
   OPENID-CORE:
     title: "OpenID Connect Core 1.0"
     target: https://openid.net/specs/openid-connect-core-1_0.html
@@ -121,7 +111,7 @@ This profile fills that gap for common use cases, several of which are familiar 
 
 ## Relationship to the Obligations Core {#structure}
 
-Following the AuthZEN Extensibility Model {{AUTHZEN-EXT}}, this document is a profile. It selects and constrains the Obligations Core, defines a type vocabulary, and defines conformance. All processing rules are defined in {{OBLIGATIONS-CORE}} and apply unchanged. These include the Obligation object, PEP compliance on PERMIT and DENY decisions, the handling of Search results, non-compliance, unknown-member handling, the PDP outcome rules, binding, and discovery. This profile does not relax any of them.
+This document is a profile of the Obligations Core {{OBLIGATIONS-CORE}}. It selects and constrains the Obligations Core, defines a type vocabulary, and defines conformance. All processing rules are defined in {{OBLIGATIONS-CORE}} and apply unchanged. These include the Obligation object, PEP compliance on PERMIT and DENY decisions, the handling of Search results, non-compliance, unknown-member handling, the PDP outcome rules, binding, and discovery. This profile does not relax any of them.
 
 The profile carries mandatory-to-understand elements only through the Obligations Core. It is therefore adopted on the wire by opting in to that extension, by listing `obligations` in `supported_mandatory_extensions` in the request context. It requires no separate negotiation signal. Whether a party implements a given type of this profile is reflected in the `supported_obligations` values it advertises (PDP) or declares (PEP).
 
@@ -384,37 +374,14 @@ This specification requests the following registrations in the "AuthZEN Obligati
 | session_termination | Requires the PEP to terminate all sessions of a subject. | {{obligation-session-termination}} |
 {: #tab-iana-registrations title="AuthZEN Obligation Types registrations"}
 
-## AuthZEN JSON Members Registry
+## JSON Member Names
 
-This specification requests the following registration in the "AuthZEN JSON Members" registry established by {{AUTHZEN-EXT}}, with the OpenID Foundation AuthZEN Working Group as change controller:
+When a registry of AuthZEN JSON member names is established, the following member is to be registered with a reference to this specification, with the OpenID Foundation AuthZEN Working Group as change controller:
 
 | Member | Location | Processing strength | Extension Identifier | Reference |
 |---|---|---|---|---|
 | `decision_subject` | Request `context` | Advisory | (none) | {{decision-subject}} |
 {: #tab-iana-members title="JSON members defined by the Standard Types Profile"}
-
-## AuthZEN Profile Identifiers Registry
-
-This specification requests the following registration in the "AuthZEN Profile Identifiers" registry established by {{AUTHZEN-EXT}}.
-
-Profile Identifier:
-: `urn:openid:authzen:profile:obligations-standard-types`
-
-Kind:
-: Profile
-
-Extensions Selected:
-: `obligations` ({{OBLIGATIONS-CORE}})
-
-Description:
-: Standard Obligation Types (`step-up`, `notification`, `session_termination`) and their conformance requirements.
-
-Change Controller:
-: OpenID Foundation AuthZEN Working Group
-: mailto:openid-specs-authzen@lists.openid.net
-
-Specification Document(s):
-: This specification
 
 # Acknowledgements
 
