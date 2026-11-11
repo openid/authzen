@@ -22,6 +22,9 @@ jobs:
             html: authorization-api-1_0.html
             # The working draft of the spec is also published as the site index
             extra_html: index.html
+          - name: authzen-registries-draft
+            source: api/draft-tulshibagwale-authzen-registries.md
+            html: draft-tulshibagwale-authzen-registries.html
           - name: patterns-doc
             source: patterns/AuthorizationDesignPatterns.md
             html: patterns.html
@@ -49,6 +52,9 @@ jobs:
           - name: access-request-actor-profile
             source: profiles/authzen-access-request-approval/authzen-access-request-actor-profile-1_0.md
             html: authzen-access-request-actor-profile-1_0.html
+          - name: access-request-oauth-profile
+            source: profiles/authzen-access-request-oauth/authzen-access-request-oauth-profile-1_0.md
+            html: authzen-access-request-oauth-profile-1_0.html
           - name: obligations-core
             source: profiles/authzen-obligations-core-1_0.md
             html: authzen-obligations-core-1_0.html
@@ -73,10 +79,10 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.1"
+          ruby-version: "3.4"
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.10"
+          python-version: "3.13"
       - name: Install kramdown-rfc2629 and xml2rfc
         run: |
           gem install kramdown-rfc2629
