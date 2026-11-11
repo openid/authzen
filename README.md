@@ -23,6 +23,10 @@ A companion [Access Request Catalog Profile](https://openid.github.io/authzen/au
 
 Companion [Bulk Access Requests](https://openid.github.io/authzen/authzen-access-request-bulk-profile-1_0.html) and [Callback Notifications](https://openid.github.io/authzen/authzen-access-request-callback-profile-1_0.html) profiles define multi-item requests and authenticated completion notifications, and an [Actor Delegation](https://openid.github.io/authzen/authzen-access-request-actor-profile-1_0.html) profile defines how a PEP conveys the acting party and request origin.
 
+## Draft Access Request OAuth Profile
+
+The OAuth binding of the Access Request and Approval Profile, in which an approved access request completes as an issued OAuth access token rather than as a re-evaluation. It defines the token issuance completion mode and binds it to three OAuth asynchronous mechanisms: the Deferred Token Response, CIBA, and the Transaction Authorization Challenge. It is at `profiles/authzen-access-request-oauth/authzen-access-request-oauth-profile-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-access-request-oauth-profile-1_0.html).
+
 ## Draft Extensibility Model
 
 The contract for extending AuthZEN. It defines the kinds of specification that extend AuthZEN (extensions, profiles, and transport bindings), the extension surface, advisory and mandatory-to-understand processing strengths, the `supported_mandatory_extensions` opt-in by which a PEP commits to enforcing an extension's mandatory elements, the invariants every extension must preserve, and the registries for extension identifiers. It is at `profiles/authzen-extensibility-model-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-extensibility-model-1_0.html).
