@@ -1,11 +1,18 @@
 import { OpenFGAStatefulAuthorizationService } from "./stateful/openfga";
-import { StatefulAuthorizationService } from "interfaces";
+import { StatefulAuthorizationService } from "./interfaces";
 
-export function createStatefulAuthorizationService( pdpBaseName:string, pdpAuthHeader:string, pdpHeader:string): StatefulAuthorizationService {
+export function createStatefulAuthorizationService(
+  pdpBaseName: string,
+  pdpAuthHeader: string,
+  pdpHeader: string
+): StatefulAuthorizationService {
   console.log(pdpHeader);
   switch (pdpHeader.toLowerCase()) {
     case "openfga":
-      return new OpenFGAStatefulAuthorizationService(pdpBaseName, pdpAuthHeader);
+      return new OpenFGAStatefulAuthorizationService(
+        pdpBaseName,
+        pdpAuthHeader
+      );
     default:
       return new NullStatefulAuthorizationService();
   }

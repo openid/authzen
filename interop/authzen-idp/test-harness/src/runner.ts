@@ -17,7 +17,6 @@ const FORMAT =
 type Endpoint = "resource";
 
 type Expected = (typeof search)[0]["expected"];
-type ExpectedResult = Expected["results"]
 
 interface Result {
   endpoint: Endpoint;
@@ -69,14 +68,17 @@ async function execute(
   const REQ = decision.request;
   const EXP = decision.expected;
   try {
-    const response = await fetch(`${AUTHZEN_PDP_URL}/access/v1/search/${endpoint}`, {
-      method: "POST",
-      headers: {
-        [process.env.AUTHZEN_PDP_API_HEADER || "authorization"]: AUTHZEN_PDP_API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(REQ),
-    });
+    const response = await fetch(
+      `${AUTHZEN_PDP_URL}/access/v1/search/${endpoint}`,
+      {
+        method: "POST",
+        headers: {
+          [AUTHZEN_PDP_API_HEADER || "authorization"]: AUTHZEN_PDP_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(REQ),
+      }
+    );
 
     const data = await response.json();
     const RSP = data || [];
@@ -107,9 +109,10 @@ async function execute(
 function status(response: Expected, expected: Expected) {
   const sortResults = (items: Expected["results"]) => {
     return [...items].sort((a, b) => {
-      const aAsTypeId = (a as { type: string, id: string });
-      const bAsTypeId = (b as { type: string, id: string });
-      if (aAsTypeId.type !== bAsTypeId.type) return aAsTypeId.type.localeCompare(bAsTypeId.type);
+      const aAsTypeId = a as { type: string; id: string };
+      const bAsTypeId = b as { type: string; id: string };
+      if (aAsTypeId.type !== bAsTypeId.type)
+        return aAsTypeId.type.localeCompare(bAsTypeId.type);
       return aAsTypeId.id.localeCompare(bAsTypeId.id);
     });
   };
@@ -119,18 +122,28 @@ function status(response: Expected, expected: Expected) {
   let sortedExpectedResults = sortResults(expected.results || []);
 
   // ensure keys are serialized in alpha order, to support string comparison
-  let actualJson = JSON.stringify(sortedActualResults, Object.keys(sortedActualResults).sort());
-  let expectedJson = JSON.stringify(sortedExpectedResults, Object.keys(sortedExpectedResults).sort());
+  let actualJson = JSON.stringify(
+    sortedActualResults,
+    Object.keys(sortedActualResults).sort()
+  );
+  let expectedJson = JSON.stringify(
+    sortedExpectedResults,
+    Object.keys(sortedExpectedResults).sort()
+  );
 
   // re-parse, to prepare for second JSON.stringify
   sortedActualResults = JSON.parse(actualJson);
   sortedExpectedResults = JSON.parse(expectedJson);
 
   // ensure keys with a null value are not serialized, to support string comparison
-  actualJson = JSON.stringify(sortedActualResults, (_, value) => value === null ? undefined : value);
-  expectedJson = JSON.stringify(sortedExpectedResults, (_, value) => value === null ? undefined : value);
+  actualJson = JSON.stringify(sortedActualResults, (_, value) =>
+    value === null ? undefined : value
+  );
+  expectedJson = JSON.stringify(sortedExpectedResults, (_, value) =>
+    value === null ? undefined : value
+  );
 
-  return actualJson === expectedJson ? "PASS" : "FAIL"
+  return actualJson === expectedJson ? "PASS" : "FAIL";
 }
 
 function logResult(result: Result) {
@@ -156,7 +169,6 @@ function logResult(result: Result) {
 }
 
 function arrayToTable(array) {
-  var cols = Object.keys(array[0]);
   var table = `<table>
   <tr>
     <th>result</th>

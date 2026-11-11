@@ -37,7 +37,7 @@ async function main() {
     process.exit(0);
   }
 
-  const decisionFile ='./decisions.json'
+  const decisionFile = "./decisions.json";
   const { evaluation, evaluations } = require(decisionFile);
 
   const results: Result[] = [];
@@ -60,15 +60,15 @@ async function main() {
             result: d.status,
             request: JSON.stringify(d.request, null, 2),
           };
-        })
-      )
+        }),
+      ),
     );
   }
 }
 
 async function execute(
   decision: (typeof evaluation)[number],
-  endpoint: Endpoint
+  endpoint: Endpoint,
 ): Promise<Result> {
   const REQ = decision.request;
   const EXP = decision.expected;
@@ -127,14 +127,13 @@ function logResult(result: Result) {
         "REQ:",
         JSON.stringify(result.request),
         "Error:",
-        result.error
+        result.error,
       );
       break;
   }
 }
 
 function arrayToTable(array) {
-  var cols = Object.keys(array[0]);
   var table = `<table>
   <tr>
     <th>result</th>
