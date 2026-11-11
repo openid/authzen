@@ -302,7 +302,7 @@ A Standing Token is a signed credential demonstrating that the bearer is an Affe
 - `iss` — the Notice-emitting Operating Entity or a delegate authority
 - `sub` — the Affected Party Entity identifier
 - `aud` — the PDP challenge endpoint
-- `decision_ref` — the decision binding from the Notice; SHOULD be carried as ARAP's `evaluation_id` where the PDP exposes one, or as an integrity-protected `binding_token`, so subject-side binding reuses ARAP's binding patterns rather than a profile-specific reference. An open ARAP PR (#532) would require `binding_token` for an independent Access Request Service and scope `evaluation_id`-only binding to same-service deployments; if that lands, this document's binding guidance should be revised to track it rather than treating the two as interchangeable.
+- `decision_ref` — the decision binding from the Notice; SHOULD be carried as an integrity-protected `binding_token`, or as ARAP's `evaluation_id` in a same-service or shared-state deployment, so subject-side binding reuses ARAP's binding patterns rather than a profile-specific reference. ARAP scopes `evaluation_id`-only binding to those deployments and requires `binding_token` for an independent Access Request Service; `decision_ref` follows the same rule.
 - `iat` — issuance timestamp
 - `exp` — expiry (MUST be bounded by the regulatory or disclosed dispute window)
 - `jti` — a unique token identifier
@@ -354,7 +354,7 @@ A PDP MAY reject malformed challenges with a defined error response ({{errors}})
 The `subject_side_challenge` Decision Context object is a JSON object with the following members:
 
 - `standing_token` — REQUIRED. The Standing Token described in {{standing}}.
-- `decision_ref` — REQUIRED. The decision binding from the Notice, carried as ARAP's `evaluation_id` or an integrity-protected `binding_token` (see the applicability note at {{standing}}, pending ARAP PR #532). MUST match the `decision_ref` claim in the Standing Token.
+- `decision_ref` — REQUIRED. The decision binding from the Notice, carried as ARAP's `evaluation_id` or an integrity-protected `binding_token` (same applicability as {{standing}}). MUST match the `decision_ref` claim in the Standing Token.
 - `challenge_basis` — REQUIRED. A structured enumeration indicating the basis on which the Affected Party challenges the decision. Values include: `factual-error`, `procedure-error`, `category-mismatch`, `consent-withdrawn`, `change-in-circumstances`, `bias-asserted`, `regulatory-objection`, `other`. The Affected Party MAY specify multiple bases.
 - `challenge_evidence` — OPTIONAL. A structured object carrying additional evidence the PDP may use in re-evaluation (for example: a corrected attribute value; a counter-document hash; a regulatory reference). Format is determined by the policy under evaluation.
 - `requested_effect` — REQUIRED. One of: `reverse`, `suspend-pending-review`, `mark-for-human-review`. The Affected Party indicates the desired effect; the PDP determines the actual effect per {{outcomes}}. In this version, `reverse` is satisfied by `reevaluate-with-subject-context` returning a corrected decision; true rollback of an already-executed effect is out of scope pending a dedicated completion mode.
@@ -609,7 +609,7 @@ Field names taken verbatim into normative text (for example, `access_request` me
 
 This is a first cut (Draft 00), prepared for review within the OpenID AuthZEN Working Group. It is an unadopted Working Group Draft. It composes with the OpenID AuthZEN Authorization API 1.0 and is positioned as the subject-side complement to ARAP. It has not been reviewed, adopted, or endorsed by the OpenID Foundation, the AuthZEN Working Group, or the author of ARAP, and was circulated in full to Karl McGuinness, author of ARAP, on 22 July 2026 before this submission. IETF cross-referencing is anticipated at a future AUDIT BoF (targeted for IETF 127); the BoF originally anticipated for IETF 126 was deferred.
 
-`decision_ref` ({{standing}}, {{challenge-payload}}) follows ARAP as published, in which `evaluation_id` and `binding_token` are interchangeable. ARAP PR #532 would require `binding_token` for an independent Access Request Service. Issue #606 asks which of the two dependent work should pin to. This document will be revised to match #532 as settled.
+`decision_ref` ({{standing}}, {{challenge-payload}}) follows ARAP's binding rule as merged in #532: `binding_token` except in shared-state deployments. #606 is settled by that merge.
 
 Specific attention is requested on:
 
