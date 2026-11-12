@@ -27,9 +27,13 @@ Companion [Bulk Access Requests](https://openid.github.io/authzen/authzen-access
 
 The OAuth binding of the Access Request and Approval Profile, in which an approved access request completes as an issued OAuth access token rather than as a re-evaluation. It defines the token issuance completion mode and binds it to three OAuth asynchronous mechanisms: the Deferred Token Response, CIBA, and the Transaction Authorization Challenge. It is at `profiles/authzen-access-request-oauth/authzen-access-request-oauth-profile-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-access-request-oauth-profile-1_0.html).
 
-## Draft Obligations Profile
+## Draft Obligations Core
 
-A profile that lets a PDP attach mandatory, machine-readable actions -- obligations -- to an authorization decision, which the PEP must carry out in order to honor that decision. It defines the obligation object model, PEP compliance semantics, a set of normative obligation types, and a mechanism for a PDP and PEP to discover which types they mutually support. It is at `profiles/authzen-obligations-profile-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-obligations-profile-1_0.html).
+An extension that lets a PDP attach mandatory, machine-readable actions -- obligations -- to an authorization decision, which the PEP must carry out in order to honor that decision. It defines the obligation object model, its fail-closed processing, the opt-in (`supported_mandatory_extensions`) and negotiation mechanism by which a PEP commits to enforcing obligations, binding requirements, and discovery. It is at `profiles/authzen-obligations-core-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-obligations-core-1_0.html).
+
+## Draft Obligations Core: Standard Types Profile
+
+A profile of the Obligations Core that defines a set of standard obligation types -- `step-up`, `notification`, and `session_termination` -- and the conformance requirements for PDPs and PEPs that implement them. It is at `profiles/authzen-obligations-standard-types-profile-1_0.md`. The HTML version is available [here](https://openid.github.io/authzen/authzen-obligations-standard-types-profile-1_0.html).
 
 ## Draft OAuth 2.0 Token Issuance Profile
 
