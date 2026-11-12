@@ -11,7 +11,7 @@ keyword:
   - authorization
   - obligations
   - AuthZEN
-  - extensibility
+  - negotiation
   - policy enforcement
 stand_alone: true
 smart_quotes: no
@@ -797,4 +797,4 @@ When a registry of AuthZEN JSON member names is established, the following membe
 
 # Acknowledgements
 
-The author acknowledges the OpenID AuthZEN Working Group for the base specification on which this document builds, and the working group's discussions of extensibility, which shaped the opt-in and processing-strength model used here. The author also acknowledges prior obligation-bearing access-control models, notably {{XACML}}, for informing the design of the Obligation object model.
+The author acknowledges the OpenID AuthZEN Working Group for the base specification on which this document builds. The author also acknowledges prior obligation-bearing access-control models, notably {{XACML}}, for informing the design of the Obligation object model.
