@@ -48,7 +48,7 @@ informative:
 
 --- abstract
 
-This specification establishes the IANA registries required by the OpenID AuthZEN Authorization API 1.0 specification. It creates the "AuthZEN" registry group, establishes the "AuthZEN Policy Decision Point Metadata" and "AuthZEN Policy Decision Point Capabilities" registries within that group, registers the "authzen-configuration" well-known URI, and registers the "authzen" URN sub-namespace.
+This specification establishes one of the IANA registries required by the OpenID AuthZEN Authorization API 1.0 specification. It establishes the "AuthZEN Policy Decision Point Metadata" registry, registers the "authzen-configuration" well-known URI, and registers the "authzen" URN sub-namespace.
 
 --- middle
 
@@ -56,9 +56,7 @@ This specification establishes the IANA registries required by the OpenID AuthZE
 
 The Authorization API 1.0 {{AUTHZEN}} is a Final Specification of the OpenID Foundation, developed by the OpenID AuthZEN Working Group. It defines an interoperable API through which a Policy Enforcement Point (PEP) communicates with a Policy Decision Point (PDP) to obtain authorization decisions and to search for subjects, resources, and actions.
 
-The IANA Considerations section of {{AUTHZEN}} defines two registries of protocol parameters, a well-known URI, and a URN sub-namespace that implementations depend upon for interoperability. Because {{AUTHZEN}} is published by the OpenID Foundation rather than as part of an IETF document stream, this companion document requests that IANA perform the corresponding actions on its behalf, following the precedent set by {{RFC8809}} for the W3C Web Authentication specification.
-
-The initial values for the registries established by this document, and the definitions of the registered well-known URI and URN sub-namespace, are supplied by the IANA Considerations section (Section 12) of {{AUTHZEN}}.
+The IANA Considerations section of {{AUTHZEN}} defines two registries of protocol parameters, a well-known URI, and a URN sub-namespace that implementations depend upon for interoperability. Because {{AUTHZEN}} is published by the OpenID Foundation rather than as part of an IETF document stream, this companion document requests that IANA perform the corresponding actions on its behalf, following the precedent set by {{RFC8809}} for the W3C Web Authentication specification. Since one of the registries envisioned by {{AUTHZEN}} is initially empty, this specification only creates the non-empty registry.
 
 ## Requirements Notation and Conventions {#conventions}
 
@@ -69,7 +67,7 @@ The initial values for the registries established by this document, and the defi
 This document requests that IANA take four actions:
 
 1. Create a new protocol registry group named "AuthZEN".
-2. Establish two new registries within that group: "AuthZEN Policy Decision Point Metadata" ({{iana-pdp-metadata-registry}}) and "AuthZEN Policy Decision Point Capabilities" ({{iana-pdp-capabilities-registry}}).
+2. Establish a new registry within that group: "AuthZEN Policy Decision Point Metadata" ({{iana-pdp-metadata-registry}}).
 3. Register the well-known URI "authzen-configuration" in the "Well-Known URIs" registry ({{iana-wk-registry}}).
 4. Register the "authzen" URN sub-namespace in the "IETF URN Sub-namespace for Registered Protocol Parameter Identifiers" registry ({{iana-urn-namespace}}).
 
@@ -77,9 +75,9 @@ Note: the IANA Considerations section of {{AUTHZEN}} refers to the registry grou
 
 ## Registration Procedure {#iana-procedure}
 
-The following registration procedure is used for both registries established by this document.
+The following registration procedure is used for the registry established by this document.
 
-The registration policy for both registries is Specification Required, as defined in {{RFC8126}}. Each registration request is posted to the `openid-specs-authzen@lists.openid.net` mailing list for a two-week public review period, and is approved or denied by one or more Designated Experts.
+The registration policy for the registry is Specification Required, as defined in {{RFC8126}}. Each registration request is posted to the `openid-specs-authzen@lists.openid.net` mailing list for a two-week public review period, and is approved or denied by one or more Designated Experts.
 
 To allow values to be allocated before the final version of a specification is published, the Designated Experts may approve a registration once they are satisfied that the specification will be completed and published. If the specification is not completed and published in a timely manner, as determined by the Designated Experts, the Designated Experts may request that IANA withdraw the registration.
 
@@ -149,7 +147,7 @@ Registry Name: authzen
 
 Specification: {{AUTHZEN}} and \[This Document\]
 
-Repository: "AuthZEN Policy Decision Point Capabilities" registry ({{iana-pdp-capabilities-registry}} of \[This Document\])
+Repository: "AuthZEN" registry group (\[This Document\])
 
 Index value: Sub-parameters MUST be specified in UTF-8, using standard URI encoding where necessary.
 
