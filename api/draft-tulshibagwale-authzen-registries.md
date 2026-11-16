@@ -119,41 +119,6 @@ Change Controller:
 Specification Document(s):
 : Reference to the document or documents that specify the parameter, preferably including URIs that can be used to retrieve copies of the documents. An indication of the relevant sections may also be included but is not required.
 
-### Initial Registrations {#iana-pdp-metadata-initial}
-
-The initial registrations in this registry are those defined in Section 12.1.3 of {{AUTHZEN}}. This document does not reproduce them; {{AUTHZEN}} is the authoritative source for their contents.
-
-## AuthZEN Policy Decision Point Capabilities Registry {#iana-pdp-capabilities-registry}
-
-IANA is requested to establish the "AuthZEN Policy Decision Point Capabilities" registry under the "AuthZEN" registry group. The registry contains PDP-specific capabilities or features, identified by URNs within the "authzen" URN sub-namespace registered in {{iana-urn-namespace}}. These URNs are intended to be used in Policy Decision Point metadata discovery documents (as described in Section 9 of {{AUTHZEN}}) to allow a PEP to determine the supported functionality of a given PDP instance. The content of this registry will be specified by AuthZEN-compliant PDP vendors that want to declare interoperable capabilities.
-
-Registry Name: AuthZEN Policy Decision Point Capabilities
-
-Registration Policy: Specification Required per {{RFC8126}}, following the procedure described in {{iana-procedure}}
-
-Reference: Section 12.3 of {{AUTHZEN}} and \[This Document\]
-
-### Registration Template {#iana-pdp-capabilities-template}
-
-Capability Name:
-: The name of the capability. This name MUST begin with the colon (":") character. This name is case-sensitive. Names may not match other registered names in a case-insensitive manner unless the Designated Experts state that there is a compelling reason to allow an exception.
-
-Capability URN:
-: The URN of the AuthZEN Policy Decision Point Capability.
-
-Capability Description:
-: Brief description of the capability.
-
-Change Controller:
-: For IETF stream RFCs, list the "IETF". For others, give the name of the responsible party. Other details (e.g., postal address, email address, home page URI) may also be included.
-
-Specification Document(s):
-: Reference to the document or documents that specify the parameter, preferably including URIs that can be used to retrieve copies of the documents. An indication of the relevant sections may also be included but is not required.
-
-### Initial Registrations {#iana-pdp-capabilities-initial}
-
-This registry is initially empty. {{AUTHZEN}} defines no initial registrations for it.
-
 ## Well-Known URI Registry {#iana-wk-registry}
 
 IANA is requested to register the well-known URI defined in Section 9.2 of {{AUTHZEN}} in the "Well-Known URIs" registry {{IANA.well-known-uris}} established by {{RFC8615}}.
