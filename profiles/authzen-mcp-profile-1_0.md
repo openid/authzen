@@ -35,7 +35,7 @@ informative:
     target: https://openid.github.io/authzen/authzen-coaz-framework-1_0.html
     date: 2026
   COAZMCP:
-    title: "COAZ-MCP: COAZ Binding for the Model Context Protocol"
+    title: "COAZ-MCP 2026-07-28: COAZ Binding for the Model Context Protocol 2026-07-28"
     target: https://openid.github.io/authzen/authzen-coaz-mcp-binding-1_0.html
     date: 2026
 

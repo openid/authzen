@@ -1,6 +1,6 @@
 ---
-title: "COAZ-MCP: COAZ Binding for the Model Context Protocol - Draft 1"
-abbrev: "coaz-mcp"
+title: "COAZ-MCP 2026-07-28: COAZ Binding for the Model Context Protocol 2026-07-28 - Draft 1"
+abbrev: "coaz-mcp-2026-07-28"
 category: std
 date: 2026-02-13
 ipr: none
@@ -86,8 +86,9 @@ informative:
 
 --- abstract
 
-This specification defines COAZ-MCP, the COAZ binding — as defined by the COAZ
-Framework {{COAZFW}} — for the Model Context Protocol (MCP) {{MCP}}. It defines how MCP
+This specification defines COAZ-MCP 2026-07-28, the COAZ binding — as defined
+by the COAZ Framework {{COAZFW}} — for version 2026-07-28 of the Model Context
+Protocol (MCP) {{MCP}}. It defines how MCP
 JSON-RPC messages are mapped into requests to the OpenID AuthZEN Authorization
 API {{AUTHZEN}}, enabling MCP gateways and servers to perform fine-grained,
 parameter-level authorization through an AuthZEN Policy Decision Point (PDP).
@@ -120,8 +121,21 @@ The OpenID AuthZEN Authorization API {{AUTHZEN}} provides standardized,
 fine-grained authorization using the Subject-Action-Resource-Context (SARC)
 model. The COAZ Framework {{COAZFW}} defines, in a protocol-neutral way, how to
 project the information model of a protocol into an AuthZEN Authorization API
-request. This specification is COAZ-MCP, the COAZ *binding* for MCP: it binds
-that framework to MCP's information model.
+request. This specification is COAZ-MCP 2026-07-28, the COAZ *binding* for
+MCP: it binds that framework to the information model of MCP protocol version
+2026-07-28.
+
+## MCP Protocol Version {#mcp-version}
+
+Each MCP protocol version can add, remove, or change methods and their
+parameters, and the default mappings in this binding depend on those details.
+This binding is therefore pinned to a single MCP protocol version, 2026-07-28
+{{MCP}}, in the same way that a binding to HTTP is pinned to an HTTP version,
+and that version is part of the binding's name. A later MCP protocol version is
+covered by a new version of this binding that carries that MCP version in its
+name. Until such a binding exists, methods introduced by a later MCP version
+are unknown methods and fail closed ({{unknown-methods}}). Methods that earlier
+MCP versions define and 2026-07-28 removed are covered in {{earlier-versions}}.
 
 This binding authorizes **all** MCP messages. It does
 so by defining a fixed default mapping for each MCP method ({{default-mappings}}),
@@ -602,7 +616,7 @@ mapping is never interpreted as a deny.
   `notifications/tools/list_changed`, `notifications/prompts/list_changed`, and
   `notifications/subscriptions/acknowledged`.
 
-## Unknown Methods
+## Unknown Methods {#unknown-methods}
 
 A request whose `method` has neither a default mapping defined by this binding
 nor an applicable declared mapping, and that is not in the pass-through set
