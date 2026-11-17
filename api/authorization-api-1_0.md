@@ -1105,7 +1105,7 @@ The Subject Search request is an object consisting of the following entities:
 : REQUIRED. The resource of type Resource.
 
 `context`:
-: OPTIONAL. Contextual data about the request.
+: OPTIONAL. The context (or environment) of type Context.
 
 `page`:
 : OPTIONAL. A page object for paginated requests.
@@ -1169,7 +1169,7 @@ The Resource Search request is an object consisting of the following entities:
 : REQUIRED. The resource of type Resource. The Resource MUST contain a `type`, but the Resource `id` SHOULD be omitted, and if present, MUST be ignored.
 
 `context`:
-: OPTIONAL. Contextual data about the request.
+: OPTIONAL. The context (or environment) of type Context.
 
 `page`:
 : OPTIONAL. A page object for paginated requests.
@@ -1227,7 +1227,7 @@ The Action Search request is an object consisting of the following entities:
 : REQUIRED. The resource of type Resource.
 
 `context`:
-: OPTIONAL. Contextual data about the request.
+: OPTIONAL. The context (or environment) of type Context.
 
 `page`:
 : OPTIONAL. A page object for paginated requests.
@@ -1310,7 +1310,9 @@ Note: the absence of any of these parameters is sufficient for the PEP to determ
 
 In addition to JSON elements, metadata parameters MAY also be provided as a `signed_metadata` value, which is a JSON Web Token {{RFC7519}} that asserts metadata values about the PDP as a bundle. A set of metadata parameters that can be used in signed metadata as claims are defined in {{pdp-metadata-data-endpoint}}. The signed metadata MUST be digitally signed or MACed using JSON Web Signature {{RFC7515}} and MUST contain an `iss` (issuer) claim denoting the party attesting to the claims in the signed metadata.
 
-A PEP MAY ignore the signed metadata if they do not support this feature. If the PEP supports signed metadata, metadata values conveyed in the signed metadata MUST take precedence over the corresponding values conveyed using plain JSON elements. Signed metadata is included in the Policy Decision Point metadata JSON object using this OPTIONAL metadata parameter:
+A PEP MAY ignore the signed metadata if they do not support this feature. If the PEP supports signed metadata, metadata values conveyed in the signed metadata MUST take precedence over the corresponding values conveyed using plain JSON elements. Parameters that are REQUIRED in {{pdp-metadata-data-endpoint}} MUST be present as plain JSON elements, even when `signed_metadata` also conveys them, so that a PEP that ignores signed metadata can still use the document. Signed metadata MAY convey any subset of the metadata parameters; a parameter present as a plain JSON element does not need to be repeated in the signed metadata.
+
+Signed metadata is included in the Policy Decision Point metadata JSON object using this OPTIONAL metadata parameter:
 
 `signed_metadata`:
 : A JWT containing metadata parameters about the protected resource as claims. This is a string value consisting of the entire signed JWT. A `signed_metadata` parameter SHOULD NOT appear as a claim in the JWT; it is RECOMMENDED to reject any metadata in which this occurs.
