@@ -133,9 +133,10 @@ This binding is therefore pinned to a single MCP protocol version, 2026-07-28
 {{MCP}}, in the same way that a binding to HTTP is pinned to an HTTP version,
 and that version is part of the binding's name. A later MCP protocol version is
 covered by a new version of this binding that carries that MCP version in its
-name. Until such a binding exists, methods introduced by a later MCP version
-are unknown methods and fail closed ({{unknown-methods}}). Methods that earlier
-MCP versions define and 2026-07-28 removed are covered in {{earlier-versions}}.
+name. Until such a binding exists, requests introduced by a later MCP version
+are unknown methods and fail closed ({{unknown-methods}}); notifications remain
+pass-through ({{pass-through}}). Methods that earlier MCP versions define and
+2026-07-28 removed are covered in {{earlier-versions}}.
 
 This binding authorizes **all** MCP messages. It does
 so by defining a fixed default mapping for each MCP method ({{default-mappings}}),
@@ -603,17 +604,19 @@ MAY instead project the level, for example as
 `"log_level": "$params._meta[?'io.modelcontextprotocol/logLevel']"` in
 `context`, which omits the field when no level is requested.
 
-## Pass-through Operations
+## Pass-through Operations {#pass-through}
 
 The following are pass-through: the PEP MUST NOT call the PDP for them and MUST
 allow them to proceed. They are listed explicitly so that the absence of a
 mapping is never interpreted as a deny.
 
 - all notifications (`notifications/*`), in either direction, which carry no
-  `id` and expect no response. In 2026-07-28 these are
-  `notifications/cancelled`, `notifications/progress`, `notifications/message`,
-  `notifications/resources/updated`, `notifications/resources/list_changed`,
-  `notifications/tools/list_changed`, `notifications/prompts/list_changed`, and
+  `id` and expect no response. This includes notifications that a later MCP
+  version or an extension defines, not only those listed here. For example,
+  2026-07-28 defines `notifications/cancelled`, `notifications/progress`,
+  `notifications/message`, `notifications/resources/updated`,
+  `notifications/resources/list_changed`, `notifications/tools/list_changed`,
+  `notifications/prompts/list_changed`, and
   `notifications/subscriptions/acknowledged`.
 
 ## Unknown Methods {#unknown-methods}
@@ -635,11 +638,13 @@ that carries those requests in `inputRequests`, and the client retries the
 original request with its answers in `params.inputResponses`, together with
 any opaque `params.requestState` the server returned.
 
-A retry is an ordinary client request. The PEP MUST authorize it with the
-mapping for its method, exactly as for the first attempt, and MUST NOT reuse
-the decision made for an earlier attempt. `inputResponses` and `requestState`
-are part of `params` and are therefore available to expressions; no default
-mapping projects them. Authorizing the server's embedded input requests
+A retry is an ordinary client request, and the PEP MUST process it as a new
+request. The PEP MUST authorize it with the mapping for its method, applying
+the mapping and calling the PDP afresh, and MUST NOT reuse the decision, or
+any AuthZEN request, constructed for an earlier attempt. Policy, the selected
+mapping, or the inputs may have changed since the earlier attempt.
+`inputResponses` and `requestState` are part of `params` and are therefore
+available to expressions; no default mapping projects them. Authorizing the server's embedded input requests
 themselves is out of scope for this version of the binding.
 
 ## Methods from Earlier MCP Versions {#earlier-versions}
