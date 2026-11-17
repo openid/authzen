@@ -54,7 +54,7 @@ following drafts, which together replace it:
 
 - COAZ: A Framework for Mapping Information Models to AuthZEN Authorization
   Requests - Draft 1 {{COAZFW}}
-- COAZ-MCP: COAZ Binding for the Model Context Protocol - Draft 1 {{COAZMCP}}
+- COAZ-MCP 2026-07-28: COAZ Binding for the Model Context Protocol 2026-07-28 {{COAZMCP}}
 
 Refer to {{COAZFW}} for the protocol-neutral framework and {{COAZMCP}} for the
 Model Context Protocol binding.
