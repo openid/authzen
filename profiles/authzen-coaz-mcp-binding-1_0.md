@@ -1,5 +1,5 @@
 ---
-title: "COAZ-MCP 2026-07-28: COAZ Binding for the Model Context Protocol 2026-07-28 - Draft 1"
+title: "COAZ-MCP 2026-07-28: COAZ Binding for the Model Context Protocol 2026-07-28"
 abbrev: "coaz-mcp-2026-07-28"
 category: std
 date: 2026-02-13
