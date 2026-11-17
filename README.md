@@ -9,7 +9,7 @@ The latest published version of the spec is available [here](https://openid.gith
 
 ## Draft IANA Registries Specification
 
-An IETF Internet-Draft that establishes the IANA registries required by the Authorization API: the "AuthZEN" registry group, the PDP Metadata and PDP Capabilities registries, the `authzen-configuration` well-known URI, and the `authzen` URN sub-namespace. It is at `api/draft-tulshibagwale-authzen-registries.md`. The HTML version is available [here](https://openid.github.io/authzen/draft-tulshibagwale-authzen-registries.html).
+An IETF Internet-Draft that establishes the IANA registries required by the Authorization API: the "AuthZEN" registry group, the PDP Metadata registry, the `authzen-configuration` well-known URI, and the `authzen` URN sub-namespace. It is at `api/draft-tulshibagwale-authzen-registries.md`. The HTML version is available [here](https://openid.github.io/authzen/draft-tulshibagwale-authzen-registries.html).
 
 ## Draft COAZ Framework
 
