@@ -174,7 +174,7 @@ Idempotency-Key: 9c1f5d12-2a18-4cba-8a5e-e0e8e2b6b5c7
     "evaluated_at": "2026-05-12T15:00:00Z",
     "expires_at": "2026-05-12T15:10:00Z",
     "reason": "agent_authority_missing",
-    "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJldmFsdWF0aW9uX2lkIjoiZXZhbF8wMUhYNkE5RDJNN04wRjRHM0syVDlQMUI4WCIsImNsYXNzIjoiY3JtX3Rvb2xzIn0.aGFzaA",
+    "binding_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6InBkcC0xIn0.eyJhdWQiOiJodHRwczovL3BkcC5leGFtcGxlLmNvbS9hY2Nlc3MvdjEvcmVxdWVzdHMiLCJiaW5kaW5nX2NvbnRleHRfbWVtYmVycyI6W10sImJpbmRpbmdfaGFzaCI6InlOTTlYRy1LNEJnNnhrNUt6UWQ0R1UwbVlNNmdNdURtNUFXejBxMVllZU0iLCJjbGFzcyI6ImNybV90b29scyIsImRlbmlhbF9leHBpcmVzX2F0IjoiMjAyNi0wNS0xMlQxNToxMDowMFoiLCJldmFsdWF0aW9uX2lkIjoiZXZhbF8wMUhYNkE5RDJNN04wRjRHM0syVDlQMUI4WCIsImV4cCI6MTc3ODU5ODYwMCwiaWF0IjoxNzc4NTk4MDAwLCJpc3MiOiJodHRwczovL3BkcC5leGFtcGxlLmNvbSIsImp0aSI6ImJ0XzAxSFg2QTlEMk03TjBGNEczSzJUOVAxQjhYIn0.e_5f3lGaZQe86aKoML6cMqUB1mCZqOEf7f1YmfDUcQF5pPRAY9cTz2be6Z5-SXBcQy-ONO0CnKT-rym5Y5emlg",
     "template": "agent_tool_class_approval"
   }
 }
