@@ -121,7 +121,7 @@ When `items` is present and any item lacks a per-item `denial`, the top-level `d
 The top-level `denial` presence rules are in {{bulk-request-body}}; the binding claims are defined in [Denial Binding Claims](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#binding-token-integrity).  For bulk submissions, those claims cover the entire `items` array and authorization-relevant Context:
 
 * Inline bulk binding claims list each submitted item, including the full Resource and Action objects for that item, in the same order as the bound Access Request.
-* A bulk `binding_hash` is the base64url-encoded (without padding) SHA-256 digest of the JCS {{RFC8785}} serialization of the JSON object `{"subject": <Subject>, "items": [{"resource": <Resource>, "action": <Action>}, ...], "context": <authorization-relevant Context>}`, where `<Subject>` is the bound Subject with `subject.properties.act` removed and the `items` array order is the order bound by the denial.  Implementations that use a bulk hashed form MUST use exactly this construction.
+* A bulk `binding_hash` is the base64url-encoded (without padding) SHA-256 digest of the JCS {{RFC8785}} serialization of the JSON object `{"subject": <Subject>, "items": [{"resource": <Resource>, "action": <Action>}, ...], "context": <authorization-relevant Context>}`, where `<Subject>` is the bound Subject in full, including `subject.properties.act` when the evaluation carried an actor, and the `items` array order is the order bound by the denial.  Implementations that use a bulk hashed form MUST use exactly this construction.
 
 When every item carries its own per-item `denial`, each per-item binding is verified using the single-item rules instead of this bundle construction.
 

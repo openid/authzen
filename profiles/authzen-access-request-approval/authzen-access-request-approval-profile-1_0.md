@@ -725,7 +725,7 @@ Throughout this profile, structural comparison requires the same JSON type and a
 
 These rules apply wherever the profile compares Subject, Resource, Action, or authorization-relevant Context, including inline denial binding and approval-scope matching ({{approval-scope}}).
 
-For inline denial binding and exact-match approval-scope matching, Subject, Resource, and Action are compared as full AuthZEN Authorization API objects, every `properties` member present in the bound values included, except that `subject.properties.act` is excluded because the PEP MAY normalize the actor to `client.actor` (see {{pep-processing-rules}} and {{ACTOR}}); the exclusion applies whether or not the actor profile is implemented, so two core implementations compare identically.  Context comparison includes each member of the authorization-relevant Context and excludes profile machinery members.
+For inline denial binding and exact-match approval-scope matching, Subject, Resource, and Action are compared as full AuthZEN Authorization API objects, every `properties` member present in the bound values included, `subject.properties.act` among them.  Context comparison includes each member of the authorization-relevant Context and excludes profile machinery members.
 
 Denial binding, approval-scope matching, and idempotent-submission comparison all compare the authorization-relevant Context, so when any member is authorization-relevant the PDP MUST make it explicit and integrity-protected, and the Access Request Service MUST use exactly that set:
 
@@ -784,7 +784,7 @@ PEPs MUST NOT submit credentials to a host that is not trusted to receive them.
 * MUST NOT interpret the `template` value except for display or request submission; the value is not a policy language.
 * MAY ignore `display`.
 
-The PEP MUST preserve the principal identity of the Subject, and MUST preserve the Resource, Action, and relevant Context of the denied evaluation when submitting the Access Request.  When the original evaluation conveyed an actor identity in the Subject (for example, via `subject.properties.act`), the PEP MAY preserve the actor in the submission's `subject` or normalize it to `client.actor` ({{ACTOR}}); the actor identity itself MUST NOT be dropped.
+The PEP MUST preserve the principal identity of the Subject, and MUST preserve the Resource, Action, and authorization-relevant Context of the denied evaluation when submitting the Access Request.  When the original evaluation conveyed an actor identity in the Subject (for example, via `subject.properties.act`), the PEP MUST carry it there unchanged, and MAY additionally express it as `client.actor` ({{ACTOR}}).  The actor is covered by denial binding ({{denial-request-binding}}) and compared in approval scope ({{approval-scope}}), so the PEP MUST NOT move it out of the Subject.
 
 Submission-time augmentations MUST NOT change or remove authorization-relevant context from the denied evaluation.  When the Access Request Service needs to distinguish original evaluation context from submission-time input, deployments SHOULD place the latter in well-defined extension members rather than overwriting original context members.
 
@@ -969,7 +969,7 @@ The PDP MUST check current approval status during re-evaluation, including wheth
 
 Approval scope determines which Access Evaluations may use an approval, subject to current PDP policy.  Reusing an approval avoids a new Access Request for each operation.  This profile defines exact-match scope; broader matching, such as a resource-class or role grant, is deployment-specific or defined by downstream profiles ({{approval-scope-extensions}}).
 
-The default approval scope is the original denied Subject, Resource, Action, and authorization-relevant Context bound to the Access Request.  An evaluation is within this scope when its Subject, Resource, Action, and authorization-relevant Context are equal, member by member, to the bound values, using the structural comparison, authorization-relevant Context set, and `subject.properties.act` exclusion defined in {{structural-comparison}}.  This baseline is engine-neutral, and two independently implemented PDP and Access Request Service pairs MUST interoperate on it.
+The default approval scope is the original denied Subject, Resource, Action, and authorization-relevant Context bound to the Access Request.  An evaluation is within this scope when its Subject, Resource, Action, and authorization-relevant Context are equal, member by member, to the bound values, using the structural comparison and authorization-relevant Context set defined in {{structural-comparison}}.  The actor is compared with the rest of the Subject, so an approval obtained while one party was acting for the Subject is not within scope for an evaluation acted for by another.  This baseline is engine-neutral, and two independently implemented PDP and Access Request Service pairs MUST interoperate on it.
 
 The exact-match baseline is the default unless the Access Request Service or PDP records a broader or narrower approval scope ({{approval-scope-extensions}}).  This default scope is not serialized in the Approval Result unless a profile or deployment defines a representation for it.
 
@@ -1200,7 +1200,7 @@ Binding claims identify the original denied evaluation using either of the follo
 }
 ~~~
 
-`<Subject>` is the bound Subject with `subject.properties.act` removed (matching the exclusion in {{structural-comparison}}).  `<authorization-relevant Context>` is the set enumerated by `binding_context_members`, which the Access Request Service recomputes from the submission.
+`<Subject>` is the bound Subject in full, including `subject.properties.act` when the evaluation carried an actor.  `<authorization-relevant Context>` is the set enumerated by `binding_context_members`, which the Access Request Service recomputes from the submission.
 
 Implementations that use the hashed form MUST use exactly this construction so that a PDP and an independently implemented Access Request Service compute identical digests.
 
@@ -1385,6 +1385,8 @@ This section describes threats and cites their mitigations.  It introduces no re
 **Confused deputy and request substitution.** An attacker could substitute a Subject or Resource.  Submission checks compare signed denial claims ({{verifying-denial-binding}}) or, when no token is present, recorded state ({{shared-state-deployments}}).  Task binding covers the denial, requester, and client ({{ars-processing-rules}}), and re-evaluation checks approval applicability and scope ({{approval-verification}} and {{approval-scope}}).
 
 **Binding-token integrity.** A buggy or hostile PEP could alter or fabricate PDP-issued state to influence approval routing or scope.  {{binding-token-integrity}} and {{verifying-denial-binding}} define integrity, binding, and freshness checks; {{denial-binding-alternatives}} covers other formats.
+
+**Approval use by a different actor.** An approval obtained while one agent was acting for the Subject would otherwise be usable by another, since the Subject is the same.  The actor travels in the Subject ({{pep-construct}}), is covered by denial binding ({{denial-request-binding}}), and is compared in approval scope ({{approval-scope}}), so an evaluation acted for by a different party falls outside the approval.  A deployment that intends an approval to be usable by any actor for the Subject records a broader approval scope ({{approval-scope-extensions}}).
 
 **Approval reference substitution and replay.** A compromised PEP could present another request's approval or replay an expired or inapplicable reference.  {{approval-verification}} defines applicability checks; {{decision-and-binding-integrity}} defines verification of by-value material and protection of backing records.  An approval reference is not a bearer grant.
 
