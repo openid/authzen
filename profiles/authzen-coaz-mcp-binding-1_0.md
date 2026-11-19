@@ -94,7 +94,7 @@ parameter-level authorization through an AuthZEN Policy Decision Point (PDP).
 The binding defines a fixed *default mapping* for each MCP method, so that all
 MCP messages can be authorized without per-operation configuration, and allows
 MCP servers to override the default for a specific tool by *declaring* a mapping
-in the tool's input schema using Common Expression Language (CEL) {{CEL}}. It
+in the tool's `_meta` using Common Expression Language (CEL) {{CEL}}. It
 also defines how an MCP server advertises declared mappings so that clients can
 understand how authorization will be performed.
 
@@ -170,7 +170,7 @@ This binding fulfils the binding conformance requirements of the COAZ Framework
 | Framework requirement | This binding |
 |:---|:---|
 | Information model | `params`, `token` ({{information-model}}) |
-| Mapping location | `x-authzen-mapping` in a tool's `inputSchema`; otherwise the default mapping ({{declared-mappings}}, {{default-mappings}}) |
+| Mapping location | `net.openid.authzen/coaz-mcp` key in a tool's `_meta`; otherwise the default mapping ({{declared-mappings}}, {{default-mappings}}) |
 | Literal/expression discriminator | framework default: `$` prefix, `$$` escape ({{expressions}}) |
 | Expression language | framework default: Common Expression Language {{CEL}} ({{expressions}}) |
 | Envelopes | `evaluation` and `evaluations` ({{mapping-envelopes}}) |
@@ -183,8 +183,8 @@ This binding fulfils the binding conformance requirements of the COAZ Framework
 
 ## Architecture
 
-The response to `tools/list` carries each tool's `inputSchema`, and, for tools
-that declare a mapping, the `x-authzen-mapping` within it. Because the mapping
+The response to `tools/list` carries each tool definition, and, for tools
+that declare a mapping, the mapping in that tool's `_meta`. Because the mapping
 travels in the protocol itself, it reaches every party that can act as the PEP.
 This binding supports both deployment shapes:
 
@@ -204,6 +204,74 @@ In both shapes, carrying the mapping in `tools/list` also makes it available to
 the MCP client, so that the client (or the LLM driving it) can understand how a
 call will be authorized and shape tool arguments appropriately.
 
+The following non-normative example illustrates this benefit. A `get_report`
+tool retrieves a financial report. `report_id` is needed for the tool to work,
+so JSON Schema marks it `required`. `audit_ticket` is optional: the tool works
+without it, and most callers never supply it:
+
+~~~ json
+{
+  "name": "get_report",
+  "description": "Retrieve a financial report",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "report_id":    { "type": "string", "description": "Canonical report identifier" },
+      "audit_ticket": { "type": "string", "description": "Optional audit ticket reference" }
+    },
+    "required": ["report_id"]
+  }
+}
+~~~
+{: #fig-client-example-schema title="Tool definition without a declared mapping"}
+
+Suppose the deployment's policy lets analysts read most reports freely but
+allows reports classified as restricted to be read only with an open audit
+ticket. Whether `audit_ticket` is needed depends on the report and on the
+caller, so JSON Schema cannot express it: the field cannot be marked
+`required`, and nothing in the schema says that it bears on authorization. A
+client reading only the schema has no reason to supply it, so an agent working
+an audit omits it and is denied.
+
+With the declared mapping below, the client learns that `audit_ticket` is
+projected into the authorization `context`. It can therefore supply the ticket
+it is working under on the first attempt, instead of finding out from a denial
+that the ticket mattered:
+
+~~~ json
+{
+  "name": "get_report",
+  "description": "Retrieve a financial report",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "report_id":    { "type": "string", "description": "Canonical report identifier" },
+      "audit_ticket": { "type": "string", "description": "Optional audit ticket reference" }
+    },
+    "required": ["report_id"]
+  },
+  "_meta": {
+    "net.openid.authzen/coaz-mcp": {
+      "evaluation": {
+        "subject":  { "type": "identity", "id": "$token.sub" },
+        "action":   { "name": "get_report" },
+        "resource": { "type": "report", "id": "$params.arguments.report_id" },
+        "context":  {
+          "agent": "$token.?client_id",
+          "audit_ticket": "$params.arguments.?audit_ticket"
+        }
+      }
+    }
+  }
+}
+~~~
+{: #fig-client-example-mapping title="Client usage of a declared mapping"}
+
+The mapping tells the client which inputs authorization depends on. It does not
+reveal the policy, and it confers no privilege: the PDP applies the same policy
+whether or not the client has read the mapping, and the client only gains the
+ability to supply relevant inputs up front.
+
 When an MCP message is processed, the PEP — the MCP gateway or the MCP server
 itself — selects the applicable mapping (declared, if present for the tool;
 otherwise the default mapping for the method), constructs the corresponding
@@ -218,8 +286,9 @@ effect.
        |  1. tools/list     |    1. tools/list     |                    |
        +------------------->+--------------------->+                    |
        |                    |  tools incl. any     |                    |
-       |  tools incl. any   |  x-authzen-mapping   |                    |
-       |  x-authzen-mapping +<---------------------+                    |
+       |  tools incl. any   |  COAZ mapping in     |                    |
+       |  mapping in _meta  |  _meta               |                    |
+       |                    +<---------------------+                    |
        +<-------------------+                      |                    |
        |                    |                      |                    |
        |  2. MCP request    |   3. authorize       |                    |
@@ -371,17 +440,25 @@ message only if every decision is a permit.
 
 # Declaring a Mapping {#declaring-support}
 
-An MCP server declares a mapping for a tool by including an `x-authzen-mapping`
-object within that tool's `inputSchema` in the `tools/list` response. The
-presence of `x-authzen-mapping` indicates the tool carries a declared mapping;
-its absence means the default mapping for `tools/call` applies. No separate
-marker field is used.
+An MCP server declares a mapping for a tool by including a mapping object under
+the `net.openid.authzen/coaz-mcp` key of that tool's `_meta` object in the
+`tools/list` response. `_meta` is the MCP extension point for attaching
+additional metadata to protocol objects {{MCP}}; the key uses a reverse-DNS
+prefix of the OpenID Foundation, as MCP recommends, so that it cannot collide
+with keys defined by MCP or by other extensions. The mapping is deliberately not
+placed in `inputSchema`, which is a JSON Schema document describing the tool's
+arguments and is not a namespace this binding controls.
+
+The presence of the `net.openid.authzen/coaz-mcp` key in a tool's `_meta`
+indicates the tool carries a declared mapping; its absence means the default
+mapping for `tools/call` applies. No separate marker field is used. A PEP MUST
+ignore any other `_meta` keys when selecting a mapping.
 
 Because the declared mapping is carried in the `tools/list` response, it is
 available to any MCP gateway on the path — which can therefore enforce it as
 the PEP without out-of-band configuration ({{framework-conformance}}) — and to
 the MCP client, satisfying the framework's discoverability capability. When MCP
-Server Cards become available, `x-authzen-mapping` SHOULD also be included
+Server Cards become available, the declared mapping SHOULD also be included
 there.
 
 The following non-normative example shows a `tools/list` response with one tool
@@ -399,8 +476,10 @@ that declares a mapping and one that does not:
           "id":   { "type": "string", "description": "The customer identifier" },
           "case": { "type": "string", "description": "The case being worked on" }
         },
-        "required": ["id"],
-        "x-authzen-mapping": {
+        "required": ["id"]
+      },
+      "_meta": {
+        "net.openid.authzen/coaz-mcp": {
           "evaluation": {
             "subject": { "type": "identity", "id": "$token.sub" },
             "action": { "name": "get_customer" },
@@ -594,8 +673,8 @@ version of the binding.
 
 # Declared Mappings {#declared-mappings}
 
-An MCP server MAY declare a mapping for a tool by including `x-authzen-mapping` in
-the tool's `inputSchema` ({{declaring-support}}). A declared mapping has the same
+An MCP server MAY declare a mapping for a tool by including it under the
+`net.openid.authzen/coaz-mcp` key of the tool's `_meta` ({{declaring-support}}). A declared mapping has the same
 shape as a default mapping — an envelope naming the AuthZEN API and a template
 for that API's request body ({{mapping-envelopes}}) — and uses the same
 expression and literal rules ({{expressions}}). A declared mapping MAY use
@@ -693,8 +772,10 @@ PEP.
       "source":      { "type": "string", "description": "Source object location" },
       "destination": { "type": "string", "description": "Destination object location" }
     },
-    "required": ["source", "destination"],
-    "x-authzen-mapping": {
+    "required": ["source", "destination"]
+  },
+  "_meta": {
+    "net.openid.authzen/coaz-mcp": {
       "evaluations": {
         "subject": { "type": "identity", "id": "$token.sub" },
         "context": { "agent": "$token.?client_id" },
@@ -751,8 +832,10 @@ so on the basis of the verified `subject.id`, not the declared `subject.type`:
       "amount":       { "type": "number" },
       "currency":     { "type": "string" }
     },
-    "required": ["from_account", "to_account", "amount", "currency"],
-    "x-authzen-mapping": {
+    "required": ["from_account", "to_account", "amount", "currency"]
+  },
+  "_meta": {
+    "net.openid.authzen/coaz-mcp": {
       "evaluation": {
         "subject": {
           "type": "$token.roles.exists(r, r == 'treasury') ? 'treasury_user' : 'standard_user'",
@@ -786,7 +869,7 @@ When an MCP message is processed, the PEP MUST:
    ({{default-mappings}}), allow it without calling the PDP.
 
 3. Select the applicable mapping: for a `tools/call` whose tool declares an
-   `x-authzen-mapping`, use the declared mapping; otherwise use the default mapping
+   mapping in its `_meta`, use the declared mapping; otherwise use the default mapping
    for the method. A method that is neither in the pass-through set nor has a
    mapping MUST be denied ({{default-mappings}}).
 
@@ -1012,9 +1095,9 @@ declared mapping requires multiple decisions ({{mapping-envelopes}}).
 
 ## Model Context Protocol
 
-This binding extends the MCP {{MCP}} tool schema with the `x-authzen-mapping`
-extension to `inputSchema`. It is backward compatible: servers and clients that
-do not understand it ignore the field, and the default mappings still allow a
+This binding extends the MCP {{MCP}} tool definition with the
+`net.openid.authzen/coaz-mcp` key in the tool's `_meta`. It is backward
+compatible: servers and clients that do not understand it ignore the key, and the default mappings still allow a
 PEP to authorize their messages.
 
 ## OAuth 2.1
