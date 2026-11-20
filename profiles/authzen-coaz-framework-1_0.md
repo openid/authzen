@@ -269,7 +269,8 @@ exactly as that API's request body. This framework defines two envelope keys:
   Section 7 of {{AUTHZEN}}: one or more authorization decisions, expressed with OPTIONAL
   top-level `subject`, `action`, `resource`, and `context` defaults and an
   `evaluations` array whose entries MAY each contain their own `subject`,
-  `action`, `resource`, and `context` fields.
+  `action`, `resource`, and `context` fields. Where the binding permits it, an
+  entry MAY also contain a `for_each` member ({{for-each}}).
 
 A mapping with no top-level member, more than one top-level member, or an
 envelope key not defined by this framework or by the applicable binding is
@@ -405,9 +406,11 @@ PEP cannot construct a valid request; this is a mapping error (see {{errors}}).
 A value that an expression returns is always a single field value, including
 when it is a list or a map. Returning a list SHALL NOT cause the request to
 fan out into multiple evaluations. The number of decisions requested MUST be
-determined solely by the mapping's envelope — one for `evaluation`, and the
-number of entries in the `evaluations` array for `evaluations` (see
-{{construction}}) — not by the type of a value an expression returns.
+determined by the mapping's envelope: one for `evaluation`, and for
+`evaluations` one per entry of the `evaluations` array, except that an entry
+with `for_each` contributes one per element of the list its `for_each`
+expression yields ({{for-each}}). It MUST NOT depend on the type of a value
+any other expression returns.
 
 ## Constructing the AuthZEN Request {#construction}
 
@@ -430,6 +433,94 @@ constructed request carry exactly the default and override semantics defined by
 {{AUTHZEN}}. COAZ does not define any additional merge behavior.
 
 A binding MUST state which envelope keys it permits ({{conformance}}).
+
+### Fan-Out {#for-each}
+
+Some operations carry a variable number of entities that each need their own
+decision, such as a list of resource identifiers in a single request. An entry
+of an `evaluations` array MAY contain a `for_each` member, which declares that
+the entry is to be repeated once for each element of a list. A binding states
+whether it permits `for_each` ({{conformance}}); where it does not, a mapping
+containing `for_each` is malformed.
+
+The value of `for_each` MUST be an expression, and it MUST yield a list or
+**absent**. A PEP constructs evaluations from such an entry as follows:
+
+1. The PEP evaluates the `for_each` expression against the input variables.
+
+2. For each element of the resulting list, in order, the PEP resolves the
+   entry's other values with the element bound to the input variable `item`,
+   and appends the resulting evaluation, without the `for_each` member, to the
+   constructed `evaluations` array, in the position the entry occupies in the
+   mapping.
+
+3. An empty list or **absent** contributes no evaluations. Any other value is a
+   mapping error ({{errors}}).
+
+The variable `item` is defined only while resolving the values of an entry
+with `for_each`. It is not defined in the `for_each` expression itself, in
+other entries, or in the top-level defaults of the `evaluations` template, and
+an expression there that references it is a mapping error. A binding that
+permits `for_each` MUST NOT define an input variable named `item`. An entry
+MUST NOT contain more than one `for_each` member, and `for_each` MUST NOT
+appear anywhere other than in an entry of an `evaluations` array.
+
+The `evaluations` array itself, and each entry in it, remain literal parts of
+the mapping. `for_each` is the only means by which the number of decisions
+depends on the operation's inputs.
+
+A binding that permits `for_each` MUST specify the maximum number of
+evaluations a constructed request may contain, or require the PEP to be
+configured with one. A mapping that would produce more evaluations than that
+maximum, or none at all, is a mapping error.
+
+Because evaluations are constructed in order, the position of each decision in
+the Access Evaluations response identifies the element it was made for. A
+binding that needs to act on individual decisions, for example to narrow what
+it grants rather than refuse the whole operation, MAY rely on this
+correspondence. Unless the binding states otherwise, the operation is
+permitted only if every decision is a permit ({{errors}}).
+
+The following non-normative example, using the illustrative binding of
+{{example-mappings}}, authorizes moving several documents into a folder: one
+`write` decision on the destination folder, and one `delete` decision for each
+document listed in `request.document_ids`.
+
+~~~ json
+{
+  "evaluations": {
+    "subject": { "type": "identity", "id": "$token.sub" },
+    "evaluations": [
+      { "action": { "name": "write" },
+        "resource": { "type": "folder",
+                      "id": "$request.destination" } },
+      { "for_each": "$request.document_ids",
+        "action": { "name": "delete" },
+        "resource": { "type": "document", "id": "$item" } }
+    ]
+  }
+}
+~~~
+{: #fig-example-for-each title="Mapping using for_each"}
+
+For a request with `"document_ids": ["d1", "d2"]` and a `destination` of `f9`,
+the PEP constructs an Access Evaluations request with the top-level `subject`
+and the following `evaluations` array:
+
+~~~ json
+[
+  { "action": { "name": "write" },
+    "resource": { "type": "folder", "id": "f9" } },
+  { "action": { "name": "delete" },
+    "resource": { "type": "document", "id": "d1" } },
+  { "action": { "name": "delete" },
+    "resource": { "type": "document", "id": "d2" } }
+]
+~~~
+{: #fig-example-for-each-constructed title="Evaluations constructed from the mapping using for_each"}
+
+An element need not be a scalar. Where each element is a map, the entry's
+expressions select from it, for example `"$item.department.id"`.
 
 ## Default and Declared Mappings {#default-declared}
 
@@ -570,7 +661,10 @@ specifies all of the following:
    {{expression-contract}}.
 
 5. **Envelopes.** The envelope keys it permits in mappings, drawn from those
-   defined in {{mapping}} or by the binding itself ({{construction}}).
+   defined in {{mapping}} or by the binding itself ({{construction}}), and
+   whether it permits `for_each`. A binding that permits `for_each` also
+   specifies the maximum number of evaluations, or requires the PEP to be
+   configured with one ({{for-each}}).
 
 6. **Operations in scope.** The set of operations the binding authorizes and,
    where a default mapping is provided, the explicit set of pass-through
@@ -621,6 +715,17 @@ well-formed and that its expressions reference only defined input variables
 before relying on it. Where mappings are supplied by a party other than the PEP
 (for example, declared mappings), the trust placed in that party MUST be
 considered in the threat model.
+
+## Bounded Fan-Out
+
+With `for_each`, the caller whose operation is being authorized controls how
+many decisions the PEP requests, so an unbounded list would let it inflate the
+load on the PDP. The maximum required by {{for-each}} bounds this, and a PEP
+SHOULD reject an over-limit operation before calling the PDP. A mapping whose
+lists are all empty would construct a request with no decisions, and a request
+with no decisions has no deny to enforce; {{for-each}} makes that case a
+mapping error, so that the PEP fails closed rather than permitting the
+operation vacuously.
 
 ## Transport Security
 
@@ -674,6 +779,19 @@ future versions of this framework, or individual bindings, can bind additional
 keys to other AuthZEN APIs without changing the shape of existing mappings,
 and a PEP treats an envelope key it does not support as a mapping error, so
 unknown request types fail closed.
+
+## Fan-Out in the Envelope
+
+An operation that carries a variable number of entities needs a variable
+number of decisions. The framework could let an expression returning a list
+fan out, or it could leave such operations to put the list in `context`. The
+first makes the number of decisions depend on the type of a value, which is
+hard to see when reviewing a mapping and hard to bound. The second hides the
+entities from any PDP that reasons over resources and relationships, and makes
+every policy iterate over a list. `for_each` instead declares the fan-out in the
+structure of the mapping: a reader sees which entry repeats and over what,
+every expression still yields a single value, the expression language needs no
+extension, and the PEP enforces a maximum.
 
 ## One Output, Many Inputs
 
