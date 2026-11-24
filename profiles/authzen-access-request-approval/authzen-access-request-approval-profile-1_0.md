@@ -819,7 +819,11 @@ An intermediate enforcer (such as an OAuth Authorization Server or other gateway
 
 ## Re-evaluate {#approval-reevaluation-request}
 
-The PEP MUST include the `approval` object unchanged at `context.approval` inside the AuthZEN Authorization API re-evaluation request.  This includes its `id`, timestamps, and any `state`.
+The PEP MUST construct the re-evaluation request's `context` using the same rules it applies to an ordinary Access Evaluation of the attempted operation, and MUST include the `approval` object unchanged at `context.approval`.  This includes the approval's `id`, timestamps, and any `state`.
+
+Presenting an approval MUST NOT cause the PEP to remove Context members or to substitute an approval-only object for its ordinary construction.  Changes of membership or value that those ordinary rules require remain permitted: a member carrying a current condition is obtained fresh, and a bound value that has changed means this is not the request that was approved, which correctly fails the approval-scope comparison ({{approval-scope}}) rather than being replayed.
+
+The inputs those rules need MUST remain reachable at re-evaluation, including where a Task Handle is resumed in another process ({{task-handle-portability}}).  A PEP that can no longer reach an input its rules require cannot construct the request, and where that input was bound the approval cannot be applied.  A new approval does not restore a missing input, so the PEP stops until the inputs are available; a fresh evaluation and, where it is eligible, a new Access Request follow from there.
 
 The PEP MUST preserve the JSON value exactly and MUST NOT modify or interpret the contents of `approval.state`.
 
@@ -974,6 +978,8 @@ The default approval scope is the original denied Subject, Resource, Action, and
 The exact-match baseline is the default unless the Access Request Service or PDP records a broader or narrower approval scope ({{approval-scope-extensions}}).  This default scope is not serialized in the Approval Result unless a profile or deployment defines a representation for it.
 
 The PDP MUST only consider an Approval Result applicable when the current evaluation request is within the approval scope recorded for that Approval Result.
+
+The PDP MUST compare every member of the bound authorization-relevant Context and MUST NOT treat a bound member that is absent from the request as matching.
 
 #### Approval Scope Extensions {#approval-scope-extensions}
 
