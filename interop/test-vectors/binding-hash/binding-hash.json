@@ -7,7 +7,7 @@
   "vectors": [
     {
       "id": "single-basic",
-      "description": "Single-item baseline; excludes subject.properties.act and selects only the authorization-relevant tenant context member.",
+      "description": "Single-item baseline; includes subject.properties.act and selects only the authorization-relevant tenant context member.",
       "kind": "single",
       "binding_context_members": ["tenant"],
       "request": {
@@ -35,7 +35,7 @@
         "subject": {
           "type": "user",
           "id": "alice@example.com",
-          "properties": { "department": "engineering" }
+          "properties": { "department": "engineering", "act": {"sub": "delegating-client"} }
         },
         "resource": {
           "type": "document",
@@ -45,9 +45,9 @@
         "action": { "name": "read" },
         "context": { "tenant": "acme" }
       },
-      "jcs": "{\"action\":{\"name\":\"read\"},\"context\":{\"tenant\":\"acme\"},\"resource\":{\"id\":\"quarterly-plan\",\"properties\":{\"classification\":\"internal\"},\"type\":\"document\"},\"subject\":{\"id\":\"alice@example.com\",\"properties\":{\"department\":\"engineering\"},\"type\":\"user\"}}",
-      "sha256_hex": "974ba013696ea4397354213e4711fbfef9e98af0c3919e7ce5558c0741c937f7",
-      "binding_hash": "l0ugE2lupDlzVCE-RxH7_vnpivDDkZ585VWMB0HJN_c"
+      "jcs": "{\"action\":{\"name\":\"read\"},\"context\":{\"tenant\":\"acme\"},\"resource\":{\"id\":\"quarterly-plan\",\"properties\":{\"classification\":\"internal\"},\"type\":\"document\"},\"subject\":{\"id\":\"alice@example.com\",\"properties\":{\"act\":{\"sub\":\"delegating-client\"},\"department\":\"engineering\"},\"type\":\"user\"}}",
+      "sha256_hex": "711ab0ebbf6132eec1164ee011e28a10456c9d79bce092949ea7715b3fe96895",
+      "binding_hash": "cRqw679hMu7BFk7gEeKKEEVsnXm84JKUnqdxWz_paJU"
     },
     {
       "id": "single-empty-context",
@@ -211,7 +211,7 @@
         "subject": {
           "type": "service",
           "id": "deployment-agent",
-          "properties": { "environment": "production" }
+          "properties": { "environment": "production", "act": {"sub": "release-manager"} }
         },
         "items": [
           {
@@ -225,9 +225,9 @@
         ],
         "context": { "tenant": "acme", "region": "eu-west-1" }
       },
-      "jcs": "{\"context\":{\"region\":\"eu-west-1\",\"tenant\":\"acme\"},\"items\":[{\"action\":{\"name\":\"deploy\",\"properties\":{\"version\":\"2.1.0\"}},\"resource\":{\"id\":\"api\",\"type\":\"service\"}},{\"action\":{\"name\":\"migrate\",\"properties\":{\"revision\":42}},\"resource\":{\"id\":\"primary\",\"type\":\"database\"}}],\"subject\":{\"id\":\"deployment-agent\",\"properties\":{\"environment\":\"production\"},\"type\":\"service\"}}",
-      "sha256_hex": "9adaa09631f41d0aa2758f2fce98ba12a32321b0f137c3df957a842043895982",
-      "binding_hash": "mtqgljH0HQqidY8vzpi6EqMjIbDxN8PflXqEIEOJWYI"
+      "jcs": "{\"context\":{\"region\":\"eu-west-1\",\"tenant\":\"acme\"},\"items\":[{\"action\":{\"name\":\"deploy\",\"properties\":{\"version\":\"2.1.0\"}},\"resource\":{\"id\":\"api\",\"type\":\"service\"}},{\"action\":{\"name\":\"migrate\",\"properties\":{\"revision\":42}},\"resource\":{\"id\":\"primary\",\"type\":\"database\"}}],\"subject\":{\"id\":\"deployment-agent\",\"properties\":{\"act\":{\"sub\":\"release-manager\"},\"environment\":\"production\"},\"type\":\"service\"}}",
+      "sha256_hex": "2901e93efa7aa3cae065c2732e3d74d6a791b514e0b051c78bac0c7c42e6e5f1",
+      "binding_hash": "KQHpPvp6o8rgZcJzLj101qeRtRTgsFHHi6wMfELm5fE"
     }
   ]
 }
