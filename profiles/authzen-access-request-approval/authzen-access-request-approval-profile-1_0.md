@@ -955,7 +955,7 @@ Values carried outside `approval.state`, including `approval.id`, `approved_at`,
 
 Deployments MAY use lookup of `approval.id` and verification of `approval.state` together.  In all cases, the PDP MUST verify the approval against trusted state or integrity-protected binding material; neither `approval.id` nor `approval.state` is a bearer grant by itself.
 
-The approval record or verifiable binding material MUST contain, or allow the PDP to determine, at least the approval identifier, Access Request task identifier, original denied evaluation identifier when available, approved Subject, approved Resource and Action or approval scope, requester and client binding, approval status, `approved_at` when available, `approved_until`, and any revocation or cancellation state.
+The approval record or verifiable binding material MUST contain, or allow the PDP to determine, at least the approval identifier, Access Request task identifier, original denied evaluation identifier when available, approved Subject, approved Resource and Action or approval scope, requester and client binding, approval status, `approved_at` when available, `approved_until`, any revocation or cancellation state, and whether the approval's validity depends on the approver's authority remaining current ({{approver-authority-dependence}}).
 
 ### Approval Reference by Lookup {#approval-reference-lookup}
 
@@ -964,6 +964,19 @@ The PDP resolves `approval.id` in trusted server-side state.  {{approval-state}}
 ### Current Approval Status {#approval-current-status}
 
 The PDP MUST check current approval status during re-evaluation, including whether the approval has been revoked, cancelled, superseded, or otherwise invalidated before `approved_until`.  Stateless PDP evaluation means retaining no prior decisions, not dispensing with this check.
+
+### Approver Authority Dependence {#approver-authority-dependence}
+
+{{approver-eligibility}} requires the Access Request Service to evaluate approver eligibility, including delegated approver authority, before returning `approved`.  That check happens once.  {{approval-current-status}} covers the approval's own state at re-evaluation.  Neither re-examines the authority that produced the approval, so an approval can remain unrevoked, unexpired, and in scope after the authority behind it has lapsed.
+
+Whether that is a defect depends on what the approval is.  One kind records that an authorized approver confirmed something at the time they confirmed it; losing that authority later does not unmake the record.  Another exists only because the approver's authority covers that class of access, and is downstream of it.  This profile does not define which kind a deployment issues, so it records the distinction rather than choosing:
+
+`approver_authority`:
+: `point_in_time` where the approval records what an authorized approver confirmed when they confirmed it, and stands afterwards.  `continuing` where the approval's validity depends on the approver's authority remaining current.
+
+The value imposes no further check.  A PDP is not required to reach the authority source, which may sit in another trust domain, and a PDP that cannot evaluate a `continuing` approval's authority applies the rules it already has.  The value identifies the approvals for which an audit needs evidence of continuing authority; it does not provide that evidence, and nothing here requires the authority to have been checked.
+
+The requirement applies to both verification paths, as the rest of the record does.  A PDP that resolves `approval.id` from trusted state determines the value by lookup.  A PDP verifying a self-contained `approval.state` determines it from that payload, whose representation is deployment-specific because this profile defines no interoperable approval-state payload ({{approval-state}}, #659); two independently implemented parties therefore agree on the distinction before they agree on how it is carried by value.
 
 ### Approval Scope {#approval-scope}
 
