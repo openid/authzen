@@ -455,6 +455,18 @@ The `task` object has the following members:
 `display`:
 : OPTIONAL.  Object containing user-interface hints for the pending request.
 
+`links`:
+: OPTIONAL.  Object containing related URLs.  Each member name is a link relation type and the value is an HTTPS URI.  The following relation types are defined; implementations MAY define additional relation types.
+
+  * `ticket`: URL where the requester (Subject) can view the request and its status.
+  * `cancel`: URL where the PEP can cancel the request, when PEP-initiated cancellation is supported.
+
+The `items` member of this object, present for bulk submissions, is defined in {{BULK}}.
+
+### Registered Task Handle Members {#task-handle-extension-members}
+
+The following members are registered in the AuthZEN Access Request Member Names registry ({{iana-member-names}}) rather than defined as part of the base Task Handle.  They carry approval workflow state, which the Introduction places out of scope, and a conforming implementation need not emit or consume them.  A deployment that uses them registers nothing new: the names and semantics are those below.
+
 `progress`:
 : OPTIONAL.  Object describing approval workflow progress for tasks with multi-step approvals.  The following members are defined:
 
@@ -463,14 +475,8 @@ The `task` object has the following members:
   * `step_name`: OPTIONAL.  String.  Short identifier of the current step (for example, `manager_approval` or `resource_owner_review`).
   * `awaiting`: OPTIONAL.  Array.  Identifiers of approvers whose action is currently expected.
 
-`links`:
-: OPTIONAL.  Object containing related URLs.  Each member name is a link relation type and the value is an HTTPS URI.  The following relation types are defined; implementations MAY define additional relation types.
-
-  * `ticket`: URL where the requester (Subject) can view the request and its status.
-  * `review`: URL where an approver or administrator can review or act on the request.
-  * `cancel`: URL where the PEP can cancel the request, when PEP-initiated cancellation is supported.
-
-The `items` member of this object, present for bulk submissions, is defined in {{BULK}}.
+`links.review`:
+: OPTIONAL.  URL where an approver or administrator can review or act on the request.  {{pep-facing-surfaces}} restricts its disclosure.
 
 ## Task Status and Transitions {#task-status}
 
@@ -535,7 +541,7 @@ Completion notification is defined by {{CALLBACK}}.
 
 ## Pending Task Response
 
-A response with `task.status: pending` echoes the submission's Task Handle ({{task-handle-object}}).  Polls use the same shape, updating status, progress, and links as the task advances.  {{completed-task-response}} defines the response at terminal status.
+A response with `task.status: pending` echoes the submission's Task Handle ({{task-handle-object}}).  Polls use the same shape, updating status and links as the task advances.  {{completed-task-response}} defines the response at terminal status.
 
 Non-normative example:
 
@@ -888,7 +894,7 @@ Human-facing members are intended only for callers authorized for the correspond
 * `task.links.review`: URL where an approver or administrator can review or act on the request.
 * `task.display`: localizable user-interface hints.
 
-When a PEP renders requester-facing status to an end client, it SHOULD do so by rendering `task.display` and `task.links.ticket` rather than by exposing the machine surfaces.  A PEP MUST NOT expose `task.links.review` to a requester or other end client unless that caller has been authenticated and authorized as an approver or administrator for the task.
+When a PEP renders requester-facing status to an end client, it SHOULD do so by rendering `task.display` and `task.links.ticket` rather than by exposing the machine surfaces.  A PEP MUST NOT expose `task.links.review`, when present, to a requester or other end client unless that caller has been authenticated and authorized as an approver or administrator for the task.  A PEP MUST NOT forward a `task.links` relation it does not recognize to an end client: the forward-compatibility rule in {{extensibility}} permits passing unrecognized members through unchanged, and a relation name does not establish who the URL is for.
 
 Cancellation ({{cancellation}}), actor delegation ({{ACTOR}}), and machine-readable forms ({{machine-readable-forms}}) define further PEP rules where those mechanisms are used.
 
@@ -1073,7 +1079,7 @@ The `approval.id` value ({{approval-result}}) MUST contain sufficient entropy to
 
 The Access Request Service SHOULD retain the original `evaluation_id` in the approval record so the sequence from denied evaluation through Access Request, approval, and re-evaluation can be reconstructed for audit.
 
-Implementations SHOULD apply privacy controls before populating `progress.awaiting`; see {{privacy-considerations}}.
+An Access Request Service that uses the registered `progress` member ({{task-handle-extension-members}}) SHOULD apply privacy controls before populating `progress.awaiting`, which carries approver identifiers; see {{privacy-considerations}}.
 
 ### Status Mapping Obligation {#status-mapping-obligation}
 
@@ -1307,9 +1313,9 @@ The following protocol members and status value are defined by normative referen
 | Task Handle | `items`; `partial` value of `status` | Bulk Access Requests {{BULK}} |
 | Access Request submission | `callback` | Callback Notifications {{CALLBACK}} |
 
-A normative reference to a companion profile makes its definitions authoritative when the feature is used; conformance to this profile does not require implementing a companion unless a rule here says so.  These are defined protocol names, not unrecognized extension names under the forward-compatibility rule.  The companion definitions do not open the submission or Task Handle to arbitrary additional members.
+A normative reference to a companion profile makes its definitions authoritative when the feature is used; conformance to this profile does not require implementing a companion unless a rule here says so.  These are defined protocol names, not unrecognized extension names under the forward-compatibility rule.  A companion definition does not itself widen the submission or the Task Handle; additional members may appear only at the locations listed in {{extension-points}} and follow the naming rules in {{extension-naming}}.
 
-## Extension Points
+## Extension Points {#extension-points}
 
 Additional members beyond those defined in this document or by {{companion-profiles}} MAY appear only at the following locations, and those members MUST follow the naming rules in {{extension-naming}}.  No other object members may be extended without a revision of this specification or a profile that explicitly redefines them.  The AuthZEN extensibility model proposes a recursive rule under which any named object carries registered, namespaced members; aligning this list with that rule is a decision for a revision of this specification.
 
@@ -1319,6 +1325,7 @@ Additional members beyond those defined in this document or by {{companion-profi
 * `context` in an Access Request submission: augments the AuthZEN Context.
 * `requested_access` in an Access Request submission.
 * `client` in an Access Request submission.
+* `task`: Task Handle members, including the registered members defined in {{task-handle-extension-members}}.
 * `task.display`: user-interface hints attached to a Task Handle.
 * `task.links`: link relations to related URLs.
 * `result` and the additions defined under each `result.mode`.
@@ -1402,7 +1409,7 @@ This section describes threats and cites their mitigations.  It introduces no re
 
 **Task handle leakage.** A leaked handle could expose workflow state or sensitive information.  Opacity and unguessability do not replace authorization for each operation ({{task-handle-leakage}} and {{authorization-and-authentication}}).  Cancellation requires separate authorization ({{cancellation}}).
 
-**PEP-facing and end-client-facing surfaces.** Exposed machine endpoints let end clients bypass the PEP; exposed approval references enable injection attempts in other evaluations.  {{pep-facing-surfaces}} separates machine and human-facing members and restricts disclosure of approver links.
+**PEP-facing and end-client-facing surfaces.** Exposed machine endpoints let end clients bypass the PEP; exposed approval references enable injection attempts in other evaluations.  {{pep-facing-surfaces}} separates machine and human-facing members and restricts disclosure of approver links and of link relations the PEP does not recognize.
 
 ## Operational and Integration
 
@@ -1502,6 +1509,7 @@ Initial entries registered by this specification:
 |---|---|---|
 | `requested_until` | `requested_access` | RFC 3339 timestamp requesting access through a specific absolute time. |
 | `emergency` | `requested_access` | Boolean requesting an expedited or emergency-access path. |
+| `progress` | `task` | Object describing approval workflow progress for tasks with multi-step approvals. |
 | `ticket` | `task.links` | URL where the requester can view the request and its status. |
 | `review` | `task.links` | URL where an approver or administrator can review or act on the request. |
 | `cancel` | `task.links` | URL where the PEP can cancel the request. |

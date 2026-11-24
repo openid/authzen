@@ -135,7 +135,7 @@ When every item carries its own per-item `denial`, each per-item binding is veri
   * `status`: REQUIRED.  Per-item status using the values defined in [Task Status and Transitions](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#task-status).
   * `result`: OPTIONAL before the item reaches a terminal status; REQUIRED when the item status is `approved`.  Per-item completion result with the same shape as the top-level `result` ([Approval and Re-evaluation](https://openid.github.io/authzen/authzen-access-request-approval-profile-1_0.html#completion-semantics)).
 
-When `items` is present, `progress` describes aggregate workflow progress for the bundled task; per-item progress is tracked in `task.items[]`.
+When `items` is present, the registered `progress` member of the Task Handle ({{ARAP}}) describes aggregate workflow progress for the bundled task; per-item progress is tracked in `task.items[]`.
 
 When `task.status` is `approved` and the task contains an `items` array, each approved item in `task.items[]` MUST include its own `result` object.  The response MAY also include a top-level `result` object for aggregate workflow information, but a PEP MUST NOT use that top-level `result` to authorize an individual item unless the same result is also present in that item's `result` member.
 
